@@ -215,8 +215,11 @@ public class WaterAdapter extends RecyclerView.Adapter<WaterAdapter.ViewHolder> 
         }
 
         //set icon with time:
-        Calendar now = Calendar.getInstance();
-        int currentSeconds = ((now.get(Calendar.HOUR_OF_DAY) * 60) + now.get(Calendar.MINUTE)) * 60;
+        //Calendar now = Calendar.getInstance();
+        // int currentSeconds = ((now.get(Calendar.HOUR_OF_DAY) * 60) + now.get(Calendar.MINUTE)) * 60;
+
+        int currentSeconds =  ((datetime.getHourOfDay() * 60) + datetime.getMinuteOfHour()) * 60;
+        Log.i(TAG_REPORT, "currentSeconds: " + currentSeconds);
 
         //<>
         int startMadrugada = ((1  * 60) + 0) * 60; //1am

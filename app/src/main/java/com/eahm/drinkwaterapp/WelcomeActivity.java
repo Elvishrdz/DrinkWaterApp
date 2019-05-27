@@ -378,7 +378,17 @@ public class WelcomeActivity extends AppCompatActivity {
                 return;
             }
 
-            Float goal = Float.parseFloat(amount);
+            float goal = 0;
+
+            try{
+                goal = Float.parseFloat(amount);
+            }
+            catch (Exception ignore){ }
+
+            if(goal <= 0){
+                Toast.makeText(this, "Ingresa una cantidad valida", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             switch (spinnerSG.getSelectedItemPosition()){
                 case 0:
@@ -413,19 +423,28 @@ public class WelcomeActivity extends AppCompatActivity {
 
         //region LAYOUT SET REMINDER INTERVAL
         buttonSRIContinue.setOnClickListener(v -> {
-            int hours = 0, minutes = 0;
+            int hourOfDay = 0, minute = 0;
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                hours = timePickerSRI.getHour();
+                hourOfDay = timePickerSRI.getHour();
             }
-            else hours = timePickerSRI.getCurrentHour();
+            else hourOfDay = timePickerSRI.getCurrentHour();
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                minutes = timePickerSRI.getMinute();
+                minute = timePickerSRI.getMinute();
             }
-            else minutes = timePickerSRI.getCurrentMinute();
+            else minute = timePickerSRI.getCurrentMinute();
 
-            int totalSecs = ((hours * 60) + minutes) * 60;
+            if((hourOfDay == 0 && minute == 0) || (hourOfDay == 0 && minute < 5)){
+                Toast.makeText(WelcomeActivity.this, "El intervalo es demasiado corto", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            else if(hourOfDay >= 12){
+                Toast.makeText(WelcomeActivity.this, "El intervalo es demasiado grande", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            int totalSecs = ((hourOfDay * 60) + minute) * 60;
 
             settings.setIntervalValue(totalSecs);
 
@@ -869,28 +888,7 @@ public class WelcomeActivity extends AppCompatActivity {
             layoutWelcome.startAnimation(animationOut);
             layoutWelcome.setVisibility(View.GONE);
         }
-
-        /*
-        layoutWelcome;
-    RelativeLayout layoutGetUserData;
-    RelativeLayout layoutAmountResults;
-    RelativeLayout layoutSetGoal;
-    RelativeLayout layoutSetReminderInterval;
-    RelativeLayout layoutSetMorningTime;
-    RelativeLayout layoutSetLastTime;
-    RelativeLayout layoutNotificationInformation;
-    RelativeLayout layoutSetNotificationSkip;
-    RelativeLayout layoutSetNotificationDrink;
-    RelativeLayout layoutFinished;
-         */
-
-
-
-
-
-
-
-        else {
+        else if(layoutFinished.getVisibility() != View.VISIBLE) {
             Log.i(TAG_ANIMATION, "show condition Default");
             //default
             Animation animationIn = AnimationUtils.loadAnimation(this, R.anim.show);

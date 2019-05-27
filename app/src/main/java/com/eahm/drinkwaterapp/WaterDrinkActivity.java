@@ -217,6 +217,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
             //fragment instanceof NewsFragment
             layoutFragmentNews.setVisibility(View.GONE);
             super.onBackPressed();
+            requestExtraSettings();
         }
         else if(includeLayoutRecords.getVisibility() == View.VISIBLE){
             includeLayoutRecords.setVisibility(View.GONE);
@@ -578,8 +579,16 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
             public void afterTextChanged(Editable s) {
                 //Log.i(LOG_SETTING_GOAL, "after text changed " + s.toString());
                 String newAmount = s.toString();
+                float newGoal = 0;
 
-                if(!convertNotSave && !newAmount.isEmpty() && !newAmount.equalsIgnoreCase("0.0")){
+                if(!newAmount.isEmpty()){
+                    try{
+                        newGoal = Float.parseFloat(newAmount);
+                    }
+                    catch (Exception ignore){ }
+                }
+
+                if(!convertNotSave && !newAmount.isEmpty() && !newAmount.equalsIgnoreCase("0.0") && newGoal > 0){
 
                     String goal = "";
 
@@ -604,7 +613,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
                 }
                 else if(convertNotSave) convertNotSave = false;
 
-                if(s.toString().isEmpty() || s.toString().equalsIgnoreCase("0")){
+                if(s.toString().isEmpty() || s.toString().equalsIgnoreCase("0") || newGoal <= 0 ){
                     switch (spinnerDayMax.getSelectedItemPosition()){
                         case 0: // mililiters
                             editTextDayMax.setText("1000");
@@ -641,6 +650,15 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
             public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
                 Log.i(LOG_SETTING_GOAL, "Del selector obtuvimos: " + hourOfDay + ":" + minute);
 
+                if((hourOfDay == 0 && minute == 0) || (hourOfDay == 0 && minute < 5)){
+                    Toast.makeText(WaterDrinkActivity.this, "El intervalo es demasiado corto", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                else if(hourOfDay >= 12){
+                    Toast.makeText(WaterDrinkActivity.this, "El intervalo es demasiado grande", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 String textReminder = "Recordar cada:\n" + utils.getTimeString(hourOfDay, minute, 0);
 
                 textViewReminder.setText(textReminder);
@@ -665,6 +683,15 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
 
             TimePickerDialog.OnTimeSetListener timeSet = (view, hourOfDay, minute) -> {
                 Log.i(LOG_SETTING_GOAL, "Del selector obtuvimos: " + hourOfDay + ":" + minute);
+
+                if((hourOfDay == 0 && minute == 0) || (hourOfDay == 0 && minute < 5)){
+                    Toast.makeText(WaterDrinkActivity.this, "El intervalo es demasiado corto", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                else if(hourOfDay >= 12){
+                    Toast.makeText(WaterDrinkActivity.this, "El intervalo es demasiado grande", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 String textReminder = "Recordar cada:\n" + utils.getTimeString(hourOfDay, minute, 0);
 
@@ -816,7 +843,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
                 Log.i(LOG_RESTORE_CHRONO, "Cronometro con: " + timeInMillis + " millisegundos");
                 countDownTimer = new CountDownTimerDrink(timeInMillis,1000);
                 countDownTimer.start();
-                setPulsatorLayout(false);
+
                 buttonDrink.setText("Tomar agua ahora");
 
             }
@@ -927,7 +954,6 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
                 }
                 else Toast.makeText(WaterDrinkActivity.this, "Bravo! +" + currentProgressString, Toast.LENGTH_SHORT).show();
 
-
                 DecimalFormat formatDecimal = new DecimalFormat("#.##");
                 String progress = "Progreso:\nLlevas " + currentProgressString + " mililitros, tu meta es " + formatDecimal.format(goal) + " mililitros ";
 
@@ -946,8 +972,14 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
 
         //endregion INITIALIZE
 
-        //region VALIDATE NOTIFICATION ON THIS PHONES
+        showNews();
+
+    }
+
+    private void requestExtraSettings(){
+
         if("huawei".equalsIgnoreCase(android.os.Build.MANUFACTURER) && settings.getProtectedStatus() != 2 ) {
+            // Solicitar activar notificaciones en telefonos HUAWEI
             AlertDialog.Builder builder  = new AlertDialog.Builder(this);
             builder.setTitle("HUAWEI").setMessage("Se requiere añadir la app a la lista de apps protegidas para recibir notificaciones")
                     .setPositiveButton("Proceder", new DialogInterface.OnClickListener() {
@@ -971,17 +1003,11 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
 
             builder.create().show();
         }
-        //endregion VALIDATE NOTIFICATION ON THIS PHONES
-
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(WaterDrinkActivity.this)) {
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(WaterDrinkActivity.this)) {
+            // Solicitar habilitar a la aplicacion para escribir sobre otras apps
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
             startActivityForResult(intent, APP_PERMISSION_REQUEST);
         }
-
-        showNews();
-
-
     }
 
     final String FRAGMENT_TAG_NEWS = "NEWS_FRAGMENT";
@@ -1024,6 +1050,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
             //Mostrar noticias
 
         }
+        else  requestExtraSettings();
     }
 
     private void initializeReport() {
@@ -1160,6 +1187,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
             buttonAlarmStatus.setTextColor(getResources().getColor(R.color.red_indio));
             buttonAlarmStatus.setText("Desactivar Alarma");
             textViewNextDrink.setText("Listos para tomar agua en cualquier momento!");
+            setPulsatorLayout(true);
         }
         else {
             Log.i(LOG_WATER_DRINK_ACT, "La alarma esta fuera de horas laborales");
@@ -1220,7 +1248,6 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
                 pulsatorCount = 4;
             }
 
-            setPulsatorLayout(true);
         }
     }
 

@@ -117,7 +117,7 @@ public class NotificationClass {
                     break;
                 case 4:
                     notiColor = context.getResources().getColor(R.color.grey_3);
-                    notiSmallIcon = R.drawable.ic_trophy_yellow;
+                    notiSmallIcon = R.drawable.ic_trophy_white;
                     break;
                 default:
                     notiColor = context.getResources().getColor(R.color.purple);
@@ -130,7 +130,7 @@ public class NotificationClass {
             switch (random){
                 case 1:
                     notiColor = context.getResources().getColor(R.color.green_2);
-                    notiSmallIcon = R.drawable.ic_drink_holo_light;
+                    notiSmallIcon = R.drawable.ic_drink_holo_dark;
                     break;
                 case 2:
                     notiColor = context.getResources().getColor(R.color.black);

@@ -27,7 +27,7 @@
             android:layout_below="@+id/imageViewPP"
             android:layout_marginTop="10dp"
             android:gravity="center_horizontal"
-            android:text="Politicas de Privacidad"
+            android:text="@string/privacy_policy_title"
             android:textSize="24sp"
             android:textStyle="bold" />
 

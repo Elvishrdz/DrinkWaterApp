@@ -18,52 +18,52 @@ public class AwesomeTextsClass {
     //region GET NICE TEXTS
     public String getCoutdownTextDone(){
 
-        String message = "Temporizador Terminado!";
+        String message = "";
         //switch random text here!
 
         int randomPos1 = new Utils().getRandomNumber(1, 15);   //This gives a random integer between 7 (inclusive) and 0 (exclusive).
         switch (randomPos1){
             case 1:
-                message = message + "\n" + "El agua ofrece vitalidad y salud, necesarias para realizar actividad física y mantenerse motivado.";
+                message = message + "\n" + "El agua ofrece vitalidad y salud, necesarias para realizar actividades fisicas y mantenerse motivado.";
                 break;
             case 2:
                 message = message + "\n" + "Una buena hidratación mejora el funcionamiento de nuestro cuerpo.";
                 break;
             case 3:
-                message = message + "\n" + "Creeme tu cuerpo se refrescara luego de unos tragos";
+                message = message + "\n" + "Tu cuerpo se sentira mucho mejor si lo mantienes hidratado.";
                 break;
             case 4:
-                message = message + "\n" + "Tu cuerpo necesita ese % de agua, vamos a por el!";
+                message = message + "\n" + "El consumo de agua debe ser cuando tu cuerpo te lo pida, si no tienes sed entonces no debes tomar agua. Debes encontrar el balance correcto.";
                 break;
             case 5:
-                message = message + "\n" + "Un consumo regular de agua contribuye al mejor funcionamiento de los riñones.";
+                message = message + "\n" + "Un consumo regular de agua contribuye a un mejor funcionamiento de los riñones.";
                 break;
             case 6:
                 message = message + "\n" + "Recuerda tienes una meta que quieres cumplir";
                 break;
             case 7:
-                message = message + "\n" + "No es dificil, vamos a buscar ese vaso un paso a la vez...";
+                message = message + "\n" + "No es dificil, vamos a buscar un vaso de agua, un paso a la vez...";
                 break;
             case 8:
-                message = message + "\n" + "El cuerpo necesita un litro de agua para digerir al menos 1,000 calorías que se consuman.";
+                message = message + "\n" + "Si bebieses unos 10 vasos de agua fría al día, quemarías un extra de ¡490 calorías por semana";
                 break;
             case 9:
-                message = message + "\n" + "Desintoxicación del cuerpo, mejor tono muscular y piel más sana... gracias H2O!";
+                message = message + "\n" + "Desintoxicación del cuerpo, mejor tono muscular y piel más sana son algunos de los beneficios de ingerir regularmente H2O";
                 break;
             case 10:
-                message = message + "\n" + "Preferir agua con las comidas antes que otros líquidos y tomarla antes de ésta";
+                message = message + "\n" + "Es preferible beber agua con las comidas antes que otros líquidos";
                 break;
             case 11:
-                message = message + "\n" + "Llevar una botella de agua pequeña para no olvidar estar hidratado, a la oficina, a la escuela, etc.";
+                message = message + "\n" + "Lleva una botella de agua pequeña a la oficina, a la escuela, etc. para no olvidar mantenerte hidratado";
                 break;
             case 12:
-                message = message + "\n" + "Si deseas.. puedes agregar limón para darle sabor, ayuda a tomar agua más regularmente";
+                message = message + "\n" + "Si deseas.. puedes agregar limón al agua para darle sabor ademas ayuda a tomar más regularmente";
                 break;
             case 13:
-                message = message + "\n" + "Mentalizarse y no encontrar excusas para beber agua. Es un elemento esencial en el cuerpo y en el proceso de pérdida de peso. Luego de tomarla regularmente por 3 días se convierte en un hábito... o eso dicen...";
+                message = message + "\n" + "Mentalizarse y no encontrar excusas para beber agua, recuerda que es un elemento esencial en el cuerpo y en el proceso de pérdida de peso. Luego de tomarla regularmente por 3 días se convierte en un hábito... o eso dicen...";
                 break;
             default:
-                    message = message + "\n" + "... y tú? porque no te has hidratado aun?";
+                    message = message + "\n" + "Tienes sed?";
                     break;
         }
 

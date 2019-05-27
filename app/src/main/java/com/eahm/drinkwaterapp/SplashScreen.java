@@ -658,9 +658,9 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
             if(privacyPolicy.isEmpty()){
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                     //getResources()
-                    textViewPPContent.setText(Html.fromHtml("Esta vacio el string, usar local de la fecha de publicacion de la app", Html.FROM_HTML_MODE_LEGACY));
+                    textViewPPContent.setText(Html.fromHtml(getResources().getString(R.string.privacy_policy_local_content), Html.FROM_HTML_MODE_LEGACY));
                 } else {
-                    textViewPPContent.setText(Html.fromHtml("Esta vacio el string, usar local de la fecha de publicacion de la app"));
+                    textViewPPContent.setText(Html.fromHtml(getResources().getString(R.string.privacy_policy_local_content)));
                 }
             }
             else {
@@ -721,7 +721,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
         else {
             builder.setMessage(getString(R.string.permission_request_02));
 
-            builder.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.text_privacy_policy), new DialogInterface.OnClickListener() {
+            builder.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.privacy_policy_title), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     // User cancelled the dialog
                     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(privacyPolicyURL));
@@ -748,10 +748,9 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
 
     private void getInitialAppPermissions() {
 
-        //region ACCESS_FINE_LOCATION
-        /*
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
+        //region SYSTEM ALERT WINDOW
+/*
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(this, Manifest.permission.SYSTEM_ALERT_WINDOW) != PackageManager.PERMISSION_GRANTED) {
             if(!settings.getPermissionStatus()){
                 showPermissionDialog();
                 return;
@@ -759,11 +758,11 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
 
             startDelay = 1500;
 
-            requestPermissionAccessFineLocation();
+            requestPermissionSystemAlertWindow();
             return;
         }
-        */
-        //endregion ACCESS_FINE_LOCATION
+*/
+        //endregion SYSTEM ALERT WINDOW
 
         //region READ_EXTERNAL_STORAGE
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -806,25 +805,25 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
 
     }
 
-    final int CODE_ACCESS_FINE_LOCATION = 123;
+    final int CODE_SYSTEM_ALERT_WINDOW = 123;
     final int CODE_READ_EXTERNAL_STORAGE = 321;
     final int CODE_WRITE_EXTERNAL_STORAGE = 357;
 
-    boolean STATUS_ACCESS_FINE_LOCATION = true;
+    boolean STATUS_SYSTEM_ALERT_WINDOW = true;
     boolean STATUS_READ_EXTERNAL_STORAGE = true;
     boolean STATUS_WRITE_EXTERNAL_STORAGE = true;
 
-    //region ACCESS_FINE_LOCATION
+    //region SYSTEM_ALERT_WINDOW
 
-    private void requestPermissionAccessFineLocation() {
+    private void requestPermissionSystemAlertWindow() {
 
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)){
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.SYSTEM_ALERT_WINDOW)){
 
-            new AlertDialog.Builder(this).setTitle(getString(R.string.permission_access_location_title)).setMessage(getString(R.string.permission_access_location_explanation))
+            new AlertDialog.Builder(this).setTitle(getString(R.string.permission_system_alert_windows)).setMessage(getString(R.string.permission_system_alert_windows_explanation))
                     .setPositiveButton(getString(R.string.permission_grant), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            ActivityCompat.requestPermissions(SplashScreen.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, CODE_ACCESS_FINE_LOCATION);
+                            ActivityCompat.requestPermissions(SplashScreen.this, new String[]{Manifest.permission.SYSTEM_ALERT_WINDOW}, CODE_SYSTEM_ALERT_WINDOW);
                         }
                     })
                     .create()
@@ -832,12 +831,12 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
 
         }
         else {
-            ActivityCompat.requestPermissions(SplashScreen.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, CODE_ACCESS_FINE_LOCATION);
+            ActivityCompat.requestPermissions(SplashScreen.this, new String[]{Manifest.permission.SYSTEM_ALERT_WINDOW}, CODE_SYSTEM_ALERT_WINDOW);
         }
 
 
     }
-    //endregion  ACCESS_FINE_LOCATION
+    //endregion SYSTEM_ALERT_WINDOW
 
     // region READ_EXTERNAL_STORAGE
 
@@ -900,18 +899,18 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         switch (requestCode){
-            case CODE_ACCESS_FINE_LOCATION:{
+            case CODE_SYSTEM_ALERT_WINDOW:{
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-                        //WE NOW HAVE THE PERSMISSIONS TO USE MAP LOCATION!
+                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.SYSTEM_ALERT_WINDOW) == PackageManager.PERMISSION_GRANTED){
+                        //WE NOW HAVE THE PERSMISSIONS TO SHOW LAYOUTS IN THE PHONE SCREEN
                     }
                     textViewExtraInfo.setText("");
                     textViewLoadingApp.setText(getString(R.string.ss_confirm_permissions_2));
                 }
-                else if(STATUS_ACCESS_FINE_LOCATION) {
-                    textViewExtraInfo.setText(getString(R.string.permission_access_location));
+                else if(STATUS_SYSTEM_ALERT_WINDOW) {
+                    textViewExtraInfo.setText(getString(R.string.permission_system_alert_window));
                     textViewLoadingApp.setText(getString(R.string.ss_confirm_permissions_3));
-                    STATUS_ACCESS_FINE_LOCATION = false;
+                    STATUS_SYSTEM_ALERT_WINDOW = false;
                 }
                 getInitialAppPermissions();
                 break;
