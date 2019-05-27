@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Drink Water App</string>
+    <string name="login_title">-LOGIN-</string>
+    <string name="youtube_key">AIzaSyDDHOg1nce_QhSE2L-D9OuScJskO4Val7Y</string>
+
+    <!-- FACEBOOK -->
+    <string name="facebook_app_id">2078723809014570</string>
+
+    <!-- Splash Screen -->
+    <string name="text_continue">continuar</string>
+    <string name="text_privacy_policy">Privacy Policy</string>
+
+    <string name="ss_getting_content">Getting content…</string>
+    <string name="ss_not_connected">Not internet connection… Check your network</string>
+    <string name="ss_getting_info">Getting information of the application…</string>
+    <string name="ss_checking_news">Checking for news…</string>
+    <string name="ss_verifying_user">Verifying user…</string>
+    <string name="ss_loading_content">Loading content</string>
+    <string name="permission_request_01">La aplicacion requiere la autorizacion de algunos permisos para un correcto funcionamiento.</string>
+    <string name="permission_request_02">La aplicacion requiere la autorizacion de algunos permisos para un correcto funcionamiento.\nPara mas informacion sobre cada uno de ellos revisa nuestra política de privacidad</string>
+    <string name="ss_confirm_permissions_1">Confirming initial app permissions…</string>
+    <string name="ss_confirm_permissions_2">Confirming app permissions…</string>
+    <string name="ss_confirm_permissions_3">You need to grant the permissions to start the application.</string>
+    <string name="ss_starting">Starting…</string>
+
+    <string name="permission_access_location">Se necesita el permiso de localizacion para ubicar al usuario con el conductor y viceversa.</string>
+    <string name="permission_read_external">Se necesita el permiso de lectura para obtener informacion creada por la aplicacion respecto al usuario actual.</string>
+    <string name="permission_write_external">Se necesita el permiso de escritura para guardar informacion importante de manera local y agilizar la carga de los servicios.</string>
+
+    <string name="permission_grant">Allow</string>
+
+    <string name="permission_access_location_title">Necesitamos los permisos de localizacion!</string>
+    <string name="permission_access_location_explanation">Necesario, por ejemplo: para encontrar un conductor o cliente cercano.</string>
+    <string name="permission_read_external_title">Necesitamos los permisos de lectura!</string>
+    <string name="permission_read_external_explanation">Necesario, por ejemplo: para recuperar e iniciar tu sesion en este telefono.</string>
+    <string name="permission_write_external_title">Necesitamos los permisos de escritura!</string>
+    <string name="permission_write_external_explanation">Necesarios, por ejemplo: para guardar tu sesion en el telefono.</string>
+
+    <!-- Login-->
+    <string name="button_login">Log In</string>
+    <string name="text_sign_up">Sign Up</string>
+    <string name="text_return">Return</string>
+    <string name="text_email">Email</string>
+    <string name="text_password">Password</string>
+    <string name="text_forgot_password">Forgot Password</string>
+    <string name="text_join">Join</string>
+    <string name="text_send_password_instructions">Send Instructions</string>
+
+    <!-- ARRAYS -->
+    <string-array name="weight_metric_volume">
+        <item>Libras</item>
+        <item>Kilogramos</item>
+    </string-array>
+
+    <string-array name="aprox_max">
+        <item>Mililitros</item>
+        <item>Litros</item>
+    </string-array>
+
+    <string-array name="noti_skip_times">
+        <item>5min</item>
+        <item>10min</item>
+        <item>15min</item>
+        <item>20min</item>
+    </string-array>
+
+    <string-array name="noti_drinks">
+        <item>10mL</item>
+        <item>50mL</item>
+        <item>100mL</item>
+        <item>150mL</item>
+    </string-array>
+
+    <!-- ADMOB -->
+    <string name="ads_app_id">ca-app-pub-9403893294190125~4239664850</string>
+    <string name="ads_banner_ad_unit_id">ca-app-pub-9403893294190125/8776486293</string>
+
+
+</resources>
