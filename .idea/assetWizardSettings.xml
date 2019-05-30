@@ -34,8 +34,8 @@
                                   <option name="values">
                                     <map>
                                       <entry key="assetType" value="IMAGE" />
-                                      <entry key="imageAsset" value="C:\Users\elvis antonio\Documents\GitHub\01 RECURSOS DE LAS APPS\Drink Water App\Diseño v1.0.4\icon_water_glass_white.png" />
-                                      <entry key="outputName" value="ic_drink_holo_dark" />
+                                      <entry key="imageAsset" value="C:\Users\elvis antonio\Documents\GitHub\01 RECURSOS DE LAS APPS\Drink Water App\Diseño v1.0.4\ic_share_black.png" />
+                                      <entry key="outputName" value="ic_share" />
                                       <entry key="theme" value="HOLO_DARK" />
                                     </map>
                                   </option>

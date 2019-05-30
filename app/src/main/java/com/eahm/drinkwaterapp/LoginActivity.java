@@ -286,7 +286,7 @@ public class LoginActivity extends AppCompatActivity {
             if(loginEmail != null && resetEmail != null){
                 String email = loginEmail.getText().toString();
 
-                if(new Utils().validateEmail(email).equalsIgnoreCase("TRUE")){
+                if(new Utils().validateEmail(email, this).equalsIgnoreCase("TRUE")){
                     resetEmail.setText(email);
                 }
                 else {
@@ -310,13 +310,13 @@ public class LoginActivity extends AppCompatActivity {
 
         Utils utils = new Utils();
 
-        String validateEmail = utils.validateEmail(email);
+        String validateEmail = utils.validateEmail(email, this);
         if (!validateEmail.equalsIgnoreCase("true")){
             Toast.makeText(getApplicationContext(), validateEmail, Toast.LENGTH_SHORT).show();
             return;
         }
 
-        String validatePassword = utils.validatePassword(inputLoginUserPassword.getEditText().getText().toString());
+        String validatePassword = utils.validatePassword(inputLoginUserPassword.getEditText().getText().toString(), this);
         if (!validatePassword.equalsIgnoreCase("true")){
             Toast.makeText(getApplicationContext(), validatePassword, Toast.LENGTH_SHORT).show();
             return;
@@ -975,7 +975,7 @@ public class LoginActivity extends AppCompatActivity {
         if(editTextPass == null) return;
 
         String email = editTextEmail.getText().toString();
-        String responseEmail = new Utils().validateEmail(email);
+        String responseEmail = new Utils().validateEmail(email, this);
 
         if(!responseEmail.equalsIgnoreCase("TRUE")){
             Toast.makeText(this, responseEmail, Toast.LENGTH_SHORT).show();
@@ -983,7 +983,7 @@ public class LoginActivity extends AppCompatActivity {
         };
 
         String pass = editTextPass.getText().toString();
-        String responsePass = new Utils().validatePassword(pass);
+        String responsePass = new Utils().validatePassword(pass, this);
 
         if(!responsePass.equalsIgnoreCase("TRUE")){
             Toast.makeText(this, responsePass, Toast.LENGTH_SHORT).show();

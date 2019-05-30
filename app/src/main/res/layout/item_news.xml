@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:text="Vandalicos"
+        android:text="Titulo"
         android:textSize="18sp"
         android:textStyle="bold" />
 
@@ -24,7 +24,7 @@
         android:layout_below="@+id/textViewNewsTitle"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:text="Juega ahora y resiste contra oleadas de enemigos todo el tiempo que puedas." />
+        android:text="Descripcion de este articulo" />
 
     <android.support.v7.widget.CardView
         android:id="@+id/cardViewContainer"
@@ -47,7 +47,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                app:srcCompat="@drawable/news_test" />
+                app:srcCompat="@color/grey_2" />
 
             <TextView
                 android:id="@+id/textViewNewsDate"

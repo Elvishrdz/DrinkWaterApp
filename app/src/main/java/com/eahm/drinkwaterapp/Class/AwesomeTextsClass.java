@@ -1,5 +1,8 @@
 package com.eahm.drinkwaterapp.Class;
 
+import android.content.Context;
+import android.support.v4.content.ContextCompat;
+
 import com.eahm.drinkwaterapp.Utils.Utils;
 
 import java.util.Calendar;
@@ -60,7 +63,7 @@ public class AwesomeTextsClass {
                 message = message + "\n" + "Si deseas.. puedes agregar limón al agua para darle sabor ademas ayuda a tomar más regularmente";
                 break;
             case 13:
-                message = message + "\n" + "Mentalizarse y no encontrar excusas para beber agua, recuerda que es un elemento esencial en el cuerpo y en el proceso de pérdida de peso. Luego de tomarla regularmente por 3 días se convierte en un hábito... o eso dicen...";
+                message = message + "\n" + "Mentalizarse y no encontrar excusas para no beber agua, recuerda que es un elemento esencial en el cuerpo y en el proceso de pérdida de peso. Luego de tomarla regularmente por 3 días se convierte en un hábito... o eso dicen...";
                 break;
             default:
                     message = message + "\n" + "Tienes sed?";
@@ -151,7 +154,7 @@ public class AwesomeTextsClass {
 
     }
 
-    public String getText(int category){
+    public String getText(int category, Context context){
         //<>
         String contentText = "Listo para tomar tu primer vaso de agua?";
 
@@ -192,10 +195,10 @@ public class AwesomeTextsClass {
                 int randomPos2 = new Utils().getRandomNumber(1, 4);
                 switch (randomPos2){
                     case 1:
-                        contentText += "Consumiste " + new Utils().getFinalProgressString(false) + ". Entra para ver mas detalles";
+                        contentText += "Consumiste " + new Utils().getFinalProgressString(false, context) + ". Entra para ver mas detalles";
                         break;
                     case 2:
-                        contentText += "Tomaste " + new Utils().getFinalProgressString(true) + " de agua durante esta jornada";
+                        contentText += "Tomaste " + new Utils().getFinalProgressString(true, context) + " de agua durante esta jornada";
                         break;
                     default:
                         contentText += "Quieres saber a que horas ingeriste agua hoy? Entra y revisa tu resumen";
@@ -227,7 +230,7 @@ public class AwesomeTextsClass {
         return contentText;
     }
 
-    public String getBigText(int category){
+    public String getBigText(int category, Context context){
         //<>
         updateCurrentTime();
 
@@ -267,22 +270,22 @@ public class AwesomeTextsClass {
                 break;
             case 2:
                 //region TEXTO PARA LAST ALARM
-                String today = new Utils().getTodayString();
+                String today = new Utils().getTodayString(context);
                 bigText = today + "\n";
-                if(new SettingsClass().isGoalReached()){
+                if(!new SettingsClass().isGoalReached()){
                     int randomPos2 = new Utils().getRandomNumber(1, 5);
                     switch (randomPos2){
                         case 1:
-                            bigText += "Has consumido " + new Utils().getFinalProgressString(false) + "\nRecuerda que es importante mantener el ritmo, recuerda dar un vistazo a tu actividad presionando en esta notificacion";
+                            bigText += "Has consumido " + new Utils().getFinalProgressString(false, context) + "\nRecuerda que es importante mantener el ritmo, recuerda dar un vistazo a tu actividad presionando en esta notificacion";
                             break;
                         case 2:
-                            bigText += new Utils().getFinalProgressString(false) + " bien hecho! Las notificaciones ya no apareceran en tu telefono, sera hasta la proxima hora de inicio";
+                            bigText += new Utils().getFinalProgressString(false, context) + " bien hecho! Las notificaciones ya no apareceran en tu telefono, sera hasta la proxima hora de inicio";
                             break;
                         case 3:
                             bigText += "Tenemos tu resumen de hoy! Entra y revisa que tal fue el dia de hoy";
                             break;
                         default:
-                            bigText += "Las horas de descanso empiezan ahora y tú has ingerido " + new Utils().getFinalProgressString(true) + "hasta este momento. Entra en esta notificacion para ver detalles";
+                            bigText += "Las horas de descanso empiezan ahora y tú has ingerido " + new Utils().getFinalProgressString(true, context) + "hasta este momento. Entra en esta notificacion para ver detalles";
                             break;
                     }
                 }
@@ -290,16 +293,16 @@ public class AwesomeTextsClass {
                     int randomPos2 = new Utils().getRandomNumber(1, 5);
                     switch (randomPos2){
                         case 1:
-                            bigText += "FELICIDADES\nLograste completar tu meta diaria con " + new Utils().getFinalProgressString(false) + " de agua ingeridos el dia de hoy";
+                            bigText += "FELICIDADES\nLograste completar tu meta diaria con " + new Utils().getFinalProgressString(false, context) + " de agua ingeridos el dia de hoy";
                             break;
                         case 2:
-                            bigText += "EXCELENTE!\nCon " + new Utils().getFinalProgressString(false) + " has logrado pasar la marca establecida. Excelente jornada!";
+                            bigText += "EXCELENTE!\nCon " + new Utils().getFinalProgressString(false, context) + " has logrado pasar la marca establecida. Excelente jornada!";
                             break;
                         case 3:
                             bigText += "HAS ALCANZADO LA META!\n Lo lograste, entra y mira tu actividad de hoy. SIGUE ASI!";
                             break;
                         default:
-                            bigText += "LO LOGRASTE!\nSon " + new Utils().getFinalProgressString(true) + " que tu cuerpo ha añadido para funcionar correctamente\nMuchas Felicitaciones!\n\nEntra en esta notificacion para ver tu actividad";
+                            bigText += "LO LOGRASTE!\nSon " + new Utils().getFinalProgressString(true, context) + " que tu cuerpo ha añadido para funcionar correctamente\nMuchas Felicitaciones!\n\nEntra en esta notificacion para ver tu actividad";
                             break;
                     }
                 }

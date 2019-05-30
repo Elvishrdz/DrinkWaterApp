@@ -133,7 +133,7 @@ public class WelcomeActivity extends AppCompatActivity {
     public void onBackPressed() {
         if(layoutWelcome.getVisibility() == View.VISIBLE && !closeApp){
             closeApp = true;
-            Toast.makeText(this, "Presiona otra vez para salir", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.exit_press_again), Toast.LENGTH_SHORT).show();
             new Handler().postDelayed(()->{
                 closeApp = false;
             }, 2500);
@@ -163,6 +163,10 @@ public class WelcomeActivity extends AppCompatActivity {
             settings.deleteProtectedStatus();
             settings.deleteAppFirstSetupDone();
             //settings.deletePrivacyPolicyStatus();
+
+            settings.deleteContratulationStatus();
+            settings.deleteAppRated();
+            settings.deleteAppVersion();
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
@@ -262,7 +266,7 @@ public class WelcomeActivity extends AppCompatActivity {
             String temp = editTextGUDWeight.getText().toString();
 
             if(temp.isEmpty() || temp.equalsIgnoreCase(".")){
-                Toast.makeText(this, "Ingresa una cantidad valida", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.text_enter_a_valid_amout), Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -271,14 +275,14 @@ public class WelcomeActivity extends AppCompatActivity {
             switch (spinnerGUD.getSelectedItemPosition()){
                 case 0: // Libras
                     if(amount < 10){
-                        Toast.makeText(this, "Ingresa una cantidad superior a 10 libras", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.text_enter_an_amount_greater_lbs), Toast.LENGTH_SHORT).show();
                         return;
                     }
                     break;
                 case 1: // Kilogramos convertido a libras
                     amount =   2.2046 * amount;
                     if(amount < 5){ //4.535970244035199
-                        Toast.makeText(this, "Ingresa una cantidad superior a 5 kilogramos", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.text_enter_an_amount_greater_kg), Toast.LENGTH_SHORT).show();
                         return;
                     }
                     break;
@@ -299,7 +303,7 @@ public class WelcomeActivity extends AppCompatActivity {
             String formatLiters = formatDecimal.format(liters);
             String formatMililiters = formatDecimal.format(mililiters);
 
-            temp = formatLiters + " litros\n" + formatMililiters + " mililitros";
+            temp = formatLiters + " " + getResources().getString(R.string.text_liters) + "\n" + formatMililiters + " " + getResources().getString(R.string.text_mililiters);
 
             textViewAR.setText(temp);
 
@@ -329,7 +333,7 @@ public class WelcomeActivity extends AppCompatActivity {
         buttonARUseCalculatedAmount.setOnClickListener(v -> {
 
             if(mililiters == 0){
-                Toast.makeText(this, "Regresa y vuelve a calcular, algo no esta correcto", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.text_something_isnt_correct), Toast.LENGTH_LONG).show();
                 return;
             }
 
@@ -374,7 +378,7 @@ public class WelcomeActivity extends AppCompatActivity {
         buttonSGContinue.setOnClickListener(v -> {
             String amount = editTextSGAmount.getText().toString();
             if(amount.isEmpty() || amount.equalsIgnoreCase(".")){
-                Toast.makeText(this, "Ingresa una cantidad valida", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getResources().getString(R.string.text_enter_a_valid_amout), Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -386,7 +390,7 @@ public class WelcomeActivity extends AppCompatActivity {
             catch (Exception ignore){ }
 
             if(goal <= 0){
-                Toast.makeText(this, "Ingresa una cantidad valida", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getResources().getString(R.string.text_enter_a_valid_amout), Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -436,11 +440,11 @@ public class WelcomeActivity extends AppCompatActivity {
             else minute = timePickerSRI.getCurrentMinute();
 
             if((hourOfDay == 0 && minute == 0) || (hourOfDay == 0 && minute < 5)){
-                Toast.makeText(WelcomeActivity.this, "El intervalo es demasiado corto", Toast.LENGTH_SHORT).show();
+                Toast.makeText(WelcomeActivity.this, getString(R.string.text_interval_too_short), Toast.LENGTH_SHORT).show();
                 return;
             }
             else if(hourOfDay >= 12){
-                Toast.makeText(WelcomeActivity.this, "El intervalo es demasiado grande", Toast.LENGTH_SHORT).show();
+                Toast.makeText(WelcomeActivity.this, getString(R.string.text_interval_too_big), Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -490,7 +494,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 showNext();
             }
             else {
-                Toast.makeText(this, "La hora seleccionada no esta en el rango", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.text_out_of_range_hour), Toast.LENGTH_LONG).show();
             }
 
         });
@@ -528,7 +532,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 showNext();
             }
             else {
-                Toast.makeText(this, "La hora seleccionada no esta en el rango", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.text_out_of_range_hour), Toast.LENGTH_LONG).show();
             }
         });
 
@@ -605,33 +609,33 @@ public class WelcomeActivity extends AppCompatActivity {
             int seconds = settings.getIntervalValue();
             String reminderTimeString = utils.getTimeString(utils.getHours(seconds * 1000L),
                     utils.getMinutes(seconds * 1000L),
-                    0);
+                    0, WelcomeActivity.this);
 
             String goalMililitersString = "3,500 mililitros";
             float goalValueMililiters = settings.getGoalValue();
             if(goalValueMililiters % 1 == 0){
                 long integer = (long) goalValueMililiters;
-                goalMililitersString = String.valueOf(integer) + " mililitros";
+                goalMililitersString = String.valueOf(integer) + " " + getResources().getString(R.string.text_mililiters);
             }
             else{
                 DecimalFormat formatDecimal = new DecimalFormat("#.##");
-                goalMililitersString = formatDecimal.format(goalValueMililiters) + " mililitros";
+                goalMililitersString = formatDecimal.format(goalValueMililiters) + " " + getResources().getString(R.string.text_mililiters);
             }
 
             String goalLitersString = "3.5 litros";
             float goalValueLiters = goalValueMililiters / 1000;
             if(goalValueLiters % 1 == 0){
                 long integer = (long) goalValueLiters;
-                goalLitersString = String.valueOf(integer) + " litros";
+                goalLitersString = String.valueOf(integer) + " " + getResources().getString(R.string.text_liters);
             }
             else{
                 DecimalFormat formatDecimal = new DecimalFormat("#.##");
-                goalLitersString = formatDecimal.format(goalValueLiters) + " litros";
+                goalLitersString = formatDecimal.format(goalValueLiters) + " " + getResources().getString(R.string.text_liters);
             }
 
-            String myWelcomeAndStats = "Se te notificara cada " + reminderTimeString +
-                    " para que logres tu meta diaria de " + goalLitersString  +
-                    " de agua (" + goalMililitersString + ")";
+            String myWelcomeAndStats = getString(R.string.text_welcome_stats_01) + " " + reminderTimeString + " " +
+                    getString(R.string.text_welcome_stats_02) + " " + goalLitersString  + " " +
+                    getString(R.string.text_welcome_stats_03) + " (" + goalMililitersString + ")";
 
             textViewWelcomeMyConfig.setText(myWelcomeAndStats);
 

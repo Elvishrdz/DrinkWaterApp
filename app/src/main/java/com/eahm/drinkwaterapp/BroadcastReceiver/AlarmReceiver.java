@@ -73,11 +73,9 @@ public class AlarmReceiver extends BroadcastReceiver {
             //Toast.makeText(context, "La app esta visible", Toast.LENGTH_SHORT).show();
             isAppVisible = true;
         }
-        else {
-            // no esta visible, hay q usar la base de datos
-            dbHelper = new RecordsDbHelper(context);
-            Log.i(LOG_RECORD, "base de datos inicializada");
-        }
+
+        dbHelper = new RecordsDbHelper(context);
+        Log.i(LOG_RECORD, "base de datos inicializada");
 
         //region FIRST AND LAST NOTIFICATIONS
         if(actionCodeName.equalsIgnoreCase("MORNING")){
@@ -96,14 +94,15 @@ public class AlarmReceiver extends BroadcastReceiver {
             deleteRecords();
             settings.deleteTodayProgress(); // reiniciar el progreso de hoy
             settings.setContratulationStatus(false);
+            settings.setDrinkNextTime("");
 
             //Si la app no esta visible, mostramos una notificacion mañanera hurra!
             if(!isAppVisible){
                 Log.i(Constants.LOG_MORNING_ALARM, "Mostrar notificacion, la app no esta activa");
                 new NotificationClass().showDrinkNotification(Constants.CHANNEL_ID_APP, Constants.NOTIFICATION_ID_APP, context,
                         awesomeTexts.getTitle(1),
-                        awesomeTexts.getText(1),
-                        awesomeTexts.getBigText(1));
+                        awesomeTexts.getText(1, context),
+                        awesomeTexts.getBigText(1, context));
             }
             else {
                 Log.i(Constants.LOG_MORNING_ALARM, "Estas en la app, no puedo mostrarte la notificacion");
@@ -132,8 +131,8 @@ public class AlarmReceiver extends BroadcastReceiver {
                 Log.i(Constants.LOG_LAST_ALARM, "Mostrar notificacion, la app no esta activa");
                 new NotificationClass().showReportNotification(Constants.CHANNEL_ID_REPORT, Constants.NOTIFICATION_ID_REPORT, context,
                         awesomeTexts.getTitle(2),
-                        awesomeTexts.getText(2),
-                        awesomeTexts.getBigText(2));
+                        awesomeTexts.getText(2, context),
+                        awesomeTexts.getBigText(2, context));
             }
             else {
                 Log.i(Constants.LOG_LAST_ALARM, "Estas en la app, no puedo mostrarte la notificacion");
@@ -250,7 +249,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
                 }
                 else if(utils.getRandomNumber(0,10) > 5){
-                    Toast.makeText(context, "Siguiente en " + utils.getTimeString(utils.getHours(timeInMillis), utils.getMinutes(timeInMillis), utils.getSeconds(timeInMillis)), Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, "Siguiente en " + utils.getTimeString(utils.getHours(timeInMillis), utils.getMinutes(timeInMillis), utils.getSeconds(timeInMillis), context), Toast.LENGTH_LONG).show();
                 }
                 else {
                     String amountString = String.valueOf(notiDrinkAmount);
@@ -277,8 +276,8 @@ public class AlarmReceiver extends BroadcastReceiver {
 
             new NotificationClass().showDrinkNotification(Constants.CHANNEL_ID_APP, Constants.NOTIFICATION_ID_APP, context,
                     awesomeTexts.getTitle(3),
-                    awesomeTexts.getText(3),
-                    awesomeTexts.getBigText(3));
+                    awesomeTexts.getText(3, context),
+                    awesomeTexts.getBigText(3, context));
         }
 
         //region LOGS

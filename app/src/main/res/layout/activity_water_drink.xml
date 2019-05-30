@@ -7,16 +7,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    tools:context=".WaterDrinkActivity">
+    tools:context=".WaterDrinkActivity"
+    tools:ignore="ContentDescription">
 
     <ImageView
         android:id="@+id/imageViewBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:alpha=".5"
-        android:contentDescription="Imagen de fondo"
         android:scaleType="centerCrop"
-        android:visibility="gone" />
+        android:visibility="gone"
+         />
 
     <RelativeLayout
         android:id="@+id/rLViewStub"
@@ -46,7 +47,7 @@
                     android:layout_alignParentBottom="false"
                     android:layout_margin="7dp"
                     android:gravity="center_vertical|center_horizontal"
-                    android:text="Llevas 150 mL de 1000L"
+                    android:text="@string/water_drink_04"
                     android:textColor="@android:color/white"
                     android:textStyle="bold" />
 
@@ -75,7 +76,7 @@
                 android:paddingTop="10dp"
                 android:paddingRight="7dp"
                 android:paddingBottom="10dp"
-                android:text="Beber Agua"
+                android:text="@string/text_drink_water"
                 android:textColor="#ffffff"
                 android:textStyle="bold" />
 
@@ -89,7 +90,7 @@
                 android:background="@drawable/button_background_03_selector"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
-                android:text="DesActivar Alarmas"
+                android:text="@string/text_disable_alarm"
                 android:textColor="@android:color/white" />
 
             <ScrollView
@@ -97,7 +98,8 @@
                 android:layout_height="match_parent"
                 android:layout_above="@+id/buttonAlarmStatus"
                 android:layout_below="@+id/buttonDrink"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="7dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -110,7 +112,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="7dp"
                         android:gravity="center_horizontal"
-                        android:text="Siguiente en 55 minutos 30 segundos"
+                        android:text="@string/water_drink_03"
                         android:textColor="#808080"
                         android:textSize="18sp" />
 
@@ -119,7 +121,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_horizontal"
-                        android:text="El agua ayuda a hidratar tu piel"
+                        android:text="@string/water_drink_02"
                         android:textColor="#808080"
                         android:textSize="18sp" />
 
@@ -142,6 +144,20 @@
             android:src="@drawable/com_facebook_profile_picture_blank_portrait"
             ads:civ_border_color="#000000"
             ads:civ_border_width="0dp" />
+
+        <ImageButton
+            android:id="@+id/imageButtonShare"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_below="@+id/cardView"
+            android:layout_alignParentLeft="true"
+            android:layout_marginStart="7dp"
+            android:layout_marginEnd="7dp"
+            android:background="@drawable/button_circle_background_01_selector"
+            android:padding="7dp"
+            android:scaleType="centerInside"
+            ads:srcCompat="@drawable/ic_share"
+            android:layout_alignParentStart="true" />
 
         <ImageButton
             android:id="@+id/imageButtonRecords"
@@ -218,7 +234,7 @@
             android:marqueeRepeatLimit="marquee_forever"
             android:scrollHorizontally="true"
             android:singleLine="true"
-            android:text="Te has adelantado por 27 segundos a tu tiempo de agua"
+            android:text="@string/water_drink_01"
 
             android:textColor="@color/com_facebook_blue"
             android:textStyle="bold" />
@@ -337,6 +353,24 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/layoutRate"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black_transparent"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <include
+            layout="@layout/layout_app_rate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="7dp" />
+    </LinearLayout>
+
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView"
         android:layout_width="match_parent"
@@ -354,7 +388,8 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/adView"
         android:clickable="true"
-        android:visibility="gone">
+        android:visibility="gone"
+        android:focusable="true">
 
     </RelativeLayout>
 

@@ -101,7 +101,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
         if(includeLayoutPrivacyPolicy.getVisibility() == View.VISIBLE){
             if(!closeApp){
                 closeApp = true;
-                Toast.makeText(this, "Presiona otra vez para salir", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.exit_press_again), Toast.LENGTH_SHORT).show();
                 new Handler().postDelayed(()->{
                     closeApp = false;
                 }, 2500);
@@ -260,7 +260,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
                             if(dataSnapshot.child("application").child("onDisableMessage").hasChild(language)){
                                 appOnDisableMessage = dataSnapshot.child("application").child("onDisableMessage").child(language).getValue().toString();
                             }
-                            else appOnDisableMessage = "We currently disabled the application, try again later...";
+                            else appOnDisableMessage = getString(R.string.message_app_disabled);
                         }
 
                         if (dataSnapshot.child("application").hasChild("privacyPolicyUrl")){
@@ -285,7 +285,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
                             if(dataSnapshot.child("updates").child("onNewUpdateMessage").hasChild(language)){
                                 updateOnNewVersionMessage = dataSnapshot.child("updates").child("onNewUpdateMessage").child(language).getValue().toString();
                             }
-                            else updateOnNewVersionMessage = "A new version is available. Download it now!";
+                            else updateOnNewVersionMessage = getString(R.string.message_update_new_version);
                         }
                     }
 
@@ -581,8 +581,8 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
                                     this,
                                     "UPDATE_APP",
                                     updateOnNewVersionMessage,
-                                    "DESCARGAR",
-                                    "Cerrar",
+                                    getString(R.string.text_download),
+                                    getString(R.string.text_exit),
                                     false);
 
                             if (Constants.SPLASH_SCREEN_MODE.equalsIgnoreCase("1") || Constants.SPLASH_SCREEN_MODE.equalsIgnoreCase("2"))
@@ -594,7 +594,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
                         //PackageManager.NameNotFoundException
                         e.printStackTrace();
                         if (Constants.SPLASH_SCREEN_MODE.equalsIgnoreCase("1") || Constants.SPLASH_SCREEN_MODE.equalsIgnoreCase("2"))
-                            textViewLoadingApp.setText("Something fail\nRestart the App :(");
+                            textViewLoadingApp.setText(getString(R.string.text_something_fail));
                         return;
                     }
                 }
@@ -609,7 +609,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
                         this,
                         "DISABLED_APP",
                         appOnDisableMessage,
-                        "Aceptar",
+                        getString(R.string.text_accept),
                         false);
                 return;
             }
@@ -713,7 +713,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
         }
 
         builder = new AlertDialog.Builder(this).create();
-        builder.setTitle("Permisos");
+        builder.setTitle(getString(R.string.text_permissions));
 
         if(privacyPolicyURL.isEmpty()){
             builder.setMessage(getString(R.string.permission_request_01));
@@ -977,7 +977,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
                 overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
             }
             else if (!cUser.getCurrentDevice().equalsIgnoreCase(utils.getDeviceName(SplashScreen.this))){
-                Toast.makeText(this, "Sesion activa en otro dispositivo!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.text_session_in_other_device), Toast.LENGTH_SHORT).show();
                 auth.signOut();
                 userManager.removeCustomerData();
             }

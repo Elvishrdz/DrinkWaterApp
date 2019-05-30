@@ -1,14 +1,10 @@
 package com.eahm.drinkwaterapp;
 
 import android.app.AlertDialog;
-import android.app.KeyguardManager;
 import android.app.TimePickerDialog;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -19,7 +15,6 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.provider.BaseColumns;
 import android.provider.Settings;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NotificationManagerCompat;
@@ -32,7 +27,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -60,7 +54,6 @@ import com.eahm.drinkwaterapp.DB.RecordsDbHelper;
 import com.eahm.drinkwaterapp.DB.RecordsContract.RecordsEntry;
 import com.eahm.drinkwaterapp.Fragments.NewsFragment;
 import com.eahm.drinkwaterapp.Interfaces.Callbacks;
-import com.eahm.drinkwaterapp.Models.News;
 import com.eahm.drinkwaterapp.Models.RecordModel;
 import com.eahm.drinkwaterapp.Services.FloatWidgetService;
 import com.eahm.drinkwaterapp.Singleton.AlarmApp;
@@ -109,17 +102,24 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
 04      <div>Icons made by <a href="https://www.freepik.com/?__hstc=57440181.bdd6304c040eeae6a353f69e3b28a5ee.1557337823332.1558769490382.1558778521392.10&__hssc=57440181.10.1558778521392&__hsfp=20414623" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" 			    title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" 			    title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
 05      <div>Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/" 			    title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" 			    title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
 06      <div>Icons made by <a href="https://www.freepik.com/?__hstc=57440181.bdd6304c040eeae6a353f69e3b28a5ee.1557337823332.1558769490382.1558778521392.10&__hssc=57440181.12.1558778521392&__hsfp=20414623" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" 			    title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" 			    title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+
+     share icon:
+     <div>Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/" 			    title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" 			    title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+
+
      */
     //endregion CREDITS
 
     //region VARIABLES
-    private final static String LOG_WATER_DRINK_ACT = "LOG_WATER_DRINK_ACT";
-    private final static String LOG_BUTTON_DRINK = "LOG_BUTTON_DRINK";
-    private final static String LOG_SETTING_HOURS = "LOG_SETTING_HOURS";
-    private final static String LOG_SETTING_GOAL = "LOG_SETTING_GOAL";
-    private final static String LOG_RESTORE_CHRONO = "LOG_RESTORE_CHRONO";
-    private static final String LOG_RECORD = "LOG_RECORD";
+    private final static String TAG_WATER_DRINK_ACT = "TAG_WATER_DRINK_ACT";
+    private final static String TAG_BUTTON_DRINK = "TAG_BUTTON_DRINK";
+    private final static String TAG_SETTING_HOURS = "TAG_SETTING_HOURS";
+    private final static String TAG_SETTING_GOAL = "TAG_SETTING_GOAL";
+    private final static String TAG_RESTORE_CHRONO = "TAG_RESTORE_CHRONO";
+    private static final String TAG_RECORD = "TAG_RECORD";
     private static final String TAG_NEWS = "TAG_NEWS";
+    private static final String TAG_RATE = "TAG_RATE";
+
     private static final String CODE_SET_ALARM = "SET_ALARM";
 
     RelativeLayout root;
@@ -134,8 +134,16 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
     ImageButton imageButtonSetNotification;
     ImageButton imageButtonSetDrinks;
     ImageButton imageButtonSetClocks;
+    ImageButton imageButtonShare;
 
     RelativeLayout layoutFragmentNews;
+
+    //region RATE
+    LinearLayout layoutRate;
+    ImageButton imageButtonRateClose;
+    Button buttonRate;
+    //endregion RATE
+
 
     //region RECORDS
     CardView includeLayoutRecords;
@@ -237,15 +245,13 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         }
         else if(!settings.isAlarmWorking()){
             utils.displayAlertDialogYesNo(this, this, CODE_SET_ALARM,
-                    "Ya pasamos tu hora de finalizacion\n¿Deseas seguir recibiendo alarmas?",
-                    "No, salir", "Si, extender tiempo", true);
+                    getString(R.string.dialog_text_reactivate_alarm),
+                    getString(R.string.dialog_exit), getString(R.string.dialog_extend_hours), true);
         }
         else if(!closeApp && settings.isAlarmWorking()){
             closeApp = true;
-            Toast.makeText(this, "Presiona otra vez para salir", Toast.LENGTH_SHORT).show();
-            new Handler().postDelayed(()->{
-                closeApp = false;
-            }, 2500);
+            Toast.makeText(this, getResources().getString(R.string.exit_press_again), Toast.LENGTH_SHORT).show();
+            new Handler().postDelayed(()-> closeApp = false, 2500);
         }
         else{
 
@@ -253,7 +259,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
                 // Si es hora de tomar agua (alarma nula) y el usuario abandona la app, vamos a poner una alarma en 5min,
                 // cuando se active la alarma (si aun esta la app en horas activas) entonces lanzamos notificacion.
                 if(!isDrinkTimeFromNotification){
-                    Log.i(LOG_RECORD, "Debes tomar agua pero salista intencionalmente aun asi... registrar 6");
+                    Log.i(TAG_RECORD, "Debes tomar agua pero salista intencionalmente aun asi... registrar 6");
                     recordDrink(0, 6);
                 }
             }
@@ -273,28 +279,29 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
 
         switch (receivedFrom){
             case "CLOSED":
-                Log.i(LOG_WATER_DRINK_ACT, "onNewIntent: CLOSED recibido");
+                Log.i(TAG_WATER_DRINK_ACT, "onNewIntent: CLOSED recibido");
                 break;
             case "SKIP":
-                Log.i(LOG_WATER_DRINK_ACT, "onNewIntent: SKIP recibido");
+                Log.i(TAG_WATER_DRINK_ACT, "onNewIntent: SKIP recibido");
                 break;
             case "DRINK":
-                Log.i(LOG_WATER_DRINK_ACT, "onNewIntent: DRINK recibido");
+                Log.i(TAG_WATER_DRINK_ACT, "onNewIntent: DRINK recibido");
                 break;
             case "MORNING":
-                Log.i(LOG_WATER_DRINK_ACT, "onNewIntent: MORNING recibido");
+                Log.i(TAG_WATER_DRINK_ACT, "onNewIntent: MORNING recibido");
+                setAppStyle();
                 break;
             case "LAST":
-                Log.i(LOG_WATER_DRINK_ACT, "onNewIntent: LAST recibido");
+                Log.i(TAG_WATER_DRINK_ACT, "onNewIntent: LAST recibido");
                 isDrinkTimeFromNotification = false;
                 //Ajustar app a modo fin de dia!
                 setAppStyle();
                 if(countDownTimer != null) countDownTimer.onFinish();
-                String text = "Periodo de bebida terminado!\n" + textViewNextDrink.getText();
+                String text = getString(R.string.text_drinking_over) + textViewNextDrink.getText();
                 textViewNextDrink.setText(text);
                 break;
             case Intent.ACTION_SCREEN_OFF:
-                Log.i(LOG_WATER_DRINK_ACT, "Pantalla apagada");
+                Log.i(TAG_WATER_DRINK_ACT, "Pantalla apagada");
 
                 //inicializar en onCreate si deseas usar este listener
                 /* INITIALIZE RECEIVER
@@ -306,7 +313,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
                 break;
         }
 
-        Log.i(LOG_WATER_DRINK_ACT, "onNewIntent Invocado! " + receivedFrom);
+        Log.i(TAG_WATER_DRINK_ACT, "onNewIntent Invocado! " + receivedFrom);
     }
 
     @Override
@@ -340,8 +347,15 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         imageButtonSetNotification = findViewById(R.id.imageButtonSetNotification);
         imageButtonSetDrinks = findViewById(R.id.imageButtonSetDrinks);
         imageButtonSetClocks = findViewById(R.id.imageButtonSetClocks);
+        imageButtonShare = findViewById(R.id.imageButtonShare);
 
         layoutFragmentNews = findViewById(R.id.layoutFragmentNews);
+
+        //region RATE
+        layoutRate = findViewById(R.id.layoutRate);
+        imageButtonRateClose = findViewById(R.id.imageButtonRateClose);
+        buttonRate = findViewById(R.id.buttonRate);
+        //endregion RATE
 
         //region RECORDS
         includeLayoutRecords = findViewById(R.id.includeLayoutRecords);
@@ -442,6 +456,22 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
 
         //region LISTENERS
 
+        //region RATE
+        imageButtonRateClose.setOnClickListener(v -> {
+            layoutRate.setVisibility(View.GONE);
+            settings.setAppRated(0);
+        });
+
+        buttonRate.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse( "https://play.google.com/store/apps/details?id=" + getPackageName()));
+            intent.setPackage("com.android.vending");
+            startActivity(intent);
+            settings.setAppRated(8);
+            if(layoutRate.getVisibility() == View.VISIBLE) layoutRate.setVisibility(View.GONE);
+        });
+        //endregion RATE
+
         //region BUTTONS
         imageButtonRecords.setOnClickListener(v -> {
             //Toast.makeText(this, "Preparar reporte eh!", Toast.LENGTH_SHORT).show();
@@ -485,8 +515,8 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
                 includeCardViewSetTime.setVisibility(View.GONE);
             }
             else{
-                Log.i(LOG_SETTING_HOURS, settings.getStartHour() + ":" + settings.getStartMin());
-                Log.i(LOG_SETTING_HOURS, settings.getEndHour() + ":" + settings.getEndMin());
+                Log.i(TAG_SETTING_HOURS, settings.getStartHour() + ":" + settings.getStartMin());
+                Log.i(TAG_SETTING_HOURS, settings.getEndHour() + ":" + settings.getEndMin());
 
                 setSettingsValues(settings.getStartHour(), settings.getStartMin(), true);
                 setSettingsValues(settings.getEndHour(), settings.getEndMin(), false);
@@ -495,6 +525,17 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
             }
         });
 
+        imageButtonShare.setOnClickListener(v -> {
+            String dynamicLink = "https://drinkwaterapp.page.link/Tn65";
+
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.text_share_content) + "\n\n" + dynamicLink);
+            sendIntent.putExtra(Intent.EXTRA_SUBJECT, R.string.text_share_subject);
+            sendIntent.setType("text/plain");
+            startActivity(Intent.createChooser(sendIntent,
+                    getResources().getText(R.string.text_share_title)));
+        });
         //endregion BUTTONS
 
         //region RECORDS
@@ -567,17 +608,17 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         editTextDayMax.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                //Log.i(LOG_SETTING_GOAL, "before text changed " + s.toString());
+                //Log.i(TAG_SETTING_GOAL, "before text changed " + s.toString());
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                //Log.i(LOG_SETTING_GOAL, "on text changed " + s.toString());
+                //Log.i(TAG_SETTING_GOAL, "on text changed " + s.toString());
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                //Log.i(LOG_SETTING_GOAL, "after text changed " + s.toString());
+                //Log.i(TAG_SETTING_GOAL, "after text changed " + s.toString());
                 String newAmount = s.toString();
                 float newGoal = 0;
 
@@ -594,19 +635,19 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
 
                     switch (spinnerDayMax.getSelectedItemPosition()){
                         case 0: // mililiters
-                            goal = "mililitros";
+                            goal = getResources().getString(R.string.text_mililiters);
                             break;
                         case 1: // liters 1-1000
-                            goal = "litros";
+                            goal = getResources().getString(R.string.text_liters);;
                             float convertion = Float.parseFloat(newAmount) * 1000;
                             newAmount = String.valueOf(convertion); // Convert to mililiters
                             break;
                     }
-                    Log.i(LOG_SETTING_GOAL, "Saving goal: " + s.toString());
+                    Log.i(TAG_SETTING_GOAL, "Saving goal: " + s.toString());
                     settings.setGoalValue(Float.valueOf(newAmount));
 
                     if(Float.parseFloat(s.toString()) == 1) goal = goal.substring(0, goal.length()-1);
-                    goal = "Tu meta de hoy es de " + s.toString() + " " + goal + " de agua";
+                    goal = getString(R.string.text_your_goal_01) + " " + s.toString() + " " + goal + " " + getString(R.string.text_your_goal_02);
                     textViewStats.setText(goal);
                     updateProgress();
                     setAppStyle();
@@ -631,7 +672,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         spinnerDayMax.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Log.i(LOG_SETTING_GOAL, "on item selected " + position);
+                Log.i(TAG_SETTING_GOAL, "on item selected " + position);
 
                 settings.setGoalMetricVolume(position);
                 setGoalMetricVolumeConverted(position);
@@ -641,14 +682,15 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                Log.i(LOG_SETTING_GOAL, "on nothing selected");
+                Log.i(TAG_SETTING_GOAL, "on nothing selected");
             }
         });
 
+        /*
         timePickerInterval.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
             @Override
             public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-                Log.i(LOG_SETTING_GOAL, "Del selector obtuvimos: " + hourOfDay + ":" + minute);
+                Log.i(TAG_SETTING_GOAL, "Del selector obtuvimos: " + hourOfDay + ":" + minute);
 
                 if((hourOfDay == 0 && minute == 0) || (hourOfDay == 0 && minute < 5)){
                     Toast.makeText(WaterDrinkActivity.this, "El intervalo es demasiado corto", Toast.LENGTH_SHORT).show();
@@ -664,11 +706,12 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
                 textViewReminder.setText(textReminder);
 
                 int newTime = utils.getSeconds(hourOfDay, minute);
-                Log.i(LOG_SETTING_GOAL, "Interval value SAVED: " + newTime);
+                Log.i(TAG_SETTING_GOAL, "Interval value SAVED: " + newTime);
                 settings.setIntervalValue(newTime);
 
             }
         });
+        */
 
         buttonTimePickerInterval.setOnClickListener(v -> {
 
@@ -682,23 +725,23 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
 
 
             TimePickerDialog.OnTimeSetListener timeSet = (view, hourOfDay, minute) -> {
-                Log.i(LOG_SETTING_GOAL, "Del selector obtuvimos: " + hourOfDay + ":" + minute);
+                Log.i(TAG_SETTING_GOAL, "Del selector obtuvimos: " + hourOfDay + ":" + minute);
 
                 if((hourOfDay == 0 && minute == 0) || (hourOfDay == 0 && minute < 5)){
-                    Toast.makeText(WaterDrinkActivity.this, "El intervalo es demasiado corto", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(WaterDrinkActivity.this, getResources().getString(R.string.text_interval_too_short), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 else if(hourOfDay >= 12){
-                    Toast.makeText(WaterDrinkActivity.this, "El intervalo es demasiado grande", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(WaterDrinkActivity.this, getResources().getString(R.string.text_interval_too_big), Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                String textReminder = "Recordar cada:\n" + utils.getTimeString(hourOfDay, minute, 0);
+                String textReminder =  getString(R.string.text_remember_each) + "\n" + utils.getTimeString(hourOfDay, minute, 0, WaterDrinkActivity.this);
 
                 textViewReminder.setText(textReminder);
 
                 int newTime = utils.getSeconds(hourOfDay, minute);
-                Log.i(LOG_SETTING_GOAL, "Interval value SAVED: " + newTime);
+                Log.i(TAG_SETTING_GOAL, "Interval value SAVED: " + newTime);
                 settings.setIntervalValue(newTime);
             };
 
@@ -707,7 +750,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
 
             // Set the newly created TextView as a custom tile of DatePickerDialog
             timePickerDialog.setCustomTitle(utils.createCustomTitle(this,
-                    "Cada cuanto deseas recibir notificaciones?",
+                    getString(R.string.text_timepicker_title),
                     getResources().getColor(R.color.com_facebook_blue),
                     getResources().getColor(R.color.white),
                     20));
@@ -770,86 +813,6 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         activateAlarmOnRestartPhone(true);
         //endregion RESTORE ALARMS
 
-        //region RESTORE CHRONO
-
-        String timestamp = settings.getDrinkNextTime();
-
-        if(timestamp.isEmpty()){
-            Log.i(LOG_RESTORE_CHRONO, "No hay tiempo siguiente guardado.");
-
-            if(settings.isAlarmWorking()){
-                textViewNextDrink.setText("Empecemos...\n\nToma un vaso de agua ahora, presiona el boton y luego selecciona la cantidad que ingeriste. \nDespues continua con tus actividades que nosotros te avisaremos cuando debas beber otravez");
-            }
-            else {
-                textViewNextDrink.setText("La alarma esta desactivada...\n\nToma un vaso de agua ahora, presiona el boton y luego selecciona la cantidad que ingeriste. \nSi aun deseas recibir alarmas puedes extender tu hora de finalizacion en los ajustes");
-            }
-
-            // LOG_BUTTON_DRINK
-        }
-        else if(timestamp.equalsIgnoreCase("OVER")){
-            Log.i(LOG_RESTORE_CHRONO, "No hay tiempo siguiente guardado.");
-            textViewNextDrink.setText("Horas de descanso\n\nSi deseas seguir recibiendo notificaciones puedes ampliar mas la hora de finalizacion en los ajustes");
-            // LOG_BUTTON_DRINK
-
-        }
-        else {
-            Log.i(LOG_RESTORE_CHRONO, "Tiempo siguiente guardado: " + timestamp);
-
-            long timeInMillis = utils.getMillis(timestamp);
-            Log.i(LOG_RESTORE_CHRONO, "Timestamp nextDrink en millis: " + timeInMillis);
-
-            long currentTimestamp = System.currentTimeMillis()/1000;
-            Log.i(LOG_RESTORE_CHRONO, "Timestamp actual en millis: " + timeInMillis);
-
-            timeInMillis = Long.parseLong(timestamp);
-
-            if(timeInMillis <= currentTimestamp){
-                Log.i(LOG_RESTORE_CHRONO, "Beber agua, (ya se paso la hora definida)");
-                textViewTips.setText(awesomeTexts.getCoutdownTextDone());
-                setPulsatorLayout(true);
-            }
-            else {
-                Log.i(LOG_RESTORE_CHRONO, "Siguiente bebida en: " + timestamp);
-
-                // update the time in the chronometer hehe... by elvis :v
-                int secondsRemaining = (int) (timeInMillis - currentTimestamp);
-                Log.i(LOG_RESTORE_CHRONO, "Segundos restantes: " + secondsRemaining);
-
-                timeInMillis = secondsRemaining * 1000; // convert in millis
-                Log.i(LOG_RESTORE_CHRONO, "Restantes en millis: " + timeInMillis);
-
-                if(countDownTimer != null){
-                    long remainingTimeInMillis = countDownTimer.getTimeInMillis();
-                    Log.i(LOG_RESTORE_CHRONO, "Obtener tiempo restante de la anterior alarma. Restante en millis: " + remainingTimeInMillis);
-
-                    int remainingHours = utils.getHours(remainingTimeInMillis);
-                    int remainingMinutes = utils.getMinutes(remainingTimeInMillis);
-                    int remainingSeconds = utils.getSeconds(remainingTimeInMillis);
-
-                    String stats;
-
-                    if(remainingHours > 0){ // Mas de 60 Minutos
-                        stats = "Te has adelantado por " + remainingHours + " hora " + remainingMinutes + " minutos " + remainingSeconds + " segundos a tu tiempo de agua";
-                    }
-                    else if(remainingMinutes > 0){ // Mas de 60 segundos
-                        stats = "Te has adelantado por " + remainingMinutes + " minutos " + remainingSeconds + " segundos a tu tiempo de agua";
-                    }
-                    else stats = "Te has adelantado por " + remainingSeconds + " segundos a tu tiempo de agua";
-
-                    textViewStats.setText(stats);
-                    countDownTimer.cancel();
-                }
-
-                Log.i(LOG_RESTORE_CHRONO, "Cronometro con: " + timeInMillis + " millisegundos");
-                countDownTimer = new CountDownTimerDrink(timeInMillis,1000);
-                countDownTimer.start();
-
-                buttonDrink.setText("Tomar agua ahora");
-
-            }
-        }
-        //endregion RESTORE CHRONO
-
         //region INITIALIZE
         textViewTips.setText("");
         buttonAlarmStatus.setVisibility(View.GONE); // En progreso
@@ -860,7 +823,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         buttonTimePickerInterval.setVisibility(View.VISIBLE);
 
         dbHelper = new RecordsDbHelper(this);
-        Log.i(LOG_RECORD, "base de datos inicializada");
+        Log.i(TAG_RECORD, "base de datos inicializada");
 
         if(FirebaseAuth.getInstance().getCurrentUser() == null){
             circleImageViewProfilePic.setVisibility(View.GONE);
@@ -875,21 +838,21 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         setAppStyle();
 
         //Cerrar la notificacion en caso de estar activa
-        Log.i(LOG_WATER_DRINK_ACT, "onCreate: Cerrar notificacion en caso que exista");
+        Log.i(TAG_WATER_DRINK_ACT, "onCreate: Cerrar notificacion en caso que exista");
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(WaterDrinkActivity.this);
         notificationManager.cancel(Constants.NOTIFICATION_ID_APP);
 
         if(startedFromNotification){
             // Entramos a la app presionando la notificacion
             startedFromNotification = false;
-            Log.i(LOG_WATER_DRINK_ACT, "Activity iniciada desde la notificacion");
+            Log.i(TAG_WATER_DRINK_ACT, "Activity iniciada desde la notificacion");
             setPulsatorLayout(true);
 
             if(getIntent() != null && getIntent().getExtras() != null &&
                     getIntent().getExtras().getBoolean("SHOW_REPORT")){
-                Log.i(LOG_WATER_DRINK_ACT, "Mostramos la notificacion final y entramos a ver el registro de hoy");
+                Log.i(TAG_WATER_DRINK_ACT, "Mostramos la notificacion final y entramos a ver el registro de hoy");
                 imageButtonRecords.callOnClick();
-                Toast.makeText(this, "Este es el registro de tú dia hasta ahora", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.text_your_record_so_far), Toast.LENGTH_LONG).show();
             }
             else if(getIntent() != null && getIntent().getExtras() != null &&
                     getIntent().getExtras().getBoolean("IS_LAST_NOTIFICATION")){
@@ -899,7 +862,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         }
         else {
             //normal start
-            Log.i(LOG_WATER_DRINK_ACT, "Activity onCreate() Entrada normal");
+            Log.i(TAG_WATER_DRINK_ACT, "Activity onCreate() Entrada normal");
         }
 
 
@@ -941,7 +904,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
 
                 if(currentProgress>= goal && !settings.getContratulationStatus()){
                     settings.setContratulationStatus(true);
-                    textViewTips.setText("FELICIDADES!\nYa has alcanzado tu meta de hoy!");
+                    textViewTips.setText(getString(R.string.text_goal_reached_01));
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(WaterDrinkActivity.this)) {
                         //No tenemos activado el permiso de mostrar VIEWS encima de otras apps
@@ -949,13 +912,13 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
                         startService(new Intent(WaterDrinkActivity.this, FloatWidgetService.class));
                     }
 
-                    Toast.makeText(WaterDrinkActivity.this, "Bien Hecho! has alcanzado tu meta de hoy!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(WaterDrinkActivity.this, getString(R.string.text_goal_reached_02), Toast.LENGTH_LONG).show();
 
                 }
-                else Toast.makeText(WaterDrinkActivity.this, "Bravo! +" + currentProgressString, Toast.LENGTH_SHORT).show();
+                else Toast.makeText(WaterDrinkActivity.this, getString(R.string.text_hurra) + currentProgressString, Toast.LENGTH_SHORT).show();
 
                 DecimalFormat formatDecimal = new DecimalFormat("#.##");
-                String progress = "Progreso:\nLlevas " + currentProgressString + " mililitros, tu meta es " + formatDecimal.format(goal) + " mililitros ";
+                String progress = getString(R.string.text_progress_01) + " " + currentProgressString + getResources().getString(R.string.text_mililiters) + ", " + getString(R.string.text_progress_02) + " " + formatDecimal.format(goal) + " " + getResources().getString(R.string.text_mililiters);
 
                 textViewStats.setText(progress);
                 setAppStyle();
@@ -972,28 +935,124 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
 
         //endregion INITIALIZE
 
+        //region RESTORE CHRONO
+
+        String timestamp = settings.getDrinkNextTime();
+
+        if(timestamp.isEmpty()){
+            Log.i(TAG_RESTORE_CHRONO, "No hay tiempo siguiente guardado.");
+            setPulsatorLayout(true);
+        }
+        else if(timestamp.equalsIgnoreCase("OVER")){
+            Log.i(TAG_RESTORE_CHRONO, "No hay tiempo siguiente guardado.");
+            setPulsatorLayout(true);
+        }
+        else {
+            Log.i(TAG_RESTORE_CHRONO, "Tiempo siguiente guardado: " + timestamp);
+
+            long timeInMillis = utils.getMillis(timestamp);
+            Log.i(TAG_RESTORE_CHRONO, "Timestamp nextDrink en millis: " + timeInMillis);
+
+            long currentTimestamp = System.currentTimeMillis()/1000;
+            Log.i(TAG_RESTORE_CHRONO, "Timestamp actual en millis: " + timeInMillis);
+
+            timeInMillis = Long.parseLong(timestamp);
+
+            if(timeInMillis <= currentTimestamp){
+                Log.i(TAG_RESTORE_CHRONO, "Beber agua, (ya se paso la hora definida)");
+                textViewTips.setText(awesomeTexts.getCoutdownTextDone());
+                setPulsatorLayout(true);
+            }
+            else {
+                Log.i(TAG_RESTORE_CHRONO, "Siguiente bebida en: " + timestamp);
+
+                // update the time in the chronometer hehe... by elvis :v
+                int secondsRemaining = (int) (timeInMillis - currentTimestamp);
+                Log.i(TAG_RESTORE_CHRONO, "Segundos restantes: " + secondsRemaining);
+
+                timeInMillis = secondsRemaining * 1000; // convert in millis
+                Log.i(TAG_RESTORE_CHRONO, "Restantes en millis: " + timeInMillis);
+
+                if(countDownTimer != null){
+                    long remainingTimeInMillis = countDownTimer.getTimeInMillis();
+                    Log.i(TAG_RESTORE_CHRONO, "Obtener tiempo restante de la anterior alarma. Restante en millis: " + remainingTimeInMillis);
+
+                    int remainingHours = utils.getHours(remainingTimeInMillis);
+                    int remainingMinutes = utils.getMinutes(remainingTimeInMillis);
+                    int remainingSeconds = utils.getSeconds(remainingTimeInMillis);
+
+                    String stats = getString(R.string.text_stats_01) + " " + utils.getTimeString(remainingHours, remainingMinutes, remainingSeconds, WaterDrinkActivity.this) + " " + getString(R.string.text_stats_02);
+
+                    textViewStats.setText(stats);
+                    countDownTimer.cancel();
+                }
+
+                Log.i(TAG_RESTORE_CHRONO, "Cronometro con: " + timeInMillis + " millisegundos");
+                countDownTimer = new CountDownTimerDrink(timeInMillis,1000);
+                countDownTimer.start();
+
+                buttonDrink.setText(getString(R.string.text_drink_water_now));
+
+            }
+        }
+        //endregion RESTORE CHRONO
+
         showNews();
+
+        //region RATE
+        layoutRate.setVisibility(View.GONE);
+
+        if(settings.getAppVersion().equalsIgnoreCase(BuildConfig.VERSION_NAME)){
+            //Esta version es la actual!
+            if(settings.getAppRated() >= 8){
+                //Ya calificamos la app, no hay problema!
+                // NO HACEMOS NADA!
+            }
+            else if(settings.getAppRated() >= 7){
+                layoutRate.setVisibility(View.VISIBLE);
+                Log.i(TAG_RATE, "Mostrando pregunta para calificar la app");
+            }
+            else{
+                settings.setAppRated(settings.getAppRated() + 1);
+            }
+        }
+        else {
+            //La version ha cambiado!
+            settings.setAppRated(0); // volver a contar para pedir una calificacion a la nueva version.
+            settings.setAppVersion(BuildConfig.VERSION_NAME); // Actualizar a la nueva version, asi no volver a pedir calificar
+            Log.i(TAG_RATE, "Rating: Nueva version instalada!");
+        }
+        Log.i(TAG_RATE, settings.getAppVersion() + " - Contador de rated: " + settings.getAppRated());
+        //endregion RATE
 
     }
 
     private void requestExtraSettings(){
 
-        if("huawei".equalsIgnoreCase(android.os.Build.MANUFACTURER) && settings.getProtectedStatus() != 2 ) {
+        if("huawei".equalsIgnoreCase(Build.MANUFACTURER) && settings.getProtectedStatus() != 2 ) {
             // Solicitar activar notificaciones en telefonos HUAWEI
             AlertDialog.Builder builder  = new AlertDialog.Builder(this);
-            builder.setTitle("HUAWEI").setMessage("Se requiere añadir la app a la lista de apps protegidas para recibir notificaciones")
-                    .setPositiveButton("Proceder", new DialogInterface.OnClickListener() {
+            builder.setTitle(getString(R.string.dialog_huawei_title)).setMessage(getString(R.string.dialog_huawei_message))
+                    .setPositiveButton(getString(R.string.text_proceed), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             Intent intent = new Intent();
-                            intent.setComponent(new ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity"));
-                            startActivity(intent);
+                            ComponentName cn = new ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity");
+
+                            try{
+                                intent.setComponent(cn);
+                                startActivity(intent);
+                            }
+                            catch (Exception e){
+                               //ignore, component not founded
+                            }
+
                             settings.setProtectedStatus(1);
                         }
                     });
 
             if(settings.getProtectedStatus() == 1){
-                builder.setNegativeButton("Ya esta hecho", new DialogInterface.OnClickListener() {
+                builder.setNegativeButton(getString(R.string.text_its_done), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         settings.setProtectedStatus(2);
@@ -1050,22 +1109,24 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
             //Mostrar noticias
 
         }
-        else  requestExtraSettings();
+        else requestExtraSettings();
     }
 
     private void initializeReport() {
         DateTime datetime = Utils.getDateTimeByTimestamp(utils.getCurrentTimestamp());
 
-        String stringTodayDate = Utils.getDayName(datetime.getDayOfWeek(),"es") + " " +
-                                 datetime.getDayOfMonth() + " de " +
-                                 Utils.getMonthName(datetime.getMonthOfYear(), "es") + " " +
+        String locale = Locale.getDefault().getLanguage(); //"es"
+        String stringTodayDate = Utils.getDayName(datetime.getDayOfWeek(), WaterDrinkActivity.this) + " " +
+                                 datetime.getDayOfMonth() + " " + getString(R.string.text_of) + " " +
+                                 Utils.getMonthName(datetime.getMonthOfYear(), WaterDrinkActivity.this) + " " +
                                  datetime.getYear();
 
-        textViewRecordTitle.setText("Registros de\n" + stringTodayDate);
+        String title = getString(R.string.text_report_title) + stringTodayDate;
+        textViewRecordTitle.setText(title);
 
         recyclerRecords.setVisibility(View.GONE);
         progressBarRecord.setVisibility(View.VISIBLE);
-        textViewRecordMessage.setText("Cargando registros...");
+        textViewRecordMessage.setText(getString(R.string.text_report_loading));
 
         if(recyclerRecords == null || adapterSwitch == null){
             recyclerRecords.setHasFixedSize(true);
@@ -1118,24 +1179,24 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         Cursor records = dbHelper.getAllRecords();
 
         if(records.moveToFirst()){
-            Log.i(LOG_RECORD, "Registros encontrados! ");
+            Log.i(TAG_RECORD, "Registros encontrados! ");
 
             List<RecordModel> receivedData = new ArrayList<>();
 
             do {
-                Log.i(LOG_RECORD, "entramos al while..!");
+                Log.i(TAG_RECORD, "entramos al while..!");
                 RecordModel newRecord = new RecordModel();
                 newRecord.setId(Integer.parseInt(records.getString(0)));
                 newRecord.setTimestamp(records.getString(1));
                 newRecord.setDrinkAmount(Float.parseFloat(records.getString(2)));
                 newRecord.setStatusCode(Integer.parseInt(records.getString(3)));
 
-                Log.i(LOG_RECORD, "Añadido: " + newRecord.getTimestamp() + " " + newRecord.getDrinkAmount() + " " + newRecord.getStatusCode());
+                Log.i(TAG_RECORD, "Añadido: " + newRecord.getTimestamp() + " " + newRecord.getDrinkAmount() + " " + newRecord.getStatusCode());
                 receivedData.add(newRecord);
             }
             while (records.moveToNext());
 
-            Log.i(LOG_RECORD, "SALIMOS DEL while..! " + receivedData.size() + " " + records.getCount());
+            Log.i(TAG_RECORD, "SALIMOS DEL while..! " + receivedData.size() + " " + records.getCount());
             /*
             // Registros cargados
             List<RecordModel> receivedData = new ArrayList<>();
@@ -1162,7 +1223,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         }
         else {
             // Sin registros
-            textViewRecordMessage.setText("No tienes registros todavia!");
+            textViewRecordMessage.setText(getString(R.string.text_report_no_records));
             recyclerRecords.setVisibility(View.GONE);
             progressBarRecord.setVisibility(View.GONE);
         }
@@ -1181,50 +1242,34 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         int endSeconds = ((settings.getEndHour() * 60) + settings.getEndMin()) * 60;
 
         if ((currentSeconds  >= startSeconds) && (currentSeconds <= endSeconds)){
-            Log.i(LOG_WATER_DRINK_ACT, "La alarma esta activa porque estamos en horas de trabajo");
+            Log.i(TAG_WATER_DRINK_ACT, "La alarma esta activa porque estamos en horas de trabajo");
 
             settings.setAlarmWorking(true);
             buttonAlarmStatus.setTextColor(getResources().getColor(R.color.red_indio));
-            buttonAlarmStatus.setText("Desactivar Alarma");
-            textViewNextDrink.setText("Listos para tomar agua en cualquier momento!");
-            setPulsatorLayout(true);
+            buttonAlarmStatus.setText(getResources().getString(R.string.text_disable_alarm));
+
+            if(utils.getRandomNumber(1,10) > 5){
+                textViewNextDrink.setText(getString(R.string.text_first_drink_01));
+            }
+            else textViewNextDrink.setText(getString(R.string.text_first_drink_02));
+
         }
         else {
-            Log.i(LOG_WATER_DRINK_ACT, "La alarma esta fuera de horas laborales");
+            Log.i(TAG_WATER_DRINK_ACT, "La alarma esta fuera de horas laborales");
             settings.setAlarmWorking(false);
             settings.setDrinkNextTime("OVER");
 
             buttonAlarmStatus.setTextColor(getResources().getColor(R.color.green));
-            buttonAlarmStatus.setText("Activar Alarma");
-            textViewNextDrink.setText("Horas de descanso!\nLas notificaciones estan desactivadas");
+            buttonAlarmStatus.setText(getResources().getString(R.string.text_enable_alarm));
+
+            if(utils.getRandomNumber(1,10) > 5){
+                textViewNextDrink.setText(getString(R.string.text_break_hours_01));
+            }
+            else textViewNextDrink.setText(getString(R.string.text_break_hours_02));
+
         }
 
-        if(!settings.isAlarmWorking()){
-            root.setBackgroundColor(getResources().getColor(R.color.black));
-
-            if(settings.isGoalReached()){
-                //Estilo de la app cuando hemos alcanzado la meta y la alarma esta NO activa
-                buttonDrink.setTextColor(getResources().getColor(R.color.purple));
-                buttonDrink.setBackground(getResources().getDrawable(R.drawable.button_background_02_selector));
-
-                pulsatorColor = R.color.white;
-                pulsatorInterpolator = PulsatorLayout.INTERP_DECELERATE;
-                pulsatorDuration = 8000;
-                pulsatorCount = 2;
-            }
-            else {
-                //Estilo de la app cuando no hay alarmas, la hora de finalizar esta activa
-                buttonDrink.setTextColor(getResources().getColor(R.color.white));
-                buttonDrink.setBackground(getResources().getDrawable(R.drawable.button_background_04_selector));
-
-                pulsatorColor = R.color.purple;
-                pulsatorInterpolator = PulsatorLayout.INTERP_DECELERATE;
-                pulsatorDuration = 8000;
-                pulsatorCount = 2;
-            }
-            setPulsatorLayout(true);
-        }
-        else{
+        if(settings.isAlarmWorking()){
             root.setBackgroundColor(getResources().getColor(R.color.white));
 
             if(settings.isGoalReached()){
@@ -1247,14 +1292,54 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
                 pulsatorDuration = 5000;
                 pulsatorCount = 4;
             }
+        }
+        else { // alarmNotWorking
+            root.setBackgroundColor(getResources().getColor(R.color.black));
+
+            if(settings.isGoalReached()){
+                //Estilo de la app cuando hemos alcanzado la meta y la alarma esta NO activa
+                buttonDrink.setTextColor(getResources().getColor(R.color.purple));
+                buttonDrink.setBackground(getResources().getDrawable(R.drawable.button_background_02_selector));
+
+                pulsatorColor = R.color.white;
+                pulsatorInterpolator = PulsatorLayout.INTERP_DECELERATE;
+                pulsatorDuration = 8000;
+                pulsatorCount = 2;
+            }
+            else {
+                //Estilo de la app cuando no hay alarmas, la hora de finalizar esta activa
+                buttonDrink.setTextColor(getResources().getColor(R.color.white));
+                buttonDrink.setBackground(getResources().getDrawable(R.drawable.button_background_04_selector));
+
+                pulsatorColor = R.color.purple;
+                pulsatorInterpolator = PulsatorLayout.INTERP_DECELERATE;
+                pulsatorDuration = 8000;
+                pulsatorCount = 2;
+            }
+        }
+
+
+        String timestamp = settings.getDrinkNextTime();
+
+        if(timestamp.isEmpty()){
+            Log.i(TAG_RESTORE_CHRONO, "No hay tiempo siguiente guardado.");
+            setPulsatorLayout(true);
 
         }
+        else if(timestamp.equalsIgnoreCase("OVER")){
+            Log.i(TAG_RESTORE_CHRONO, "Horas de descanso");
+             setPulsatorLayout(true);
+        }
+        else {
+            setPulsatorLayout(false);
+        }
+
     }
 
     private void updateProgress(){
 
-        final String simbolMililiters = "mL";
-        final String simbolLiters = "L";
+        final String simbolMililiters = getString(R.string.text_vol_unit_mililiters);
+        final String simbolLiters = getString(R.string.text_vol_unit_liters);
 
         float todayProgress = settings.getTodayProgress();
         String currentAmount = String.valueOf(todayProgress) + simbolMililiters;
@@ -1290,7 +1375,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
                 break;
         }
 
-        String progress =  "Llevas " + currentAmount + " de " + goalAmount;
+        String progress =  getString(R.string.text_you_have) + " " + currentAmount + " " + getResources().getString(R.string.text_of)  + " "+ goalAmount;
 
         textViewProgress.setText(progress);
 
@@ -1300,37 +1385,37 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         // TODO: Use the current user's information
         // You can call any combination of these three methods
         Crashlytics.setUserIdentifier(utils.getDeviceName(WaterDrinkActivity.this));
-        Crashlytics.setUserEmail("Testing_Email");
-        Crashlytics.setUserName("Testing_Name");
+        Crashlytics.setUserEmail("Aun no disponible");
+        Crashlytics.setUserName("Aun no disponible");
 
         //Custom Keys
-        Crashlytics.setInt("current_level", 3);
-        Crashlytics.setString("last_UI_action", "logged_in");
+        Crashlytics.setInt("rate_value", settings.getAppRated());
+        Crashlytics.setString("today_progress", String.valueOf(settings.getTodayProgress()));
 
         //Logging
-        Crashlytics.log("Higgs-Boson detected! Bailing out...");
+        Crashlytics.log("Registro en caso de fallo! hora de inicio en la app: " + utils.getCurrentTimestamp());
 
     }
 
     private void buttonDrink(){
         if(countDownTimer != null){
             long remainingTimeInMillis = countDownTimer.getTimeInMillis();
-            Log.i(LOG_BUTTON_DRINK, "Obtener tiempo restante de la anterior alarma. Restante en millis: " + remainingTimeInMillis);
+            Log.i(TAG_BUTTON_DRINK, "Obtener tiempo restante de la anterior alarma. Restante en millis: " + remainingTimeInMillis);
 
             int remainingHours = utils.getHours(remainingTimeInMillis);
             int remainingMinutes = utils.getMinutes(remainingTimeInMillis);
             int remainingSeconds = utils.getSeconds(remainingTimeInMillis);
 
-            String stats;
+            String stats = getString(R.string.text_stats_01) + " " + utils.getTimeString(remainingHours, remainingMinutes, remainingSeconds, WaterDrinkActivity.this) + " " + getString(R.string.text_stats_02);
 
-            if(remainingHours > 0){ // Mas de 60 Minutos
+            /*if(remainingHours > 0){ // Mas de 60 Minutos
                 stats = "Te has adelantado por " + remainingHours + " hora " + remainingMinutes + " minutos " + remainingSeconds + " segundos a tu tiempo de agua";
             }
             else if(remainingMinutes > 0){ // Mas de 60 segundos
                 stats = "Te has adelantado por " + remainingMinutes + " minutos " + remainingSeconds + " segundos a tu tiempo de agua";
             }
             else stats = "Te has adelantado por " + remainingSeconds + " segundos a tu tiempo de agua";
-
+*/
             textViewStats.setText(stats);
             countDownTimer.cancel();
         }
@@ -1352,7 +1437,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
             textViewTips.setText(awesomeTexts.getCoutdownTextDone());
         }
 
-        buttonDrink.setText("Bien Hecho!");
+        buttonDrink.setText(getString(R.string.text_well_done));
     }
 
     private void restoreNotificationValues(){
@@ -1393,14 +1478,14 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         //settings.deleteGoalData();
 
         int selection = settings.getGoalMetricVolume();
-        Log.i(LOG_SETTING_GOAL, "Goal Metric: " + selection);
+        Log.i(TAG_SETTING_GOAL, "Goal Metric: " + selection);
 
         spinnerDayMax.setSelection(selection);
 
         setGoalMetricVolumeConverted(selection);
 
         int allSeconds = settings.getIntervalValue();
-        Log.i(LOG_SETTING_GOAL, "Interval value: " + allSeconds);
+        Log.i(TAG_SETTING_GOAL, "Interval value: " + allSeconds);
 
         String result = utils.convertSecondTo_HHmmss_String(allSeconds);
 
@@ -1422,7 +1507,8 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         timePickerInterval.setIs24HourView(true);
         timePickerInterval.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS); // Disable edit, enable just spinner mode
 
-        String textReminder = "Recordar cada:\n" + utils.getTimeString(hours, minutes, 0);
+        String textReminder =  getString(R.string.text_remember_each) + "\n" + utils.getTimeString(hours, minutes, 0, WaterDrinkActivity.this);
+
         textViewReminder.setText(textReminder);
 
     }
@@ -1430,20 +1516,20 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
     private void setGoalMetricVolumeConverted(int position){
         float mililiters = settings.getGoalValue();
 
-        Log.i(LOG_SETTING_GOAL,"Goal Value: " + mililiters);
+        Log.i(TAG_SETTING_GOAL,"Goal Value: " + mililiters);
 
         String goal = "";
         switch (position){
             case 0:
-                goal = "mililitros";
+                goal = getResources().getString(R.string.text_mililiters);
                 break;
             case 1:
-                goal = "litros";
+                goal = getResources().getString(R.string.text_liters);
                 mililiters = (mililiters/1000);
                 break;
         }
 
-        Log.i(LOG_SETTING_GOAL, "Goal Value After Switch: " + mililiters);
+        Log.i(TAG_SETTING_GOAL, "Goal Value After Switch: " + mililiters);
 
         convertNotSave = true;
         String amount = String.valueOf(mililiters);
@@ -1463,14 +1549,14 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
 
         editTextDayMax.setText(amount);
 
-        goal = "Tu meta de hoy es de " + amount + " " + goal + " de agua";
+        goal = getString(R.string.text_your_goal_01) + " " + amount + " " + goal + " " + getString(R.string.text_your_goal_02);
         textViewStats.setText(goal);
     }
 
     private void getHourTime(int defaultHour, int defaultMinute, boolean isStartTime){
 
         TimePickerDialog timePickerDialog = new TimePickerDialog(this, (view, hourOfDay, minute) -> {
-            Log.i(LOG_SETTING_HOURS, "Del selector obtuvimos: " + hourOfDay + ":" + minute + " es hora inicial? " + isStartTime);
+            Log.i(TAG_SETTING_HOURS, "Del selector obtuvimos: " + hourOfDay + ":" + minute + " es hora inicial? " + isStartTime);
 
             int selectedTimeSecs = ((hourOfDay * 60) + minute) * 60;
 
@@ -1483,11 +1569,11 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
                     settings.setStartHour(hourOfDay);
                     settings.setStartMin(minute);
                     setSettingsValues(hourOfDay, minute, true);
-                    Log.i(LOG_SETTING_HOURS, "Horas iniciales establecidas");
+                    Log.i(TAG_SETTING_HOURS, "Horas iniciales establecidas");
                 }
                 else {
-                    Log.i(LOG_SETTING_HOURS, "Hora inicial no esta dentro del rango valido");
-                    Toast.makeText(this, "La hora seleccionada no esta en el rango", Toast.LENGTH_LONG).show();
+                    Log.i(TAG_SETTING_HOURS, "Hora inicial no esta dentro del rango valido");
+                    Toast.makeText(this, getResources().getString(R.string.text_out_of_range_hour), Toast.LENGTH_LONG).show();
                 }
             }
             else{
@@ -1500,11 +1586,11 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
                     settings.setEndMin(minute);
                     setAppStyle();
                     setSettingsValues(hourOfDay, minute, false);
-                    Log.i(LOG_SETTING_HOURS, "Hora final establecida");
+                    Log.i(TAG_SETTING_HOURS, "Hora final establecida");
                 }
                 else {
-                    Log.i(LOG_SETTING_HOURS, "Hora final no esta dentro del rango valido");
-                    Toast.makeText(this, "La hora seleccionada no esta en el rango", Toast.LENGTH_LONG).show();
+                    Log.i(TAG_SETTING_HOURS, "Hora final no esta dentro del rango valido");
+                    Toast.makeText(this, getResources().getString(R.string.text_out_of_range_hour), Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -1513,14 +1599,14 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
 
         if(isStartTime){
             timePickerDialog.setCustomTitle(utils.createCustomTitle(this,
-                    "Selecciona la hora de inicio\n(entre 01:00am a 12:00pm)",
+                    getString(R.string.text_timepicker_title_start_hours),
                     getResources().getColor(R.color.com_facebook_blue),
                     getResources().getColor(R.color.white),
                     18));
         }
         else {
             timePickerDialog.setCustomTitle(utils.createCustomTitle(this,
-                    "Selecciona la hora de finalizar\n(entre las 06:00pm a 11:59pm)",
+                    getString(R.string.text_timepicker_title_end_hours),
                     getResources().getColor(R.color.com_facebook_blue),
                     getResources().getColor(R.color.white),
                     18));
@@ -1530,7 +1616,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
     }
 
     private void setSettingsValues(int hourOfDay, int minute, boolean isStartTime){
-        Log.i(LOG_SETTING_HOURS, "Establecer: " + hourOfDay + ":" + minute + " - es inicio? " + isStartTime);
+        Log.i(TAG_SETTING_HOURS, "Establecer: " + hourOfDay + ":" + minute + " - es inicio? " + isStartTime);
         final String ZERO = "0";
 
         //Formateo el hora obtenido: antepone el 0 si son menores de 10
@@ -1552,12 +1638,12 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         String pickedHour = formattedHour + ":" + formattedMinute + " " + AM_PM;
 
         if(isStartTime){
-            String startText = "Iniciamos a las "+ pickedHour +" de la mañana";
+            String startText = getString(R.string.text_start_at) + " " + pickedHour;
             textViewMyStart.setText(startText);
             AlarmFirst.getInstance().adminFirstAlarm(WaterDrinkActivity.this);
         }
         else{
-            String endText = "Concluimos cerca de las " + pickedHour +" de la noche ";
+            String endText = getString(R.string.text_end_at) + " " + pickedHour;
             textViewMyEnd.setText(endText);
             AlarmLast.getInstance().adminLastAlarm(WaterDrinkActivity.this);
         }
@@ -1605,56 +1691,62 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
 
     @Override
     protected void onStop() {
-        Log.i(LOG_WATER_DRINK_ACT, "onStop");
+        Log.i(TAG_WATER_DRINK_ACT, "onStop");
         super.onStop();
     }
 
     @Override
     protected void onDestroy() {
-        Log.i(LOG_WATER_DRINK_ACT, "onDestroy");
+        Log.i(TAG_WATER_DRINK_ACT, "onDestroy");
         if(dbWrite != null) dbWrite.close();
         super.onDestroy();
     }
 
     @Override
     protected void onResume() {
-        Log.i(LOG_WATER_DRINK_ACT, "onResume");
+        Log.i(TAG_WATER_DRINK_ACT, "onResume");
         super.onResume();
         ThisApplication.onResume();
         updateProgress();
 
         //Cerrar la notificacion en caso de estar activa
-        Log.i(LOG_WATER_DRINK_ACT, "Cerrar notificacion en caso que exista");
+        Log.i(TAG_WATER_DRINK_ACT, "Cerrar notificacion en caso que exista");
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(WaterDrinkActivity.this);
         notificationManager.cancel(Constants.NOTIFICATION_ID_APP);
     }
 
     @Override
     protected void onPause() {
-        Log.i(LOG_WATER_DRINK_ACT, "onPause");
+        Log.i(TAG_WATER_DRINK_ACT, "onPause");
         super.onPause();
         ThisApplication.onPause();
+
+        if(layoutRate.getVisibility() == View.VISIBLE){
+            // Si salimos y el rating esta visible, entonces reiniciamos
+            if(settings.getAppRated() != 8){
+                settings.setAppRated(0);
+                Log.i(TAG_RATE, settings.getAppVersion() + " - Contador de rated: " + settings.getAppRated());
+            }
+            // Pero si regresa (aun tendremos cero) y entonces califica la app, establecemos 8 y ya no necesitamos
+            // volver a ponerlo en cero
+        }
 
         if(countDownTimer == null && settings.isAlarmWorking()){
 
             // Si es hora de tomar agua (alarma nula) y el usuario abandona la app, vamos a poner una alarma en 5min,
             // cuando se active la alarma (si aun esta la app en horas activas) entonces lanzamos notificacion.
 
-            Log.i(LOG_WATER_DRINK_ACT, "La alarma esta funcionando: Salio de la app, alarma en: 5 mins");
+            Log.i(TAG_WATER_DRINK_ACT, "La alarma esta funcionando: Salio de la app, alarma en: 5 mins");
             long nextReminder = SystemClock.elapsedRealtime() + ((5 * 60) * 1000); // cada 5 minutos
             AlarmApp.getInstance().updateAlarm(nextReminder);
         }
 
         if(isDrinkTimeFromNotification){
-            Log.i(LOG_RECORD, "Entraste a la app desde la notificacion y no tomaste agua. Registrar 3");
+            Log.i(TAG_RECORD, "Entraste a la app desde la notificacion y no tomaste agua. Registrar 3");
             recordDrink(0,3);
             isDrinkTimeFromNotification = false;
         }
     }
-
-
-
-
 
     //endregion ACTIVITY CALLBACKS
 
@@ -1685,18 +1777,18 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
             String text = "";
 
             if(hours > 0 ){
-                text = String.format(Locale.getDefault(), "Siguiente en %2d horas %2d minutos %2d segundos",
+                text = String.format(Locale.getDefault(), getString(R.string.text_next_in) + " %2d " + getString(R.string.text_hours) + " %2d " + getString(R.string.text_minutes) + " %2d " + getString(R.string.text_seconds),
                         hours,
                         minutes,
                         seconds);
             }
             else if(minutes > 0){
-                text = String.format(Locale.getDefault(), "Siguiente en %2d minutos %2d segundos",
+                text = String.format(Locale.getDefault(), getString(R.string.text_next_in) + " %2d " + getString(R.string.text_minutes) + " %2d " + getString(R.string.text_seconds),
                         minutes,
                         seconds);
             }
             else {
-                text = String.format(Locale.getDefault(), "Siguiente en %2d segundos",
+                text = String.format(Locale.getDefault(), getString(R.string.text_next_in) + " %2d " + getString(R.string.text_seconds),
                         seconds);
             }
 
@@ -1708,7 +1800,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
             textViewNextDrink.setText("");
             textViewTips.setText(awesomeTexts.getCoutdownTextDone());
             //textViewStats.setText("");
-            buttonDrink.setText("Ya tome agua!");
+            buttonDrink.setText(getString(R.string.text_i_drink));
 
             setAppStyle();
             setPulsatorLayout(true);
@@ -1830,7 +1922,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         );
 
         dbWrite.close();
-        Log.i(LOG_RECORD, "Registramos con estado: " + statusCode + ". Resultado: " + (newRowId == -1 ? "FALLO al guardar" : "Registrado!"));
+        Log.i(TAG_RECORD, "Registramos con estado: " + statusCode + ". Resultado: " + (newRowId == -1 ? "FALLO al guardar" : "Registrado!"));
 
     }
 
@@ -1858,11 +1950,11 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         }
         catch (Exception e){
             //Toast.makeText(this, "Error en base de datos", Toast.LENGTH_SHORT).show();
-            Log.i(LOG_RECORD, "Error:\n\n" + e.toString() );
+            Log.i(TAG_RECORD, "Error:\n\n" + e.toString() );
         }
 
         dbWrite.close();
-        Log.i(LOG_RECORD, "Borrado del ultimo registro terminado...");
+        Log.i(TAG_RECORD, "Borrado del ultimo registro terminado...");
 
     }
 

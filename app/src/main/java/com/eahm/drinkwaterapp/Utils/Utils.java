@@ -49,66 +49,61 @@ public class Utils {
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-    public static String getDayName(int day, String language) {
-        if(language.equalsIgnoreCase("es")){
-            switch (day){
-                case 1:
-                    return "Lunes";
-                case 2:
-                    return "Martes";
-                case 3:
-                    return "Miercoles";
-                case 4:
-                    return "Jueves";
-                case 5:
-                    return "Viernes";
-                case 6:
-                    return "Sabado";
-                case 7:
-                    return "Domingo";
-                default:
-                    return "DAY_NOT_FOUNDED";
-            }
+    public static String getDayName(int day, Context context) {
+
+        switch (day){
+            case 1:
+                return context.getString(R.string.monday);
+            case 2:
+                return context.getString(R.string.tuesday);
+            case 3:
+                return context.getString(R.string.wednesday);
+            case 4:
+                return context.getString(R.string.thursday);
+            case 5:
+                return context.getString(R.string.friday);
+            case 6:
+                return context.getString(R.string.saturday);
+            case 7:
+                return context.getString(R.string.sunday);
+            default:
+                return "DAY_NOT_FOUNDED";
         }
-        else{
-            return "LANGUAGUE_NOT_FOUND";
-        }
+
+
     }
 
-    public static String getMonthName(int month, String language){
-        if(language.equalsIgnoreCase("es")){
-            switch (month){
-                case 1:
-                    return "Enero";
-                case 2:
-                    return "Febrero";
-                case 3:
-                    return "Marzo";
-                case 4:
-                    return "Abril";
-                case 5:
-                    return "Mayo";
-                case 6:
-                    return "Junio";
-                case 7:
-                    return "Julio";
-                case 8:
-                    return "Agosto";
-                case 9:
-                    return "Septiembre";
-                case 10:
-                    return "Octubre";
-                case 11:
-                    return "Noviembre";
-                case 12:
-                    return "Diciembre";
-                default:
-                    return "DAY_NOT_FOUNDED";
-            }
+    public static String getMonthName(int month, Context context){
+
+        switch (month){
+            case 1:
+                return context.getString(R.string.january);
+            case 2:
+                return context.getString(R.string.fabruary);
+            case 3:
+                return context.getString(R.string.march);
+            case 4:
+                return context.getString(R.string.april);
+            case 5:
+                return context.getString(R.string.may);
+            case 6:
+                return context.getString(R.string.june);
+            case 7:
+                return context.getString(R.string.july);
+            case 8:
+                return context.getString(R.string.august);
+            case 9:
+                return context.getString(R.string.september);
+            case 10:
+                return context.getString(R.string.october);
+            case 11:
+                return context.getString(R.string.november);
+            case 12:
+                return context.getString(R.string.december);
+            default:
+                return "DAY_NOT_FOUNDED";
         }
-        else{
-            return "LANGUAGUE_NOT_FOUND";
-        }
+
     }
 
     public static String getUserCountry(Context context) {
@@ -180,38 +175,38 @@ public class Utils {
                 + "_" + android_id;
     }
 
-    public String validateEmail(String email) {
+    public String validateEmail(String email, Context context) {
 
-        if (email.isEmpty()) {
-            return "Ingresa una direccion de correo electronico!";
+        if (email.isEmpty()) { 
+            return context.getString(R.string.validate_email_empty);
         }
         else if (!email.contains("@") || !email.contains(".")){
-            return "Direccion invalida";
+            return context.getString(R.string.validate_email_invalid);
         }
 
         return "TRUE";
     }
-    public String validatePassword(String password){
+    public String validatePassword(String password, Context context){
 
         if (password.isEmpty()) {
-            return "Ingresa una contraseña!";
+            return context.getString(R.string.validate_password_empty);
         }
         else if (password.length() < 6) {
-            return "Contraseña muy corta!";
+            return context.getString(R.string.validate_password_too_short);
         }
 
         return "TRUE";
     }
-    public String validatePhoneNumber(String phoneNumber) {
+    public String validatePhoneNumber(String phoneNumber, Context context) {
 
         if (phoneNumber.isEmpty()) {
-            return "Numero vacio";
+            return context.getString(R.string.validate_phone_empty);
         } else if (phoneNumber.length() < 8) {
-            return "Numero Incompleto";
+            return context.getString(R.string.validate_phone_incomplete);
         } else if (phoneNumber.length() > 15) {
-            return "Numero demasiado extenso";
+            return context.getString(R.string.validate_phone_too_long);
         } else if (!phoneNumber.matches("[0-9]+")) {
-            return "Entrada no debe contener letras solo numeros";
+            return context.getString(R.string.validate_phone_only_numbers);
         }
 
         return "TRUE";
@@ -365,7 +360,7 @@ public class Utils {
 
     }
 
-      public String calculateTimeBetweenDates(DateTime startRideDateTime, DateTime endRideDateTime ){
+      public String calculateTimeBetweenDates(DateTime startRideDateTime, DateTime endRideDateTime, Context context ){
 
         int startSeconds = (startRideDateTime.getHourOfDay() * 3600) + (startRideDateTime.getMinuteOfHour() * 60) + startRideDateTime.getSecondOfMinute();
         int endSeconds = (endRideDateTime.getHourOfDay() * 3600) + (endRideDateTime.getMinuteOfHour() * 60) + endRideDateTime.getSecondOfMinute();
@@ -379,20 +374,20 @@ public class Utils {
         int minutes = Integer.parseInt( parts[1] );
         int secs = Integer.parseInt( parts[2] );
 
-        return getTimeString(hours, minutes, secs);
+        return getTimeString(hours, minutes, secs, context);
     }
 
-    public String getTimeString(int hourOfDay, int minute, int seconds) {
+    public String getTimeString(int hourOfDay, int minute, int seconds, Context context) {
 
         String a = "";
 
-        String hora = "horas";
-        String minutos = "minutos";
-        String segundos = "segundos";
+        String hora = context.getResources().getString(R.string.text_hours);
+        String minutos = context.getResources().getString(R.string.text_minutes);
+        String segundos = context.getResources().getString(R.string.text_seconds);
 
-        if(hourOfDay == 1) hora = "hora";
-        if(minute == 1) minutos = "minuto";
-        if(seconds == 1) segundos = "segundo";
+        if(hourOfDay == 1) hora = context.getResources().getString(R.string.text_hour);
+        if(minute == 1) minutos = context.getResources().getString(R.string.text_minute);
+        if(seconds == 1) segundos = context.getResources().getString(R.string.text_second);
 
         if(hourOfDay > 0){
             a = a + hourOfDay + " " + hora + " ";
@@ -477,30 +472,30 @@ public class Utils {
         return tv;
     }
 
-    public String getTodayString() {
+    public String getTodayString(Context context) {
 
         DateTime datetime = Utils.getDateTimeByTimestamp(getCurrentTimestamp());
 
-        String stringDate = Utils.getDayName(datetime.getDayOfWeek(),"es") + " " +
-                datetime.getDayOfMonth() + " de " +
-                Utils.getMonthName(datetime.getMonthOfYear(), "es") + " " +
+        String stringDate = Utils.getDayName(datetime.getDayOfWeek(),context) + " " +
+                datetime.getDayOfMonth() + " " + context.getResources().getString(R.string.text_of) + " " +
+                Utils.getMonthName(datetime.getMonthOfYear(), context) + " " +
                 datetime.getYear();
 
         return stringDate;
     }
 
-    public String getFinalProgressString(boolean useAbbreviations) {
+    public String getFinalProgressString(boolean useAbbreviations, Context context) {
 
         float myProgressMl = new SettingsClass().getTodayProgress();
         float inLiters = myProgressMl / 1000;
         String myFinalProgress;
 
-        String metricMililiters = "mililitros";
-        String metricLiters = "litros";
+        String metricMililiters = context.getResources().getString(R.string.text_mililiters);
+        String metricLiters = context.getResources().getString(R.string.text_liters);
 
         if(useAbbreviations){
-            metricMililiters = "ml";
-            metricLiters = "L";
+            metricMililiters = context.getResources().getString(R.string.text_vol_unit_mililiters);
+            metricLiters = context.getResources().getString(R.string.text_vol_unit_liters);
         }
 
         if(inLiters > 0.9){
@@ -530,18 +525,18 @@ public class Utils {
 
     }
 
-    public String getGoalString(boolean useAbbreviations) {
+    public String getGoalString(boolean useAbbreviations, Context context) {
 
         float myGoalMl = new SettingsClass().getGoalValue();
         float inLiters = myGoalMl / 1000;
         String myFinalGoal;
 
-        String metricMililiters = "mililitros";
-        String metricLiters = "litros";
+        String metricMililiters = context.getResources().getString(R.string.text_mililiters);
+        String metricLiters = context.getResources().getString(R.string.text_liters);
 
         if(useAbbreviations){
-            metricMililiters = "ml";
-            metricLiters = "L";
+            metricMililiters = context.getResources().getString(R.string.text_vol_unit_mililiters);
+            metricLiters = context.getResources().getString(R.string.text_vol_unit_liters);
         }
 
         if(inLiters > 0.9){

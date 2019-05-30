@@ -63,7 +63,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
         }
         else {
             //Template
-            viewHolder.imageViewNews.setImageResource(R.drawable.news_test);
+            //viewHolder.imageViewNews.setImageResource(R.drawable.news_test);
         }
 
         String contentUrl = newsList.get(position).getContentUrl();

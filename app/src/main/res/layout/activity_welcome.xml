@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#D8EBF9"
-    tools:context=".WelcomeActivity">
+    tools:context=".WelcomeActivity"
+    tools:ignore="ContentDescription">
 
     <!--region Last Half-->
 
@@ -32,7 +33,7 @@
             android:layout_marginTop="7dp"
             android:layout_marginRight="20dp"
             android:layout_marginBottom="20dp"
-            android:text="Estamos listos!"
+            android:text="@string/welcome_guide_26"
             android:textColor="@android:color/white"
             android:textSize="30sp"
             android:textStyle="bold" />
@@ -73,7 +74,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="7dp"
                     android:gravity="center_horizontal"
-                    android:text="Se te notificara cada 45 minutos para que logres tu meta diaria de 1.5 litros de agua (1500 mililitros)"
+                    android:text="@string/welcome_guide_25"
                     android:textColor="@color/purple"
                     android:textSize="24sp" />
 
@@ -87,8 +88,9 @@
                     android:layout_marginBottom="27dp"
                     android:background="@drawable/button_background_03_selector"
                     android:clipToPadding="false"
-                    android:text="Empezar"
-                    android:textColor="@android:color/white" />
+                    android:text="@string/text_start"
+                    android:textColor="@android:color/white"
+                    android:layout_alignParentEnd="false" />
             </RelativeLayout>
 
         </android.support.v7.widget.CardView>
@@ -167,14 +169,14 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/spinnerContainer"
                     android:layout_marginTop="15dp"
-                    android:text="No te preocupes, puedes cambiar estos valores mas adelante en la app " />
+                    android:text="@string/welcome_guide_24" />
 
                 <TextView
                     android:id="@+id/textView25"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="40dp"
-                    android:text="Cuanto deseas registrar cuando presiones el boton BEBER en una notificacion?"
+                    android:text="@string/welcome_guide_23"
                     android:textColor="@android:color/black"
                     android:textSize="18sp" />
 
@@ -289,14 +291,14 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/spinnerContainer01"
                     android:layout_marginTop="15dp"
-                    android:text="No te preocupes, puedes cambiar estos valores mas adelante en la app " />
+                    android:text="@string/welcome_guide_22" />
 
                 <TextView
                     android:id="@+id/textV98iew23"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="40dp"
-                    android:text="Cuanto tiempo deseas cuando omitas una notificacion?"
+                    android:text="@string/welcome_guide_21"
                     android:textColor="@android:color/black"
                     android:textSize="18sp" />
 
@@ -328,7 +330,7 @@
             android:layout_marginTop="7dp"
             android:layout_marginRight="20dp"
             android:layout_marginBottom="20dp"
-            android:text="Notificaciones"
+            android:text="@string/text_notifications"
             android:textColor="@android:color/white"
             android:textSize="30sp"
             android:textStyle="bold" />
@@ -381,7 +383,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="7dp"
                     android:layout_marginBottom="10dp"
-                    android:text="Te enviaremos notificaciones para que recuerdes tomar agua"
+                    android:text="@string/welcome_guide_20"
                     android:textColor="@android:color/black"
                     android:textSize="18sp" />
 
@@ -406,7 +408,9 @@
                         android:layout_alignParentRight="true"
                         android:layout_marginRight="17dp"
                         android:layout_marginBottom="17dp"
-                        app:srcCompat="@mipmap/ic_launcher_round" />
+                        app:srcCompat="@mipmap/ic_launcher_round"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginEnd="17dp" />
 
                     <TextView
                         android:id="@+id/textView34"
@@ -417,7 +421,10 @@
                         android:layout_marginRight="7dp"
                         android:layout_marginBottom="7dp"
                         android:text="@string/app_name"
-                        android:textSize="9sp" />
+                        android:textSize="9sp"
+                        tools:ignore="SmallSp"
+                        android:layout_marginStart="30dp"
+                        android:layout_marginEnd="7dp" />
 
                     <TextView
                         android:id="@+id/textView35"
@@ -429,8 +436,12 @@
                         android:layout_marginRight="7dp"
                         android:layout_marginBottom="7dp"
                         android:layout_toLeftOf="@+id/imageViewIcon"
-                        android:text="Hora de tomar agua!\nLlevas 970ml el dia de hoy. Tu meta es de 1 litro."
-                        android:textSize="10sp" />
+                        android:text="@string/welcome_guide_19"
+                        android:textSize="10sp"
+                        tools:ignore="SmallSp"
+                        android:layout_marginStart="17dp"
+                        android:layout_toStartOf="@+id/imageViewIcon"
+                        android:layout_marginEnd="7dp" />
 
                     <LinearLayout
                         android:id="@+id/NInotificationContainer"
@@ -440,23 +451,25 @@
                         android:layout_alignParentBottom="false"
                         android:layout_marginLeft="10dp"
                         android:layout_marginBottom="12dp"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:layout_marginStart="10dp">
 
                         <TextView
                             android:id="@+id/textView33"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"
-                            android:text="SALTAR"
+                            android:text="@string/text_skip"
                             android:textColor="@color/purple"
                             android:textSize="17sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:layout_marginEnd="10dp" />
 
                         <TextView
                             android:id="@+id/textView32"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="BEBER"
+                            android:text="@string/text_drink"
                             android:textColor="@color/purple"
                             android:textSize="17sp"
                             android:textStyle="bold" />
@@ -470,7 +483,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/NIcontainer"
                     android:layout_marginTop="10dp"
-                    android:text="Cuando tengas la notificacion puedes decidir entre SALTAR durante un tiempo y BEBER una cantidad predefinida de agua sin necesidad de entrar en la aplicacion" />
+                    android:text="@string/welcome_guide_18" />
 
             </RelativeLayout>
 
@@ -510,7 +523,7 @@
                     android:layout_below="@+id/timePickerSLT"
                     android:layout_marginTop="7dp"
                     android:gravity="center_horizontal"
-                    android:text="Entre 6:00pm a 11:59pm" />
+                    android:text="@string/welcome_guide_17" />
 
                 <TimePicker
                     android:id="@+id/timePickerSLT"
@@ -542,8 +555,9 @@
                         android:paddingLeft="10dp"
                         android:paddingTop="3dp"
                         android:paddingBottom="3dp"
-                        android:text="A que hora de la noche deseas terminar de recibir notificaciones?\n(aproximadamente)"
-                        android:textColor="@android:color/white" />
+                        android:text="@string/welcome_guide_16"
+                        android:textColor="@android:color/white"
+                        tools:ignore="RtlSymmetry" />
 
                     <ImageView
                         android:id="@+id/imageView12"
@@ -654,7 +668,7 @@
                     android:layout_below="@+id/timePickerSMT"
                     android:layout_marginTop="7dp"
                     android:gravity="center_horizontal"
-                    android:text="Entre 1:00am a 12:00pm" />
+                    android:text="@string/welcome_guide_15" />
 
                 <RelativeLayout
                     android:id="@+id/SMTcontainer"
@@ -674,8 +688,11 @@
                         android:paddingLeft="10dp"
                         android:paddingTop="3dp"
                         android:paddingBottom="3dp"
-                        android:text="A que hora de la mañana quieres empezar a tomar agua?"
-                        android:textColor="@android:color/white" />
+                        android:text="@string/welcome_guide_14"
+                        android:textColor="@android:color/white"
+                        android:layout_marginStart="10dp"
+                        android:layout_toStartOf="@+id/imageView11"
+                        tools:ignore="RtlSymmetry" />
 
                     <ImageView
                         android:id="@+id/imageView11"
@@ -685,7 +702,9 @@
                         android:layout_centerVertical="true"
                         android:layout_marginRight="10dp"
                         android:padding="7dp"
-                        app:srcCompat="@drawable/icon_morning" />
+                        app:srcCompat="@drawable/icon_morning"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginEnd="10dp" />
 
                 </RelativeLayout>
 
@@ -729,7 +748,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="40dp"
-                    android:text="Cuando tomes agua esperaremos un tiempo antes de volver a notificarte."
+                    android:text="@string/welcome_guide_13"
                     android:textColor="@android:color/black"
                     android:textSize="18sp" />
 
@@ -742,7 +761,7 @@
                     android:background="@drawable/background_rounded_all_corners"
                     android:gravity="center_horizontal"
                     android:padding="7dp"
-                    android:text="Cada cuanto deseas ser recordado aproximadamente?"
+                    android:text="@string/welcome_guide_12"
                     android:textColor="@android:color/white"
                     android:textSize="18sp" />
 
@@ -823,7 +842,8 @@
                     android:maxLength="7"
                     android:text="0"
                     android:textSize="36sp"
-                    android:theme="@style/editTextWelcome" />
+                    android:theme="@style/editTextWelcome"
+                    tools:ignore="HardcodedText" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -870,7 +890,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="40dp"
-                    android:text="Cuanto deseas alcanzar por dia?"
+                    android:text="@string/welcome_guide_11"
                     android:textColor="@android:color/black"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -908,7 +928,7 @@
             android:layout_marginTop="7dp"
             android:layout_marginRight="20dp"
             android:layout_marginBottom="20dp"
-            android:text="Tu consumo calculado al dia es de"
+            android:text="@string/welcome_guide_10"
             android:textColor="@android:color/white"
             android:textSize="27sp"
             android:textStyle="bold" />
@@ -948,7 +968,7 @@
                     android:layout_marginLeft="20dp"
                     android:layout_marginTop="10dp"
                     android:layout_marginRight="20dp"
-                    android:text="No te preocupes, puedes cambiar estos valores mas adelante en la app " />
+                    android:text="@string/welcome_guide_09" />
 
                 <TextView
                     android:id="@+id/textView27"
@@ -958,7 +978,7 @@
                     android:layout_marginLeft="20dp"
                     android:layout_marginTop="30dp"
                     android:layout_marginRight="20dp"
-                    android:text="Deseas establecer esta como tu meta diaria?"
+                    android:text="@string/welcome_guide_08"
                     android:textColor="@android:color/black"
                     android:textSize="18sp" />
 
@@ -973,7 +993,7 @@
                     android:layout_marginRight="20dp"
                     android:layout_marginBottom="20dp"
                     android:background="@drawable/button_background_03_selector"
-                    android:text="Establecer META Manualmente"
+                    android:text="@string/welcome_guide_07"
                     android:textColor="@android:color/white" />
 
                 <Button
@@ -989,7 +1009,7 @@
                     android:background="@drawable/button_background_03_selector"
                     android:paddingLeft="7dp"
                     android:paddingRight="7dp"
-                    android:text="Usar cantidad calculada"
+                    android:text="@string/welcome_guide_06"
                     android:textColor="@android:color/white" />
 
                 <TextView
@@ -998,7 +1018,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="40dp"
                     android:gravity="center_horizontal"
-                    android:text="1000 mililitros "
+                    android:text="@string/welcome_guide_05"
                     android:textSize="30sp"
                     android:textStyle="bold" />
             </RelativeLayout>
@@ -1024,7 +1044,7 @@
             android:layout_marginTop="7dp"
             android:layout_marginRight="20dp"
             android:layout_marginBottom="20dp"
-            android:text="Calcularemos una meta inicial para ti "
+            android:text="@string/welcome_guide_04"
             android:textColor="@android:color/white"
             android:textSize="30sp"
             android:textStyle="bold" />
@@ -1061,7 +1081,8 @@
                     android:maxLength="7"
                     android:text="0"
                     android:textSize="36sp"
-                    android:theme="@style/editTextWelcome" />
+                    android:theme="@style/editTextWelcome"
+                    tools:ignore="HardcodedText" />
 
                 <Button
                     android:id="@+id/buttonGUDSetGoalManually"
@@ -1072,7 +1093,7 @@
                     android:layout_marginRight="20dp"
                     android:layout_marginBottom="20dp"
                     android:background="@drawable/button_background_03_selector"
-                    android:text="Establecer META manualmente"
+                    android:text="@string/welcome_guide_03"
                     android:textColor="@android:color/white" />
 
                 <LinearLayout
@@ -1096,7 +1117,9 @@
                     android:background="@drawable/button_background_03_selector"
                     android:padding="7dp"
                     android:scaleType="fitCenter"
-                    app:srcCompat="@drawable/icon_arrow_right" />
+                    app:srcCompat="@drawable/icon_arrow_right"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="20dp" />
 
                 <RelativeLayout
                     android:id="@+id/GUDcontainer"
@@ -1142,7 +1165,7 @@
                     android:layout_marginTop="30dp"
                     android:layout_marginRight="20dp"
                     android:gravity="center_vertical"
-                    android:text="Cual es tu peso actualmente?"
+                    android:text="@string/welcome_guide_02"
                     android:textColor="@android:color/black"
                     android:textSize="18sp" />
 
@@ -1173,7 +1196,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:gravity="center_horizontal"
-                android:text="Bienvenido"
+                android:text="@string/text_welcome"
                 android:textColor="@android:color/white"
                 android:textSize="36sp"
                 android:textStyle="bold" />
@@ -1187,7 +1210,7 @@
                 android:gravity="center_horizontal"
                 android:paddingLeft="50dp"
                 android:paddingRight="50dp"
-                android:text="Te guiara para ajustarse segun tus preferencias"
+                android:text="@string/welcome_guide_01"
                 android:textColor="@android:color/black"
                 android:textStyle="bold" />
 
@@ -1211,7 +1234,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="7dp"
                     android:gravity="center_horizontal"
-                    android:text="DRINK WATER"
+                    android:text="@string/app_global_name"
                     android:textColor="#1D98CE"
                     android:textSize="24sp"
                     android:textStyle="bold" />

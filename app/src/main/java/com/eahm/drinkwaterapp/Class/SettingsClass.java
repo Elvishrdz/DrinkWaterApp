@@ -2,6 +2,7 @@ package com.eahm.drinkwaterapp.Class;
 
 import android.util.Log;
 
+import com.eahm.drinkwaterapp.BuildConfig;
 import com.pixplicity.easyprefs.library.Prefs;
 
 public class SettingsClass {
@@ -396,6 +397,43 @@ public class SettingsClass {
 
     public void deleteContratulationStatus(){
         Prefs.remove(APP_CONGRATULATIONS_STATUS);
+    }
+
+
+    private static String APP_RATE = "APP_RATE";
+
+    public int getAppRated() {
+        int _default = 0;
+        if(!Prefs.contains(APP_RATE)){
+            setAppRated(_default);
+        }
+        return Prefs.getInt(APP_RATE, _default);
+    }
+
+    public void setAppRated(int status){
+        Prefs.putInt(APP_RATE, status);
+    }
+
+    public void deleteAppRated(){
+        Prefs.remove(APP_RATE);
+    }
+
+
+    private static String APP_VERSION = "APP_VERSION";
+
+    public String getAppVersion() {
+        if(!Prefs.contains(APP_VERSION)){
+            Prefs.putString(APP_VERSION, "");
+        }
+        return Prefs.getString(APP_VERSION, "");
+    }
+
+    public void setAppVersion(String version){
+        Prefs.putString(APP_VERSION, version);
+    }
+
+    public void deleteAppVersion(){
+        Prefs.remove(APP_VERSION);
     }
 
 }

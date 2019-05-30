@@ -149,7 +149,7 @@ public class FloatWidgetService extends Service {
         layoutCongratulations.setVisibility(View.GONE);
 
         //region CUSTOM STYLE
-        String description = "Has alcanzado "+ new Utils().getFinalProgressString(false) +" de agua durante esta jornada. Has logrado tu meta de " + new Utils().getGoalString(false) + " y has mantenido hidratado tu cuerpo. Sigue asi!";
+        String description = "Has alcanzado "+ new Utils().getFinalProgressString(false, this) +" de agua durante esta jornada. Has logrado tu meta de " + new Utils().getGoalString(false, this) + " y has mantenido hidratado tu cuerpo. Sigue asi!";
 
         int random = new Utils().getRandomNumber(1, 6);
         switch (random){

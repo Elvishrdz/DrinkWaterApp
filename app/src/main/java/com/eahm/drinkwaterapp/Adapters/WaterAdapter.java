@@ -81,9 +81,9 @@ public class WaterAdapter extends RecyclerView.Adapter<WaterAdapter.ViewHolder> 
 
         DateTime datetime = Utils.getDateTimeByTimestamp(timestamp);
 
-        String stringDate = Utils.getDayName(datetime.getDayOfWeek(),"es") + " " +
+        String stringDate = Utils.getDayName(datetime.getDayOfWeek(),context) + " " +
                             datetime.getDayOfMonth() + " de " +
-                            Utils.getMonthName(datetime.getMonthOfYear(), "es") + " " +
+                            Utils.getMonthName(datetime.getMonthOfYear(), context) + " " +
                             datetime.getYear();
         Log.i(TAG_REPORT, "string date: " + stringDate);
 
