@@ -2,7 +2,7 @@ package com.eahm.drinkwaterapp.Utils;
 
 public class Constants {
 
-    public static String SPLASH_SCREEN_MODE = "1"; // 0: Without(Testing) 1: Normal   2: Video
+    //public static String SPLASH_SCREEN_MODE = "1"; // 0: Without(Testing) 1: Normal   2: Video
 
     public static final String C_NAME = "CUSTOMER_NAME";
     public static final String C_LAST_NAME = "CUSTOMER_LAST_NAME";

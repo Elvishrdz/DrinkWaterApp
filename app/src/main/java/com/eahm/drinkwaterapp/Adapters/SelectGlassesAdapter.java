@@ -19,9 +19,11 @@ public class SelectGlassesAdapter extends BaseAdapter {
             "100",
             "200",
             "300",
+            "400",
             "10",
-            "20",
-            "30"};
+            "30",
+            "50",
+            "70"};
 
 
     public SelectGlassesAdapter(Context context) {
@@ -56,6 +58,7 @@ public class SelectGlassesAdapter extends BaseAdapter {
         ImageView imageViewGlassIcon = view.findViewById(R.id.imageViewGlassIcon);
 
         textViewGlassAmount.setText(defaultAmounts[position]);
+        textViewGlassText.setText(context.getResources().getString(R.string.text_mililiters));
 
         return view;
     }

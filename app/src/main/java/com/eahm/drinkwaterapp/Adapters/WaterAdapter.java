@@ -16,7 +16,6 @@ import com.eahm.drinkwaterapp.R;
 import com.eahm.drinkwaterapp.Utils.Utils;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import org.joda.time.DateTime;
@@ -63,6 +62,10 @@ public class WaterAdapter extends RecyclerView.Adapter<WaterAdapter.ViewHolder> 
         dataset = value;
     }
 
+    int style = 0;
+    public void setCustomStyle(int code){
+        style = code;
+    }
 
     @NonNull
     @Override
@@ -75,14 +78,14 @@ public class WaterAdapter extends RecyclerView.Adapter<WaterAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
 
         RecordModel recordModel = dataset.get(position);
-        String timestamp = recordModel.getTimestamp();
+        String timestamp = String.valueOf(recordModel.getTimestamp());
 
         Log.i(TAG_REPORT, "timestamp: " + timestamp);
 
         DateTime datetime = Utils.getDateTimeByTimestamp(timestamp);
 
         String stringDate = Utils.getDayName(datetime.getDayOfWeek(),context) + " " +
-                            datetime.getDayOfMonth() + " de " +
+                            datetime.getDayOfMonth() + " " + context.getResources().getString(R.string.text_of) + " " +
                             Utils.getMonthName(datetime.getMonthOfYear(), context) + " " +
                             datetime.getYear();
         Log.i(TAG_REPORT, "string date: " + stringDate);
@@ -104,7 +107,7 @@ public class WaterAdapter extends RecyclerView.Adapter<WaterAdapter.ViewHolder> 
             amountString = String.valueOf(integer);
         }
 
-        final String amountText = "+" + amountString + " ml";
+        final String amountText = "+" + amountString + " " + context.getResources().getString(R.string.text_vol_unit_mililiters);
 
         /*
         1 = bebio dentro de la app
@@ -115,9 +118,19 @@ public class WaterAdapter extends RecyclerView.Adapter<WaterAdapter.ViewHolder> 
         6 = saltado El cronometro termino y es hora de beber pero salio.
          */
 
-        //calculate last time with currenttime
+        switch (style){
+            case 0: // TODAY
+                viewHolder.textViewDate.setText("");
+                viewHolder.textViewDate.setBackgroundColor(context.getResources().getColor(R.color.blue_water));
+                viewHolder.textViewTime.setTextColor(context.getResources().getColor(R.color.dark_purple));
+                break;
+            case 1: // YESTERDAY
+                viewHolder.textViewDate.setText(stringDate);
+                viewHolder.textViewDate.setBackgroundColor(context.getResources().getColor(R.color.green));
+                viewHolder.textViewTime.setTextColor(context.getResources().getColor(R.color.green));
 
-        viewHolder.textViewDate.setText("");
+                break;
+        }
 
         switch (recordModel.getStatusCode()){
             case 1:
@@ -153,7 +166,7 @@ public class WaterAdapter extends RecyclerView.Adapter<WaterAdapter.ViewHolder> 
                 viewHolder.imageViewStatus.setVisibility(View.VISIBLE);
                 viewHolder.textViewMessage.setVisibility(View.VISIBLE);
                 viewHolder.textViewMessage.setTextColor(context.getResources().getColor(R.color.green));
-                viewHolder.textViewMessage.setText("Registrados desde la notificacion");
+                viewHolder.textViewMessage.setText(context.getString(R.string.text_notification_case_02));
                 viewHolder.textViewAmount.setVisibility(View.VISIBLE);
                 viewHolder.textViewAmount.setText(amountText);
                 viewHolder.textViewDate.setVisibility(View.VISIBLE);
@@ -165,7 +178,7 @@ public class WaterAdapter extends RecyclerView.Adapter<WaterAdapter.ViewHolder> 
                 viewHolder.imageViewStatus.setVisibility(View.GONE);
                 viewHolder.textViewMessage.setVisibility(View.VISIBLE);
                 viewHolder.textViewMessage.setTextColor(context.getResources().getColor(R.color.white));
-                viewHolder.textViewMessage.setText("No tomaste agua.\nEntraste desde la notificacion");
+                viewHolder.textViewMessage.setText(context.getString(R.string.text_notification_case_03));
                 viewHolder.textViewAmount.setVisibility(View.GONE);
                 viewHolder.textViewAmount.setText(amountText);
                 viewHolder.textViewDate.setVisibility(View.GONE);
@@ -178,7 +191,7 @@ public class WaterAdapter extends RecyclerView.Adapter<WaterAdapter.ViewHolder> 
                 viewHolder.imageViewStatus.setVisibility(View.GONE);
                 viewHolder.textViewMessage.setVisibility(View.VISIBLE);
                 viewHolder.textViewMessage.setTextColor(context.getResources().getColor(R.color.black));
-                viewHolder.textViewMessage.setText("Saltado desde la notificacion");
+                viewHolder.textViewMessage.setText(context.getString(R.string.text_notification_case_04));
                 viewHolder.textViewAmount.setVisibility(View.GONE);
                 viewHolder.textViewDate.setVisibility(View.GONE);
                 //viewHolder.textViewTime.setTextColor(context.getResources().getColor(R.color.white));
@@ -190,7 +203,7 @@ public class WaterAdapter extends RecyclerView.Adapter<WaterAdapter.ViewHolder> 
                 viewHolder.imageViewStatus.setVisibility(View.GONE);
                 viewHolder.textViewMessage.setVisibility(View.VISIBLE);
                 viewHolder.textViewMessage.setTextColor(context.getResources().getColor(R.color.dark_purple));
-                viewHolder.textViewMessage.setText("La notificacion fue cerrada");
+                viewHolder.textViewMessage.setText(context.getString(R.string.text_notification_case_05));
                 viewHolder.textViewAmount.setVisibility(View.GONE);
                 viewHolder.textViewAmount.setText(amountText);
                 viewHolder.textViewDate.setVisibility(View.GONE);
@@ -203,7 +216,7 @@ public class WaterAdapter extends RecyclerView.Adapter<WaterAdapter.ViewHolder> 
                 viewHolder.imageViewStatus.setVisibility(View.GONE);
                 viewHolder.textViewMessage.setVisibility(View.VISIBLE);
                 viewHolder.textViewMessage.setTextColor(context.getResources().getColor(R.color.yellow));
-                viewHolder.textViewMessage.setText("Abandonaste sin beber");
+                viewHolder.textViewMessage.setText(context.getString(R.string.text_notification_case_06));
                 viewHolder.textViewAmount.setVisibility(View.GONE);
                 viewHolder.textViewAmount.setText(amountText);
                 viewHolder.textViewDate.setVisibility(View.GONE);

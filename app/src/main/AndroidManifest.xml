@@ -9,26 +9,25 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- To check if we have internet or not -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- To restart the alarms when  the phone is restarted... -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- To select a profile image -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/> <!-- Para mostrar ventana flotante cuando logres tu meta! -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />  <!-- To save profile pic -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />  <!-- Para mostrar ventana flotante cuando logres tu meta! -->
 
-    <!-- To save profile pic -->
+
     <application
         android:name=".ThisApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:windowSoftInputMode="adjustResize"
         android:fitsSystemWindows="true"
-        android:theme="@style/AppTheme">
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        android:windowSoftInputMode="adjustResize">
 
         <!-- META DATA -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="@string/ads_app_id"/>
-
+            android:value="@string/ads_app_id" />
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="4f7a6c67a66c20413e326e04c2975cf223de9dfa" />
@@ -45,38 +44,38 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@style/SplashTheme">
             <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
-            <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
 
-            <category android:name="android.intent.category.DEFAULT" />
-            <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!--<activity android:name=".LoginActivity" />-->
+        <activity
+            android:name=".WelcomeActivity"
+            android:theme="@style/WelcomeTheme" />
+        <activity
+            android:name=".WaterDrinkActivity"
+            android:theme="@style/WaterDrinkTheme" />
+        <!--<activity android:name=".MainActivity" />-->
+        <!--<activity android:name=".PrevWaterActivity" />-->
+        <!--<activity android:name=".SplashScreen02"></activity>-->
 
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".WelcomeActivity" android:theme="@style/WelcomeTheme" />
-        <activity android:name=".WaterDrinkActivity" android:theme="@style/WaterDrinkTheme"/>
-        <activity android:name=".MainActivity" />
-        <activity android:name=".PrevWaterActivity" />
+         <!-- RECEIVERS -->
 
-        <!-- RECEIVERS -->
-
-        <receiver
-            android:name=".BroadcastReceiver.NotificationReceiver"
-            tools:ignore="InnerclassSeparator" />
         <receiver
             android:name=".BroadcastReceiver.AlarmReceiver"
             tools:ignore="InnerclassSeparator" />
         <receiver
             android:name=".BroadcastReceiver.AndroidActionsReceiver"
-            android:exported="true"
             android:enabled="true"
+            android:exported="true"
             tools:ignore="InnerclassSeparator">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
 
         <!-- SERVICES -->
         <service
@@ -84,6 +83,7 @@
             android:enabled="true"
             android:exported="false"
             tools:ignore="InnerclassSeparator" />
+
 
     </application>
 

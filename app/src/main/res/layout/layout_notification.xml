@@ -18,14 +18,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical|center_horizontal"
-            android:text="Configuracion de la notificacion"
+            android:text="@string/text_notification_title"
             android:textColor="@android:color/white"
             android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="5dp"
-            android:layout_above="@+id/editTextGUDWeight"
             android:layout_marginTop="7dp"
             android:background="@color/purple"
             android:orientation="vertical" />
@@ -41,22 +40,21 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="3dp"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_marginEnd="3dp">
 
                 <TextView
                     android:id="@+id/textView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="3dp"
-                    android:layout_weight="1"
                     android:gravity="center_vertical|center_horizontal"
-                    android:text="SALTAR durante:"
+                    android:text="@string/text_skip_time"
                     android:textColor="@android:color/white" />
 
                 <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:background="@color/dark_purple"
                     android:orientation="horizontal">
 
@@ -77,9 +75,10 @@
                         android:layout_alignParentRight="true"
                         android:layout_centerVertical="true"
                         android:layout_marginRight="10dp"
-                        android:layout_weight="1"
                         android:scaleType="fitEnd"
-                        app:srcCompat="@drawable/icon_dropdown_white_small" />
+                        app:srcCompat="@drawable/icon_dropdown_white_small"
+                        android:layout_marginEnd="10dp"
+                        android:layout_alignParentEnd="true" />
 
                 </RelativeLayout>
 
@@ -90,7 +89,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="3dp"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_marginStart="3dp">
 
                 <TextView
                     android:id="@+id/textView6"
@@ -98,7 +98,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="3dp"
                     android:gravity="center_vertical|center_horizontal"
-                    android:text="Cantidad al BEBER"
+                    android:text="@string/text_drink_amount"
                     android:textColor="@android:color/white" />
 
                 <RelativeLayout
@@ -123,7 +123,9 @@
                         android:layout_centerVertical="true"
                         android:layout_marginRight="10dp"
                         android:scaleType="fitEnd"
-                        app:srcCompat="@drawable/icon_dropdown_white_small" />
+                        app:srcCompat="@drawable/icon_dropdown_white_small"
+                        android:layout_marginEnd="10dp"
+                        android:layout_alignParentEnd="true" />
 
                 </RelativeLayout>
 

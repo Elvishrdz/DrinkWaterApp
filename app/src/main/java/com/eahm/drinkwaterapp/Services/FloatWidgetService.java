@@ -149,7 +149,7 @@ public class FloatWidgetService extends Service {
         layoutCongratulations.setVisibility(View.GONE);
 
         //region CUSTOM STYLE
-        String description = "Has alcanzado "+ new Utils().getFinalProgressString(false, this) +" de agua durante esta jornada. Has logrado tu meta de " + new Utils().getGoalString(false, this) + " y has mantenido hidratado tu cuerpo. Sigue asi!";
+        String description = getString(R.string.text_congratulations_01) + " " + new Utils().getFinalProgressString(false, this) + " " + getString(R.string.text_congratulations_02) + " " + new Utils().getGoalString(false, this) + " " + getString(R.string.text_congratulations_03);
 
         int random = new Utils().getRandomNumber(1, 6);
         switch (random){
@@ -159,7 +159,7 @@ public class FloatWidgetService extends Service {
                 textViewAppName.setTextColor(getResources().getColor(R.color.white));
                 imageViewTrophy.setImageResource(R.drawable.icon_trophy_01);
                 textViewTitle.setTextColor(getResources().getColor(R.color.white));
-                //textViewTitle.setText("FELICIDADES!");
+                textViewTitle.setText(getString(R.string.text_congratulations));
                 textViewDescription.setTextColor(getResources().getColor(R.color.black));
                 textViewDescription.setText(description);
                 break;
@@ -169,7 +169,7 @@ public class FloatWidgetService extends Service {
                 textViewAppName.setTextColor(getResources().getColor(R.color.white));
                 imageViewTrophy.setImageResource(R.drawable.icon_trophy_02);
                 textViewTitle.setTextColor(getResources().getColor(R.color.white));
-                //textViewTitle.setText("FELICIDADES!");
+                textViewTitle.setText(getString(R.string.text_congratulations));
                 textViewDescription.setTextColor(getResources().getColor(R.color.black));
                 textViewDescription.setText(description);
                 break;
@@ -179,7 +179,7 @@ public class FloatWidgetService extends Service {
                 textViewAppName.setTextColor(getResources().getColor(R.color.white));
                 imageViewTrophy.setImageResource(R.drawable.icon_trophy_03);
                 textViewTitle.setTextColor(getResources().getColor(R.color.white));
-                //textViewTitle.setText("FELICIDADES!");
+                textViewTitle.setText(getString(R.string.text_congratulations));
                 textViewDescription.setTextColor(getResources().getColor(R.color.black));
                 textViewDescription.setText(description);
                 break;
@@ -189,7 +189,7 @@ public class FloatWidgetService extends Service {
                 textViewAppName.setTextColor(getResources().getColor(R.color.white));
                 imageViewTrophy.setImageResource(R.drawable.icon_trophy_04);
                 textViewTitle.setTextColor(getResources().getColor(R.color.white));
-                //textViewTitle.setText("FELICIDADES!");
+                textViewTitle.setText(getString(R.string.text_congratulations));
                 textViewDescription.setTextColor(getResources().getColor(R.color.black));
                 textViewDescription.setText(description);
                 break;
@@ -199,7 +199,7 @@ public class FloatWidgetService extends Service {
                 textViewAppName.setTextColor(getResources().getColor(R.color.white));
                 imageViewTrophy.setImageResource(R.drawable.icon_trophy_05);
                 textViewTitle.setTextColor(getResources().getColor(R.color.white));
-                //textViewTitle.setText("FELICIDADES!");
+                textViewTitle.setText(getString(R.string.text_congratulations));
                 textViewDescription.setTextColor(getResources().getColor(R.color.grey));
                 textViewDescription.setText(description);
                 break;
@@ -209,7 +209,7 @@ public class FloatWidgetService extends Service {
                 textViewAppName.setTextColor(getResources().getColor(R.color.white));
                 imageViewTrophy.setImageResource(R.drawable.icon_trophy_06);
                 textViewTitle.setTextColor(getResources().getColor(R.color.white));
-                //textViewTitle.setText("FELICIDADES!");
+                textViewTitle.setText(getString(R.string.text_congratulations));
                 textViewDescription.setTextColor(getResources().getColor(R.color.white));
                 textViewDescription.setText(description);
                 break;

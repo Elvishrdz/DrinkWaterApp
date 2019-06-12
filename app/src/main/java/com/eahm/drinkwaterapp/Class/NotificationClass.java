@@ -42,7 +42,7 @@ public class NotificationClass {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
             CharSequence name = context.getString(R.string.app_name); //R.string.channel_name
-            String description = context.getString(R.string.login_title); //R.string.channel_description
+            String description = context.getString(R.string.channel_description); //R.string.channel_description
 
             int importance = NotificationManager.IMPORTANCE_HIGH; //SET IMPORTANCE OF NOTIFICATION
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
@@ -64,6 +64,7 @@ public class NotificationClass {
         intentNotification.setAction("ON_NOTIFICATION_CLICKED");
         intentNotification.putExtra("NOTI_ID", NOTIFICATION_ID);
         intentNotification.putExtra("IS_FROM_NOTIFICATION", true);
+        intentNotification.putExtra("IS_DRINK_TIME", true);
         intentNotification.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intentNotification, PendingIntent.FLAG_ONE_SHOT);
 
@@ -164,8 +165,8 @@ public class NotificationClass {
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(bigText))
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setContentIntent(pendingIntent)
-                .addAction(0, "Saltar", pendingIntentSkip) //R.drawable.icon_skip
-                .addAction(0, "Tome Agua", pendingIntentDrink) //R.drawable.icon_drink
+                .addAction(0, context.getResources().getString(R.string.text_skip), pendingIntentSkip) //R.drawable.icon_skip
+                .addAction(0, context.getResources().getString(R.string.text_drink), pendingIntentDrink) //R.drawable.icon_drink
                 .setCategory(NotificationCompat.CATEGORY_REMINDER)
                 //.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 //.setOnlyAlertOnce(true)
@@ -206,6 +207,7 @@ public class NotificationClass {
         intentNotification.putExtra("IS_FROM_NOTIFICATION", true);
         intentNotification.putExtra("SHOW_REPORT", true);
         intentNotification.putExtra("IS_LAST_NOTIFICATION", true);
+        intentNotification.putExtra("TIMESTAMP", new Utils().getCurrentTimestamp());
         intentNotification.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intentNotification, PendingIntent.FLAG_ONE_SHOT);
 

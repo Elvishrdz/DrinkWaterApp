@@ -27,7 +27,7 @@
             android:layout_marginTop="7dp"
             android:layout_marginRight="7dp"
             android:gravity="center_horizontal"
-            android:text="Recordar cada:\n2 horas 48 minutos"
+            android:text="@string/text_reminder_title"
             android:textColor="@android:color/white"
             android:textStyle="bold" />
 
@@ -49,7 +49,7 @@
             android:layout_gravity="center_vertical"
             android:layout_margin="7dp"
             android:background="@color/dark_purple"
-            android:text="Cambiar"
+            android:text="@string/text_change"
             android:textColor="@android:color/white"
             android:textStyle="bold" />
 

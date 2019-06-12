@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -16,6 +15,7 @@ import android.widget.Toast;
 import com.eahm.drinkwaterapp.DB.RecordsContract;
 import com.eahm.drinkwaterapp.DB.RecordsDbHelper;
 import com.eahm.drinkwaterapp.Models.RecordModel;
+import com.eahm.drinkwaterapp.R;
 import com.eahm.drinkwaterapp.Services.FloatWidgetService;
 import com.eahm.drinkwaterapp.Singleton.AlarmApp;
 import com.eahm.drinkwaterapp.Class.AwesomeTextsClass;
@@ -25,6 +25,8 @@ import com.eahm.drinkwaterapp.Class.NotificationClass;
 import com.eahm.drinkwaterapp.Utils.Constants;
 import com.eahm.drinkwaterapp.Utils.Utils;
 import com.eahm.drinkwaterapp.WaterDrinkActivity;
+
+import java.util.Calendar;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
@@ -91,7 +93,8 @@ public class AlarmReceiver extends BroadcastReceiver {
                 notificationManager.cancel(Constants.NOTIFICATION_ID_APP);
             }
 
-            deleteRecords();
+            //deleteRecords();
+            deleteRecordsFrom2DaysAgo();
             settings.deleteTodayProgress(); // reiniciar el progreso de hoy
             settings.setContratulationStatus(false);
             settings.setDrinkNextTime("");
@@ -100,7 +103,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             if(!isAppVisible){
                 Log.i(Constants.LOG_MORNING_ALARM, "Mostrar notificacion, la app no esta activa");
                 new NotificationClass().showDrinkNotification(Constants.CHANNEL_ID_APP, Constants.NOTIFICATION_ID_APP, context,
-                        awesomeTexts.getTitle(1),
+                        awesomeTexts.getTitle(1, context),
                         awesomeTexts.getText(1, context),
                         awesomeTexts.getBigText(1, context));
             }
@@ -126,16 +129,17 @@ public class AlarmReceiver extends BroadcastReceiver {
                 notificationManager.cancel(Constants.NOTIFICATION_ID_APP); // Si esta la notificacion la terminamos en este momento, ya que el dia termino. continuamos hasta el dia siguiente
             }
 
-            //Si la app no esta visible, mostramos una notificacion mañanera hurra!
+            Log.i(Constants.LOG_LAST_ALARM, "Mostrar notificacion, aun si la app esta activa o no");
+            new NotificationClass().showReportNotification(Constants.CHANNEL_ID_REPORT, Constants.NOTIFICATION_ID_REPORT, context,
+                    awesomeTexts.getTitle(2, context),
+                    awesomeTexts.getText(2, context),
+                    awesomeTexts.getBigText(2, context));
+
             if(!isAppVisible){
-                Log.i(Constants.LOG_LAST_ALARM, "Mostrar notificacion, la app no esta activa");
-                new NotificationClass().showReportNotification(Constants.CHANNEL_ID_REPORT, Constants.NOTIFICATION_ID_REPORT, context,
-                        awesomeTexts.getTitle(2),
-                        awesomeTexts.getText(2, context),
-                        awesomeTexts.getBigText(2, context));
+                Log.i(Constants.LOG_LAST_ALARM, "App NO visible");
             }
             else {
-                Log.i(Constants.LOG_LAST_ALARM, "Estas en la app, no puedo mostrarte la notificacion");
+                Log.i(Constants.LOG_LAST_ALARM, "Estas en la app");
                 Log.i(Constants.LOG_LAST_ALARM, "Termino el dia, configurar app a modo TERMINADO");
                 //Si deseas enviar algun mensaje a la activity desde aqui
                 Intent intentWaterDrinkA = new Intent(context, WaterDrinkActivity.class);
@@ -238,18 +242,20 @@ public class AlarmReceiver extends BroadcastReceiver {
                 if(settings.isGoalReached() && !settings.getContratulationStatus()){
                     settings.setContratulationStatus(true);
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(context)) {
-                        //no hay permisos para mostrar regalo en pantalla
-                    }
-                    else {
-                        context.startService(new Intent(context, FloatWidgetService.class));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        if (Settings.canDrawOverlays(context)) {
+                            context.startService(new Intent(context, FloatWidgetService.class));  // Mostrar regalo en pantalla
+                        }
+                        else {
+                            //no hay permisos para mostrar regalo en pantalla
+                        }
                     }
 
-                    Toast.makeText(context, "FELICIDADES! ALCANZASTE LA META DE HOY", Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, context.getString(R.string.text_congratulations_04), Toast.LENGTH_LONG).show();
 
                 }
                 else if(utils.getRandomNumber(0,10) > 5){
-                    Toast.makeText(context, "Siguiente en " + utils.getTimeString(utils.getHours(timeInMillis), utils.getMinutes(timeInMillis), utils.getSeconds(timeInMillis), context), Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, context.getString(R.string.text_next_in) + " " + utils.getTimeString(utils.getHours(timeInMillis), utils.getMinutes(timeInMillis), utils.getSeconds(timeInMillis), context), Toast.LENGTH_LONG).show();
                 }
                 else {
                     String amountString = String.valueOf(notiDrinkAmount);
@@ -258,7 +264,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                         amountString = String.valueOf(integer);
                     }
 
-                    Toast.makeText(context, "Bien hecho! +" + amountString + "mL!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, context.getString(R.string.text_well_done) + " +" + amountString + context.getString(R.string.text_vol_unit_mililiters), Toast.LENGTH_LONG).show();
                 }
 
             }
@@ -275,7 +281,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                    "Es importante mantener hidratado tu cuerpo para realizar todas tus actividades al maximo nivel");*/
 
             new NotificationClass().showDrinkNotification(Constants.CHANNEL_ID_APP, Constants.NOTIFICATION_ID_APP, context,
-                    awesomeTexts.getTitle(3),
+                    awesomeTexts.getTitle(3, context),
                     awesomeTexts.getText(3, context),
                     awesomeTexts.getBigText(3, context));
         }
@@ -298,7 +304,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         // Gets the data repository in write mode
         dbWrite = dbHelper.getWritableDatabase();
 
-        RecordModel newRecord = new RecordModel(utils.getCurrentTimestamp(), drinkAmount, statusCode);
+        RecordModel newRecord = new RecordModel(Long.parseLong(utils.getCurrentTimestamp()) , drinkAmount, statusCode);
 
         // Insert the new row, returning the primary key value of the new row
         long newRowId = dbWrite.insert(RecordsContract.RecordsEntry.TABLE_NAME,
@@ -320,6 +326,36 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         dbWrite.close();
         Log.i(LOG_RECORD, "Borramos todos los registros. Resultado: " + (newRowId == -1 ? "FALLO al borrar" : "Limpiado!"));
+    }
+
+    private void deleteRecordsFrom2DaysAgo(){
+        // Gets the data repository in write mode
+        dbWrite = dbHelper.getWritableDatabase();
+
+        // Insert the new row, returning the primary key value of the new row
+        Calendar rightNow = Calendar.getInstance();
+        rightNow.add(Calendar.DATE, -2); // Establecer hace 2 dias atras
+
+        rightNow.set(Calendar.HOUR_OF_DAY, 0);
+        rightNow.set(Calendar.MINUTE, 0);
+        rightNow.set(Calendar.SECOND, 0);
+        long startOfToday = rightNow.getTimeInMillis() / 1000;
+
+        rightNow.set(Calendar.HOUR_OF_DAY, 23);
+        rightNow.set(Calendar.MINUTE, 59);
+        rightNow.set(Calendar.SECOND, 59);
+        long endOfToday = rightNow.getTimeInMillis() / 1000;
+
+        String query = "DELETE * FROM " + RecordsContract.RecordsEntry.TABLE_NAME +
+                " WHERE " +
+                RecordsContract.RecordsEntry.COLUMN_NAME_TIMESTAMP + " >= " + startOfToday
+                + " AND " +
+                RecordsContract.RecordsEntry.COLUMN_NAME_TIMESTAMP + " <= " + endOfToday;
+
+        dbWrite.rawQuery(query, null).close();
+
+        dbWrite.close();
+        Log.i(LOG_RECORD, "Borramos registros de hace 2 dias! (si es que existen...)");
     }
 
 }

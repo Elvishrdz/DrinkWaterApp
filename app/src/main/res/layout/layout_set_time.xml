@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardBackgroundColor="@color/dark_purple"
     app:cardCornerRadius="7dp"
-    app:cardElevation="7dp">
+    app:cardElevation="7dp"
+    tools:ignore="ContentDescription" >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -23,7 +25,9 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_toLeftOf="@+id/buttonSetStart"
-                android:orientation="vertical">
+                android:gravity="center_vertical"
+                android:orientation="vertical"
+                android:layout_toStartOf="@+id/buttonSetStart">
 
                 <TextView
                     android:id="@+id/textView9"
@@ -31,7 +35,7 @@
                     android:layout_height="wrap_content"
                     android:background="@color/purple"
                     android:gravity="center_vertical"
-                    android:text="Hora de inicio"
+                    android:text="@string/text_start_title"
                     android:textColor="@android:color/white"
                     android:textStyle="bold" />
 
@@ -39,9 +43,8 @@
                     android:id="@+id/textViewMyStart"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:gravity="center_vertical"
-                    android:text="Iniciamos a las 00:00 de la mañana"
+                    android:text="@string/text_start_at"
                     android:textColor="@android:color/white" />
 
             </LinearLayout>
@@ -57,7 +60,7 @@
                 android:padding="7dp"
                 android:scaleType="fitXY"
                 android:src="@drawable/icon_morning"
-                android:text="Cambiar Inicio" />
+                android:layout_alignParentEnd="true" />
 
         </RelativeLayout>
 
@@ -71,18 +74,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
+                android:layout_toStartOf="@+id/buttonSetEnd"
                 android:layout_toLeftOf="@+id/buttonSetEnd"
-                android:layout_weight="1"
+                android:gravity="center_vertical"
                 android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/textView8"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:background="@color/purple"
                     android:gravity="center_vertical"
-                    android:text="Hora para terminar aproximada"
+                    android:text="@string/text_end_title"
                     android:textColor="@android:color/white"
                     android:textStyle="bold" />
 
@@ -90,9 +93,8 @@
                     android:id="@+id/textViewMyEnd"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:gravity="center_vertical"
-                    android:text="Concluimos cerca de las 00:00 de la noche "
+                    android:text="@string/text_end_at"
                     android:textColor="@android:color/white" />
             </LinearLayout>
 
@@ -103,12 +105,11 @@
                 android:layout_alignParentRight="true"
                 android:layout_marginLeft="7dp"
                 android:layout_marginRight="7dp"
-                android:layout_weight="3"
                 android:background="@drawable/button_circle_background_01_selector"
                 android:padding="7dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/icon_night"
-                android:text="Cambiar Fin" />
+                android:layout_alignParentEnd="true" />
         </RelativeLayout>
 
     </LinearLayout>

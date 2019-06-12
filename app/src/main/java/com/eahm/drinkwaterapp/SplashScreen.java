@@ -7,7 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.media.MediaPlayer;
+import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,6 +20,7 @@ import android.support.v7.widget.CardView;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -27,12 +28,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.eahm.drinkwaterapp.Class.SettingsClass;
 import com.eahm.drinkwaterapp.Interfaces.Callbacks;
 import com.eahm.drinkwaterapp.Models.News;
 import com.eahm.drinkwaterapp.Models.NewsMedia;
 import com.eahm.drinkwaterapp.Models.UserModel;
-import com.eahm.drinkwaterapp.Utils.Constants;
 import com.eahm.drinkwaterapp.Utils.UserManagement;
 import com.eahm.drinkwaterapp.Utils.Utils;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -46,20 +52,33 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.treebo.internetavailabilitychecker.InternetAvailabilityChecker;
+import com.treebo.internetavailabilitychecker.InternetConnectivityListener;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class SplashScreen extends AppCompatActivity implements Callbacks, ValueEventListener {
+public class SplashScreen extends AppCompatActivity implements Callbacks, InternetConnectivityListener {
 
     //region VARIABLES
+    private static final String TAG_SS = "TAG_SS";
     private final static String TAG_CONNECTED = "TAG_CONNECTED";
     private final static String TAG_NEWS = "TAG_NEWS";
+    private static final String TAG_SET_APP_INFO = "TAG_SET_APP_INFO";
 
-    String language = "Español";
+    private static final String UPDATE_APP = "UPDATE_APP";
+    private static final String UPDATE_APP_FORCED = "UPDATE_APP_FORCED";
+    private static final String DISABLED_APP = "DISABLED_APP";
+
+    String languagePhone = "Español"; //Lenguaje que tiene definido en el telefono
+    String languageCountry = "Español"; //Lenguaje del pais donde esta actualmente
+
     boolean worksOffline = true; // Esta app funciona sin internet?
-    boolean appConnected = true; // conectividad a internet
+    boolean weHaveInternet = true; // conectividad a internet
 
     private ImageView imageViewMarkerDesign;
     private TextView textViewExtraInfo;
@@ -70,31 +89,51 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
 
     private boolean stopFadeAnimation = false;
 
-    boolean appEnabled = false;
-    String appOnDisableMessage = "";
-
-    boolean updateForce = true;
-    String updateCurrentVersion = "NONE";
-    String updateOnNewVersionMessage = "";
-
     UserManagement userManager = new UserManagement();
     private UserModel cUser = new UserModel("","","","","","","","", null);
     private FirebaseAuth auth;
 
 
-    boolean appInfo = false;
+    boolean fullscreen = false;
+
+    //region GET APP INFORMATION
+    boolean appInfoDone = false;
+
+    DatabaseReference dbRefAppInfo;
+    ValueEventListener veListenerAppInfo;
+
+    boolean appEnabled = false;
+    String appOnDisableMessage = "";
+    String privacyPolicyURL = "";
+    boolean updateForce = true;
+    String updateCurrentVersion = "NONE";
+    String updateOnNewVersionMessage = "";
+
+    //endregion GET APP INFORMATION
+
+    boolean appGetCountry = false;
     boolean appNews = false;
     boolean appUser = false;
-    boolean videoSplashScreenDone = false;
-    //endregion
 
+    boolean videoSplashScreenDone = false;
+    boolean closeApp = false;
+    boolean started = false;
+    boolean updateLater = false;
+
+
+    //region PRIVACY POLICY
     CardView includeLayoutPrivacyPolicy;
     TextView textViewPPContent;
     TextView textViewPPInformation;
     CheckBox checkBoxPP;
     Button buttonPPContinue;
+    //endregion PRIVACY POLICY
 
-    boolean closeApp = false;
+    //endregion
+
+    SettingsClass settings = new SettingsClass();
+
+    InternetAvailabilityChecker iaChecker;
 
     @Override
     public void onBackPressed() {
@@ -113,46 +152,82 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //((AnimationDrawable) getWindow().getDecorView().getBackground()).start();
-        // getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        if(fullscreen){
+            ((AnimationDrawable) getWindow().getDecorView().getBackground()).start();
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
 
-        //Listener para verificar si tenemos internet (siempre inicia con desconectado, aun con internet)
-        DatabaseReference conection = FirebaseDatabase.getInstance().getReference(".info/connected");
-        conection.addValueEventListener(this);
+        languagePhone = Utils.convertFirstLetterToUpperCase(Locale.getDefault().getDisplayLanguage());
+        Log.i(TAG_SS, "Lenguaje del telefono: " + languagePhone);
 
-        language = Utils.convertFirstLetterToUpperCase(Locale.getDefault().getDisplayLanguage());
+        // Check internet flow is active
+        InternetAvailabilityChecker.init(this);
+        iaChecker = InternetAvailabilityChecker.getInstance();
+        iaChecker.addInternetConnectivityListener(this);
 
+        setContentView(R.layout.activity_splash_screen);
+
+        //region FIND IDS
+        imageViewMarkerDesign = findViewById(R.id.imageViewLoadingDesign);
+        textViewExtraInfo = findViewById(R.id.textViewExtraInfo);
+        textViewLoadingApp = findViewById(R.id.textViewLoadingApp);
+
+        //region PRIVACY POLICY
+        includeLayoutPrivacyPolicy = findViewById(R.id.includeLayoutPrivacyPolicy);
+        textViewPPContent = findViewById(R.id.textViewPPContent);
+        textViewPPInformation = findViewById(R.id.textViewPPInformation);
+        checkBoxPP = findViewById(R.id.checkBoxPP);
+        buttonPPContinue = findViewById(R.id.buttonPPContinue);
+        //endregion PRIVACY POLICY
+
+        //endregion FIND IDS
+
+        //region LISTENERS
+        checkBoxPP.setOnCheckedChangeListener((buttonView, isChecked) -> textViewPPInformation.setVisibility(View.INVISIBLE));
+
+        buttonPPContinue.setOnClickListener(v -> {
+            if(checkBoxPP.isChecked()){
+                settings.setPrivacyPolicyStatus(true);
+                textViewPPInformation.setVisibility(View.INVISIBLE);
+                includeLayoutPrivacyPolicy.setVisibility(View.GONE);
+                setAppInformation();
+            }
+            else {
+                textViewPPInformation.setVisibility(View.VISIBLE);
+            }
+        });
+        //endregion LISTENERS
+
+        //Ocultar politicas de privacidad, las mostraremos mas tarde si es necesario...
+        textViewPPInformation.setVisibility(View.INVISIBLE);
+
+        //initialize and wait a response since the splash screen is in progress...
+        textViewLoadingApp.setText(getString(R.string.ss_loading_content));
+
+        //setAnimation while we wait...
+        imageViewMarkerDesign.setAlpha(1f);
+        fadeOut(imageViewMarkerDesign, 1000);
+
+        //Esperamos al callback OnInternetConnectivityChanged() para continuar...
+
+        //region OLD METHOD
+        /*
         // 0: Without(Testing) 1: Normal  2: Video
         switch (Constants.SPLASH_SCREEN_MODE){
             case "0":
                 //region WITHOUT
                 getAppInformation();
-                getAppNewsCheckAvailability();
+                getAppNewsCheckAvailabilityAndPrivacyPolicy();
                 getAppCurrentUser();
                 //endregion WITHOUT
                 break;
             case "1":
-                //region NORMAL
-                setContentView(R.layout.activity_splash_screen);
-                
-                imageViewMarkerDesign = findViewById(R.id.imageViewLoadingDesign);
-                textViewExtraInfo = findViewById(R.id.textViewExtraInfo);
-                textViewLoadingApp = findViewById(R.id.textViewLoadingApp);
-
-                //initialize and wait a response since the splash screen is in progress...
-                textViewLoadingApp.setText(getString(R.string.ss_getting_content));
-
-                //Get data from server
-                //setAppInformation(); // this method is called when the .info/connected listener is called!
-
-                //setAnimation while we wait...
-                imageViewMarkerDesign.setAlpha(1f);
-                fadeOut(imageViewMarkerDesign, 1000);
-
-                //endregion NORMAL
+              //norma was here
                 break;
             case "2":
                 //region VIDEO
@@ -181,7 +256,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
                     });
 
                     getAppInformation();
-                    getAppNewsCheckAvailability();
+                    getAppNewsCheckAvailabilityAndPrivacyPolicy();
                     getAppCurrentUser();
 
                     videoViewSplashVideo.start();
@@ -195,28 +270,8 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
             case "3":
                 break;
         }
-
-        includeLayoutPrivacyPolicy = findViewById(R.id.includeLayoutPrivacyPolicy);
-        textViewPPContent = findViewById(R.id.textViewPPContent);
-        textViewPPInformation = findViewById(R.id.textViewPPInformation);
-        checkBoxPP = findViewById(R.id.checkBoxPP);
-        buttonPPContinue = findViewById(R.id.buttonPPContinue);
-
-        checkBoxPP.setOnCheckedChangeListener((buttonView, isChecked) -> textViewPPInformation.setVisibility(View.INVISIBLE));
-
-        buttonPPContinue.setOnClickListener(v -> {
-            if(checkBoxPP.isChecked()){
-                settings.setPrivacyPolicyStatus(true);
-                textViewPPInformation.setVisibility(View.INVISIBLE);
-                includeLayoutPrivacyPolicy.setVisibility(View.GONE);
-                setAppInformation();
-            }
-            else {
-                textViewPPInformation.setVisibility(View.VISIBLE);
-            }
-        });
-
-        textViewPPInformation.setVisibility(View.INVISIBLE);
+        */
+        //endregion OLD METHOD
     }
 
     //region ANIMATION
@@ -239,39 +294,41 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
     //endregion
 
     //region GET APP CONFIGURATION
-    DatabaseReference databaseRefAppInfo;
-    ValueEventListener vEventListenerAppInfo;
+
+    boolean appInfoFromServer = false;
 
     private void getAppInformation(){
-        databaseRefAppInfo = FirebaseDatabase.getInstance().getReference("app");
-        vEventListenerAppInfo = new ValueEventListener() {
+        // Establecemos valores por defecto
+        appInfoFromServer = false;
+
+        appEnabled = false;
+        appOnDisableMessage = getString(R.string.message_app_disabled);
+        updateForce = true;
+        updateCurrentVersion = "NONE";
+        updateOnNewVersionMessage = getString(R.string.message_update_new_version);
+
+        dbRefAppInfo = FirebaseDatabase.getInstance().getReference("app");
+
+        veListenerAppInfo = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()){
-                    appEnabled = false;
-                    appOnDisableMessage = "";
 
+                if (dataSnapshot.exists()){
                     if (dataSnapshot.hasChild("application")){
                         if (dataSnapshot.child("application").hasChild("enabled"))
                             appEnabled = dataSnapshot.child("application").child("enabled").getValue(true).toString().equalsIgnoreCase("true");
 
                         if (dataSnapshot.child("application").hasChild("onDisableMessage")){
 
-                            if(dataSnapshot.child("application").child("onDisableMessage").hasChild(language)){
-                                appOnDisableMessage = dataSnapshot.child("application").child("onDisableMessage").child(language).getValue().toString();
+                            if(dataSnapshot.child("application").child("onDisableMessage").hasChild(languagePhone)){
+                                appOnDisableMessage = dataSnapshot.child("application").child("onDisableMessage").child(languagePhone).getValue().toString();
                             }
-                            else appOnDisableMessage = getString(R.string.message_app_disabled);
                         }
 
                         if (dataSnapshot.child("application").hasChild("privacyPolicyUrl")){
                             privacyPolicyURL = dataSnapshot.child("application").child("privacyPolicyUrl").getValue().toString();
                         }
-
                     }
-
-                    updateForce = true;
-                    updateCurrentVersion = "NONE";
-                    updateOnNewVersionMessage = "";
 
                     if (dataSnapshot.hasChild("updates")){
                         if (dataSnapshot.child("updates").hasChild("enabledVersion"))
@@ -282,42 +339,199 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
 
                         if (dataSnapshot.child("updates").hasChild("onNewUpdateMessage")) {
 
-                            if(dataSnapshot.child("updates").child("onNewUpdateMessage").hasChild(language)){
-                                updateOnNewVersionMessage = dataSnapshot.child("updates").child("onNewUpdateMessage").child(language).getValue().toString();
+                            if(dataSnapshot.child("updates").child("onNewUpdateMessage").hasChild(languagePhone)){
+                                updateOnNewVersionMessage = dataSnapshot.child("updates").child("onNewUpdateMessage").child(languagePhone).getValue().toString();
                             }
-                            else updateOnNewVersionMessage = getString(R.string.message_update_new_version);
                         }
                     }
-
-                    appInfo = true;
-                    setAppInformation();
+                    appInfoFromServer = true;
                 }
+
+                appInfoDone = true;
+                setAppInformation();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(SplashScreen.this, "App Information Error: " + databaseError.toString(), Toast.LENGTH_SHORT).show();
+                Log.i(TAG_SET_APP_INFO, "onCancelled Called, database error: " + databaseError.toString());
+
+                appInfoDone = true;
+                setAppInformation();
             }
         };
-        databaseRefAppInfo.addListenerForSingleValueEvent(vEventListenerAppInfo);
+
+        dbRefAppInfo.addListenerForSingleValueEvent(veListenerAppInfo);
     }
 
     DatabaseReference drNewsCheck;
     ValueEventListener velNewsCheck;
 
     String privacyPolicy = "";
-    String privacyPolicyURL = "";
 
-    private void getAppNewsCheckAvailability() {
-        final String country = Utils.getUserCountry(SplashScreen.this);
-        if(country != null) {
+    private final static String COUNTRY_WEB_SERVICE_URL = "http://ip-api.com/json"; //TODO The limit is 150 requests per minute from an IP address. If you go over this limit your IP address will be blackholed. You can unban here. If you need unlimited queries, please see our pro service.
+    RequestQueue requestQueue;
 
-            drNewsCheck =  FirebaseDatabase.getInstance().getReference().child("communication").child(language);
+    private void getCountry() {
+
+        //region CHECK TO QUERY AGAIN
+        String userCountryCode = settings.getWSUserCountry();
+        String lastCountryCheckTimestamp = settings.getWSCountryLastTimestamp();
+
+        boolean weCanCheck = false; // Si ya paso mas de 1 minutos desde la ultima vez q revisamos el pais, entonces podemos volver a revisar
+        Log.i(TAG_NEWS, "Revisar: CountryCode: " + userCountryCode + " LastTimestamp: " + lastCountryCheckTimestamp);
+
+        if(lastCountryCheckTimestamp.isEmpty()){
+            Log.i(TAG_NEWS, "No hay ultima vez consultada");
+            weCanCheck = true;
+        }
+        else {
+            try{
+                Long current = Long.parseLong(utils.getCurrentTimestamp());
+                Long previous = Long.parseLong(lastCountryCheckTimestamp);
+
+                long difference = Math.abs(current - previous);
+                Log.i(TAG_NEWS, "Diferencia entre la ultima vez: " + current + " - " + previous + " = " + difference);
+
+                if(difference > 60){
+                    //Ya paso mas de 1 minuto desde la ultima vez que revisamos el pais. Ya podemos volver a consultar.
+                    weCanCheck = true;
+                    Log.i(TAG_NEWS, "Consultar Pais");
+                }
+            }
+            catch (Exception e){
+                Log.i(TAG_NEWS, "Error al convertir String a Long: " + e.toString());
+                weCanCheck = true;
+            }
+        }
+
+        //endregion CHECK TO QUERY AGAIN
+
+        if (userCountryCode.isEmpty() || weCanCheck) {
+            Log.i(TAG_NEWS, "Preparando consulta a webservice");
+
+            requestQueue = Volley.newRequestQueue(this);
+
+            StringRequest stringRequest = new StringRequest(Request.Method.GET,
+                    COUNTRY_WEB_SERVICE_URL,
+                    onResponseListener,
+                    onResponseErrorListener);
+
+            requestQueue.add(stringRequest);
+            requestQueue.start();
+
+        }
+        else {
+            Log.i(TAG_NEWS, "Pais actual guardado: " + userCountryCode);
+
+            appGetCountry = true;
+            setAppInformation();
+        }
+
+    }
+
+    int attempts = 0;
+
+    Response.ErrorListener onResponseErrorListener = new Response.ErrorListener(){
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            Log.i(TAG_NEWS, "Volley error: " + error.toString());
+
+            if(attempts >= 4){
+                Log.i(TAG_NEWS, "Ya intentamos 4 veces y no funciono!");
+                attempts = 0;
+                onGetCountryError();
+            }
+            else {
+                attempts++;
+                getCountry();
+            }
+        }
+    };
+
+    private void onGetCountryError() {
+        //Guardar este pais segun la tarjeta SIM. Este no es muy confiable por eso lo dejamos como ultimo recurso
+        final String myCountry = Utils.getUserCountry(SplashScreen.this);
+        settings.setWSUserCountry(myCountry);
+        settings.setWSCountryLastTimestamp(utils.getCurrentTimestamp());
+
+        appGetCountry = true;
+        setAppInformation();
+    }
+
+    Response.Listener<String> onResponseListener = new Response.Listener<String>() {
+        @Override
+        public void onResponse(String response) {
+            Log.i(TAG_NEWS, "Respuesta recibida");
+            try {
+                JSONObject respuesta = new JSONObject(response);
+                if(respuesta.has("status") && respuesta.get("status").toString().equalsIgnoreCase("success")){
+                    String countryCode = respuesta.get("countryCode").toString();
+                    String country = respuesta.get("country").toString();
+
+                    settings.setWSUserCountry(countryCode);
+                    settings.setWSCountryLastTimestamp(utils.getCurrentTimestamp());
+
+                    Log.i(TAG_NEWS, "Pais: " + country + " CODIGO: " + countryCode);
+                    appGetCountry = true;
+                    setAppInformation();
+                }
+                else {
+                    Log.i(TAG_NEWS, "Web service devolvio error... seguir sin webservice...");
+                    onGetCountryError();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Log.i(TAG_NEWS, "Un error ocurrio al obtener el json: " + e.toString());
+
+                onGetCountryError();
+            }
+        }
+    };
+
+    private void getAppNewsCheckAvailabilityAndPrivacyPolicy() {
+
+        String countryCode = settings.getWSUserCountry();
+
+        //region VALIDATE PER COUNTRY
+
+        //Crear funcion para devolver el lenguaje segun el pais en nodo: communication
+
+        if(
+            countryCode .equalsIgnoreCase("DE")
+           ){
+            languageCountry = "Deutsch";
+        }
+        else if(
+            countryCode .equalsIgnoreCase("US") ||
+            countryCode .equalsIgnoreCase("EN")
+                ){
+            languageCountry = "English";
+        }
+        else if(
+            countryCode .equalsIgnoreCase("NI") ||
+            countryCode .equalsIgnoreCase("ES") ||
+            countryCode .equalsIgnoreCase("HN")
+                ){
+            languageCountry = "Español";
+        }
+        else {
+            languageCountry = "NOT_FOUND";
+        }
+
+        ((ThisApplication) getApplication()).setLanguageCountry(languageCountry.equals("NOT_FOUND") ? languagePhone : languageCountry);
+        Log.i(TAG_NEWS, languageCountry.equals("NOT_FOUND") ? "Lenguaje no encontrado, asignado del telefono: " + languagePhone : "Lenguaje encontrado, asignado: " + languageCountry);
+
+        //endregion VALIDATE PER COUNTRY
+
+        if(languageCountry.equals("NOT_FOUNDED")){
+            Log.i(TAG_NEWS, "Lenguaje no encontrado. Sin noticias");
+            getAppNewsDone();
+        }
+        else {
+            drNewsCheck =  FirebaseDatabase.getInstance().getReference().child("communication").child(languageCountry);
             velNewsCheck = new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if(!appConnected) return;
-
 
                     if (dataSnapshot.exists() && dataSnapshot.hasChild("countries")) {
 
@@ -325,8 +539,10 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
 
                         for (DataSnapshot countries : dataSnapshot.child("countries").getChildren()) {
                             String key = countries.getKey();
-                            Log.i("LANGUAGUE", key + " == " + country);
-                            if (key.equalsIgnoreCase(country)) {
+                            Log.i(TAG_NEWS, key + " == " + countryCode);
+
+                            if (key != null && key.equalsIgnoreCase(countryCode)) {
+                                Log.i(TAG_NEWS, "Pais disponible");
                                 countryAvailable = true;
                             }
                         }
@@ -347,14 +563,12 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
                     //Toast.makeText(SplashScreen.this, "1. Error: " + databaseError.toString(), Toast.LENGTH_SHORT).show();
+                    Log.i(TAG_NEWS, "getAppNewsCheckAvailabilityAndPrivacyPolicy() Hay un problema: " + databaseError.toString());
                     getAppNewsDone();
                 }
             };
             drNewsCheck.addListenerForSingleValueEvent(velNewsCheck);
-
         }
-        else getAppNewsDone();
-
     }
 
     Query queryNewsByCountry;
@@ -363,7 +577,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
     private void getAppNewsByCountry(){
         int limitMaxOfNewsTo = 4;
 
-        queryNewsByCountry = FirebaseDatabase.getInstance().getReference("communication").child(language).child("news")
+        queryNewsByCountry = FirebaseDatabase.getInstance().getReference("communication").child(languageCountry).child("news")
                 .orderByChild("enabled").equalTo(true)
                 .limitToLast(limitMaxOfNewsTo);
 
@@ -441,6 +655,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
     Task<SignInMethodQueryResult> fetch;
     DatabaseReference drCurrentUserDBVerification;
     ValueEventListener velCurrentUserDBVerification;
+
 
     private void getAppCurrentUser() {
 
@@ -548,114 +763,245 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
         }
     }
 
+    private void cancelAllEventListeners() {
+        Log.i(TAG_SET_APP_INFO, "Cancelando listeners...");
 
-    SettingsClass settings = new SettingsClass();
+        if(dbRefAppInfo != null && veListenerAppInfo != null) dbRefAppInfo.removeEventListener(veListenerAppInfo); //getAppInformation();
+        if(drNewsCheck != null && velNewsCheck != null) drNewsCheck.removeEventListener(velNewsCheck); //getAppNewsCheckAvailabilityAndPrivacyPolicy();
+        if(queryNewsByCountry != null && velNewsByCountry != null) queryNewsByCountry.removeEventListener(velNewsByCountry); //getAppNewsByCountry();
+
+        //fetch Sign In Methods, we should find a way to cancel this in getAppCurrentUser();
+        if(fetch != null) fetch = null;
+        if(drCurrentUserDBVerification != null && velCurrentUserDBVerification != null) drCurrentUserDBVerification.removeEventListener(velCurrentUserDBVerification); //getAppCurrentUser();
+
+        if(requestQueue != null){
+            // Remover listeners de getCountry()
+            requestQueue.cancelAll(new RequestQueue.RequestFilter() {
+                @Override
+                public boolean apply(Request<?> request) {
+                    return true;
+                }
+            });
+            requestQueue.stop();
+            requestQueue = null;
+        }
+
+    }
+
     private void setAppInformation(){
+        textViewLoadingApp.setText(getString(R.string.ss_getting_content));
 
+        // Cancelar todos los listener (si acaso estan ejecutandose) para volverlos a usar si es requerido.
         cancelAllEventListeners();
 
-        if(appConnected) {
-            //region GET APPLICATION INFORMATION
-            if (!appInfo) {
-                if (Constants.SPLASH_SCREEN_MODE.equalsIgnoreCase("1") || Constants.SPLASH_SCREEN_MODE.equalsIgnoreCase("2"))
-                    textViewLoadingApp.setText(getString(R.string.ss_getting_info));
+        // Casos:
+        //       1.  Funcionar solo con internet       2.  Funcionar sin internet
+        //       1.1 Tengo internet (CORRE)            2.1 Tengo internet (CORRE)
+        //       1.2 No tengo internet (NO CORRE)      2.2 No tengo internet (CORRE)
 
-                getAppInformation();
-                return;
-            }
-
-            if (appEnabled) {
-                if (updateForce) {
-                    try {
-                        PackageInfo pinfo = null;
-                        pinfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-
-                        int versionNumber = pinfo.versionCode;
-                        String versionName = pinfo.versionName;
-
-                        if (!versionName.equalsIgnoreCase(updateCurrentVersion) && !updateCurrentVersion.equalsIgnoreCase("NONE")) {
-
-                            stopFadeAnimation = true;
-                            utils.displayAlertDialogYesNo(
-                                    this,
-                                    this,
-                                    "UPDATE_APP",
-                                    updateOnNewVersionMessage,
-                                    getString(R.string.text_download),
-                                    getString(R.string.text_exit),
-                                    false);
-
-                            if (Constants.SPLASH_SCREEN_MODE.equalsIgnoreCase("1") || Constants.SPLASH_SCREEN_MODE.equalsIgnoreCase("2"))
-                                textViewLoadingApp.setText("Hurrah!");
-                            return;
-                        }
-                    }
-                    catch (Exception e) {
-                        //PackageManager.NameNotFoundException
-                        e.printStackTrace();
-                        if (Constants.SPLASH_SCREEN_MODE.equalsIgnoreCase("1") || Constants.SPLASH_SCREEN_MODE.equalsIgnoreCase("2"))
-                            textViewLoadingApp.setText(getString(R.string.text_something_fail));
-                        return;
-                    }
-                }
-            }
-            else {
-                if (Constants.SPLASH_SCREEN_MODE.equalsIgnoreCase("1") || Constants.SPLASH_SCREEN_MODE.equalsIgnoreCase("2"))
-                    textViewLoadingApp.setText("Ouch!");
-
-                stopFadeAnimation = true;
-                utils.displayAlertDialogOneOption(
-                        this,
-                        this,
-                        "DISABLED_APP",
-                        appOnDisableMessage,
-                        getString(R.string.text_accept),
-                        false);
-                return;
-            }
-            //endregion GET APPLICATION INFORMATION
-
-            //region GET APP NEWS
-            if (!appNews) {
-                if (Constants.SPLASH_SCREEN_MODE.equalsIgnoreCase("1") || Constants.SPLASH_SCREEN_MODE.equalsIgnoreCase("2"))
-                    textViewLoadingApp.setText(getString(R.string.ss_checking_news));
-
-                getAppNewsCheckAvailability();
-                return;
-            }
-            //endregion GET APP NEWS
-
-            //region GET CURRENT USER
-            if (!appUser) {
-                if (Constants.SPLASH_SCREEN_MODE.equalsIgnoreCase("1") || Constants.SPLASH_SCREEN_MODE.equalsIgnoreCase("2"))
-                    textViewLoadingApp.setText(getString(R.string.ss_verifying_user));
-
-                getAppCurrentUser();
-                return;
-            }
-            //endregion GET CURRENT USER
-        }
-        else startDelay = 400;
-
-        if(!worksOffline && !appConnected) {
+        //region REVISION DE INTERNET
+        Log.i(TAG_SET_APP_INFO, "Revisando internet 1");
+        //Revision constante de internet al terminar los listeners
+        if(!worksOffline && !weHaveInternet) {
+            getAppInfoAgain = true; // Permitir continuar el  proceso de inicio cuando onInternetConnectivityChanged() sea llamado otra vez.
             textViewLoadingApp.setText(getString(R.string.ss_not_connected));
             return;
         }
+        //endregion REVISION DE INTERNET
 
-        if (Constants.SPLASH_SCREEN_MODE.equalsIgnoreCase("2")) {
-            if (!videoSplashScreenDone) return;
+        //region GET APPLICATION INFORMATION
+
+        if (weHaveInternet && !appInfoDone) {
+            Log.i(TAG_SET_APP_INFO, "Obtener datos de la app en el servidor");
+            textViewLoadingApp.setText(getString(R.string.ss_getting_info));
+            getAppInformation();
+            return;
         }
 
-        if (Constants.SPLASH_SCREEN_MODE.equalsIgnoreCase("1") || Constants.SPLASH_SCREEN_MODE.equalsIgnoreCase("2"))
-            textViewLoadingApp.setText(getString(R.string.ss_loading_content));
+        //region REVISION DE INTERNET
+        Log.i(TAG_SET_APP_INFO, "Revisando internet 2: en get application information");
+        //Revision en: Get Application information
+        if(!worksOffline && !weHaveInternet) {
+            getAppInfoAgain = true; // Permitir continuar el  proceso de inicio cuando onInternetConnectivityChanged() sea llamado otra vez.
+            textViewLoadingApp.setText(getString(R.string.ss_not_connected));
+            return;
+        }
+        //endregion REVISION DE INTERNET
 
-        stopFadeAnimation = true;
+        Log.i(TAG_SET_APP_INFO, "Si ya tenemos datos del servidor, vamos a revisarlos...");
+        if(appInfoFromServer){
+            textViewLoadingApp.setText(getString(R.string.text_ss_validating_config));
 
-        //Revisamos las politicas de privacidad
-        //region PRIVACY POLICY
+            //region GET CURRENT APP VERSION INSTALLED
+            //Obtenemos datos para ver si hay alguna nueva actualizacion...
+            int versionNumber = -1;
+            String versionName = "";
+
+            try {
+                PackageInfo pinfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+
+                versionNumber = pinfo.versionCode;
+                versionName = pinfo.versionName;
+            }
+            catch (Exception e) {
+                Log.i(TAG_SET_APP_INFO, "Error obteniendo version: " + e.toString());
+                //PackageManager.NameNotFoundException
+                e.printStackTrace();
+            }
+
+            //endregion GET CURRENT APP VERSION INSTALLED
+
+            if(worksOffline && !weHaveInternet){
+                //region WORK OFFLINE
+                Log.i(TAG_SET_APP_INFO, "Revisar offline. " + versionName + " = " + updateCurrentVersion + " (updateLater = " + updateLater + ")");
+                if (!updateLater && !versionName.equalsIgnoreCase(updateCurrentVersion) && !updateCurrentVersion.equalsIgnoreCase("NONE")) {
+                    showOptionalUpdateDialog();
+                    return;
+                }
+                //endregion WORK OFFLINE
+            }
+            else {
+                //region CHECK APP INFORMATION
+                if (appEnabled) {
+                    Log.i(TAG_SET_APP_INFO, "App activada\nRevisar online. " + versionName + " = " + updateCurrentVersion + " (updateLater = " + updateLater + ")");
+                    if (!versionName.equalsIgnoreCase(updateCurrentVersion) && !updateCurrentVersion.equalsIgnoreCase("NONE")) {
+                        if(updateForce){
+                            textViewLoadingApp.setText(getResources().getString(R.string.text_hurra));
+
+                            if(builder != null && builder.isShowing()){
+                                Log.i(TAG_SET_APP_INFO, "Un dialogo esta en pantalla");
+                                return;
+                            }
+
+                            builder = new AlertDialog.Builder(this).create();
+                            builder.setTitle(getResources().getString(R.string.text_hurra));
+
+                            builder.setMessage(updateOnNewVersionMessage);
+
+                            builder.setButton(AlertDialog.BUTTON_POSITIVE, getResources().getString(R.string.text_download), new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    onYesResponse(UPDATE_APP_FORCED,"");
+                                }
+                            });
+
+                            builder.setButton(AlertDialog.BUTTON_NEGATIVE, getResources().getString(R.string.text_exit), new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    onNoResponse(UPDATE_APP_FORCED, "");
+                                }
+                            });
+
+                            builder.setCancelable(false);
+                            builder.show();
+
+                            /*utils.displayAlertDialogYesNo(
+                                    this,
+                                    this,
+                                    UPDATE_APP_FORCED,
+                                    updateOnNewVersionMessage,
+                                    getString(R.string.text_download),
+                                    getString(R.string.text_exit),
+                                    false);*/
+                            return;
+                        }
+                        else if(!updateLater) {
+                            showOptionalUpdateDialog();
+                            return;
+                        }
+                    }
+                }
+                else {
+                    Log.i(TAG_SET_APP_INFO, "App desactivada desde el servidor");
+                    textViewLoadingApp.setText(getString(R.string.text_ouch));
+
+                    if(builder != null && builder.isShowing()){
+                        Log.i(TAG_SET_APP_INFO, "Un dialogo esta en pantalla");
+                        return;
+                    }
+
+                    builder = new AlertDialog.Builder(this).create();
+                    builder.setTitle(getResources().getString(R.string.text_ouch));
+
+                    builder.setMessage(appOnDisableMessage);
+
+                    builder.setButton(AlertDialog.BUTTON_POSITIVE, getResources().getString(R.string.text_accept), new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            onYesResponse(DISABLED_APP,"");
+                        }
+                    });
+
+                    builder.setCancelable(false);
+                    builder.show();
+
+                    /*utils.displayAlertDialogOneOption(
+                          this,
+                          this,
+                            DISABLED_APP,
+                          appOnDisableMessage,
+                          getString(R.string.text_accept),
+                          false);*/
+                    return;
+                }
+                //endregion CHECK APP INFORMATION
+            }
+        }
+        //endregion GET APPLICATION INFORMATION
+
+        //region REVISION DE INTERNET
+        Log.i(TAG_SET_APP_INFO, "Revisando internet 3");
+        //Revision constante de internet
+        if(!worksOffline && !weHaveInternet) {
+            getAppInfoAgain = true; // Permitir continuar el  proceso de inicio cuando onInternetConnectivityChanged() sea llamado otra vez.
+            textViewLoadingApp.setText(getString(R.string.ss_not_connected));
+            return;
+        }
+        //endregion REVISION DE INTERNET
+
+        //region GET COUNTRY
+        if (weHaveInternet && !appGetCountry) {
+            Log.i(TAG_SET_APP_INFO, "Obtener pais actual del usuario");
+            textViewLoadingApp.setText(getString(R.string.text_ss_getting_language));
+            attempts = 0; // Establecer en cero la primera vez que se llama desde aqui
+            getCountry();
+            return;
+        }
+        //endregion GET COUNTRY
+
+        //region REVISION DE INTERNET
+        Log.i(TAG_SET_APP_INFO, "Revisando internet 4");
+        //Revision constante de internet
+        if(!worksOffline && !weHaveInternet) {
+            getAppInfoAgain = true; // Permitir continuar el  proceso de inicio cuando onInternetConnectivityChanged() sea llamado otra vez.
+            textViewLoadingApp.setText(getString(R.string.ss_not_connected));
+            return;
+        }
+        //endregion REVISION DE INTERNET
+
+        //region GET NEWS COMMUNICATION
+        if (weHaveInternet && !appNews) {
+            Log.i(TAG_SET_APP_INFO, "Obtener datos de comunicacion en el servidor");
+            textViewLoadingApp.setText(getString(R.string.ss_checking_news));
+            getAppNewsCheckAvailabilityAndPrivacyPolicy();
+            return;
+        }
+        //endregion GET NEWS COMMUNICATION
+
+        //region REVISION DE INTERNET
+        Log.i(TAG_SET_APP_INFO, "Revisando internet 5");
+        //Revision constante de internet
+        if(!worksOffline && !weHaveInternet) {
+            getAppInfoAgain = true; // Permitir continuar el  proceso de inicio cuando onInternetConnectivityChanged() sea llamado otra vez.
+            textViewLoadingApp.setText(getString(R.string.ss_not_connected));
+            return;
+        }
+        //endregion REVISION DE INTERNET
+
+        //region CHECK PRIVACY POLICY
         if(!settings.getPrivacyPolicyStatus()){
+            Log.i(TAG_SET_APP_INFO, "Mostrar politicas de privacidad!");
+            textViewLoadingApp.setText(getString(R.string.text_ss_showing_pp));
 
             if(privacyPolicy.isEmpty()){
+                //Mostrar politicas guardadas localmente si no hay internet
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                     //getResources()
                     textViewPPContent.setText(Html.fromHtml(getResources().getString(R.string.privacy_policy_local_content), Html.FROM_HTML_MODE_LEGACY));
@@ -664,6 +1010,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
                 }
             }
             else {
+                //Obtuvimos las politicas desde el servidor
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                     textViewPPContent.setText(Html.fromHtml(privacyPolicy, Html.FROM_HTML_MODE_LEGACY));
                 } else {
@@ -675,26 +1022,85 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
             return;
         }
         else if(includeLayoutPrivacyPolicy.getVisibility() == View.VISIBLE) return;
-        //endregion PRIVACY POLICY
+        //endregion CHECK PRIVACY POLICY
 
-        //Primera vez que verificamos los permisos!
+        //region REVISION DE INTERNET
+        Log.i(TAG_SET_APP_INFO, "Revisando internet 6");
+        //Revision constante de internet
+        if(!worksOffline && !weHaveInternet) {
+            getAppInfoAgain = true; // Permitir continuar el  proceso de inicio cuando onInternetConnectivityChanged() sea llamado otra vez.
+            textViewLoadingApp.setText(getString(R.string.ss_not_connected));
+            return;
+        }
+        //endregion REVISION DE INTERNET
+
+        //region GET CURRENT USER
+        if (!appUser) {
+            textViewLoadingApp.setText(getString(R.string.ss_verifying_user));
+            getAppCurrentUser();
+            return;
+        }
+        //endregion GET CURRENT USER
+
+        //region REVISION DE INTERNET
+        Log.i(TAG_SET_APP_INFO, "Revisando internet 7");
+        //Revision constante de internet
+        if(!worksOffline && !weHaveInternet) {
+            getAppInfoAgain = true; // Permitir continuar el  proceso de inicio cuando onInternetConnectivityChanged() sea llamado otra vez.
+            textViewLoadingApp.setText(getString(R.string.ss_not_connected));
+            return;
+        }
+        //endregion REVISION DE INTERNET
+
+        // En este punto, ya no requerimos de internet en esta activity. asi que cancelamos el listener para no hacer mas llamadas a este metodo. Revisar los permisos debe pasar con o sin internet
+        if(iaChecker != null) iaChecker.removeInternetConnectivityChangeListener(this);
+        textViewLoadingApp.setText(getString(R.string.ss_loading_content));
+
         //region APP PERMISSIONS
         settings.setPermissionStatus(false); // establecemos falsos, vamos a revisar si alguno no esta aprobado aun
         getInitialAppPermissions();
         //endregion APP PERMISSIONS
-    }
-
-
-    private void cancelAllEventListeners() {
-        if(databaseRefAppInfo != null && vEventListenerAppInfo != null)databaseRefAppInfo.removeEventListener(vEventListenerAppInfo); //getAppInformation();
-        if(drNewsCheck != null && velNewsCheck != null) drNewsCheck.removeEventListener(velNewsCheck); //getAppNewsCheckAvailability();
-        if(queryNewsByCountry != null && velNewsByCountry != null) queryNewsByCountry.removeEventListener(velNewsByCountry); //getAppNewsByCountry();
-
-       //fetch Sign In Methods, we should find a way to cancel this in getAppCurrentUser();
-        if(fetch != null) fetch = null;
-        if(drCurrentUserDBVerification != null && velCurrentUserDBVerification != null) drCurrentUserDBVerification.removeEventListener(velCurrentUserDBVerification); //getAppCurrentUser();
 
     }
+
+    private void showOptionalUpdateDialog(){
+        textViewLoadingApp.setText(getResources().getString(R.string.text_hurra));
+
+        if(builder != null && builder.isShowing()){
+            Log.i(TAG_SET_APP_INFO, "Un dialogo esta en pantalla");
+            return;
+        }
+
+        builder = new AlertDialog.Builder(this).create();
+        builder.setTitle(getResources().getString(R.string.text_hurra));
+
+        builder.setMessage(updateOnNewVersionMessage);
+
+        builder.setButton(AlertDialog.BUTTON_POSITIVE,  getString(R.string.text_download), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                onYesResponse(UPDATE_APP,"");
+            }
+        });
+
+        builder.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.text_later), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                onNoResponse(UPDATE_APP, "");
+            }
+        });
+
+        builder.setCancelable(false);
+        builder.show();
+
+        /*utils.displayAlertDialogYesNo(
+                this,
+                this,
+                UPDATE_APP,
+                updateOnNewVersionMessage,
+                getString(R.string.text_download),
+                getString(R.string.text_later),
+                false);*/
+    }
+
 
     //endregion
 
@@ -713,13 +1119,13 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
         }
 
         builder = new AlertDialog.Builder(this).create();
-        builder.setTitle(getString(R.string.text_permissions));
+        builder.setTitle(getResources().getString(R.string.text_permissions));
 
         if(privacyPolicyURL.isEmpty()){
-            builder.setMessage(getString(R.string.permission_request_01));
+            builder.setMessage(getResources().getString(R.string.permission_request_01));
         }
         else {
-            builder.setMessage(getString(R.string.permission_request_02));
+            builder.setMessage(getResources().getString(R.string.permission_request_02));
 
             builder.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.privacy_policy_title), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
@@ -951,7 +1357,6 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
 
     //endregion
 
-    boolean started = false;
 
     private void startMainApp () {
         // Single call to this method
@@ -1001,7 +1406,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
 
     @Override
     public void onYesResponse(String code, String message) {
-        if (code.equalsIgnoreCase("UPDATE_APP")){
+        if (code.equalsIgnoreCase(UPDATE_APP_FORCED) || code.equalsIgnoreCase(UPDATE_APP)){
             //go to playstore
             final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
             try {
@@ -1011,7 +1416,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
             }
             System.exit(0);
         }
-        else if (code.equalsIgnoreCase("DISABLED_APP")){
+        else if (code.equalsIgnoreCase(DISABLED_APP)){
             //close app
             System.exit(0);
         }
@@ -1019,9 +1424,14 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
 
     @Override
     public void onNoResponse(String code, String message) {
-        if (code.equalsIgnoreCase("UPDATE_APP")){
+        if (code.equalsIgnoreCase(UPDATE_APP_FORCED)){
             //close app
             System.exit(0);
+        }
+        else if(code.equalsIgnoreCase(UPDATE_APP)){
+            // Just continue, ill update the app later...
+            updateLater = true;
+            setAppInformation();
         }
     }
  
@@ -1032,25 +1442,25 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
     Handler setApp = null;
     Runnable run = this::setAppInformation;
 
-    @Override
+    //@Override
     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
         // La primera vez devuelve FALSE. Si esta conectado a internet primero regresa FALSE Y despues TRUE (conectado)
         try{
             boolean connected = dataSnapshot.getValue(Boolean.class);
             if(connected) {
                 Log.i(TAG_CONNECTED, "ESTA CONECTADO A INTERNET");
-                appConnected = true;
+                weHaveInternet = true;
             }
             else {
                 //OFFLINE
                 Log.i(TAG_CONNECTED, "SE DESCONECTO EL INTERNET");
-                appConnected = false;
+                weHaveInternet = false;
             }
         }
         catch (Exception ignore){
             //OFFLINE
             Log.i(TAG_CONNECTED, "SE DESCONECTO EL INTERNET por exception");
-            appConnected = false;
+            weHaveInternet = false;
         }
 
         if(setApp != null) setApp.removeCallbacks(run);
@@ -1058,10 +1468,45 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, ValueE
         setApp.postDelayed(run,1000);
     }
 
-    @Override
+    //@Override
     public void onCancelled(@NonNull DatabaseError databaseError) {
         // do nothing here
     }
+
+
     //endregion FIREBASE CONNECTION STATUS
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(iaChecker != null) iaChecker.removeInternetConnectivityChangeListener(this);
+    }
+
+
+    boolean getAppInfoAgain = true; // Inicia el proceso de obtener la informacion de la app si es que fue detenido. Tambien corre la primera vez que tenemos llamada al callback onInternetConnectivityChanged()
+
+    @Override
+    public void onInternetConnectivityChanged(boolean isConnected) {
+        weHaveInternet = isConnected;
+        Log.i(TAG_CONNECTED, isConnected ? "OICC: Tienes conexion a INTERNET" : "OICC: SE DESCONECTO A INTERNET");
+
+        if(!worksOffline && !weHaveInternet) {
+            textViewLoadingApp.setText(getString(R.string.ss_not_connected));
+            return;
+        }
+
+        // si se desconecta y estabamos obteniendo datos, debemos cancelar esa peticion y entrar offline
+        //wehaveInternet && !worksoffline
+        if(getAppInfoAgain || (!weHaveInternet && worksOffline)){
+            Log.i(TAG_CONNECTED, "OICC: SetAppInformation() invocado! (getAppInfoAgain = " + getAppInfoAgain + ") (weHaveInternet = " + weHaveInternet + ") (worksOffline = " + worksOffline + ")");
+            getAppInfoAgain = false;
+            setAppInformation();
+            // - La primera vez que se llama este callback siempre iniciaremos setAppInformation()
+            // - Despues puede volver a ser llamado si antes (en el proceso de obtener la info) el usuario se desconecto, y
+            // recupero el flujo de internet, entonces ahi llamamos denuevo el metodo para reanudar el inicio de la app.
+        }
+
+    }
 
 }

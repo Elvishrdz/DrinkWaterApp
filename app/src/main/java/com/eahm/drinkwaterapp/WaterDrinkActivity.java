@@ -3,6 +3,7 @@ package com.eahm.drinkwaterapp;
 import android.app.AlertDialog;
 import android.app.TimePickerDialog;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -78,6 +79,7 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import io.fabric.sdk.android.services.common.Crash;
 import pl.bclogic.pulsator4droid.library.PulsatorLayout;
 
 public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
@@ -119,6 +121,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
     private static final String TAG_RECORD = "TAG_RECORD";
     private static final String TAG_NEWS = "TAG_NEWS";
     private static final String TAG_RATE = "TAG_RATE";
+    private static final String TAG_ADMOB = "TAG_ADMOB";
 
     private static final String CODE_SET_ALARM = "SET_ALARM";
 
@@ -144,7 +147,6 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
     Button buttonRate;
     //endregion RATE
 
-
     //region RECORDS
     CardView includeLayoutRecords;
     ImageButton buttonRecordClose;
@@ -152,6 +154,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
     RecyclerView recyclerRecords;
     ProgressBar progressBarRecord;
     TextView textViewRecordMessage;
+    Button buttonSwitchDate;
 
     RecyclerView.LayoutManager mLayourManager;
     WaterAdapter adapterSwitch;
@@ -160,6 +163,9 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
     //region SELECT GLASS
     LinearLayout includeLayoutSelectGlasses;
     GridView gridViewSG;
+    EditText editTextCustomAmount;
+    Button buttonDrinkCustomAmount;
+
     Button buttonSGCancel;
 
     SelectGlassesAdapter selectGlassesAdapter;
@@ -299,6 +305,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
                 if(countDownTimer != null) countDownTimer.onFinish();
                 String text = getString(R.string.text_drinking_over) + textViewNextDrink.getText();
                 textViewNextDrink.setText(text);
+                showReportFromLastNotification(utils.getCurrentTimestamp()); // Si recibimos esto es porque en este momento seguimos en el mismo dia
                 break;
             case Intent.ACTION_SCREEN_OFF:
                 Log.i(TAG_WATER_DRINK_ACT, "Pantalla apagada");
@@ -328,7 +335,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
 
         if(getIntent() != null && getIntent().getExtras() != null){
             startedFromNotification = getIntent().getExtras().getBoolean("IS_FROM_NOTIFICATION");
-            if(startedFromNotification){
+            if(startedFromNotification && getIntent().getExtras().getBoolean("IS_DRINK_TIME")){
                 isDrinkTimeFromNotification = true;
             }
         }
@@ -364,13 +371,15 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         recyclerRecords = findViewById(R.id.recyclerRecords);
         progressBarRecord = findViewById(R.id.progressBarRecord);
         textViewRecordMessage = findViewById(R.id.textViewRecordMessage);
+        buttonSwitchDate = findViewById(R.id.buttonSwitchDate);
         //endregion RECORDS
 
         //region SELECT GLASS
         includeLayoutSelectGlasses = findViewById(R.id.includeLayoutSelectGlasses);
         gridViewSG = findViewById(R.id.gridViewSG);
+        editTextCustomAmount = findViewById(R.id.editTextCustomAmount);
+        buttonDrinkCustomAmount = findViewById(R.id.buttonDrinkCustomAmount);
         buttonSGCancel = findViewById(R.id.buttonSGCancel);
-
         //endregion SELECT GLASS
 
         //region NOTIFICATION SETTINGS
@@ -410,48 +419,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         //endregion FIND VIEWS
 
         //region ADMOB
-        AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                .build();
-        adView.loadAd(adRequest);
-        ViewCompat.setElevation(adView, Utils.convertDpToPx(7, this));
-
-        adView.setAdListener(new AdListener(){
-            @Override
-            public void onAdClosed() {
-                super.onAdClosed();
-            }
-
-            @Override
-            public void onAdFailedToLoad(int i) {
-                super.onAdFailedToLoad(i);
-            }
-
-            @Override
-            public void onAdLeftApplication() {
-                super.onAdLeftApplication();
-            }
-
-            @Override
-            public void onAdOpened() {
-                super.onAdOpened();
-            }
-
-            @Override
-            public void onAdLoaded() {
-                super.onAdLoaded();
-            }
-
-            @Override
-            public void onAdClicked() {
-                super.onAdClicked();
-            }
-
-            @Override
-            public void onAdImpression() {
-                super.onAdImpression();
-            }
-        });
+        initializeAdmob();
         //endregion ADMOB
 
         //region LISTENERS
@@ -481,7 +449,8 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
             else{
                 includeLayoutRecords.setVisibility(View.VISIBLE);
                 ViewCompat.setElevation(includeLayoutRecords, Utils.convertDpToPx(7, WaterDrinkActivity.this));
-                initializeReport();
+                buttonSwitchDate.setText(getResources().getString(R.string.text_record_yesterday));
+                initializeReport(0);
             }
             //Crashlytics.log("Mostrando reporte!");
             //Crashlytics.setString("FABRIC_REPORT", "mostrado");
@@ -526,7 +495,20 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         });
 
         imageButtonShare.setOnClickListener(v -> {
-            String dynamicLink = "https://drinkwaterapp.page.link/Tn65";
+
+            String dynamicLink = "https://drinkwaterapp.page.link/isR1"; // En Ingles Default
+
+            String countryLanguague = ((ThisApplication) getApplication()).getLanguagueCountry();
+
+            if(countryLanguague.equalsIgnoreCase("Español")){
+                dynamicLink = "https://drinkwaterapp.page.link/Tn65"; // En español
+            }
+            else if(countryLanguague.equalsIgnoreCase("English")){
+                dynamicLink = "https://drinkwaterapp.page.link/isR1"; // En Ingles
+            }
+            else if(countryLanguague.equalsIgnoreCase("Deutsch")){
+                dynamicLink = "https://drinkwaterapp.page.link/b7pQ"; // En Alemán
+            }
 
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
@@ -541,6 +523,21 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         //region RECORDS
         buttonRecordClose.setOnClickListener(v -> {
             includeLayoutRecords.setVisibility(View.GONE);
+        });
+
+        buttonSwitchDate.setOnClickListener(v -> {
+            if(buttonSwitchDate.getText().equals(getResources().getString(R.string.text_record_yesterday))){
+                ViewCompat.setElevation(includeLayoutRecords, Utils.convertDpToPx(7, WaterDrinkActivity.this));
+                buttonSwitchDate.setText(getResources().getString(R.string.text_record_today));
+                initializeReport(1);
+            }
+            else {
+                ViewCompat.setElevation(includeLayoutRecords, Utils.convertDpToPx(7, WaterDrinkActivity.this));
+                buttonSwitchDate.setText(getResources().getString(R.string.text_record_yesterday));
+                initializeReport(0);
+            }
+
+
         });
         //endregion RECORDS
 
@@ -772,7 +769,47 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         //endregion LAYOUT SELECT TIME
 
         //region SELECT GLASS
+        buttonDrinkCustomAmount.setOnClickListener(v -> {
+
+            String stringCA = editTextCustomAmount.getText().toString();
+
+            //region VALIDATING INPUT PT1
+            if(stringCA.isEmpty()){
+                Toast.makeText(this, getString(R.string.text_amount_empty), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if(stringCA.equals(".")){
+                Toast.makeText(this, getString(R.string.text_enter_a_valid_amout), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            /*// Aqui solo numeros enteros no admite punto decimal
+            if(!stringCA.matches("[0-9]+")) {
+               //Solo se admiten numeros
+                Toast.makeText(this, getString(R.string.text_amount_just_numbers), Toast.LENGTH_SHORT).show();
+                return;
+            }*/
+            //endregion VALIDATING INPUT PT1
+
+            float floatCA = Float.parseFloat(stringCA);
+
+            //region VALIDATING INPUT PT2
+            if(floatCA <= 10){
+                //El numero debe ser mayor a cero
+                Toast.makeText(this, getString(R.string.text_amount_greater_than), Toast.LENGTH_SHORT).show();
+                return;
+            }
+            //endregion VALIDATING INPUT PT2
+
+            Utils.hideKeyboard(this);
+            settings.setCustomDrinkAmount(Float.valueOf(editTextCustomAmount.getText().toString()));
+            addDrinkAmount(floatCA);
+
+        });
+
         buttonSGCancel.setOnClickListener(v -> {
+            Utils.hideKeyboard(this);
             buttonDrink.callOnClick();
         });
         //endregion SELECT GLASS
@@ -783,6 +820,10 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
                 includeLayoutSelectGlasses.setVisibility(View.GONE);
             }
             else{
+                if(editTextCustomAmount.getText().toString().isEmpty()){
+                    restoreCustomAmount();
+                }
+
                 includeLayoutSelectGlasses.setVisibility(View.VISIBLE);
                 ViewCompat.setElevation(includeLayoutSelectGlasses, Utils.convertDpToPx(7, this));
             }
@@ -830,6 +871,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
             //imageButtonRecords.setVisibility(View.GONE);
         }
 
+        restoreCustomAmount();
         restoreNotificationValues();
         restoreGoalValues();
 
@@ -850,9 +892,11 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
 
             if(getIntent() != null && getIntent().getExtras() != null &&
                     getIntent().getExtras().getBoolean("SHOW_REPORT")){
-                Log.i(TAG_WATER_DRINK_ACT, "Mostramos la notificacion final y entramos a ver el registro de hoy");
-                imageButtonRecords.callOnClick();
-                Toast.makeText(this, getString(R.string.text_your_record_so_far), Toast.LENGTH_LONG).show();
+                Log.i(TAG_WATER_DRINK_ACT, "Mostramos la notificacion final y entramos a ver el registro");
+
+                String timestamp = getIntent().getExtras().getString("TIMESTAMP");
+
+                showReportFromLastNotification(timestamp);
             }
             else if(getIntent() != null && getIntent().getExtras() != null &&
                     getIntent().getExtras().getBoolean("IS_LAST_NOTIFICATION")){
@@ -871,65 +915,8 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         gridViewSG.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
                 String text = parent.getItemAtPosition(position).toString();
-
-                float value = Float.parseFloat(text);
-                /*
-                String[] parts = text.split("\\s+"); //Split by space " "
-                float value = Float.parseFloat(parts[0]);
-                String metricVolume = parts[1];
-
-                switch (metricVolume){
-                    case "mL":
-                        // Nothing now
-                        break;
-                    case "L":
-                        value = value * 1000;
-                        break;
-                }*/
-
-                float goal = settings.getGoalValue();
-
-                float currentProgress = settings.getTodayProgress();
-                currentProgress = currentProgress + value;
-
-                settings.setTodayProgress(currentProgress); // progress always in mililiters
-                String currentProgressString = String.valueOf(currentProgress);
-
-                if(currentProgress % 1 == 0){
-                    long integer = (long) currentProgress;
-                    currentProgressString = String.valueOf(integer);
-                }
-
-                if(currentProgress>= goal && !settings.getContratulationStatus()){
-                    settings.setContratulationStatus(true);
-                    textViewTips.setText(getString(R.string.text_goal_reached_01));
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(WaterDrinkActivity.this)) {
-                        //No tenemos activado el permiso de mostrar VIEWS encima de otras apps
-                    } else {
-                        startService(new Intent(WaterDrinkActivity.this, FloatWidgetService.class));
-                    }
-
-                    Toast.makeText(WaterDrinkActivity.this, getString(R.string.text_goal_reached_02), Toast.LENGTH_LONG).show();
-
-                }
-                else Toast.makeText(WaterDrinkActivity.this, getString(R.string.text_hurra) + currentProgressString, Toast.LENGTH_SHORT).show();
-
-                DecimalFormat formatDecimal = new DecimalFormat("#.##");
-                String progress = getString(R.string.text_progress_01) + " " + currentProgressString + getResources().getString(R.string.text_mililiters) + ", " + getString(R.string.text_progress_02) + " " + formatDecimal.format(goal) + " " + getResources().getString(R.string.text_mililiters);
-
-                textViewStats.setText(progress);
-                setAppStyle();
-                updateProgress();
-                recordDrink(value, 1);
-                isDrinkTimeFromNotification = false;
-
-                buttonDrink();
-                buttonDrink.callOnClick();
-
-                //Toast.makeText(WaterDrinkActivity.this, "Seleccionado: " + text, Toast.LENGTH_SHORT).show();
+                addDrinkAmount(Float.parseFloat(text));
             }
         });
 
@@ -960,7 +947,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
 
             if(timeInMillis <= currentTimestamp){
                 Log.i(TAG_RESTORE_CHRONO, "Beber agua, (ya se paso la hora definida)");
-                textViewTips.setText(awesomeTexts.getCoutdownTextDone());
+                textViewTips.setText(awesomeTexts.getCoutdownTextDone(WaterDrinkActivity.this));
                 setPulsatorLayout(true);
             }
             else {
@@ -988,7 +975,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
                 }
 
                 Log.i(TAG_RESTORE_CHRONO, "Cronometro con: " + timeInMillis + " millisegundos");
-                countDownTimer = new CountDownTimerDrink(timeInMillis,1000);
+                countDownTimer = new CountDownTimerDrink(timeInMillis,1000, WaterDrinkActivity.this);
                 countDownTimer.start();
 
                 buttonDrink.setText(getString(R.string.text_drink_water_now));
@@ -1025,6 +1012,142 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         Log.i(TAG_RATE, settings.getAppVersion() + " - Contador de rated: " + settings.getAppRated());
         //endregion RATE
 
+    }
+
+    private void showReportFromLastNotification(String timestamp) {
+        String message = getString(R.string.text_your_record_so_far);
+
+        imageButtonRecords.callOnClick();
+
+        if(timestamp != null && !timestamp.isEmpty() && !Utils.isDateToday(Long.parseLong(timestamp) * 1000L)){
+            Log.i(TAG_WATER_DRINK_ACT, "Mostrar registro de ayer");
+            message = getString(R.string.text_your_record_yesterday);
+            buttonSwitchDate.callOnClick();
+        }
+
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+    }
+
+    private void restoreCustomAmount() {
+        // Restableciendo valor guardado de la ultima bebida personalizada
+        float floatCustomDrink = settings.getCustomDrinkAmount();
+        String stringCustomDrink = String.valueOf(floatCustomDrink);
+        if (floatCustomDrink % 1 == 0){
+            long integer = (long) floatCustomDrink;
+            stringCustomDrink = String.valueOf(integer);
+        }
+        editTextCustomAmount.setText(stringCustomDrink);
+    }
+
+    private void initializeAdmob() {
+        if (BuildConfig.DEBUG){
+            adView.setVisibility(View.GONE);
+            return;
+        }
+
+        Log.i(TAG_ADMOB, "inicializando");
+        AdRequest adRequest = new AdRequest.Builder()
+                //.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .build();
+
+        adView.loadAd(adRequest);
+        ViewCompat.setElevation(adView, Utils.convertDpToPx(7, this));
+        adView.setAdListener(new AdListener(){
+            @Override
+            public void onAdClosed() {
+                Log.i(TAG_ADMOB, "onAdClosed");
+                super.onAdClosed();
+            }
+
+            @Override
+            public void onAdFailedToLoad(int i) {
+                Log.i(TAG_ADMOB, "onAdFailedToLoad");
+                super.onAdFailedToLoad(i);
+            }
+
+            @Override
+            public void onAdLeftApplication() {
+                Log.i(TAG_ADMOB, "onAdLeftApplication");
+                super.onAdLeftApplication();
+            }
+
+            @Override
+            public void onAdOpened() {
+                Log.i(TAG_ADMOB, "onAdLoaded");
+                super.onAdOpened();
+            }
+
+            @Override
+            public void onAdLoaded() {
+                Log.i(TAG_ADMOB, "onAdLoaded");
+                super.onAdLoaded();
+            }
+
+            @Override
+            public void onAdClicked() {
+                Log.i(TAG_ADMOB, "onAdClicked");
+                super.onAdClicked();
+            }
+
+            @Override
+            public void onAdImpression() {
+                Log.i(TAG_ADMOB, "onAdImpression");
+                super.onAdImpression();
+            }
+        });
+    }
+
+    private void addDrinkAmount(float value){
+        float goal = settings.getGoalValue();
+
+        float currentProgress = settings.getTodayProgress();
+        currentProgress = currentProgress + value;
+
+        settings.setTodayProgress(currentProgress); // progress always in mililiters
+        String currentProgressString = String.valueOf(currentProgress);
+
+        if(currentProgress % 1 == 0){
+            long integer = (long) currentProgress;
+            currentProgressString = String.valueOf(integer);
+        }
+
+        String stringValue = String.valueOf(value);
+        if (value % 1 == 0){
+            long integer = (long) value;
+            stringValue = String.valueOf(integer);
+        }
+
+        if(currentProgress>= goal && !settings.getContratulationStatus()){
+            settings.setContratulationStatus(true);
+            textViewTips.setText(getString(R.string.text_goal_reached_01));
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if(Settings.canDrawOverlays(WaterDrinkActivity.this)){
+                    startService(new Intent(WaterDrinkActivity.this, FloatWidgetService.class));
+                }
+                else {
+                    //No tenemos activado el permiso de mostrar VIEWS encima de otras apps
+                }
+            }
+
+            Toast.makeText(WaterDrinkActivity.this, getString(R.string.text_goal_reached_02), Toast.LENGTH_LONG).show();
+
+        }
+        else Toast.makeText(WaterDrinkActivity.this, getString(R.string.text_hurra) + " +" + stringValue, Toast.LENGTH_SHORT).show();
+
+        DecimalFormat formatDecimal = new DecimalFormat("#.##");
+        String progress = getString(R.string.text_progress_01) + " " + currentProgressString + " " + getResources().getString(R.string.text_mililiters) + ", " + getString(R.string.text_progress_02) + " " + formatDecimal.format(goal) + " " + getResources().getString(R.string.text_mililiters);
+
+        textViewStats.setText(progress);
+        setAppStyle();
+        updateProgress();
+        recordDrink(value, 1);
+        isDrinkTimeFromNotification = false;
+
+        buttonDrink();
+        buttonDrink.callOnClick();
+
+        //Toast.makeText(WaterDrinkActivity.this, "Seleccionado: " + text, Toast.LENGTH_SHORT).show();
     }
 
     private void requestExtraSettings(){
@@ -1109,19 +1232,50 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
             //Mostrar noticias
 
         }
-        else requestExtraSettings();
+        else{
+            Log.i(TAG_NEWS, "No hay noticias :(");
+            requestExtraSettings();
+        }
     }
 
-    private void initializeReport() {
-        DateTime datetime = Utils.getDateTimeByTimestamp(utils.getCurrentTimestamp());
+    private void initializeReport(int when) {
+        Log.i(TAG_RECORD, "Iniciando el reporte: " + when);
 
-        String locale = Locale.getDefault().getLanguage(); //"es"
-        String stringTodayDate = Utils.getDayName(datetime.getDayOfWeek(), WaterDrinkActivity.this) + " " +
-                                 datetime.getDayOfMonth() + " " + getString(R.string.text_of) + " " +
-                                 Utils.getMonthName(datetime.getMonthOfYear(), WaterDrinkActivity.this) + " " +
-                                 datetime.getYear();
+        String title = getString(R.string.text_todays_records);
+        String stringTodayDate = "";
 
-        String title = getString(R.string.text_report_title) + stringTodayDate;
+        if(when == 0){ //TODAY
+            DateTime datetime = Utils.getDateTimeByTimestamp(utils.getCurrentTimestamp());
+
+            stringTodayDate = Utils.getDayName(datetime.getDayOfWeek(), WaterDrinkActivity.this) + " " +
+                    datetime.getDayOfMonth() + " " + getString(R.string.text_of) + " " +
+                    Utils.getMonthName(datetime.getMonthOfYear(), WaterDrinkActivity.this) + " " +
+                    datetime.getYear();
+
+            //title = getString(R.string.text_today);
+            Log.i(TAG_RECORD, "0 -- " + stringTodayDate);
+        }
+        else if(when == 1){ //YESTERDAY
+            Calendar rightNow = Calendar.getInstance();
+            rightNow.add(Calendar.DATE, -1); // Establecer el dia de ayer!
+
+            rightNow.set(Calendar.HOUR_OF_DAY, 0);
+            rightNow.set(Calendar.MINUTE, 0);
+            rightNow.set(Calendar.SECOND, 0);
+            long startOfYesterday = rightNow.getTimeInMillis() / 1000;
+
+            DateTime datetime = Utils.getDateTimeByTimestamp(String.valueOf(startOfYesterday));
+
+            stringTodayDate = Utils.getDayName(datetime.getDayOfWeek(), WaterDrinkActivity.this) + " " +
+                    datetime.getDayOfMonth() + " " + getString(R.string.text_of) + " " +
+                    Utils.getMonthName(datetime.getMonthOfYear(), WaterDrinkActivity.this) + " " +
+                    datetime.getYear();
+
+            title = getString(R.string.text_report_title) + stringTodayDate;
+            Log.i(TAG_RECORD, "1 -- " + stringTodayDate);
+        }
+
+
         textViewRecordTitle.setText(title);
 
         recyclerRecords.setVisibility(View.GONE);
@@ -1137,11 +1291,16 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
             recyclerRecords.setAdapter(adapterSwitch);
         }
 
+        // Eliminar registros (si existen)
+        adapterSwitch.removeAll();
+        adapterSwitch.notifyDataSetChanged();
+
         //read from db
         dbRead = dbHelper.getReadableDatabase();
 
         //region QUERY EXAMPLES
         // Define a projection that specifies which columns from the database you will actually use after this query.
+        /*
         String[] projection = {
                 BaseColumns._ID,
                 RecordsEntry.COLUMN_NAME_TIMESTAMP,
@@ -1173,12 +1332,21 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
             itemIds.add(itemId);
         }
         cursor.close();
-
+*/
         //endregion QUERY EXAMPLES
 
-        Cursor records = dbHelper.getAllRecords();
-
-        if(records.moveToFirst()){
+        Cursor records = null;
+        //Cursor records = dbHelper.getAllRecords();
+        if(when == 0){
+            records = dbHelper.getTodayRecords();
+            Log.i(TAG_RECORD, "0 -- Records!");
+        }
+        else if(when == 1){
+            records = dbHelper.getYesterdayRecords();
+            Log.i(TAG_RECORD, "1 -- Records!");
+        }
+ 
+        if(records != null && records.moveToFirst()){
             Log.i(TAG_RECORD, "Registros encontrados! ");
 
             List<RecordModel> receivedData = new ArrayList<>();
@@ -1187,7 +1355,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
                 Log.i(TAG_RECORD, "entramos al while..!");
                 RecordModel newRecord = new RecordModel();
                 newRecord.setId(Integer.parseInt(records.getString(0)));
-                newRecord.setTimestamp(records.getString(1));
+                newRecord.setTimestamp(Long.parseLong(records.getString(1)));
                 newRecord.setDrinkAmount(Float.parseFloat(records.getString(2)));
                 newRecord.setStatusCode(Integer.parseInt(records.getString(3)));
 
@@ -1213,6 +1381,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
             */
 
             Collections.reverse(receivedData);
+            adapterSwitch.setCustomStyle(when);
             adapterSwitch.overrideList(receivedData);
             adapterSwitch.notifyDataSetChanged();
 
@@ -1222,12 +1391,13 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
 
         }
         else {
-            // Sin registros
+            Log.i(TAG_RECORD, "Sin registros");
             textViewRecordMessage.setText(getString(R.string.text_report_no_records));
             recyclerRecords.setVisibility(View.GONE);
             progressBarRecord.setVisibility(View.GONE);
         }
-        records.close();
+
+        if(records != null) records.close();
 
     }
   
@@ -1382,19 +1552,24 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
     }
 
     private void logFabricUser() {
-        // TODO: Use the current user's information
-        // You can call any combination of these three methods
-        Crashlytics.setUserIdentifier(utils.getDeviceName(WaterDrinkActivity.this));
-        Crashlytics.setUserEmail("Aun no disponible");
-        Crashlytics.setUserName("Aun no disponible");
+        if(!BuildConfig.DEBUG){
+            // TODO: Use the current user's information
+            // You can call any combination of these three methods
+            Crashlytics.setUserIdentifier(utils.getDeviceName(WaterDrinkActivity.this));
+            Crashlytics.setUserEmail("Aun no disponible");
+            Crashlytics.setUserName("Aun no disponible");
 
-        //Custom Keys
-        Crashlytics.setInt("rate_value", settings.getAppRated());
-        Crashlytics.setString("today_progress", String.valueOf(settings.getTodayProgress()));
+            //Custom Keys
+            Crashlytics.setString("version", settings.getAppVersion());
+            Crashlytics.setInt("rate_value", settings.getAppRated());
+            Crashlytics.setFloat("goal", settings.getGoalValue());
+            Crashlytics.setFloat("today_progress", settings.getTodayProgress());
+            Crashlytics.setString("country", settings.getWSUserCountry());
+            Crashlytics.setString("device", utils.getDeviceName(WaterDrinkActivity.this));
 
-        //Logging
-        Crashlytics.log("Registro en caso de fallo! hora de inicio en la app: " + utils.getCurrentTimestamp());
-
+            //Logging
+            Crashlytics.log("Registro en caso de fallo! hora de inicio en la app: " + utils.getCurrentTimestamp());
+        }
     }
 
     private void buttonDrink(){
@@ -1428,13 +1603,13 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
             AlarmApp.getInstance().updateAlarm(alarmNextTime);
 
             setPulsatorLayout(false);
-            countDownTimer = new CountDownTimerDrink(timeInMillis, 1000);
+            countDownTimer = new CountDownTimerDrink(timeInMillis, 1000, WaterDrinkActivity.this);
             countDownTimer.start();
         }
         else{
             setPulsatorLayout(true);
             textViewNextDrink.setText("");
-            textViewTips.setText(awesomeTexts.getCoutdownTextDone());
+            textViewTips.setText(awesomeTexts.getCoutdownTextDone(WaterDrinkActivity.this));
         }
 
         buttonDrink.setText(getString(R.string.text_well_done));
@@ -1748,6 +1923,8 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         }
     }
 
+
+
     //endregion ACTIVITY CALLBACKS
 
     //region COUNTDOWN
@@ -1761,10 +1938,12 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
          *                          {@link #onTick(long)} callbacks.
          */
 
+        Context context;
         private long remainingTimeInMillis;
 
-        public CountDownTimerDrink(long millisInFuture, long countDownInterval) {
+        public CountDownTimerDrink(long millisInFuture, long countDownInterval, Context context) {
             super(millisInFuture, countDownInterval);
+            this.context = context;
         }
 
         @Override
@@ -1798,7 +1977,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         @Override
         public void onFinish() {
             textViewNextDrink.setText("");
-            textViewTips.setText(awesomeTexts.getCoutdownTextDone());
+            textViewTips.setText(awesomeTexts.getCoutdownTextDone(context));
             //textViewStats.setText("");
             buttonDrink.setText(getString(R.string.text_i_drink));
 
@@ -1913,7 +2092,8 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         // Gets the data repository in write mode
         dbWrite = dbHelper.getWritableDatabase();
 
-        RecordModel newRecord = new RecordModel(utils.getCurrentTimestamp(), drinkAmount, statusCode);
+        String timestamp = utils.getCurrentTimestamp();
+        RecordModel newRecord = new RecordModel(Long.parseLong(timestamp), drinkAmount, statusCode);
 
         // Insert the new row, returning the primary key value of the new row
         long newRowId = dbWrite.insert(RecordsContract.RecordsEntry.TABLE_NAME,
@@ -1922,7 +2102,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         );
 
         dbWrite.close();
-        Log.i(TAG_RECORD, "Registramos con estado: " + statusCode + ". Resultado: " + (newRowId == -1 ? "FALLO al guardar" : "Registrado!"));
+        Log.i(TAG_RECORD, "Registramos " + timestamp + " con estado: " + statusCode + ". Resultado: " + (newRowId == -1 ? "FALLO al guardar" : "Registrado!"));
 
     }
 

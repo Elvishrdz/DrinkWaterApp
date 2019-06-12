@@ -45,7 +45,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical|center_horizontal"
-                android:text="Mililitros"
+                android:text="@string/text_mililiters"
                 android:textColor="@android:color/black"
                 android:textSize="12sp" />
         </LinearLayout>

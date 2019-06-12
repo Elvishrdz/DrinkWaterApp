@@ -167,6 +167,7 @@ public class WelcomeActivity extends AppCompatActivity {
             settings.deleteContratulationStatus();
             settings.deleteAppRated();
             settings.deleteAppVersion();
+
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);

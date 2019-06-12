@@ -7,7 +7,7 @@ import com.eahm.drinkwaterapp.DB.RecordsContract.RecordsEntry;
 public class RecordModel {
 
     private int id;
-    private String timestamp;
+    private long timestamp;
     private float drinkAmount;
     private int statusCode;
 
@@ -23,7 +23,7 @@ public class RecordModel {
     public RecordModel() {
     }
 
-    public RecordModel(String timestamp, float drinkAmount, int statusCode) {
+    public RecordModel(long timestamp, float drinkAmount, int statusCode) {
         this.id = id;
         this.timestamp = timestamp;
         this.drinkAmount = drinkAmount;
@@ -40,11 +40,11 @@ public class RecordModel {
         this.id = id;
     }
 
-    public String getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 

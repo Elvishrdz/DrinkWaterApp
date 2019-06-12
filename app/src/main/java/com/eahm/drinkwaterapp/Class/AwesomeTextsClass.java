@@ -1,8 +1,8 @@
 package com.eahm.drinkwaterapp.Class;
 
 import android.content.Context;
-import android.support.v4.content.ContextCompat;
 
+import com.eahm.drinkwaterapp.R;
 import com.eahm.drinkwaterapp.Utils.Utils;
 
 import java.util.Calendar;
@@ -19,7 +19,7 @@ public class AwesomeTextsClass {
     }
 
     //region GET NICE TEXTS
-    public String getCoutdownTextDone(){
+    public String getCoutdownTextDone(Context context){
 
         String message = "";
         //switch random text here!
@@ -27,55 +27,55 @@ public class AwesomeTextsClass {
         int randomPos1 = new Utils().getRandomNumber(1, 15);   //This gives a random integer between 7 (inclusive) and 0 (exclusive).
         switch (randomPos1){
             case 1:
-                message = message + "\n" + "El agua ofrece vitalidad y salud, necesarias para realizar actividades fisicas y mantenerse motivado.";
+                message = message + "\n" + context.getString(R.string.coutdown_done_text_01);
                 break;
             case 2:
-                message = message + "\n" + "Una buena hidratación mejora el funcionamiento de nuestro cuerpo.";
+                message = message + "\n" + context.getString(R.string.coutdown_done_text_02);
                 break;
             case 3:
-                message = message + "\n" + "Tu cuerpo se sentira mucho mejor si lo mantienes hidratado.";
+                message = message + "\n" + context.getString(R.string.coutdown_done_text_03);
                 break;
             case 4:
-                message = message + "\n" + "El consumo de agua debe ser cuando tu cuerpo te lo pida, si no tienes sed entonces no debes tomar agua. Debes encontrar el balance correcto.";
+                message = message + "\n" + context.getString(R.string.coutdown_done_text_04);
                 break;
             case 5:
-                message = message + "\n" + "Un consumo regular de agua contribuye a un mejor funcionamiento de los riñones.";
+                message = message + "\n" + context.getString(R.string.coutdown_done_text_05);
                 break;
             case 6:
-                message = message + "\n" + "Recuerda tienes una meta que quieres cumplir";
+                message = message + "\n" + context.getString(R.string.coutdown_done_text_06);
                 break;
             case 7:
-                message = message + "\n" + "No es dificil, vamos a buscar un vaso de agua, un paso a la vez...";
+                message = message + "\n" + context.getString(R.string.coutdown_done_text_07);
                 break;
             case 8:
-                message = message + "\n" + "Si bebieses unos 10 vasos de agua fría al día, quemarías un extra de ¡490 calorías por semana";
+                message = message + "\n" + context.getString(R.string.coutdown_done_text_08);
                 break;
             case 9:
-                message = message + "\n" + "Desintoxicación del cuerpo, mejor tono muscular y piel más sana son algunos de los beneficios de ingerir regularmente H2O";
+                message = message + "\n" + context.getString(R.string.coutdown_done_text_09);
                 break;
             case 10:
-                message = message + "\n" + "Es preferible beber agua con las comidas antes que otros líquidos";
+                message = message + "\n" + context.getString(R.string.coutdown_done_text_10);
                 break;
             case 11:
-                message = message + "\n" + "Lleva una botella de agua pequeña a la oficina, a la escuela, etc. para no olvidar mantenerte hidratado";
+                message = message + "\n" + context.getString(R.string.coutdown_done_text_11);
                 break;
             case 12:
-                message = message + "\n" + "Si deseas.. puedes agregar limón al agua para darle sabor ademas ayuda a tomar más regularmente";
+                message = message + "\n" + context.getString(R.string.coutdown_done_text_12);
                 break;
             case 13:
-                message = message + "\n" + "Mentalizarse y no encontrar excusas para no beber agua, recuerda que es un elemento esencial en el cuerpo y en el proceso de pérdida de peso. Luego de tomarla regularmente por 3 días se convierte en un hábito... o eso dicen...";
+                message = message + "\n" + context.getString(R.string.coutdown_done_text_13);
                 break;
             default:
-                    message = message + "\n" + "Tienes sed?";
+                    message = message + "\n" + context.getString(R.string.coutdown_done_text_default);
                     break;
         }
 
         return message;
     }
 
-    public String getTitle(int category) {
+    public String getTitle(int category, Context context) {
         //<>
-        String title = "Hora de beber agua";
+        String title = "";
         //switch random text here!
 
         switch (category){
@@ -84,28 +84,28 @@ public class AwesomeTextsClass {
                 int randomPos1 = new Utils().getRandomNumber(1, 9);
                 switch (randomPos1){
                     case 1:
-                        title = "Buenos dias!";
+                        title = context.getString(R.string.title_start_01);
                         break;
                     case 2:
-                        title = "Buen dia!";
+                        title = context.getString(R.string.title_start_02);
                         break;
                     case 3:
-                        title = "Hora de comenzar";
+                        title = context.getString(R.string.title_start_03);
                         break;
                     case 4:
-                        title = "Nuevo jornada empieza";
+                        title = context.getString(R.string.title_start_04);
                         break;
                     case 5:
-                        title = "Dormiste bien?";
+                        title = context.getString(R.string.title_start_05);
                         break;
                     case 6:
-                        title = "Hora de empezar!";
+                        title = context.getString(R.string.title_start_06);
                         break;
                     case 7:
-                        title = "Hora de iniciar!";
+                        title = context.getString(R.string.title_start_07);
                         break;
                     default:
-                        title = "Hora de H20!";
+                        title = context.getString(R.string.title_start_default);
                         break;
                 }
                 //endregion TITULOS MAÑANEROS
@@ -115,16 +115,16 @@ public class AwesomeTextsClass {
                 int randomPos2 = new Utils().getRandomNumber(1, 5);
                 switch (randomPos2){
                     case 1:
-                        title = "Hora de terminar";
+                        title = context.getString(R.string.title_end_01);
                         break;
                     case 2:
-                        title = "Terminamos... por hoy";
+                        title = context.getString(R.string.title_end_02);
                         break;
                     case 3:
-                        title = "Tenemos el resumen de la jornada";
+                        title = context.getString(R.string.title_end_03);
                         break;
                     default:
-                        title = "Reporte de la jornada!";
+                        title = context.getString(R.string.title_end_default);
                         break;
                 }
                 //endregion TITULOS PARA LAST ALARM
@@ -134,16 +134,16 @@ public class AwesomeTextsClass {
                 int randomPos3 = new Utils().getRandomNumber(1, 5);
                 switch (randomPos3){
                     case 1:
-                        title = "Llego la hora";
+                        title = context.getString(R.string.title_drink_time_01);
                         break;
                     case 2:
-                        title = "Tienes sed?";
+                        title = context.getString(R.string.title_drink_time_03);
                         break;
                     case 3:
-                        title = "Toca hidratarte";
+                        title = context.getString(R.string.title_drink_time_04);
                         break;
                     default:
-                        title = "Beber agua";
+                        title = context.getString(R.string.title_drink_time_default);
                         break;
                 }
                 //endregion TITULOS DE LA ALARMA
@@ -156,12 +156,12 @@ public class AwesomeTextsClass {
 
     public String getText(int category, Context context){
         //<>
-        String contentText = "Listo para tomar tu primer vaso de agua?";
+        String contentText = "";
 
         switch (category){
             case 1:
                 //region TEXTO MAÑANEROS
-                int randomPos1 = new Utils().getRandomNumber(1, 5);
+                int randomPos1 = new Utils().getRandomNumber(1, 6);
                 switch (randomPos1){
                     case 1:
                         String amount = "";
@@ -173,18 +173,21 @@ public class AwesomeTextsClass {
                         else amount = goalValue + "mL";
 
                         if(amount.isEmpty()){
-                            contentText = "Empecemos para alcanzar la meta de hoy!";
+                            contentText = context.getString(R.string.text_start_01);
                         }
-                        else contentText = "Empecemos con nuestra meta de " + amount + " de agua para hoy!";
+                        else contentText = context.getString(R.string.text_start_02) + " " + amount + " " + context.getString(R.string.text_start_03);
                         break;
                     case 2:
-                        contentText = "Recuerda tomar agua cuando realmente tengas sed";
+                        contentText = context.getString(R.string.text_start_04);
                         break;
                     case 3:
-                        contentText = "Pierde la pereza y empieza hidratado tú dia!";
+                        contentText = context.getString(R.string.text_start_05);
+                        break;
+                    case 4:
+                        contentText = context.getString(R.string.text_start_06);
                         break;
                     default:
-                        contentText = "Hora de levantarse con el pie derecho";
+                        contentText = context.getString(R.string.text_start_default);
                         break;
                 }
                 //endregion TEXTO MAÑANEROS
@@ -195,13 +198,13 @@ public class AwesomeTextsClass {
                 int randomPos2 = new Utils().getRandomNumber(1, 4);
                 switch (randomPos2){
                     case 1:
-                        contentText += "Consumiste " + new Utils().getFinalProgressString(false, context) + ". Entra para ver mas detalles";
+                        contentText += context.getString(R.string.text_end_01) + " " + new Utils().getFinalProgressString(false, context) + context.getString(R.string.text_end_02);
                         break;
                     case 2:
-                        contentText += "Tomaste " + new Utils().getFinalProgressString(true, context) + " de agua durante esta jornada";
+                        contentText += context.getString(R.string.text_end_03) + " " + new Utils().getFinalProgressString(true, context) + " " + context.getString(R.string.text_end_04);
                         break;
                     default:
-                        contentText += "Quieres saber a que horas ingeriste agua hoy? Entra y revisa tu resumen";
+                        contentText += context.getString(R.string.text_end_default);
                         break;
                 }
                 //endregion TEXTO PARA LAST ALARM
@@ -211,16 +214,16 @@ public class AwesomeTextsClass {
                 int randomPos3 = new Utils().getRandomNumber(1, 5);
                 switch (randomPos3){
                     case 1:
-                        contentText = "Llego la hora H2O";
+                        contentText = context.getString(R.string.text_drink_time_01);
                         break;
                     case 2:
-                        contentText = "Hey, ya tienes sed?";
+                        contentText = context.getString(R.string.text_drink_time_02);
                         break;
                     case 3:
-                        contentText = "Toca hidratarte";
+                        contentText = context.getString(R.string.text_drink_time_03);
                         break;
                     default:
-                        contentText = "Ingerir agua solo cuando tengas sed";
+                        contentText = context.getString(R.string.text_drink_time_default);
                         break;
                 }
                 //endregion TEXTO DE LA ALARMA
@@ -234,7 +237,7 @@ public class AwesomeTextsClass {
         //<>
         updateCurrentTime();
 
-        String bigText =  "Si no quieres tomar ahora te recordare en unos minutos mas tarde...";
+        String bigText =  "";
 
         switch (category){
             case 1:
@@ -242,28 +245,28 @@ public class AwesomeTextsClass {
                 int randomPos1 = new Utils().getRandomNumber(1, 9);
                 switch (randomPos1){
                     case 1:
-                        bigText = "Esta temprano, toma agua con calma. Evita problemas al tragar, tu cuerpo esta apenas iniciando";
+                        bigText = context.getString(R.string.big_text_start_01);
                         break;
                     case 2:
-                        bigText = "Te recordamos tomar agua cuando tengas sed, puedes esperar un poco si aun no quieres levantarte de la cama";
+                        bigText = context.getString(R.string.big_text_start_02);
                         break;
                     case 3:
-                        bigText = "Espero hayas dormido bien! Te aseguro que hidratarte ahora te ayudara a tomar energias para empezar el dia";
+                        bigText = context.getString(R.string.big_text_start_03);
                         break;
                     case 4:
-                        bigText = "Posiblemente estas comodo en la cama... o talvez vas camino al trabajo... toma agua cuando puedas, puedes omitir tu primer vaso si aun no estas listo";
+                        bigText = context.getString(R.string.big_text_start_04);
                         break;
                     case 5:
-                        bigText = "Beber 1 o 2 vasos de agua en ayunas es ideal para la eliminación de las toxinas y todas las sustancias que nuestro cuerpo no necesita.";
+                        bigText = context.getString(R.string.big_text_start_05);
                         break;
                     case 6:
-                        bigText = "Un vaso de agua o más en ayunas ayuda a minimizar los efectos nocivos de sustancias como el alcohol, el tabaco, la contaminación, la comida chatarra, entre otros.";
+                        bigText = context.getString(R.string.big_text_start_06);
                         break;
                     case 7:
-                        bigText = "Hey, para combatir y prevenir el estreñimiento puedes empezar con H2O en las mañanas ya que estimula el movimiento intestinal, pero si es el primer vaso hazlo con calma";
+                        bigText = context.getString(R.string.big_text_start_07);
                         break;
                     default:
-                        bigText = "Durante la noche el organismo trabaja  reparando células y haciendo limpieza interna, por esta razón, beber un vaso de agua en ayunas es muy bueno ya que esto le dará un empujón al organismo para que libere todos los desechos que no necesita, a través de la orina";
+                        bigText = context.getString(R.string.big_text_start_default);
                         break;
                 }
                 //endregion TEXTO MAÑANEROS
@@ -276,16 +279,16 @@ public class AwesomeTextsClass {
                     int randomPos2 = new Utils().getRandomNumber(1, 5);
                     switch (randomPos2){
                         case 1:
-                            bigText += "Has consumido " + new Utils().getFinalProgressString(false, context) + "\nRecuerda que es importante mantener el ritmo, recuerda dar un vistazo a tu actividad presionando en esta notificacion";
+                            bigText += context.getString(R.string.big_text_end_01) + " " + new Utils().getFinalProgressString(false, context) + "\n" + context.getString(R.string.big_text_end_02);
                             break;
                         case 2:
-                            bigText += new Utils().getFinalProgressString(false, context) + " bien hecho! Las notificaciones ya no apareceran en tu telefono, sera hasta la proxima hora de inicio";
+                            bigText += new Utils().getFinalProgressString(false, context) + " " + context.getString(R.string.big_text_end_03);
                             break;
                         case 3:
-                            bigText += "Tenemos tu resumen de hoy! Entra y revisa que tal fue el dia de hoy";
+                            bigText += context.getString(R.string.big_text_end_04);
                             break;
                         default:
-                            bigText += "Las horas de descanso empiezan ahora y tú has ingerido " + new Utils().getFinalProgressString(true, context) + "hasta este momento. Entra en esta notificacion para ver detalles";
+                            bigText += context.getString(R.string.big_text_end_default_01) + " " + new Utils().getFinalProgressString(true, context) + " " + context.getString(R.string.big_text_end_default_02);
                             break;
                     }
                 }
@@ -293,16 +296,16 @@ public class AwesomeTextsClass {
                     int randomPos2 = new Utils().getRandomNumber(1, 5);
                     switch (randomPos2){
                         case 1:
-                            bigText += "FELICIDADES\nLograste completar tu meta diaria con " + new Utils().getFinalProgressString(false, context) + " de agua ingeridos el dia de hoy";
+                            bigText += context.getString(R.string.big_text_end_goal_reached_01) + " " + new Utils().getFinalProgressString(false, context) + " " + context.getString(R.string.big_text_end_goal_reached_02);
                             break;
                         case 2:
-                            bigText += "EXCELENTE!\nCon " + new Utils().getFinalProgressString(false, context) + " has logrado pasar la marca establecida. Excelente jornada!";
+                            bigText += context.getString(R.string.big_text_end_goal_reached_03) + " " + new Utils().getFinalProgressString(false, context) + " " + context.getString(R.string.big_text_end_goal_reached_04);
                             break;
                         case 3:
-                            bigText += "HAS ALCANZADO LA META!\n Lo lograste, entra y mira tu actividad de hoy. SIGUE ASI!";
+                            bigText += context.getString(R.string.big_text_end_goal_reached_05);
                             break;
                         default:
-                            bigText += "LO LOGRASTE!\nSon " + new Utils().getFinalProgressString(true, context) + " que tu cuerpo ha añadido para funcionar correctamente\nMuchas Felicitaciones!\n\nEntra en esta notificacion para ver tu actividad";
+                            bigText += context.getString(R.string.big_text_end_goal_reached_default_01) + " " + new Utils().getFinalProgressString(true, context) + " " + context.getString(R.string.big_text_end_goal_reached_default_02);
                             break;
                     }
                 }
@@ -315,38 +318,28 @@ public class AwesomeTextsClass {
                 int randomPos3 = new Utils().getRandomNumber(1, 8);
                 switch (randomPos3){
                     case 1:
-                        bigText = "Sabes que beber agua ayuda a aliviar la fatiga? " +
-                                "El agua es utilizada por el cuerpo para eliminar toxinas y productos de desecho que este no necesita. " +
-                                "Cuando hay menos agua en el cuerpo, el corazón tiene que trabajar más para bombear la sangre oxigenada a " +
-                                "todas las células y otros órganos principales y eso puede causar la fatiga. Vamos por un vaso de agua!";
+                        bigText = context.getString(R.string.big_text_drink_time_01);
                         break;
                     case 2:
-                        bigText= "Una piel sana? El agua ayuda a reponer los tejidos de la piel, así como a hidratarla y aumentar su elasticidad. " +
-                                "Cuando el cuerpo recibe suficiente agua, la piel estará hidratada. También ayuda con las cicatrices, acné, arrugas " +
-                                "y otros síntomas de envejecimiento";
+                        bigText= context.getString(R.string.big_text_drink_time_02);
                         break;
                     case 3:
-                        bigText = "Algunos estudios indican que el consumo de agua también reduce el riesgo de cáncer de vejiga y colon. " +
-                                "El agua destruye los agentes causantes de cáncer reduciendo el riesgo de diferentes tipos de cáncer.";
+                        bigText = context.getString(R.string.big_text_drink_time_03);
                         break;
                     case 4:
-                        bigText = "El mal aliento es una clara señal de que el cuerpo necesita más agua. " +
-                                "La saliva ayuda a tu boca a liberarse de bacterias y mantener la lengua hidratada. " +
-                                "Por esto, cada vez que tengamos mal aliento, lo primero que debemos hacer es beber mucha agua";
+                        bigText = context.getString(R.string.big_text_drink_time_04);
                         break;
                     case 5:
-                        bigText =  "El H2O ayuda a eliminar los subproductos de la grasa. " +
-                                "Cuando bebemos el estómago se llena haciéndonos perder un poco el apetito. " +
-                                "El agua no contiene calorías, grasa, carbohidratos ni azúcar y es un gran reemplazo de las bebidas con alto contenido calórico";
+                        bigText =  context.getString(R.string.big_text_drink_time_05);
                         break;
                     case 6:
-                        bigText =  "Ingerir agua eleva las defensas naturales de nuestro organismo y tiene un efecto lubricante en " +
-                                "nuestros músculos y articulaciones, ya que las protege y ayuda a que funcionen correctamente. Así se mejora la resistencia de nuestros ligamentos y músculos.";
+                        bigText =  context.getString(R.string.big_text_drink_time_06);
+                        break;
+                    case 7:
+                        bigText = context.getString(R.string.big_text_drink_time_07);
                         break;
                     default:
-                        bigText = "El mal aliento es una clara señal de que el cuerpo necesita más agua. " +
-                                "La saliva ayuda a tu boca a liberarse de bacterias y mantener la lengua hidratada. " +
-                                "Por esto, cada vez que tengamos mal aliento, lo primero que debemos hacer es beber mucha agua";
+                        bigText = context.getString(R.string.big_text_drink_time_default);
                         break;
                 }
                 //endregion TEXTO DE LA ALARMA

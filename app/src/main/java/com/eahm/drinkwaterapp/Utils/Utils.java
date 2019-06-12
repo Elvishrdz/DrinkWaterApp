@@ -30,6 +30,7 @@ import org.joda.time.DateTime;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
@@ -120,7 +121,9 @@ public class Utils {
                 }
             }
         }
-        catch (Exception e) { }
+        catch (Exception e) {
+
+        }
         return null;
     }
 
@@ -251,6 +254,8 @@ public class Utils {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setMessage(message).setPositiveButton(yesText, dialogClickListener)
                 .setNegativeButton(noText, dialogClickListener).setCancelable(isCancelable).show();
+
+
     }
 
     public void setDimensionToFitScreen(Activity activity, VideoView videoView) {
@@ -340,6 +345,7 @@ public class Utils {
     public String getCurrentTimestamp() {
         return String.valueOf(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
     }
+
 
     private DateTime getDateFromStringTimestamp(String timestamp){
         Timestamp stamp = new Timestamp(Long.parseLong(timestamp));
@@ -563,5 +569,34 @@ public class Utils {
         }
 
         return myFinalGoal;
+    }
+
+    public static boolean isDateToday(long milliSeconds) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(milliSeconds);
+
+        Date getDate = calendar.getTime();
+
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        Date today = calendar.getTime();
+
+
+/*
+        int result = getDate.compareTo(today);
+        if (getDate.compareTo(today) > 0) {
+            Log.i("TAG_NOTI", "Date1 is after Date2");
+        } else if (getDate.compareTo(today) < 0) {
+            Log.i("TAG_NOTI", "Date1 is before Date2");
+        } else if (getDate.compareTo(today) == 0) {
+            Log.i("TAG_NOTI", "Date1 is equal to Date2");
+        }
+
+        Log.i("TAG_NOTI", "-- " + milliSeconds + " / Recibido: " + getDate.toString() + " - Hoy: " + today.toString() + " -- result: " + result);
+*/
+        return getDate.compareTo(today) > 0;
+
     }
 }

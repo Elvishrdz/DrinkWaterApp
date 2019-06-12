@@ -23,9 +23,15 @@ public class ThisApplication extends Application {
 
     //region General Variables
     private ArrayList<News> newsList = new ArrayList<>();
+    private String languagueCountry = "Español";
 
-    public void clearNewsList() {
-        if(newsList != null && newsList.size() > 0) newsList.clear();
+   //region GET AND SET
+    public String getLanguagueCountry() {
+        return languagueCountry;
+    }
+
+    public void setLanguageCountry(String languagueCountry) {
+        this.languagueCountry = languagueCountry;
     }
 
     public ArrayList<News> getNewsList() {
@@ -35,6 +41,13 @@ public class ThisApplication extends Application {
     public void setNewsList(ArrayList<News> newsList) {
         this.newsList = newsList;
     }
+
+    //endregion GET AND SET
+
+    public void clearNewsList() {
+        if(newsList != null && newsList.size() > 0) newsList.clear();
+    }
+
     //endregion General Variables
 
 
@@ -48,8 +61,11 @@ public class ThisApplication extends Application {
     public void onCreate() {
         super.onCreate();
         instance = this;
-        Fabric.with(this, new Crashlytics());
-        MobileAds.initialize(this,getResources().getString(R.string.ads_app_id));
+
+        if (!BuildConfig.DEBUG) {
+            Fabric.with(this, new Crashlytics());
+            MobileAds.initialize(this,getResources().getString(R.string.ads_app_id));
+        }
 
         new Prefs.Builder()
                 .setContext(this)
@@ -148,7 +164,5 @@ public class ThisApplication extends Application {
     public static void onPause(){
         appActivityVisible = false;
     }
-
-
 
 }

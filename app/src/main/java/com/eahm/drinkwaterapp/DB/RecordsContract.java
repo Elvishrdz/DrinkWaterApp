@@ -15,6 +15,9 @@ public final class RecordsContract {
         public static final String COLUMN_NAME_TIMESTAMP = "timestamp";
         public static final String COLUMN_NAME_DRINK_AMOUNT = "drinkAmount";
         public static final String COLUMN_NAME_STATUS_CODE= "statusCode";
+
+
+        public static final String TABLE_TEMP_UPGRADING = "temporal_upgrading";
     }
 
 }

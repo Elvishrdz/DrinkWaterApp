@@ -423,7 +423,7 @@ public class SettingsClass {
 
     public String getAppVersion() {
         if(!Prefs.contains(APP_VERSION)){
-            Prefs.putString(APP_VERSION, "");
+            setAppVersion("");
         }
         return Prefs.getString(APP_VERSION, "");
     }
@@ -435,5 +435,65 @@ public class SettingsClass {
     public void deleteAppVersion(){
         Prefs.remove(APP_VERSION);
     }
+
+
+
+    //GET COUNTRY BY URL
+    private static String WS_GET_USER_COUNTRY = "WEB_SERVICE_GET_COUNTRY";
+
+    public String getWSUserCountry() {
+        if(!Prefs.contains(WS_GET_USER_COUNTRY)){
+           setWSUserCountry("");
+        }
+        return Prefs.getString(WS_GET_USER_COUNTRY, "");
+    }
+
+    public void setWSUserCountry(String countryCode){
+        Prefs.putString(WS_GET_USER_COUNTRY, countryCode);
+    }
+
+    public void deleteWSUserCountry(){
+        Prefs.remove(WS_GET_USER_COUNTRY);
+    }
+
+    private static String WS_GET_COUNTRY_LAST_TIMESTAMP = "WEB_SERVICE_GET_COUNTRY_TIMESTAMP";
+
+    public String getWSCountryLastTimestamp() {
+        if(!Prefs.contains(WS_GET_COUNTRY_LAST_TIMESTAMP)){
+            setWSCountryLastTimestamp("");
+        }
+        return Prefs.getString(WS_GET_COUNTRY_LAST_TIMESTAMP, "");
+    }
+
+    public void setWSCountryLastTimestamp(String timestamp){
+        Prefs.putString(WS_GET_COUNTRY_LAST_TIMESTAMP, timestamp);
+    }
+
+    public void deleteWSCountryLastTimestamp(){
+        Prefs.remove(WS_GET_COUNTRY_LAST_TIMESTAMP);
+    }
+
+
+
+    private static String CUSTOM_DRINK_AMOUNT = "CUSTOM_DRINK_AMOUNT";
+
+    public float getCustomDrinkAmount() {
+        float _default = 0f; // Saved in Mililiters
+        if(!Prefs.contains(CUSTOM_DRINK_AMOUNT)){
+            setCustomDrinkAmount(_default);
+        }
+
+        return Prefs.getFloat(CUSTOM_DRINK_AMOUNT, _default);
+    }
+
+    public void setCustomDrinkAmount(float customAmount){
+        Prefs.putFloat(CUSTOM_DRINK_AMOUNT, customAmount);
+    }
+
+    public void deleteCustomDrinkAmount(){
+        Prefs.remove(CUSTOM_DRINK_AMOUNT);
+    }
+
+
 
 }
