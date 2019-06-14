@@ -14,7 +14,6 @@ import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.SystemClock;
-import android.provider.BaseColumns;
 import android.provider.Settings;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -79,7 +78,6 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import io.fabric.sdk.android.services.common.Crash;
 import pl.bclogic.pulsator4droid.library.PulsatorLayout;
 
 public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
@@ -125,7 +123,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
 
     private static final String CODE_SET_ALARM = "SET_ALARM";
 
-    RelativeLayout root;
+    RelativeLayout container;
     TextView textViewProgress, textViewStats, textViewNextDrink, textViewTips;
     CircleImageView circleImageViewProfilePic;
     PulsatorLayout pulsatorLayout;
@@ -341,7 +339,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         }
 
         //region FIND VIEWS
-        root = findViewById(R.id.root);
+        container = findViewById(R.id.container);
         textViewProgress = findViewById(R.id.textViewProgress);
         textViewStats = findViewById(R.id.textViewStats);
         textViewNextDrink = findViewById(R.id.textViewNextDrink);
@@ -891,16 +889,15 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
             setPulsatorLayout(true);
 
             if(getIntent() != null && getIntent().getExtras() != null &&
-                    getIntent().getExtras().getBoolean("SHOW_REPORT")){
+                    getIntent().getExtras().getBoolean("SHOW_REPORT") ||
+              getIntent() != null && getIntent().getExtras() != null &&
+                    getIntent().getExtras().getBoolean("IS_LAST_NOTIFICATION")){
                 Log.i(TAG_WATER_DRINK_ACT, "Mostramos la notificacion final y entramos a ver el registro");
 
+                isDrinkTimeFromNotification = false;
                 String timestamp = getIntent().getExtras().getString("TIMESTAMP");
 
                 showReportFromLastNotification(timestamp);
-            }
-            else if(getIntent() != null && getIntent().getExtras() != null &&
-                    getIntent().getExtras().getBoolean("IS_LAST_NOTIFICATION")){
-                isDrinkTimeFromNotification = false;
             }
 
         }
@@ -908,7 +905,6 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
             //normal start
             Log.i(TAG_WATER_DRINK_ACT, "Activity onCreate() Entrada normal");
         }
-
 
         selectGlassesAdapter = new SelectGlassesAdapter(this);
         gridViewSG.setAdapter(selectGlassesAdapter);
@@ -1440,7 +1436,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         }
 
         if(settings.isAlarmWorking()){
-            root.setBackgroundColor(getResources().getColor(R.color.white));
+            container.setBackgroundColor(getResources().getColor(R.color.white));
 
             if(settings.isGoalReached()){
                 //Estilo de la app cuando hemos alcanzado la meta y la alarma esta activa
@@ -1464,7 +1460,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
             }
         }
         else { // alarmNotWorking
-            root.setBackgroundColor(getResources().getColor(R.color.black));
+            container.setBackgroundColor(getResources().getColor(R.color.black));
 
             if(settings.isGoalReached()){
                 //Estilo de la app cuando hemos alcanzado la meta y la alarma esta NO activa

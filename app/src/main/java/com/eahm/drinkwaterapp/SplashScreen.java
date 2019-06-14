@@ -165,11 +165,6 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
         languagePhone = Utils.convertFirstLetterToUpperCase(Locale.getDefault().getDisplayLanguage());
         Log.i(TAG_SS, "Lenguaje del telefono: " + languagePhone);
 
-        // Check internet flow is active
-        InternetAvailabilityChecker.init(this);
-        iaChecker = InternetAvailabilityChecker.getInstance();
-        iaChecker.addInternetConnectivityListener(this);
-
         setContentView(R.layout.activity_splash_screen);
 
         //region FIND IDS
@@ -214,6 +209,10 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
         fadeOut(imageViewMarkerDesign, 1000);
 
         //Esperamos al callback OnInternetConnectivityChanged() para continuar...
+        // Check internet flow is active. (after the ids are initialized
+        InternetAvailabilityChecker.init(this);
+        iaChecker = InternetAvailabilityChecker.getInstance();
+        iaChecker.addInternetConnectivityListener(this);
 
         //region OLD METHOD
         /*

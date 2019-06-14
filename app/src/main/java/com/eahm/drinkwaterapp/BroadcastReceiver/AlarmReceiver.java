@@ -339,12 +339,12 @@ public class AlarmReceiver extends BroadcastReceiver {
         rightNow.set(Calendar.HOUR_OF_DAY, 0);
         rightNow.set(Calendar.MINUTE, 0);
         rightNow.set(Calendar.SECOND, 0);
-        long startOfToday = rightNow.getTimeInMillis() / 1000;
+        long startOfToday = rightNow.getTimeInMillis() / 1000L;
 
         rightNow.set(Calendar.HOUR_OF_DAY, 23);
         rightNow.set(Calendar.MINUTE, 59);
         rightNow.set(Calendar.SECOND, 59);
-        long endOfToday = rightNow.getTimeInMillis() / 1000;
+        long endOfToday = rightNow.getTimeInMillis() / 1000L;
 
         String query = "DELETE * FROM " + RecordsContract.RecordsEntry.TABLE_NAME +
                 " WHERE " +
@@ -352,10 +352,12 @@ public class AlarmReceiver extends BroadcastReceiver {
                 + " AND " +
                 RecordsContract.RecordsEntry.COLUMN_NAME_TIMESTAMP + " <= " + endOfToday;
 
-        dbWrite.rawQuery(query, null).close();
+        String where =  RecordsContract.RecordsEntry.COLUMN_NAME_TIMESTAMP + " >= " + startOfToday + " AND " + RecordsContract.RecordsEntry.COLUMN_NAME_TIMESTAMP + " <= " + endOfToday;
+
+        long delete = dbWrite.delete(RecordsContract.RecordsEntry.TABLE_NAME, where, null);
 
         dbWrite.close();
-        Log.i(LOG_RECORD, "Borramos registros de hace 2 dias! (si es que existen...)");
+        Log.i(LOG_RECORD, "Borramos registros de hace 2 dias! (si es que existen...) Respuesta: " + delete);
     }
 
 }

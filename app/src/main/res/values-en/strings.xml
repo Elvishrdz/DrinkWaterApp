@@ -2,18 +2,53 @@
 <resources>
     <string name="app_name">Drink Water App</string>
     <string name="channel_description">Notifications to drink water</string>
-    <string name="login_title">LOGIN</string>
-    <string name="youtube_key">AIzaSyDDHOg1nce_QhSE2L-D9OuScJskO4Val7Y</string>
+    <!-- UTILS -->
+    <string name="monday">Monday</string>
+    <string name="tuesday">Tuesday</string>
+    <string name="wednesday">Wednesday</string>
+    <string name="thursday">Thursday</string>
+    <string name="friday">Friday</string>
+    <string name="saturday">Saturday</string>
+    <string name="sunday">Sunday</string>
+    <string name="january">January</string>
+    <string name="fabruary">February</string>
+    <string name="march">March</string>
+    <string name="april">April</string>
+    <string name="may">May</string>
+    <string name="june">June</string>
+    <string name="july">July</string>
+    <string name="august">August</string>
+    <string name="september">September</string>
+    <string name="october">October</string>
+    <string name="november">November</string>
+    <string name="december">December</string>
+    <string name="text_hour">hour</string>
+    <string name="text_minute">minute</string>
+    <string name="text_second">second</string>
+    <string name="text_hours">hours</string>
+    <string name="text_minutes">minutes</string>
+    <string name="text_seconds">seconds</string>
+    <string name="validate_email_empty">Enter an email address!</string>
+    <string name="validate_email_invalid">Invalid address</string>
+    <string name="validate_password_empty">Enter a password!</string>
+    <string name="validate_password_too_short">Very short password!</string>
+    <string name="validate_phone_empty">Empty number</string>
+    <string name="validate_phone_incomplete">Incomplete Number</string>
+    <string name="validate_phone_too_long">Number too extensive</string>
+    <string name="validate_phone_only_numbers">Entry must not contain letters only numbers</string>
 
-    <!-- FACEBOOK -->
-    <string name="facebook_app_id">2078723809014570</string>
-
-    <!-- Splash Screen -->
+    <!-- APPLICATION STRINGS HERE!! -->
+    <!-- SPLASH SCREEN -->
+    <string name="privacy_policy_local_content"><![CDATA[<p>"<p>Effective date: May 08, 2019</p> <p>Drink Water App (\"us\", \"we\", or \"our\") operates the Drink Water App mobile application (the \"Service\").</p> <p>This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our Service and the choices you have associated with that data. Our Privacy Policy for Drink Water App is created with the help of the&nbsp;<a href=\"https://www.freeprivacypolicy.com/free-privacy-policy-generator.php\">Free Privacy Policy Generator</a>.</p> <p>We use your data to provide and improve the Service. By using the Service, you agree to the collection and use of information in accordance with this policy. Unless otherwise defined in this Privacy Policy, terms used in this Privacy Policy have the same meanings as in our Terms and Conditions.</p> <h2>Information Collection And Use</h2> <p>We collect several different types of information for various purposes to provide and improve our Service to you.</p> <h3>Types of Data Collected</h3> <h4>Personal Data</h4> <p>While using our Service, we may ask you to provide us with certain personally identifiable information that can be used to contact or identify you (\"Personal Data\"). Personally identifiable information may include, but is not limited to:</p> <ul> <li>Email address</li> <li>First name and last name</li> <li>Cookies and Usage Data</li> </ul> <h4>Usage Data</h4> <p>When you access the Service by or through a mobile device, we may collect certain information automatically, including, but not limited to, the type of mobile device you use, your mobile device unique ID, the IP address of your mobile device, your mobile operating system, the type of mobile Internet browser you use, unique device identifiers and other diagnostic data (\"Usage Data\").</p> <h4>Tracking &amp; Cookies Data</h4> <p>We use cookies and similar tracking technologies to track the activity on our Service and hold certain information.</p> <p>Cookies are files with small amount of data which may include an anonymous unique identifier. Cookies are sent to your browser from a website and stored on your device. Tracking technologies also used are beacons, tags, and scripts to collect and track information and to improve and analyze our Service.</p> <p>You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent. However, if you do not accept cookies, you may not be able to use some portions of our Service.</p> <p>Examples of Cookies we use:</p> <ul> <li><strong>Session Cookies.</strong>&nbsp;We use Session Cookies to operate our Service.</li> <li><strong>Preference Cookies.</strong>&nbsp;We use Preference Cookies to remember your preferences and various settings.</li> <li><strong>Security Cookies.</strong>&nbsp;We use Security Cookies for security purposes.</li> </ul> <h2>Use of Data</h2> <p>Drink Water App uses the collected data for various purposes:</p> <ul> <li>To provide and maintain the Service</li> <li>To notify you about changes to our Service</li> <li>To allow you to participate in interactive features of our Service when you choose to do so</li> <li>To provide customer care and support</li> <li>To provide analysis or valuable information so that we can improve the Service</li> <li>To monitor the usage of the Service</li> <li>To detect, prevent and address technical issues</li> </ul> <h2>Transfer Of Data</h2> <p>Your information, including Personal Data, may be transferred to &mdash; and maintained on &mdash; computers located outside of your state, province, country or other governmental jurisdiction where the data protection laws may differ than those from your jurisdiction.</p> <p>If you are located outside Nicaragua and choose to provide information to us, please note that we transfer the data, including Personal Data, to Nicaragua and process it there.</p> <p>Your consent to this Privacy Policy followed by your submission of such information represents your agreement to that transfer.</p> <p>Drink Water App will take all steps reasonably necessary to ensure that your data is treated securely and in accordance with this Privacy Policy and no transfer of your Personal Data will take place to an organization or a country unless there are adequate controls in place including the security of your data and other personal information.</p> <h2>Disclosure Of Data</h2> <h3>Legal Requirements</h3> <p>Drink Water App may disclose your Personal Data in the good faith belief that such action is necessary to:</p> <ul> <li>To comply with a legal obligation</li> <li>To protect and defend the rights or property of Drink Water App</li> <li>To prevent or investigate possible wrongdoing in connection with the Service</li> <li>To protect the personal safety of users of the Service or the public</li> <li>To protect against legal liability</li> </ul> <h2>Security Of Data</h2> <p>The security of your data is important to us, but remember that no method of transmission over the Internet, or method of electronic storage is 100% secure. While we strive to use commercially acceptable means to protect your Personal Data, we cannot guarantee its absolute security.</p> <h2>Service Providers</h2> <p>We may employ third party companies and individuals to facilitate our Service (\"Service Providers\"), to provide the Service on our behalf, to perform Service-related services or to assist us in analyzing how our Service is used.</p> <p>These third parties have access to your Personal Data only to perform these tasks on our behalf and are obligated not to disclose or use it for any other purpose.</p> <h2>Links To Other Sites</h2> <p>Our Service may contain links to other sites that are not operated by us. If you click on a third party link, you will be directed to that third party's site. We strongly advise you to review the Privacy Policy of every site you visit.</p> <p>We have no control over and assume no responsibility for the content, privacy policies or practices of any third party sites or services.</p> <h2>Children's Privacy</h2> <p>Our Service does not address anyone under the age of 18 (\"Children\").</p> <p>We do not knowingly collect personally identifiable information from anyone under the age of 18. If you are a parent or guardian and you are aware that your Children has provided us with Personal Data, please contact us. If we become aware that we have collected Personal Data from children without verification of parental consent, we take steps to remove that information from our servers.</p> <h2>Changes To This Privacy Policy</h2> <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page.</p> <p>We will let you know via email and/or a prominent notice on our Service, prior to the change becoming effective and update the \"effective date\" at the top of this Privacy Policy.</p> <p>You are advised to review this Privacy Policy periodically for any changes. Changes to this Privacy Policy are effective when they are posted on this page.</p> <h2>Contact Us</h2> <p>If you have any questions about this Privacy Policy, please contact us:</p> <ul> <li>By email: eahm3595@gmail.com</li> </ul>"</p>]]></string>
     <string name="privacy_policy_title">Privacy Policy</string>
     <string name="privacy_policy_alert">You must accept the policies to use the application</string>
     <string name="privacy_policy_accept">I have read and I agree with the privacy policies</string>
     <string name="text_continue">Continue</string>
 
+    <string name="text_ouch">Ouch!</string>
+    <string name="text_ss_validating_config">Validating settings…</string>
+    <string name="text_ss_getting_language">Getting language…</string>
+    <string name="text_ss_showing_pp">Showing our privacy policies</string>
     <string name="ss_getting_content">Getting content…</string>
     <string name="ss_not_connected">Not internet connection… Check your network</string>
     <string name="ss_getting_info">Getting information of the application…</string>
@@ -75,18 +110,13 @@
         <item>150mL</item>
     </string-array>
 
-    <!-- ADMOB -->
-    <string name="ads_app_id">ca-app-pub-9403893294190125~4239664850</string>
-    <string name="ads_banner_ad_unit_id">ca-app-pub-9403893294190125/8776486293</string>
-    <string name="privacy_policy_local_content"><![CDATA[<p>"<p>Effective date: May 08, 2019</p> <p>Drink Water App (\"us\", \"we\", or \"our\") operates the Drink Water App mobile application (the \"Service\").</p> <p>This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our Service and the choices you have associated with that data. Our Privacy Policy for Drink Water App is created with the help of the&nbsp;<a href=\"https://www.freeprivacypolicy.com/free-privacy-policy-generator.php\">Free Privacy Policy Generator</a>.</p> <p>We use your data to provide and improve the Service. By using the Service, you agree to the collection and use of information in accordance with this policy. Unless otherwise defined in this Privacy Policy, terms used in this Privacy Policy have the same meanings as in our Terms and Conditions.</p> <h2>Information Collection And Use</h2> <p>We collect several different types of information for various purposes to provide and improve our Service to you.</p> <h3>Types of Data Collected</h3> <h4>Personal Data</h4> <p>While using our Service, we may ask you to provide us with certain personally identifiable information that can be used to contact or identify you (\"Personal Data\"). Personally identifiable information may include, but is not limited to:</p> <ul> <li>Email address</li> <li>First name and last name</li> <li>Cookies and Usage Data</li> </ul> <h4>Usage Data</h4> <p>When you access the Service by or through a mobile device, we may collect certain information automatically, including, but not limited to, the type of mobile device you use, your mobile device unique ID, the IP address of your mobile device, your mobile operating system, the type of mobile Internet browser you use, unique device identifiers and other diagnostic data (\"Usage Data\").</p> <h4>Tracking &amp; Cookies Data</h4> <p>We use cookies and similar tracking technologies to track the activity on our Service and hold certain information.</p> <p>Cookies are files with small amount of data which may include an anonymous unique identifier. Cookies are sent to your browser from a website and stored on your device. Tracking technologies also used are beacons, tags, and scripts to collect and track information and to improve and analyze our Service.</p> <p>You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent. However, if you do not accept cookies, you may not be able to use some portions of our Service.</p> <p>Examples of Cookies we use:</p> <ul> <li><strong>Session Cookies.</strong>&nbsp;We use Session Cookies to operate our Service.</li> <li><strong>Preference Cookies.</strong>&nbsp;We use Preference Cookies to remember your preferences and various settings.</li> <li><strong>Security Cookies.</strong>&nbsp;We use Security Cookies for security purposes.</li> </ul> <h2>Use of Data</h2> <p>Drink Water App uses the collected data for various purposes:</p> <ul> <li>To provide and maintain the Service</li> <li>To notify you about changes to our Service</li> <li>To allow you to participate in interactive features of our Service when you choose to do so</li> <li>To provide customer care and support</li> <li>To provide analysis or valuable information so that we can improve the Service</li> <li>To monitor the usage of the Service</li> <li>To detect, prevent and address technical issues</li> </ul> <h2>Transfer Of Data</h2> <p>Your information, including Personal Data, may be transferred to &mdash; and maintained on &mdash; computers located outside of your state, province, country or other governmental jurisdiction where the data protection laws may differ than those from your jurisdiction.</p> <p>If you are located outside Nicaragua and choose to provide information to us, please note that we transfer the data, including Personal Data, to Nicaragua and process it there.</p> <p>Your consent to this Privacy Policy followed by your submission of such information represents your agreement to that transfer.</p> <p>Drink Water App will take all steps reasonably necessary to ensure that your data is treated securely and in accordance with this Privacy Policy and no transfer of your Personal Data will take place to an organization or a country unless there are adequate controls in place including the security of your data and other personal information.</p> <h2>Disclosure Of Data</h2> <h3>Legal Requirements</h3> <p>Drink Water App may disclose your Personal Data in the good faith belief that such action is necessary to:</p> <ul> <li>To comply with a legal obligation</li> <li>To protect and defend the rights or property of Drink Water App</li> <li>To prevent or investigate possible wrongdoing in connection with the Service</li> <li>To protect the personal safety of users of the Service or the public</li> <li>To protect against legal liability</li> </ul> <h2>Security Of Data</h2> <p>The security of your data is important to us, but remember that no method of transmission over the Internet, or method of electronic storage is 100% secure. While we strive to use commercially acceptable means to protect your Personal Data, we cannot guarantee its absolute security.</p> <h2>Service Providers</h2> <p>We may employ third party companies and individuals to facilitate our Service (\"Service Providers\"), to provide the Service on our behalf, to perform Service-related services or to assist us in analyzing how our Service is used.</p> <p>These third parties have access to your Personal Data only to perform these tasks on our behalf and are obligated not to disclose or use it for any other purpose.</p> <h2>Links To Other Sites</h2> <p>Our Service may contain links to other sites that are not operated by us. If you click on a third party link, you will be directed to that third party's site. We strongly advise you to review the Privacy Policy of every site you visit.</p> <p>We have no control over and assume no responsibility for the content, privacy policies or practices of any third party sites or services.</p> <h2>Children's Privacy</h2> <p>Our Service does not address anyone under the age of 18 (\"Children\").</p> <p>We do not knowingly collect personally identifiable information from anyone under the age of 18. If you are a parent or guardian and you are aware that your Children has provided us with Personal Data, please contact us. If we become aware that we have collected Personal Data from children without verification of parental consent, we take steps to remove that information from our servers.</p> <h2>Changes To This Privacy Policy</h2> <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page.</p> <p>We will let you know via email and/or a prominent notice on our Service, prior to the change becoming effective and update the \"effective date\" at the top of this Privacy Policy.</p> <p>You are advised to review this Privacy Policy periodically for any changes. Changes to this Privacy Policy are effective when they are posted on this page.</p> <h2>Contact Us</h2> <p>If you have any questions about this Privacy Policy, please contact us:</p> <ul> <li>By email: eahm3595@gmail.com</li> </ul>"</p>]]></string>
-    <!-- DRINK WATER APP -->
+     <!-- DRINK WATER APP -->
     <string name="exit_press_again">Press again to exit</string>
     <string name="message_app_disabled">Currently the application is disabled, try again in a few moments…</string>
     <string name="message_update_new_version">A new version is available. Download it now!</string>
     <string name="text_download">DOWNLOAD</string>
     <string name="text_exit">Exit</string>
     <string name="text_later">Later</string>
-    <string name="text_something_fail">Something fail Restart the App :(</string>
     <string name="text_accept">Accept</string>
     <string name="text_permissions">Permissions</string>
     <string name="text_session_in_other_device">Active session on another device</string>
@@ -171,6 +201,14 @@
     <string name="text_report_title">Records of\n</string>
     <string name="text_report_loading">Loading records…</string>
     <string name="text_report_no_records">You do not have records yet!</string>
+    <string name="text_record_yesterday">See yesterday\'s record</string>
+    <string name="text_record_today">See today\'s records</string>
+    <string name="text_custom_milliliters">Add Milliliters</string>
+    <string name="text_amount_empty">The amount is empty</string>
+    <string name="text_amount_greater_than">The amount must be greater than 10</string>
+    <string name="text_todays_records">Today\'s records</string>
+    <string name="text_your_record_yesterday">These are the records of yesterday</string>
+
     <string name="text_first_drink_01">Ready to drink water at any time!</string>
     <string name="text_first_drink_02">Let us begin…\n\nTake a glass of water now, press the button and then select the amount you took.\nThen continue with your activities that we will let you know when you should drink again</string>
     <string name="text_break_hours_01">Hours of rest!\nNotifications are disabled</string>
@@ -183,40 +221,7 @@
     <string name="text_timepicker_title_end_hours">Select the end time\n(between 06:00 p.m. to 11:59 p.m.)</string>
     <string name="text_next_in">Next in</string>
     <string name="text_i_drink">I already drink water!</string>
-    <!-- UTILS -->
-    <string name="monday">Monday</string>
-    <string name="tuesday">Tuesday</string>
-    <string name="wednesday">Wednesday</string>
-    <string name="thursday">Thursday</string>
-    <string name="friday">Friday</string>
-    <string name="saturday">Saturday</string>
-    <string name="sunday">Sunday</string>
-    <string name="january">January</string>
-    <string name="fabruary">February</string>
-    <string name="march">March</string>
-    <string name="april">April</string>
-    <string name="may">May</string>
-    <string name="june">June</string>
-    <string name="july">July</string>
-    <string name="august">August</string>
-    <string name="september">September</string>
-    <string name="october">October</string>
-    <string name="november">November</string>
-    <string name="december">December</string>
-    <string name="text_hour">hour</string>
-    <string name="text_minute">minute</string>
-    <string name="text_second">second</string>
-    <string name="text_hours">hours</string>
-    <string name="text_minutes">minutes</string>
-    <string name="text_seconds">seconds</string>
-    <string name="validate_email_empty">Enter an email address!</string>
-    <string name="validate_email_invalid">Invalid address</string>
-    <string name="validate_password_empty">Enter a password!</string>
-    <string name="validate_password_too_short">Very short password!</string>
-    <string name="validate_phone_empty">Empty number</string>
-    <string name="validate_phone_incomplete">Incomplete Number</string>
-    <string name="validate_phone_too_long">Number too extensive</string>
-    <string name="validate_phone_only_numbers">Entry must not contain letters only numbers</string>
+
     <!-- LAYOUT SET TIME -->
     <string name="text_start_title">Start time</string>
     <string name="text_start_at">We start at</string>
@@ -248,6 +253,7 @@
     <string name="text_notification_case_05">The notification was closed</string>
     <string name="text_notification_case_06">You left without drinking</string>
     <!-- FLOAT WIDGET CONGRATULATIONS -->
+    <string name="text_congratulations">CONGRATULATIONS!</string>
     <string name="text_congratulations_01">You have reached</string>
     <string name="text_congratulations_02">of water during this day. You have achieved your goal of</string>
     <string name="text_congratulations_03">and you have kept your body hydrated. Keep it up!</string>
@@ -328,19 +334,4 @@
     <string name="big_text_drink_time_06">Ingesting water raises the natural defenses of our body and has a lubricating effect on our muscles and joints, since it protects them and helps them to function properly. This improves the strength of our ligaments and muscles.</string>
     <string name="big_text_drink_time_07">If you do not want to drink now I will remind you in a few minutes later…</string>
     <string name="big_text_drink_time_default">Bad breath is a clear sign that the body needs more water. Saliva helps your mouth to get rid of bacteria and keep the tongue hydrated. Because of this, every time we have bad breath, the first thing we should do is drink a lot of water</string>
-    <string name="text_ouch">Ouch!</string>
-    <string name="text_ss_validating_config">Validating settings…</string>
-    <string name="text_ss_getting_language">Getting language…</string>
-    <string name="text_ss_showing_pp">Showing our privacy policies</string>
-    <string name="text_congratulations">CONGRATULATIONS!</string>
-    <string name="text_record_yesterday">See yesterday\'s record</string>
-    <string name="text_record_today">See today\'s records</string>
-    <string name="text_custom_milliliters">Add Milliliters</string>
-    <string name="text_amount_empty">The amount is empty</string>
-    <string name="text_amount_just_numbers">Only numbers are allowed</string>
-    <string name="text_amount_greater_than">The amount must be greater than 10</string>
-    <string name="text_todays_records">Today\'s records</string>
-    <string name="text_your_record_yesterday">These are the records of yesterday</string>
-
-
 </resources>
