@@ -18,11 +18,23 @@
                                 <PersistentState>
                                   <option name="children">
                                     <map>
+                                      <entry key="clipArt">
+                                        <value>
+                                          <PersistentState>
+                                            <option name="values">
+                                              <map>
+                                                <entry key="color" value="000000" />
+                                              </map>
+                                            </option>
+                                          </PersistentState>
+                                        </value>
+                                      </entry>
                                       <entry key="image">
                                         <value>
                                           <PersistentState>
                                             <option name="values">
                                               <map>
+                                                <entry key="color" value="000000" />
                                                 <entry key="trimmed" value="true" />
                                               </map>
                                             </option>
@@ -52,7 +64,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="scalingPercent" value="105" />
+                                                <entry key="scalingPercent" value="102" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -63,7 +75,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="scalingPercent" value="67" />
+                                                <entry key="scalingPercent" value="77" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -73,11 +85,32 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="backgroundImage" value="C:\Users\elvis antonio\Documents\GitHub\01 RECURSOS DE LAS APPS\Drink Water App\Icono\app_background_2.png" />
-                                      <entry key="backgroundLayerName" value="ic_launcher_background_2" />
+                                      <entry key="backgroundImage" value="C:\Users\elvis antonio\Documents\GitHub\01 RECURSOS DE LAS APPS\Drink Water App\Icono\app_background_3.png" />
+                                      <entry key="backgroundLayerName" value="ic_launcher_background_3" />
                                       <entry key="foregroundImage" value="C:\Users\elvis antonio\Documents\GitHub\01 RECURSOS DE LAS APPS\Drink Water App\Icono\app_icon.png" />
-                                      <entry key="foregroundLayerName" value="ic_app_foreground_2" />
-                                      <entry key="outputName" value="ic_app_2" />
+                                      <entry key="foregroundLayerName" value="ic_app_foreground_3" />
+                                      <entry key="outputName" value="ic_app_3" />
+                                    </map>
+                                  </option>
+                                </PersistentState>
+                              </value>
+                            </entry>
+                            <entry key="launcherLegacy">
+                              <value>
+                                <PersistentState>
+                                  <option name="children">
+                                    <map>
+                                      <entry key="clipArt">
+                                        <value>
+                                          <PersistentState>
+                                            <option name="values">
+                                              <map>
+                                                <entry key="color" value="000000" />
+                                              </map>
+                                            </option>
+                                          </PersistentState>
+                                        </value>
+                                      </entry>
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -88,11 +121,23 @@
                                 <PersistentState>
                                   <option name="children">
                                     <map>
+                                      <entry key="clipArt">
+                                        <value>
+                                          <PersistentState>
+                                            <option name="values">
+                                              <map>
+                                                <entry key="color" value="000000" />
+                                              </map>
+                                            </option>
+                                          </PersistentState>
+                                        </value>
+                                      </entry>
                                       <entry key="image">
                                         <value>
                                           <PersistentState>
                                             <option name="values">
                                               <map>
+                                                <entry key="color" value="000000" />
                                                 <entry key="paddingPercent" value="5" />
                                                 <entry key="trimmed" value="true" />
                                               </map>
@@ -105,18 +150,13 @@
                                   <option name="values">
                                     <map>
                                       <entry key="assetType" value="IMAGE" />
-                                      <entry key="imageAsset" value="C:\Users\elvis antonio\Documents\GitHub\01 RECURSOS DE LAS APPS\Drink Water App\Diseño v1.0.4\icon_trophie_white.png" />
-                                      <entry key="outputName" value="ic_trophy_white" />
+                                      <entry key="imageAsset" value="C:\Users\elvis antonio\Documents\GitHub\01 RECURSOS DE LAS APPS\Drink Water App\Diseño v1.0.4\gallery.png" />
+                                      <entry key="outputName" value="ic_gallery" />
                                     </map>
                                   </option>
                                 </PersistentState>
                               </value>
                             </entry>
-                          </map>
-                        </option>
-                        <option name="values">
-                          <map>
-                            <entry key="outputIconType" value="ACTIONBAR" />
                           </map>
                         </option>
                       </PersistentState>

@@ -14,17 +14,17 @@
 
     <application
         android:name=".ThisApplication"
-        tools:replace="android:allowBackup"
         android:allowBackup="false"
-        android:fullBackupContent="false"
         android:fitsSystemWindows="true"
-        android:icon="@mipmap/ic_launcher"
+        android:fullBackupContent="false"
+        android:icon="@mipmap/ic_app_3_round"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_app_3_round"
+        android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:windowSoftInputMode="adjustResize"
-        >
+        tools:replace="android:allowBackup">
 
         <!-- META DATA -->
         <meta-data
@@ -37,10 +37,21 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+        <meta-data
+            android:name="com.facebook.sdk.ClientToken"
+            android:value="@string/facebook_client_token" />
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/default_notification_channel_id" />
         <!-- ACTIVITIES -->
         <activity
             android:name=".SplashScreen"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -58,7 +69,24 @@
             android:name=".WaterDrinkActivity"
             android:theme="@style/WaterDrinkTheme" />
 
-         <!-- RECEIVERS -->
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation" />
+
+        <activity
+            android:name="com.facebook.CustomTabActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="@string/fb_login_protocol_scheme" />
+            </intent-filter>
+        </activity>
+
+        <!-- RECEIVERS -->
 
         <receiver
             android:name=".BroadcastReceiver.AlarmReceiver"
@@ -80,6 +108,21 @@
             android:exported="false"
             tools:ignore="InnerclassSeparator" />
 
+        <service
+            android:name=".BroadcastReceiver.NotificationJobService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            tools:ignore="InnerclassSeparator" />
+
+        <service
+            android:name=".BroadcastReceiver.MyFirebaseMessagingService"
+            android:exported="false"
+            tools:ignore="InnerclassSeparator">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

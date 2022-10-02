@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">Drink Water App</string>
     <string name="channel_description">Notifications to drink water</string>
+
     <!-- UTILS -->
     <string name="monday">Monday</string>
     <string name="tuesday">Tuesday</string>

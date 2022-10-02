@@ -3,7 +3,6 @@ package com.eahm.drinkwaterapp;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -18,6 +17,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.eahm.drinkwaterapp.Class.SettingsClass;
 import com.eahm.drinkwaterapp.Utils.Utils;
@@ -157,6 +158,7 @@ public class WelcomeActivity extends AppCompatActivity {
             settings.deleteNotiSkipTime();
             settings.deleteTimeData();
             settings.deleteTodayProgress();
+            settings.deleteCustomDrinkAmount();
 
             settings.deletePermissionStatus();
             settings.deleteAlarmWorking();
@@ -167,6 +169,9 @@ public class WelcomeActivity extends AppCompatActivity {
             settings.deleteContratulationStatus();
             settings.deleteAppRated();
             settings.deleteAppVersion();
+
+            settings.deleteStringBackground();
+            settings.deleteSelectedTextColor();
 
         }
         super.onCreate(savedInstanceState);
