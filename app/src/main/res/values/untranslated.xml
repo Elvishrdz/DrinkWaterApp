@@ -3,4 +3,9 @@
     <!-- ADMOB -->
     <string name="ads_app_id" translatable="false">ca-app-pub-9403893294190125~4239664850</string>
     <string name="ads_banner_ad_unit_id" translatable="false">ca-app-pub-9403893294190125/8776486293</string>
+    <string name="com.crashlytics.useFirebaseAppId" translatable="false">true</string>
+    <string name="facebook_app_id" translatable="false">820671868961883</string>
+    <string name="fb_login_protocol_scheme" translatable="false">fb820671868961883</string>
+    <string name="facebook_client_token" translatable="false">5d47dfc20796159d3bed258b7ab8b53f</string>
+    <string name="default_notification_channel_id" translatable="false">DRINK_WATER_APP_NOTIFICATIONS</string>
 </resources>

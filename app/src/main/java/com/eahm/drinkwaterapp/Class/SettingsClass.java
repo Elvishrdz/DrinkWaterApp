@@ -2,7 +2,6 @@ package com.eahm.drinkwaterapp.Class;
 
 import android.util.Log;
 
-import com.eahm.drinkwaterapp.BuildConfig;
 import com.pixplicity.easyprefs.library.Prefs;
 
 public class SettingsClass {
@@ -492,6 +491,49 @@ public class SettingsClass {
 
     public void deleteCustomDrinkAmount(){
         Prefs.remove(CUSTOM_DRINK_AMOUNT);
+    }
+
+
+
+
+
+    private static String CUSTOM_BACKGROUND = "CUSTOM_BACKGROUND";
+
+    public String getStringBackground() {
+        String _default = "DEFAULT";
+        if(!Prefs.contains(CUSTOM_BACKGROUND)){
+            setStringBackground(_default);
+        }
+
+        return Prefs.getString(CUSTOM_BACKGROUND, _default);
+    }
+
+    public void setStringBackground(String value){
+        Prefs.putString(CUSTOM_BACKGROUND, value);
+    }
+
+    public void deleteStringBackground(){
+        Prefs.remove(CUSTOM_BACKGROUND);
+    }
+
+
+    private static String CUSTOM_TEXT_COLOR = "CUSTOM_TEXT_COLOR";
+
+    public int getSelectedTextColor() {
+        int _default = 0;
+        if(!Prefs.contains(CUSTOM_TEXT_COLOR)){
+            setSelectedTextColor(_default);
+        }
+
+        return Prefs.getInt(CUSTOM_TEXT_COLOR, _default);
+    }
+
+    public void setSelectedTextColor(int colorCode){
+        Prefs.putInt(CUSTOM_TEXT_COLOR, colorCode);
+    }
+
+    public void deleteSelectedTextColor(){
+        Prefs.remove(CUSTOM_TEXT_COLOR);
     }
 
 

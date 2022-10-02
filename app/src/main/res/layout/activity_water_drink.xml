@@ -6,8 +6,25 @@
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
     tools:context=".WaterDrinkActivity"
     tools:ignore="ContentDescription">
+
+    <ImageView
+        android:id="@+id/imageViewBackground"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:visibility="visible"
+        tools:srcCompat="@drawable/custom_background" />
+
+    <LinearLayout
+        android:id="@+id/layerColor"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0"
+        android:background="@color/white"
+        android:orientation="horizontal"/>
 
     <RelativeLayout
         android:id="@+id/container"
@@ -15,16 +32,7 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/adView"
         android:layout_alignParentBottom="false"
-        android:background="@android:color/white"
         android:gravity="bottom|end">
-
-        <ImageView
-            android:id="@+id/imageViewBackground"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:alpha=".5"
-            android:scaleType="centerCrop"
-            android:visibility="gone" />
 
         <RelativeLayout
             android:id="@+id/rLViewStub"
@@ -33,12 +41,12 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp">
 
-            <android.support.v7.widget.CardView
+            <androidx.cardview.widget.CardView
                 android:id="@+id/cardView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="17dp"
-                ads:cardBackgroundColor="@color/purple"
+                ads:cardBackgroundColor="@color/blue_water"
                 ads:cardCornerRadius="7dp"
                 ads:cardElevation="7dp">
 
@@ -51,14 +59,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="false"
-                        android:layout_margin="7dp"
                         android:gravity="center_vertical|center_horizontal"
                         android:text="@string/water_drink_04"
                         android:textColor="@android:color/white"
                         android:textStyle="bold" />
 
                 </RelativeLayout>
-            </android.support.v7.widget.CardView>
+            </androidx.cardview.widget.CardView>
 
             <pl.bclogic.pulsator4droid.library.PulsatorLayout
                 android:id="@+id/pulsatorLayout"
@@ -119,7 +126,7 @@
                             android:layout_marginBottom="7dp"
                             android:gravity="center_horizontal"
                             android:text="@string/water_drink_03"
-                            android:textColor="#808080"
+                            android:textColor="@color/grey_4"
                             android:textSize="18sp" />
 
                         <TextView
@@ -128,7 +135,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center_horizontal"
                             android:text="@string/water_drink_02"
-                            android:textColor="#808080"
+                            android:textColor="@color/grey_4"
                             android:textSize="18sp" />
 
                     </LinearLayout>
@@ -150,23 +157,6 @@
                 android:src="@drawable/com_facebook_profile_picture_blank_portrait"
                 ads:civ_border_color="#000000"
                 ads:civ_border_width="0dp" />
-
-            <ImageButton
-                android:id="@+id/imageButtonShare"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_below="@+id/cardView"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentLeft="true"
-                android:layout_marginStart="7dp"
-                android:layout_marginEnd="7dp"
-                android:background="@drawable/button_circle_background_01_selector"
-                android:paddingLeft="2dp"
-                android:paddingTop="7dp"
-                android:paddingRight="5dp"
-                android:paddingBottom="7dp"
-                android:scaleType="centerInside"
-                ads:srcCompat="@drawable/ic_share" />
 
             <ImageButton
                 android:id="@+id/imageButtonRecords"
@@ -235,18 +225,62 @@
                 android:layout_toEndOf="@+id/circleImageViewProfilePic"
                 android:layout_toRightOf="@+id/circleImageViewProfilePic"
                 android:ellipsize="marquee"
+
+
                 android:focusable="true"
-
-
                 android:focusableInTouchMode="true"
                 android:gravity="center_vertical|center_horizontal"
                 android:marqueeRepeatLimit="marquee_forever"
                 android:scrollHorizontally="true"
                 android:singleLine="true"
-                android:text="@string/water_drink_01"
 
-                android:textColor="@color/com_facebook_blue"
+                android:text="@string/water_drink_01"
+                android:textColor="@color/grey_4"
                 android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/imageButtonShare"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_below="@+id/textViewStats"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="7dp"
+                android:background="@drawable/button_circle_background_01_selector"
+                android:paddingLeft="2dp"
+                android:paddingTop="7dp"
+                android:paddingRight="5dp"
+                android:paddingBottom="7dp"
+                android:scaleType="centerInside"
+                ads:srcCompat="@drawable/ic_share"
+                android:paddingStart="2dp"
+                android:paddingEnd="5dp" />
+
+            <ImageButton
+                android:id="@+id/imageButtonSetBackground"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_below="@+id/imageButtonShare"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="7dp"
+                android:background="@drawable/button_circle_background_01_selector"
+                android:scaleType="centerInside"
+                ads:srcCompat="@drawable/ic_gallery" />
+
+            <ImageButton
+                android:id="@+id/imageButtonCredits"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_below="@+id/imageButtonSetBackground"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="7dp"
+                android:background="@drawable/button_circle_background_01_selector"
+                android:scaleType="centerInside"
+                android:padding="6dp"
+                android:tint="@color/white"
+                ads:srcCompat="@drawable/ic_star_filled" />
 
         </RelativeLayout>
 
@@ -354,6 +388,54 @@
                 android:layout_marginStart="40dp"
                 android:layout_marginEnd="40dp"
                 android:visibility="visible" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/includeLayoutSetBackground"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/black_transparent"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:translationZ="7dp"
+            android:visibility="gone">
+
+            <include
+                layout="@layout/layout_set_background"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:visibility="visible" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/includeLayoutCredits"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/black_transparent"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:translationZ="7dp"
+            android:visibility="gone">
+
+            <include
+                layout="@layout/layout_credits"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="7dp"
+                android:layout_marginLeft="7dp"
+                android:layout_marginTop="7dp"
+                android:layout_marginEnd="7dp"
+                android:layout_marginRight="7dp"
+                android:layout_marginBottom="7dp"
+                android:translationZ="7dp" />
 
         </LinearLayout>
 

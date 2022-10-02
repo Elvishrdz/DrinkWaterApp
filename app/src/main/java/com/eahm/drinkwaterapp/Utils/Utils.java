@@ -28,6 +28,8 @@ import com.eahm.drinkwaterapp.R;
 
 import org.joda.time.DateTime;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -38,6 +40,26 @@ import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 public class Utils {
+
+    public String LoadData(Context context, String inFile) {
+        String tContents = "";
+
+        try {
+            InputStream stream = context.getAssets().open(inFile);
+
+            int size = stream.available();
+            byte[] buffer = new byte[size];
+            stream.read(buffer);
+            stream.close();
+            tContents = new String(buffer);
+        } catch (IOException e) {
+            // Handle exceptions here
+            tContents = "Fail: " + e.toString();
+        }
+
+        return tContents;
+
+    }
 
     public static void hideKeyboard(Activity activity) {
         InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);

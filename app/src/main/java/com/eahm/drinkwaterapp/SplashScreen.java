@@ -12,11 +12,12 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -41,6 +42,7 @@ import com.eahm.drinkwaterapp.Models.NewsMedia;
 import com.eahm.drinkwaterapp.Models.UserModel;
 import com.eahm.drinkwaterapp.Utils.UserManagement;
 import com.eahm.drinkwaterapp.Utils.Utils;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -52,6 +54,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.treebo.internetavailabilitychecker.InternetAvailabilityChecker;
 import com.treebo.internetavailabilitychecker.InternetConnectivityListener;
 
@@ -422,6 +425,9 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
         else {
             Log.i(TAG_NEWS, "Pais actual guardado: " + userCountryCode);
 
+            // Firebase Messaging THEME
+            subscribeToNotificationTheme(userCountryCode);
+
             appGetCountry = true;
             setAppInformation();
         }
@@ -471,6 +477,10 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
                     settings.setWSCountryLastTimestamp(utils.getCurrentTimestamp());
 
                     Log.i(TAG_NEWS, "Pais: " + country + " CODIGO: " + countryCode);
+
+                    // Firebase Messaging THEME
+                    subscribeToNotificationTheme(countryCode);
+
                     appGetCountry = true;
                     setAppInformation();
                 }
@@ -486,6 +496,23 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
             }
         }
     };
+
+    private void subscribeToNotificationTheme(String countryCode) {
+        if(!countryCode.isEmpty()){
+            FirebaseMessaging.getInstance().subscribeToTopic(countryCode)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if(task.isSuccessful()){
+                                Log.i(TAG_NEWS, "Suscrito a el tema: " + countryCode + " en FIREBASE Messaging");
+                            }
+                            else {
+                                Log.i(TAG_NEWS, "No se pudo suscribir al tema: " + countryCode);
+                            }
+                        }
+                    });
+        }
+    }
 
     private void getAppNewsCheckAvailabilityAndPrivacyPolicy() {
 
