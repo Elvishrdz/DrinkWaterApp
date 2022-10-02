@@ -12,12 +12,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -28,6 +22,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -1153,23 +1153,19 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
         else {
             builder.setMessage(getResources().getString(R.string.permission_request_02));
 
-            builder.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.privacy_policy_title), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    // User cancelled the dialog
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(privacyPolicyURL));
-                    startActivity(browserIntent);
-                    privacyPolicyURL = "";
-                    getInitialAppPermissions();
-                }
+            builder.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.privacy_policy_title), (dialog, id) -> {
+                // User cancelled the dialog
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(privacyPolicyURL));
+                startActivity(browserIntent);
+                privacyPolicyURL = "";
+                getInitialAppPermissions();
             });
         }
 
-        builder.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.text_continue), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                //Prefs.putString(device, "DONE");
-                settings.setPermissionStatus(true);
-                getInitialAppPermissions();
-            }
+        builder.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.text_continue), (dialog, id) -> {
+            //Prefs.putString(device, "DONE");
+            settings.setPermissionStatus(true);
+            getInitialAppPermissions();
         });
 
         builder.setCancelable(false);
@@ -1197,7 +1193,10 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
         //endregion SYSTEM ALERT WINDOW
 
         //region READ_EXTERNAL_STORAGE
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+        ) != PackageManager.PERMISSION_GRANTED) {
             if(!settings.getPermissionStatus()){
                 showPermissionDialog();
                 return;
@@ -1271,31 +1270,36 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
     //endregion SYSTEM_ALERT_WINDOW
 
     // region READ_EXTERNAL_STORAGE
-
     private void requestPermissionReadExternalStorage() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-
-                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-
-                    new AlertDialog.Builder(this).setTitle(R.string.permission_read_external_title).setMessage(getString(R.string.permission_read_external_explanation))
-                            .setPositiveButton(getString(R.string.permission_grant), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    ActivityCompat.requestPermissions(SplashScreen.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, CODE_READ_EXTERNAL_STORAGE);
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+        ) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+            )) {
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.permission_read_external_title)
+                        .setMessage(getString(R.string.permission_read_external_explanation))
+                        .setPositiveButton(
+                                getString(R.string.permission_grant),
+                                (dialog, which) -> {
+                                    ActivityCompat.requestPermissions(
+                                            SplashScreen.this,
+                                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                                            CODE_READ_EXTERNAL_STORAGE
+                                    );
                                 }
-                            })
-                            .create()
-                            .show();
-
-                } else {
-                    ActivityCompat.requestPermissions(SplashScreen.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, CODE_READ_EXTERNAL_STORAGE);
-                }
-
+                        )
+                        .create()
+                        .show();
+            } else {
+                ActivityCompat.requestPermissions(
+                        this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, CODE_READ_EXTERNAL_STORAGE);
             }
         }
-        else getInitialAppPermissions();
-
     }
     //endregion READ_EXTERNAL_STORAGE
 
