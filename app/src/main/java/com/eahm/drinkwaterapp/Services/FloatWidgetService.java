@@ -3,6 +3,7 @@ package com.eahm.drinkwaterapp.Services;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.PixelFormat;
+import android.os.Build;
 import android.os.IBinder;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -38,12 +39,21 @@ public class FloatWidgetService extends Service {
         mFloatingWidget = LayoutInflater.from(this).inflate(R.layout.layout_floating_widget, null);
         mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
 
-        params = new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.TYPE_PHONE,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                PixelFormat.TRANSLUCENT);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            params = new WindowManager.LayoutParams(
+                    WindowManager.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                    PixelFormat.TRANSLUCENT);
+        } else {
+            params = new WindowManager.LayoutParams(
+                    WindowManager.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.TYPE_PHONE,
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                    PixelFormat.TRANSLUCENT);
+        }
 
         params.gravity = Gravity.TOP | Gravity.START;
         params.x = 0;
@@ -109,13 +119,21 @@ public class FloatWidgetService extends Service {
 
                                     layoutButtonCongratulations.setVisibility(View.GONE);
 
-
-                                    params = new WindowManager.LayoutParams(
-                                            WindowManager.LayoutParams.MATCH_PARENT,
-                                            WindowManager.LayoutParams.WRAP_CONTENT,
-                                            WindowManager.LayoutParams.TYPE_PHONE,
-                                            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                                            PixelFormat.TRANSLUCENT);
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                        params = new WindowManager.LayoutParams(
+                                                WindowManager.LayoutParams.MATCH_PARENT,
+                                                WindowManager.LayoutParams.WRAP_CONTENT,
+                                                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                                                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                                                PixelFormat.TRANSLUCENT);
+                                    } else {
+                                       params = new WindowManager.LayoutParams(
+                                                WindowManager.LayoutParams.MATCH_PARENT,
+                                                WindowManager.LayoutParams.WRAP_CONTENT,
+                                                WindowManager.LayoutParams.TYPE_PHONE,
+                                                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                                                PixelFormat.TRANSLUCENT);
+                                    }
 
                                     params.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
                                     params.x = 0;
@@ -135,6 +153,8 @@ public class FloatWidgetService extends Service {
                         mWindowManager.updateViewLayout(mFloatingWidget, params);
                         return true;
                 }
+
+                v.performClick();
                 return false;
             }
         });

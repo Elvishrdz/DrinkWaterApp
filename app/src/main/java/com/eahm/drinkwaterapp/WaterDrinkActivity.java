@@ -1,5 +1,8 @@
 package com.eahm.drinkwaterapp;
 
+import static android.os.Build.VERSION_CODES.TIRAMISU;
+
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.TimePickerDialog;
@@ -43,10 +46,13 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -241,7 +247,7 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
     boolean closeApp = false;
     boolean isDrinkTimeFromNotification = false;
     boolean openGalleryHelper = false; // Bandera para evitar abrir la galeria multiples veces.
-
+    private Integer CODE_POST_NOTIFICATIONS = 45;
     //endregion VARIABLES
 
     @Override
@@ -349,6 +355,19 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         //settings.deleteTimeData();
 
         AlarmApp.getInstance().initialize(getBaseContext());
+
+        if (android.os.Build.VERSION.SDK_INT >= TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    android.Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                        this,
+                        new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                        CODE_POST_NOTIFICATIONS
+                );
+            }
+        }
 
         if (getIntent() != null && getIntent().getExtras() != null) {
             startedFromNotification = getIntent().getExtras().getBoolean("IS_FROM_NOTIFICATION");
@@ -1119,6 +1138,11 @@ public class WaterDrinkActivity extends AppCompatActivity implements Callbacks {
         Log.i(TAG_RATE, settings.getAppVersion() + " - Contador de rated: " + settings.getAppRated());
         //endregion RATE
 
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     private void setTextColor(int checkedId) {
