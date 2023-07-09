@@ -1228,17 +1228,19 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
         //endregion READ_EXTERNAL_STORAGE
 
         //region WRITE_EXTERNAL_STORAGE
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            if (!settings.getPermissionStatus()) {
-                showPermissionDialog();
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                if (!settings.getPermissionStatus()) {
+                    showPermissionDialog();
+                    return;
+                }
+
+
+                startDelay = 1500;
+                // Check in manifest:  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+                requestPermissionWriteExternalStorage();
                 return;
             }
-
-
-            startDelay = 1500;
-            // Check in manifest:  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-            requestPermissionWriteExternalStorage();
-            return;
         }
         //endregion WRITE_EXTERNAL_STORAGE
 
