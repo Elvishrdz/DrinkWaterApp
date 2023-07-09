@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.util.Log;
 
 import com.eahm.drinkwaterapp.BroadcastReceiver.AlarmReceiver;
@@ -17,7 +18,7 @@ public class AlarmFirst {
 
     //region VARIABLES
     private Intent intent;
-    private  AlarmManager alarmManager;
+    private AlarmManager alarmManager;
     private PendingIntent pendingIntent;
     private static int CODE_REQUEST_FIRST_ALARM = 753;
 
@@ -32,16 +33,24 @@ public class AlarmFirst {
         return instance;
     }
 
-    private AlarmFirst(){} //private constructor
+    private AlarmFirst() {
+    } //private constructor
 
     //endregion SINGLETON
 
-    private void initAlarm(Context context){
+    private void initAlarm(Context context) {
         intent = new Intent(context, AlarmReceiver.class);
         intent.setAction("NOTIFICATION_MORNING");
         intent.putExtra("NOTI_ID", Constants.NOTIFICATION_ID_APP);
         intent.putExtra("CODE", "MORNING"); //Morning Notification!
-        pendingIntent = PendingIntent.getBroadcast(context, CODE_REQUEST_FIRST_ALARM, intent, 0);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            pendingIntent = PendingIntent.getBroadcast(context, CODE_REQUEST_FIRST_ALARM, intent, PendingIntent.FLAG_IMMUTABLE);
+
+        } else {
+            pendingIntent = PendingIntent.getBroadcast(context, CODE_REQUEST_FIRST_ALARM, intent, 0);
+        }
+
     }
 
     public void adminFirstAlarm(Context context) {
@@ -59,9 +68,9 @@ public class AlarmFirst {
 
         initAlarm(context);
 
-        Log.i(Constants.LOG_MORNING_ALARM, "Current: " + currentHour +":" + currentMin +" -- Prev: " + prevHour + ":" + prevMin);
+        Log.i(Constants.LOG_MORNING_ALARM, "Current: " + currentHour + ":" + currentMin + " -- Prev: " + prevHour + ":" + prevMin);
 
-        if((prevHour != currentHour || prevMin != currentMin)){
+        if ((prevHour != currentHour || prevMin != currentMin)) {
             Log.i(Constants.LOG_MORNING_ALARM, "La hora establecida fue actualizada");
             settings.setStartPrevHour(currentHour);
             settings.setStartPrevMin(currentMin);
@@ -71,13 +80,11 @@ public class AlarmFirst {
             pendingIntent.cancel();
 
             initAlarm(context);
-        }
-        else Log.i(Constants.LOG_MORNING_ALARM, "No se ha modificado la hora");
+        } else Log.i(Constants.LOG_MORNING_ALARM, "No se ha modificado la hora");
 
-        if(!utils.existAlarm(context, CODE_REQUEST_FIRST_ALARM, intent)) {
+        if (!utils.existAlarm(context, CODE_REQUEST_FIRST_ALARM, intent)) {
             Log.i(Constants.LOG_MORNING_ALARM, "La alarma mañanera no existe");
-        }
-        else Log.i(Constants.LOG_MORNING_ALARM, "La alarma existe");
+        } else Log.i(Constants.LOG_MORNING_ALARM, "La alarma existe");
 
         Log.i(Constants.LOG_MORNING_ALARM, "Establecer la alarma ");
 
@@ -86,7 +93,7 @@ public class AlarmFirst {
         calendar.set(Calendar.HOUR_OF_DAY, currentHour);
         calendar.set(Calendar.MINUTE, currentMin);
 
-        if(Calendar.getInstance().after(calendar)){
+        if (Calendar.getInstance().after(calendar)) {
             // Today Set time passed, count to tomorrow... Move to tomorrow!
             calendar.add(Calendar.DATE, 1);
             Log.i(Constants.LOG_MORNING_ALARM, "Se paso la hora! hasta mañana!!");

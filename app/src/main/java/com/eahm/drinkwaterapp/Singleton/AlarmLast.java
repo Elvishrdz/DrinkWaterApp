@@ -1,9 +1,12 @@
 package com.eahm.drinkwaterapp.Singleton;
 
+import static android.app.PendingIntent.FLAG_IMMUTABLE;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.util.Log;
 
 import com.eahm.drinkwaterapp.BroadcastReceiver.AlarmReceiver;
@@ -31,16 +34,23 @@ public class AlarmLast {
         return instance;
     }
 
-    private AlarmLast(){} //private constructor
+    private AlarmLast() {
+    } //private constructor
 
     //endregion SINGLETON
 
-    private void initAlarm(Context context){
+    private void initAlarm(Context context) {
         intent = new Intent(context, AlarmReceiver.class);
         intent.setAction("NOTIFICATION_LAST");
         intent.putExtra("NOTI_ID", Constants.NOTIFICATION_ID_APP);
         intent.putExtra("CODE", "LAST"); //Night Notification!
-        pendingIntent = PendingIntent.getBroadcast(context, CODE_REQUEST_LAST_ALARM, intent, 0);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            pendingIntent = PendingIntent.getBroadcast(context, CODE_REQUEST_LAST_ALARM, intent, FLAG_IMMUTABLE);
+
+        } else {
+            pendingIntent = PendingIntent.getBroadcast(context, CODE_REQUEST_LAST_ALARM, intent, 0);
+        }
     }
 
     public void adminLastAlarm(Context context) {
@@ -61,7 +71,7 @@ public class AlarmLast {
 
         Log.i(Constants.LOG_LAST_ALARM, "Conteo de media noche!");
 
-        if((prevHour != currentHour || prevMin != currentMin)){
+        if ((prevHour != currentHour || prevMin != currentMin)) {
             Log.i(Constants.LOG_LAST_ALARM, "La hora establecida fue actualizada");
             settings.setEndPrevHour(currentHour);
             settings.setEndPrevMin(currentMin);
@@ -71,13 +81,11 @@ public class AlarmLast {
             pendingIntent.cancel();
 
             initAlarm(context);
-        }
-        else Log.i(Constants.LOG_LAST_ALARM, "No se ha modificado la hora");
+        } else Log.i(Constants.LOG_LAST_ALARM, "No se ha modificado la hora");
 
-        if(!utils.existAlarm(context, CODE_REQUEST_LAST_ALARM, intent)) {
+        if (!utils.existAlarm(context, CODE_REQUEST_LAST_ALARM, intent)) {
             Log.i(Constants.LOG_LAST_ALARM, "La alarma de medianoche no existe");
-        }
-        else Log.i(Constants.LOG_LAST_ALARM, "La alarma existe");
+        } else Log.i(Constants.LOG_LAST_ALARM, "La alarma existe");
 
         Log.i(Constants.LOG_LAST_ALARM, "Establecer la alarma");
 
@@ -86,7 +94,7 @@ public class AlarmLast {
         calendar.set(Calendar.HOUR_OF_DAY, currentHour);
         calendar.set(Calendar.MINUTE, currentMin);
 
-        if(Calendar.getInstance().after(calendar)){
+        if (Calendar.getInstance().after(calendar)) {
             // Today Set time passed, count to tomorrow... Move to tomorrow!
             calendar.add(Calendar.DATE, 1);
             Log.i(Constants.LOG_LAST_ALARM, "Se paso la hora! hasta mañana!!");
