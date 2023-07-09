@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.util.Log;
 
 import com.eahm.drinkwaterapp.BroadcastReceiver.AlarmReceiver;
@@ -32,34 +33,41 @@ public class AlarmApp {
         return instance;
     }
 
-    private AlarmApp(){} //private constructor
+    private AlarmApp() {
+    } //private constructor
 
     //endregion SINGLETON
 
     //region APP ALARM
 
-    public void initialize(Context context){
-        if(this.context == null) this.context = context;
+    public void initialize(Context context) {
+        if (this.context == null) this.context = context;
         initAlarm();
     }
 
-    private void initAlarm(){
-        if(context == null){
+    private void initAlarm() {
+        if (context == null) {
             Log.i(LOG_ALARM_APP, "Init alarm: No se ha inicializado el contexto de la Alarma");
             return;
         }
 
-        if(alarmManager == null)
+        if (alarmManager == null)
             alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         intent = new Intent(context, AlarmReceiver.class);
         intent.setAction("ALARM_DRINK");
         //intent.putExtra("CODE", code);
-        pendingIntent = PendingIntent.getBroadcast(context, Constants.CODE_REQUEST_ALARM_APP, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            pendingIntent = PendingIntent.getBroadcast(context, Constants.CODE_REQUEST_ALARM_APP, intent, PendingIntent.FLAG_IMMUTABLE);
+
+        } else {
+            pendingIntent = PendingIntent.getBroadcast(context, Constants.CODE_REQUEST_ALARM_APP, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        }
     }
 
     public void updateAlarm(long timeInMillis) {
-        if(context == null){
+        if (context == null) {
             Log.i(LOG_ALARM_APP, "Update alarm: No se ha inicializado el contexto de la Alarma");
             return;
         }
@@ -72,7 +80,7 @@ public class AlarmApp {
 
         initAlarm();
 
-        if(utils.existAlarm(context, Constants.CODE_REQUEST_ALARM_APP, intent)) {
+        if (utils.existAlarm(context, Constants.CODE_REQUEST_ALARM_APP, intent)) {
             //Cancel
             alarmManager.cancel(pendingIntent);
             pendingIntent.cancel();
@@ -87,13 +95,13 @@ public class AlarmApp {
 
     }
 
-    public void cancelAlarm(){
-        if(alarmManager == null){
+    public void cancelAlarm() {
+        if (alarmManager == null) {
             Log.i(LOG_ALARM_APP, "Cancel alarm: No se ha inicializado alarmManager");
             return;
         }
 
-        if(pendingIntent == null){
+        if (pendingIntent == null) {
             Log.i(LOG_ALARM_APP, "Cancel alarm: No se ha inicializado pendingIntent");
             return;
         }
@@ -113,15 +121,14 @@ public class AlarmApp {
 
         boolean exists = true;
 
-        if(!utils.existAlarm(context, Constants.CODE_REQUEST_ALARM_APP, intent)) {
+        if (!utils.existAlarm(context, Constants.CODE_REQUEST_ALARM_APP, intent)) {
             Log.i(LOG_ALARM_APP, "La alarma no existe");
             //poner alarma!
             exists = false;
         }
-        Log.i(LOG_ALARM_APP, "Exist: " + exists );
+        Log.i(LOG_ALARM_APP, "Exist: " + exists);
         return exists;
     }
-
 
 
     //endregion APP ALARM
@@ -151,7 +158,7 @@ public class AlarmApp {
 
         //Next Time - Agregar tiempo definido por usuario para la siguiente toma de agua
         long futureTime = System.currentTimeMillis() + timeInMillis;
-        long epoch = futureTime/1000;
+        long epoch = futureTime / 1000;
         String timestamp = String.valueOf(epoch);
         Log.i(LOG_ALARM_APP, "Timestamp actual: " + utils.getCurrentTimestamp());
         Log.i(LOG_ALARM_APP, "Timestamp siguiente bebida: " + timestamp);

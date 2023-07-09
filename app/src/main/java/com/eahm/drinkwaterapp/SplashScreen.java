@@ -12,12 +12,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -28,6 +22,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -65,6 +66,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+@SuppressLint("CustomSplashScreen")
 public class SplashScreen extends AppCompatActivity implements Callbacks, InternetConnectivityListener {
 
     //region VARIABLES
@@ -93,7 +95,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
     private boolean stopFadeAnimation = false;
 
     UserManagement userManager = new UserManagement();
-    private UserModel cUser = new UserModel("","","","","","","","", null);
+    private UserModel cUser = new UserModel("", "", "", "", "", "", "", "", null);
     private FirebaseAuth auth;
 
 
@@ -140,15 +142,14 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
 
     @Override
     public void onBackPressed() {
-        if(includeLayoutPrivacyPolicy.getVisibility() == View.VISIBLE){
-            if(!closeApp){
+        if (includeLayoutPrivacyPolicy.getVisibility() == View.VISIBLE) {
+            if (!closeApp) {
                 closeApp = true;
                 Toast.makeText(this, getString(R.string.exit_press_again), Toast.LENGTH_SHORT).show();
-                new Handler().postDelayed(()->{
+                new Handler().postDelayed(() -> {
                     closeApp = false;
                 }, 2500);
-            }
-            else super.onBackPressed();
+            } else super.onBackPressed();
         }
     }
 
@@ -156,7 +157,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(fullscreen){
+        if (fullscreen) {
             ((AnimationDrawable) getWindow().getDecorView().getBackground()).start();
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
@@ -189,13 +190,12 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
         checkBoxPP.setOnCheckedChangeListener((buttonView, isChecked) -> textViewPPInformation.setVisibility(View.INVISIBLE));
 
         buttonPPContinue.setOnClickListener(v -> {
-            if(checkBoxPP.isChecked()){
+            if (checkBoxPP.isChecked()) {
                 settings.setPrivacyPolicyStatus(true);
                 textViewPPInformation.setVisibility(View.INVISIBLE);
                 includeLayoutPrivacyPolicy.setVisibility(View.GONE);
                 setAppInformation();
-            }
-            else {
+            } else {
                 textViewPPInformation.setVisibility(View.VISIBLE);
             }
         });
@@ -277,19 +277,19 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
     }
 
     //region ANIMATION
-    public void fadeOut(View view, long startDelay){
+    public void fadeOut(View view, long startDelay) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            view.animate().alpha(0).setDuration(2500).setStartDelay(startDelay).withEndAction(()-> {
-                if (!stopFadeAnimation) fadeIn(view,0);
+            view.animate().alpha(0).setDuration(2500).setStartDelay(startDelay).withEndAction(() -> {
+                if (!stopFadeAnimation) fadeIn(view, 0);
             });
         }
     }
 
-    public void fadeIn(View view, long startDelay){
+    public void fadeIn(View view, long startDelay) {
         view.setAlpha(0f);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            view.animate().alpha(1).setDuration(2500).setStartDelay(startDelay).withEndAction(()-> {
-                if (!stopFadeAnimation) fadeOut(view,0);
+            view.animate().alpha(1).setDuration(2500).setStartDelay(startDelay).withEndAction(() -> {
+                if (!stopFadeAnimation) fadeOut(view, 0);
             });
         }
     }
@@ -299,7 +299,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
 
     boolean appInfoFromServer = false;
 
-    private void getAppInformation(){
+    private void getAppInformation() {
         // Establecemos valores por defecto
         appInfoFromServer = false;
 
@@ -314,34 +314,33 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
         veListenerAppInfo = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                if (dataSnapshot.exists()){
-                    if (dataSnapshot.hasChild("application")){
+                if (dataSnapshot.exists()) {
+                    if (dataSnapshot.hasChild("application")) {
                         if (dataSnapshot.child("application").hasChild("enabled"))
                             appEnabled = dataSnapshot.child("application").child("enabled").getValue(true).toString().equalsIgnoreCase("true");
 
-                        if (dataSnapshot.child("application").hasChild("onDisableMessage")){
+                        if (dataSnapshot.child("application").hasChild("onDisableMessage")) {
 
-                            if(dataSnapshot.child("application").child("onDisableMessage").hasChild(languagePhone)){
+                            if (dataSnapshot.child("application").child("onDisableMessage").hasChild(languagePhone)) {
                                 appOnDisableMessage = dataSnapshot.child("application").child("onDisableMessage").child(languagePhone).getValue().toString();
                             }
                         }
 
-                        if (dataSnapshot.child("application").hasChild("privacyPolicyUrl")){
+                        if (dataSnapshot.child("application").hasChild("privacyPolicyUrl")) {
                             privacyPolicyURL = dataSnapshot.child("application").child("privacyPolicyUrl").getValue().toString();
                         }
                     }
 
-                    if (dataSnapshot.hasChild("updates")){
+                    if (dataSnapshot.hasChild("updates")) {
                         if (dataSnapshot.child("updates").hasChild("enabledVersion"))
-                            updateCurrentVersion  = dataSnapshot.child("updates").child("enabledVersion").getValue(true).toString();
+                            updateCurrentVersion = dataSnapshot.child("updates").child("enabledVersion").getValue(true).toString();
 
                         if (dataSnapshot.child("updates").hasChild("forceUpdate"))
                             updateForce = dataSnapshot.child("updates").child("forceUpdate").getValue(true).toString() == "true";
 
                         if (dataSnapshot.child("updates").hasChild("onNewUpdateMessage")) {
 
-                            if(dataSnapshot.child("updates").child("onNewUpdateMessage").hasChild(languagePhone)){
+                            if (dataSnapshot.child("updates").child("onNewUpdateMessage").hasChild(languagePhone)) {
                                 updateOnNewVersionMessage = dataSnapshot.child("updates").child("onNewUpdateMessage").child(languagePhone).getValue().toString();
                             }
                         }
@@ -382,25 +381,23 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
         boolean weCanCheck = false; // Si ya paso mas de 1 minutos desde la ultima vez q revisamos el pais, entonces podemos volver a revisar
         Log.i(TAG_NEWS, "Revisar: CountryCode: " + userCountryCode + " LastTimestamp: " + lastCountryCheckTimestamp);
 
-        if(lastCountryCheckTimestamp.isEmpty()){
+        if (lastCountryCheckTimestamp.isEmpty()) {
             Log.i(TAG_NEWS, "No hay ultima vez consultada");
             weCanCheck = true;
-        }
-        else {
-            try{
+        } else {
+            try {
                 Long current = Long.parseLong(utils.getCurrentTimestamp());
                 Long previous = Long.parseLong(lastCountryCheckTimestamp);
 
                 long difference = Math.abs(current - previous);
                 Log.i(TAG_NEWS, "Diferencia entre la ultima vez: " + current + " - " + previous + " = " + difference);
 
-                if(difference > 60){
+                if (difference > 60) {
                     //Ya paso mas de 1 minuto desde la ultima vez que revisamos el pais. Ya podemos volver a consultar.
                     weCanCheck = true;
                     Log.i(TAG_NEWS, "Consultar Pais");
                 }
-            }
-            catch (Exception e){
+            } catch (Exception e) {
                 Log.i(TAG_NEWS, "Error al convertir String a Long: " + e.toString());
                 weCanCheck = true;
             }
@@ -421,8 +418,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
             requestQueue.add(stringRequest);
             requestQueue.start();
 
-        }
-        else {
+        } else {
             Log.i(TAG_NEWS, "Pais actual guardado: " + userCountryCode);
 
             // Firebase Messaging THEME
@@ -436,17 +432,16 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
 
     int attempts = 0;
 
-    Response.ErrorListener onResponseErrorListener = new Response.ErrorListener(){
+    Response.ErrorListener onResponseErrorListener = new Response.ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError error) {
             Log.i(TAG_NEWS, "Volley error: " + error.toString());
 
-            if(attempts >= 4){
+            if (attempts >= 4) {
                 Log.i(TAG_NEWS, "Ya intentamos 4 veces y no funciono!");
                 attempts = 0;
                 onGetCountryError();
-            }
-            else {
+            } else {
                 attempts++;
                 getCountry();
             }
@@ -469,7 +464,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
             Log.i(TAG_NEWS, "Respuesta recibida");
             try {
                 JSONObject respuesta = new JSONObject(response);
-                if(respuesta.has("status") && respuesta.get("status").toString().equalsIgnoreCase("success")){
+                if (respuesta.has("status") && respuesta.get("status").toString().equalsIgnoreCase("success")) {
                     String countryCode = respuesta.get("countryCode").toString();
                     String country = respuesta.get("country").toString();
 
@@ -483,8 +478,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
 
                     appGetCountry = true;
                     setAppInformation();
-                }
-                else {
+                } else {
                     Log.i(TAG_NEWS, "Web service devolvio error... seguir sin webservice...");
                     onGetCountryError();
                 }
@@ -498,15 +492,14 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
     };
 
     private void subscribeToNotificationTheme(String countryCode) {
-        if(!countryCode.isEmpty()){
+        if (!countryCode.isEmpty()) {
             FirebaseMessaging.getInstance().subscribeToTopic(countryCode)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            if(task.isSuccessful()){
+                            if (task.isSuccessful()) {
                                 Log.i(TAG_NEWS, "Suscrito a el tema: " + countryCode + " en FIREBASE Messaging");
-                            }
-                            else {
+                            } else {
                                 Log.i(TAG_NEWS, "No se pudo suscribir al tema: " + countryCode);
                             }
                         }
@@ -522,25 +515,22 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
 
         //Crear funcion para devolver el lenguaje segun el pais en nodo: communication
 
-        if(
-            countryCode .equalsIgnoreCase("DE")
-           ){
+        if (
+                countryCode.equalsIgnoreCase("DE")
+        ) {
             languageCountry = "Deutsch";
-        }
-        else if(
-            countryCode .equalsIgnoreCase("US") ||
-            countryCode .equalsIgnoreCase("EN")
-                ){
+        } else if (
+                countryCode.equalsIgnoreCase("US") ||
+                        countryCode.equalsIgnoreCase("EN")
+        ) {
             languageCountry = "English";
-        }
-        else if(
-            countryCode .equalsIgnoreCase("NI") ||
-            countryCode .equalsIgnoreCase("ES") ||
-            countryCode .equalsIgnoreCase("HN")
-                ){
+        } else if (
+                countryCode.equalsIgnoreCase("NI") ||
+                        countryCode.equalsIgnoreCase("ES") ||
+                        countryCode.equalsIgnoreCase("HN")
+        ) {
             languageCountry = "Español";
-        }
-        else {
+        } else {
             languageCountry = "NOT_FOUND";
         }
 
@@ -549,12 +539,11 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
 
         //endregion VALIDATE PER COUNTRY
 
-        if(languageCountry.equals("NOT_FOUNDED")){
+        if (languageCountry.equals("NOT_FOUNDED")) {
             Log.i(TAG_NEWS, "Lenguaje no encontrado. Sin noticias");
             getAppNewsDone();
-        }
-        else {
-            drNewsCheck =  FirebaseDatabase.getInstance().getReference().child("communication").child(languageCountry);
+        } else {
+            drNewsCheck = FirebaseDatabase.getInstance().getReference().child("communication").child(languageCountry);
             velNewsCheck = new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -573,11 +562,11 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
                             }
                         }
 
-                        if(dataSnapshot.hasChild("privacyPolicy") ){
+                        if (dataSnapshot.hasChild("privacyPolicy")) {
                             privacyPolicy = dataSnapshot.child("privacyPolicy").getValue().toString();
                         }
 
-                        if(countryAvailable) {
+                        if (countryAvailable) {
                             getAppNewsByCountry();
                             return;
                         }
@@ -600,7 +589,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
     Query queryNewsByCountry;
     ValueEventListener velNewsByCountry;
 
-    private void getAppNewsByCountry(){
+    private void getAppNewsByCountry() {
         int limitMaxOfNewsTo = 4;
 
         queryNewsByCountry = FirebaseDatabase.getInstance().getReference("communication").child(languageCountry).child("news")
@@ -611,9 +600,9 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
         velNewsByCountry = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()){
+                if (dataSnapshot.exists()) {
 
-                    if(!((ThisApplication) getApplication()).getNewsList().isEmpty()){
+                    if (!((ThisApplication) getApplication()).getNewsList().isEmpty()) {
                         ((ThisApplication) getApplication()).clearNewsList();
                     }
 
@@ -621,45 +610,59 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
 
                         News newsModelItem = new News();
 
-                        if (item.hasChild("enabled")) newsModelItem.setEnabled(item.child("enabled").getValue(true).toString().equalsIgnoreCase("true"));
-                        if (item.hasChild("publishedTimestamp")) newsModelItem.setPublishedTimestamp(item.child("publishedTimestamp").getValue(true).toString());
+                        if (item.hasChild("enabled"))
+                            newsModelItem.setEnabled(item.child("enabled").getValue(true).toString().equalsIgnoreCase("true"));
+                        if (item.hasChild("publishedTimestamp"))
+                            newsModelItem.setPublishedTimestamp(item.child("publishedTimestamp").getValue(true).toString());
 
 
-                        if (item.hasChild("title")) newsModelItem.setTitle(item.child("title").getValue(true).toString());
-                        if (item.hasChild("content")) newsModelItem.setContent(item.child("content").getValue(true).toString());
-                        if (item.hasChild("contentUrl")) newsModelItem.setContentUrl(item.child("contentUrl").getValue(true).toString());
+                        if (item.hasChild("title"))
+                            newsModelItem.setTitle(item.child("title").getValue(true).toString());
+                        if (item.hasChild("content"))
+                            newsModelItem.setContent(item.child("content").getValue(true).toString());
+                        if (item.hasChild("contentUrl"))
+                            newsModelItem.setContentUrl(item.child("contentUrl").getValue(true).toString());
 
-                        if (item.hasChild("media")){
+                        if (item.hasChild("media")) {
                             List<NewsMedia> newsMediaList = new ArrayList<>();
 
-                            for (DataSnapshot itemMedia: item.child("media").getChildren()) {
+                            for (DataSnapshot itemMedia : item.child("media").getChildren()) {
 
                                 NewsMedia newsMediaModelItem = new NewsMedia();
-                                if (itemMedia.hasChild("enabled")) newsMediaModelItem.setEnabled(itemMedia.child("enabled").getValue(true).toString().equalsIgnoreCase("true"));
-                                if (itemMedia.hasChild("isVideo")) newsMediaModelItem.setVideo(itemMedia.child("isVideo").getValue(true).toString().equalsIgnoreCase("true"));
+                                if (itemMedia.hasChild("enabled"))
+                                    newsMediaModelItem.setEnabled(itemMedia.child("enabled").getValue(true).toString().equalsIgnoreCase("true"));
+                                if (itemMedia.hasChild("isVideo"))
+                                    newsMediaModelItem.setVideo(itemMedia.child("isVideo").getValue(true).toString().equalsIgnoreCase("true"));
 
-                                if (itemMedia.hasChild("coverImageUrl")) newsMediaModelItem.setCoverImageUrl(itemMedia.child("coverImageUrl").getValue(true).toString());
-                                if (itemMedia.hasChild("coverImageScaleType")) newsMediaModelItem.setCoverImageScaleType(itemMedia.child("coverImageScaleType").getValue(true).toString());
-                                if (itemMedia.hasChild("mediaUrl")) newsMediaModelItem.setMediaUrl(itemMedia.child("mediaUrl").getValue(true).toString());
-                                if (itemMedia.hasChild("mediaOnClickUrl")) newsMediaModelItem.setMediaOnClickUrl(itemMedia.child("mediaOnClickUrl").getValue(true).toString());
+                                if (itemMedia.hasChild("coverImageUrl"))
+                                    newsMediaModelItem.setCoverImageUrl(itemMedia.child("coverImageUrl").getValue(true).toString());
+                                if (itemMedia.hasChild("coverImageScaleType"))
+                                    newsMediaModelItem.setCoverImageScaleType(itemMedia.child("coverImageScaleType").getValue(true).toString());
+                                if (itemMedia.hasChild("mediaUrl"))
+                                    newsMediaModelItem.setMediaUrl(itemMedia.child("mediaUrl").getValue(true).toString());
+                                if (itemMedia.hasChild("mediaOnClickUrl"))
+                                    newsMediaModelItem.setMediaOnClickUrl(itemMedia.child("mediaOnClickUrl").getValue(true).toString());
 
                                 newsMediaList.add(newsMediaModelItem);
                             }
 
                             newsModelItem.setMedia(newsMediaList);
-                        }
-                        else newsModelItem.setMedia(null);
+                        } else newsModelItem.setMedia(null);
 
-                        if (item.hasChild("titleTextSize")) newsModelItem.setTitleTextSize(Integer.parseInt(item.child("titleTextSize").getValue(true).toString()));
-                        if (item.hasChild("colorPrimaryRGB")) newsModelItem.setColorPrimaryRGB(item.child("colorPrimaryRGB").getValue(true).toString());
-                        if (item.hasChild("colorSecondaryRGB")) newsModelItem.setColorSecondaryRGB(item.child("colorSecondaryRGB").getValue(true).toString());
-                        if (item.hasChild("colorTextRGB")) newsModelItem.setColorTextRGB(item.child("colorTextRGB").getValue(true).toString());
+                        if (item.hasChild("titleTextSize"))
+                            newsModelItem.setTitleTextSize(Integer.parseInt(item.child("titleTextSize").getValue(true).toString()));
+                        if (item.hasChild("colorPrimaryRGB"))
+                            newsModelItem.setColorPrimaryRGB(item.child("colorPrimaryRGB").getValue(true).toString());
+                        if (item.hasChild("colorSecondaryRGB"))
+                            newsModelItem.setColorSecondaryRGB(item.child("colorSecondaryRGB").getValue(true).toString());
+                        if (item.hasChild("colorTextRGB"))
+                            newsModelItem.setColorTextRGB(item.child("colorTextRGB").getValue(true).toString());
 
                         ((ThisApplication) getApplication()).getNewsList().add(newsModelItem);
                     }
                 }
 
-                Log.i(TAG_NEWS, "Cantidad de noticias: " +   ((ThisApplication) getApplication()).getNewsList().size());
+                Log.i(TAG_NEWS, "Cantidad de noticias: " + ((ThisApplication) getApplication()).getNewsList().size());
 
                 getAppNewsDone();
             }
@@ -673,7 +676,8 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
         queryNewsByCountry.addListenerForSingleValueEvent(velNewsByCountry);
 
     }
-    private void getAppNewsDone(){
+
+    private void getAppNewsDone() {
         appNews = true;
         setAppInformation();
     }
@@ -687,20 +691,19 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
 
         auth = FirebaseAuth.getInstance();
 
-        if (auth.getCurrentUser() != null){
+        if (auth.getCurrentUser() != null) {
 
             fetch = auth.fetchSignInMethodsForEmail(auth.getCurrentUser().getEmail() == null ? "" : auth.getCurrentUser().getEmail());
             fetch.addOnSuccessListener(new OnSuccessListener<SignInMethodQueryResult>() {
                 @Override
                 public void onSuccess(SignInMethodQueryResult signInMethodQueryResult) {
 
-                    if(signInMethodQueryResult.getSignInMethods().isEmpty()){
+                    if (signInMethodQueryResult.getSignInMethods().isEmpty()) {
                         // theres no Email, is deleted or invalid, user do not exist
                         auth.signOut();
                         appUser = true;
                         setAppInformation();
-                    }
-                    else {
+                    } else {
                         Log.i("VALIDATION", "USUARIO EXISTE");
                         //USUARIO EXISTE signInMethodQueryResult.getSignInMethods() is not empty (user list)
                         String reference = "";
@@ -739,8 +742,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
                                     appUser = true;
                                     setAppInformation();
                                     //done!
-                                }
-                                else {
+                                } else {
                                     //DATASNAP NO EXISTE, DEBEMOS SALIR!
                                     userManager.removeCustomerData();
                                     cUser = userManager.getCustomerData();
@@ -767,11 +769,10 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Log.i("VALIDATION","fetchSignInMethodsForEmail: Error: " + e.toString());
-                    if(worksOffline){
+                    Log.i("VALIDATION", "fetchSignInMethodsForEmail: Error: " + e.toString());
+                    if (worksOffline) {
 
-                    }
-                    else {
+                    } else {
                         // Usuario no existe!
                         auth.signOut();
                         appUser = true;
@@ -780,8 +781,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
                 }
             });
 
-        }
-        else {
+        } else {
             // no hay usuario guardado, enviar a login
             auth.signOut();
             appUser = true;
@@ -792,15 +792,19 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
     private void cancelAllEventListeners() {
         Log.i(TAG_SET_APP_INFO, "Cancelando listeners...");
 
-        if(dbRefAppInfo != null && veListenerAppInfo != null) dbRefAppInfo.removeEventListener(veListenerAppInfo); //getAppInformation();
-        if(drNewsCheck != null && velNewsCheck != null) drNewsCheck.removeEventListener(velNewsCheck); //getAppNewsCheckAvailabilityAndPrivacyPolicy();
-        if(queryNewsByCountry != null && velNewsByCountry != null) queryNewsByCountry.removeEventListener(velNewsByCountry); //getAppNewsByCountry();
+        if (dbRefAppInfo != null && veListenerAppInfo != null)
+            dbRefAppInfo.removeEventListener(veListenerAppInfo); //getAppInformation();
+        if (drNewsCheck != null && velNewsCheck != null)
+            drNewsCheck.removeEventListener(velNewsCheck); //getAppNewsCheckAvailabilityAndPrivacyPolicy();
+        if (queryNewsByCountry != null && velNewsByCountry != null)
+            queryNewsByCountry.removeEventListener(velNewsByCountry); //getAppNewsByCountry();
 
         //fetch Sign In Methods, we should find a way to cancel this in getAppCurrentUser();
-        if(fetch != null) fetch = null;
-        if(drCurrentUserDBVerification != null && velCurrentUserDBVerification != null) drCurrentUserDBVerification.removeEventListener(velCurrentUserDBVerification); //getAppCurrentUser();
+        if (fetch != null) fetch = null;
+        if (drCurrentUserDBVerification != null && velCurrentUserDBVerification != null)
+            drCurrentUserDBVerification.removeEventListener(velCurrentUserDBVerification); //getAppCurrentUser();
 
-        if(requestQueue != null){
+        if (requestQueue != null) {
             // Remover listeners de getCountry()
             requestQueue.cancelAll(new RequestQueue.RequestFilter() {
                 @Override
@@ -814,7 +818,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
 
     }
 
-    private void setAppInformation(){
+    private void setAppInformation() {
         textViewLoadingApp.setText(getString(R.string.ss_getting_content));
 
         // Cancelar todos los listener (si acaso estan ejecutandose) para volverlos a usar si es requerido.
@@ -828,7 +832,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
         //region REVISION DE INTERNET
         Log.i(TAG_SET_APP_INFO, "Revisando internet 1");
         //Revision constante de internet al terminar los listeners
-        if(!worksOffline && !weHaveInternet) {
+        if (!worksOffline && !weHaveInternet) {
             getAppInfoAgain = true; // Permitir continuar el  proceso de inicio cuando onInternetConnectivityChanged() sea llamado otra vez.
             textViewLoadingApp.setText(getString(R.string.ss_not_connected));
             return;
@@ -847,7 +851,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
         //region REVISION DE INTERNET
         Log.i(TAG_SET_APP_INFO, "Revisando internet 2: en get application information");
         //Revision en: Get Application information
-        if(!worksOffline && !weHaveInternet) {
+        if (!worksOffline && !weHaveInternet) {
             getAppInfoAgain = true; // Permitir continuar el  proceso de inicio cuando onInternetConnectivityChanged() sea llamado otra vez.
             textViewLoadingApp.setText(getString(R.string.ss_not_connected));
             return;
@@ -855,7 +859,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
         //endregion REVISION DE INTERNET
 
         Log.i(TAG_SET_APP_INFO, "Si ya tenemos datos del servidor, vamos a revisarlos...");
-        if(appInfoFromServer){
+        if (appInfoFromServer) {
             textViewLoadingApp.setText(getString(R.string.text_ss_validating_config));
 
             //region GET CURRENT APP VERSION INSTALLED
@@ -868,8 +872,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
 
                 versionNumber = pinfo.versionCode;
                 versionName = pinfo.versionName;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Log.i(TAG_SET_APP_INFO, "Error obteniendo version: " + e.toString());
                 //PackageManager.NameNotFoundException
                 e.printStackTrace();
@@ -877,7 +880,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
 
             //endregion GET CURRENT APP VERSION INSTALLED
 
-            if(worksOffline && !weHaveInternet){
+            if (worksOffline && !weHaveInternet) {
                 //region WORK OFFLINE
                 Log.i(TAG_SET_APP_INFO, "Revisar offline. " + versionName + " = " + updateCurrentVersion + " (updateLater = " + updateLater + ")");
                 if (!updateLater && !versionName.equalsIgnoreCase(updateCurrentVersion) && !updateCurrentVersion.equalsIgnoreCase("NONE")) {
@@ -885,16 +888,15 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
                     return;
                 }
                 //endregion WORK OFFLINE
-            }
-            else {
+            } else {
                 //region CHECK APP INFORMATION
                 if (appEnabled) {
                     Log.i(TAG_SET_APP_INFO, "App activada\nRevisar online. " + versionName + " = " + updateCurrentVersion + " (updateLater = " + updateLater + ")");
                     if (!versionName.equalsIgnoreCase(updateCurrentVersion) && !updateCurrentVersion.equalsIgnoreCase("NONE")) {
-                        if(updateForce){
+                        if (updateForce) {
                             textViewLoadingApp.setText(getResources().getString(R.string.text_hurra));
 
-                            if(builder != null && builder.isShowing()){
+                            if (builder != null && builder.isShowing()) {
                                 Log.i(TAG_SET_APP_INFO, "Un dialogo esta en pantalla");
                                 return;
                             }
@@ -906,7 +908,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
 
                             builder.setButton(AlertDialog.BUTTON_POSITIVE, getResources().getString(R.string.text_download), new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
-                                    onYesResponse(UPDATE_APP_FORCED,"");
+                                    onYesResponse(UPDATE_APP_FORCED, "");
                                 }
                             });
 
@@ -928,18 +930,16 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
                                     getString(R.string.text_exit),
                                     false);*/
                             return;
-                        }
-                        else if(!updateLater) {
+                        } else if (!updateLater) {
                             showOptionalUpdateDialog();
                             return;
                         }
                     }
-                }
-                else {
+                } else {
                     Log.i(TAG_SET_APP_INFO, "App desactivada desde el servidor");
                     textViewLoadingApp.setText(getString(R.string.text_ouch));
 
-                    if(builder != null && builder.isShowing()){
+                    if (builder != null && builder.isShowing()) {
                         Log.i(TAG_SET_APP_INFO, "Un dialogo esta en pantalla");
                         return;
                     }
@@ -951,7 +951,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
 
                     builder.setButton(AlertDialog.BUTTON_POSITIVE, getResources().getString(R.string.text_accept), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            onYesResponse(DISABLED_APP,"");
+                            onYesResponse(DISABLED_APP, "");
                         }
                     });
 
@@ -975,7 +975,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
         //region REVISION DE INTERNET
         Log.i(TAG_SET_APP_INFO, "Revisando internet 3");
         //Revision constante de internet
-        if(!worksOffline && !weHaveInternet) {
+        if (!worksOffline && !weHaveInternet) {
             getAppInfoAgain = true; // Permitir continuar el  proceso de inicio cuando onInternetConnectivityChanged() sea llamado otra vez.
             textViewLoadingApp.setText(getString(R.string.ss_not_connected));
             return;
@@ -995,7 +995,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
         //region REVISION DE INTERNET
         Log.i(TAG_SET_APP_INFO, "Revisando internet 4");
         //Revision constante de internet
-        if(!worksOffline && !weHaveInternet) {
+        if (!worksOffline && !weHaveInternet) {
             getAppInfoAgain = true; // Permitir continuar el  proceso de inicio cuando onInternetConnectivityChanged() sea llamado otra vez.
             textViewLoadingApp.setText(getString(R.string.ss_not_connected));
             return;
@@ -1014,7 +1014,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
         //region REVISION DE INTERNET
         Log.i(TAG_SET_APP_INFO, "Revisando internet 5");
         //Revision constante de internet
-        if(!worksOffline && !weHaveInternet) {
+        if (!worksOffline && !weHaveInternet) {
             getAppInfoAgain = true; // Permitir continuar el  proceso de inicio cuando onInternetConnectivityChanged() sea llamado otra vez.
             textViewLoadingApp.setText(getString(R.string.ss_not_connected));
             return;
@@ -1022,11 +1022,11 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
         //endregion REVISION DE INTERNET
 
         //region CHECK PRIVACY POLICY
-        if(!settings.getPrivacyPolicyStatus()){
+        if (!settings.getPrivacyPolicyStatus()) {
             Log.i(TAG_SET_APP_INFO, "Mostrar politicas de privacidad!");
             textViewLoadingApp.setText(getString(R.string.text_ss_showing_pp));
 
-            if(privacyPolicy.isEmpty()){
+            if (privacyPolicy.isEmpty()) {
                 //Mostrar politicas guardadas localmente si no hay internet
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                     //getResources()
@@ -1034,8 +1034,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
                 } else {
                     textViewPPContent.setText(Html.fromHtml(getResources().getString(R.string.privacy_policy_local_content)));
                 }
-            }
-            else {
+            } else {
                 //Obtuvimos las politicas desde el servidor
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                     textViewPPContent.setText(Html.fromHtml(privacyPolicy, Html.FROM_HTML_MODE_LEGACY));
@@ -1046,14 +1045,13 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
 
             includeLayoutPrivacyPolicy.setVisibility(View.VISIBLE);
             return;
-        }
-        else if(includeLayoutPrivacyPolicy.getVisibility() == View.VISIBLE) return;
+        } else if (includeLayoutPrivacyPolicy.getVisibility() == View.VISIBLE) return;
         //endregion CHECK PRIVACY POLICY
 
         //region REVISION DE INTERNET
         Log.i(TAG_SET_APP_INFO, "Revisando internet 6");
         //Revision constante de internet
-        if(!worksOffline && !weHaveInternet) {
+        if (!worksOffline && !weHaveInternet) {
             getAppInfoAgain = true; // Permitir continuar el  proceso de inicio cuando onInternetConnectivityChanged() sea llamado otra vez.
             textViewLoadingApp.setText(getString(R.string.ss_not_connected));
             return;
@@ -1071,7 +1069,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
         //region REVISION DE INTERNET
         Log.i(TAG_SET_APP_INFO, "Revisando internet 7");
         //Revision constante de internet
-        if(!worksOffline && !weHaveInternet) {
+        if (!worksOffline && !weHaveInternet) {
             getAppInfoAgain = true; // Permitir continuar el  proceso de inicio cuando onInternetConnectivityChanged() sea llamado otra vez.
             textViewLoadingApp.setText(getString(R.string.ss_not_connected));
             return;
@@ -1079,7 +1077,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
         //endregion REVISION DE INTERNET
 
         // En este punto, ya no requerimos de internet en esta activity. asi que cancelamos el listener para no hacer mas llamadas a este metodo. Revisar los permisos debe pasar con o sin internet
-        if(iaChecker != null) iaChecker.removeInternetConnectivityChangeListener(this);
+        if (iaChecker != null) iaChecker.removeInternetConnectivityChangeListener(this);
         textViewLoadingApp.setText(getString(R.string.ss_loading_content));
 
         //region APP PERMISSIONS
@@ -1089,10 +1087,10 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
 
     }
 
-    private void showOptionalUpdateDialog(){
+    private void showOptionalUpdateDialog() {
         textViewLoadingApp.setText(getResources().getString(R.string.text_hurra));
 
-        if(builder != null && builder.isShowing()){
+        if (builder != null && builder.isShowing()) {
             Log.i(TAG_SET_APP_INFO, "Un dialogo esta en pantalla");
             return;
         }
@@ -1102,9 +1100,9 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
 
         builder.setMessage(updateOnNewVersionMessage);
 
-        builder.setButton(AlertDialog.BUTTON_POSITIVE,  getString(R.string.text_download), new DialogInterface.OnClickListener() {
+        builder.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.text_download), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                onYesResponse(UPDATE_APP,"");
+                onYesResponse(UPDATE_APP, "");
             }
         });
 
@@ -1135,11 +1133,10 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
     long startDelay = 0;
     AlertDialog builder;
 
-    private void showPermissionDialog(){
-
+    private void showPermissionDialog() {
         textViewLoadingApp.setText(getString(R.string.ss_confirm_permissions_1));
 
-        if(builder != null){
+        if (builder != null) {
             builder.dismiss();
             builder = null;
         }
@@ -1147,29 +1144,24 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
         builder = new AlertDialog.Builder(this).create();
         builder.setTitle(getResources().getString(R.string.text_permissions));
 
-        if(privacyPolicyURL.isEmpty()){
+        if (privacyPolicyURL.isEmpty()) {
             builder.setMessage(getResources().getString(R.string.permission_request_01));
-        }
-        else {
+        } else {
             builder.setMessage(getResources().getString(R.string.permission_request_02));
 
-            builder.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.privacy_policy_title), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    // User cancelled the dialog
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(privacyPolicyURL));
-                    startActivity(browserIntent);
-                    privacyPolicyURL = "";
-                    getInitialAppPermissions();
-                }
+            builder.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.privacy_policy_title), (dialog, id) -> {
+                // User cancelled the dialog
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(privacyPolicyURL));
+                startActivity(browserIntent);
+                privacyPolicyURL = "";
+                getInitialAppPermissions();
             });
         }
 
-        builder.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.text_continue), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                //Prefs.putString(device, "DONE");
-                settings.setPermissionStatus(true);
-                getInitialAppPermissions();
-            }
+        builder.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.text_continue), (dialog, id) -> {
+            //Prefs.putString(device, "DONE");
+            settings.setPermissionStatus(true);
+            getInitialAppPermissions();
         });
 
         builder.setCancelable(false);
@@ -1197,43 +1189,69 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
         //endregion SYSTEM ALERT WINDOW
 
         //region READ_EXTERNAL_STORAGE
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            if(!settings.getPermissionStatus()){
-                showPermissionDialog();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.READ_MEDIA_IMAGES
+            ) != PackageManager.PERMISSION_GRANTED) {
+                var result = settings.getPermissionStatus();
+
+                if (!result) {
+                    showPermissionDialog();
+                    return;
+                }
+
+                startDelay = 1500;
+                // Check in manifest:  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+                requestPermissionReadMediaImages();
                 return;
             }
 
+        } else {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED) {
+                var result = settings.getPermissionStatus();
 
-            startDelay = 1500;
-            // Check in manifest:  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-            requestPermissionReadExternalStorage();
-            return;
+                if (!result) {
+                    showPermissionDialog();
+                    return;
+                }
+
+                startDelay = 1500;
+                // Check in manifest:  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+                requestPermissionReadExternalStorage();
+                return;
+            }
         }
         //endregion READ_EXTERNAL_STORAGE
 
         //region WRITE_EXTERNAL_STORAGE
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            if(!settings.getPermissionStatus()){
-                showPermissionDialog();
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                if (!settings.getPermissionStatus()) {
+                    showPermissionDialog();
+                    return;
+                }
+
+
+                startDelay = 1500;
+                // Check in manifest:  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+                requestPermissionWriteExternalStorage();
                 return;
             }
-
-
-            startDelay = 1500;
-            // Check in manifest:  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-            requestPermissionWriteExternalStorage();
-            return;
         }
         //endregion WRITE_EXTERNAL_STORAGE
 
         //Terminamos la verificacion de permisos.. t0d0 en orden! dejamos la variable en true (si habian permisos) la proxima vez la volvemos a poner falso.
 
-        if (startDelay > 0){
+        if (startDelay > 0) {
             textViewLoadingApp.setText(getString(R.string.ss_starting));
             textViewExtraInfo.setText("");
         }
 
-        new Handler().postDelayed(this::startMainApp,startDelay);
+        new Handler().postDelayed(this::startMainApp, startDelay);
 
     }
 
@@ -1249,7 +1267,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
 
     private void requestPermissionSystemAlertWindow() {
 
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.SYSTEM_ALERT_WINDOW)){
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.SYSTEM_ALERT_WINDOW)) {
 
             new AlertDialog.Builder(this).setTitle(getString(R.string.permission_system_alert_windows)).setMessage(getString(R.string.permission_system_alert_windows_explanation))
                     .setPositiveButton(getString(R.string.permission_grant), new DialogInterface.OnClickListener() {
@@ -1261,8 +1279,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
                     .create()
                     .show();
 
-        }
-        else {
+        } else {
             ActivityCompat.requestPermissions(SplashScreen.this, new String[]{Manifest.permission.SYSTEM_ALERT_WINDOW}, CODE_SYSTEM_ALERT_WINDOW);
         }
 
@@ -1271,31 +1288,69 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
     //endregion SYSTEM_ALERT_WINDOW
 
     // region READ_EXTERNAL_STORAGE
-
-    private void requestPermissionReadExternalStorage() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-
-                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-
-                    new AlertDialog.Builder(this).setTitle(R.string.permission_read_external_title).setMessage(getString(R.string.permission_read_external_explanation))
-                            .setPositiveButton(getString(R.string.permission_grant), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    ActivityCompat.requestPermissions(SplashScreen.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, CODE_READ_EXTERNAL_STORAGE);
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+    private void requestPermissionReadMediaImages() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_MEDIA_IMAGES
+        ) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    this,
+                    Manifest.permission.READ_MEDIA_IMAGES
+            )) {
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.permission_read_external_title)
+                        .setMessage(getString(R.string.permission_read_external_explanation))
+                        .setPositiveButton(
+                                getString(R.string.permission_grant),
+                                (dialog, which) -> {
+                                    ActivityCompat.requestPermissions(
+                                            SplashScreen.this,
+                                            new String[]{Manifest.permission.READ_MEDIA_IMAGES},
+                                            CODE_READ_EXTERNAL_STORAGE
+                                    );
                                 }
-                            })
-                            .create()
-                            .show();
-
-                } else {
-                    ActivityCompat.requestPermissions(SplashScreen.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, CODE_READ_EXTERNAL_STORAGE);
-                }
-
+                        )
+                        .create()
+                        .show();
+            } else {
+                ActivityCompat.requestPermissions(
+                        this,
+                        new String[]{Manifest.permission.READ_MEDIA_IMAGES}, CODE_READ_EXTERNAL_STORAGE);
             }
         }
-        else getInitialAppPermissions();
+    }
 
+    private void requestPermissionReadExternalStorage() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+        ) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+            )) {
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.permission_read_external_title)
+                        .setMessage(getString(R.string.permission_read_external_explanation))
+                        .setPositiveButton(
+                                getString(R.string.permission_grant),
+                                (dialog, which) -> {
+                                    ActivityCompat.requestPermissions(
+                                            SplashScreen.this,
+                                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                                            CODE_READ_EXTERNAL_STORAGE
+                                    );
+                                }
+                        )
+                        .create()
+                        .show();
+            } else {
+                ActivityCompat.requestPermissions(
+                        this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, CODE_READ_EXTERNAL_STORAGE);
+            }
+        }
     }
     //endregion READ_EXTERNAL_STORAGE
 
@@ -1303,9 +1358,9 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
 
     private void requestPermissionWriteExternalStorage() {
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 
                 new AlertDialog.Builder(this).setTitle(getString(R.string.permission_write_external_title)).setMessage(getString(R.string.permission_write_external_explanation))
                         .setPositiveButton(getString(R.string.permission_grant), new DialogInterface.OnClickListener() {
@@ -1317,8 +1372,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
                         .create()
                         .show();
 
-            }
-            else {
+            } else {
                 ActivityCompat.requestPermissions(SplashScreen.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, CODE_WRITE_EXTERNAL_STORAGE);
             }
         }
@@ -1330,16 +1384,15 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        switch (requestCode){
-            case CODE_SYSTEM_ALERT_WINDOW:{
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.SYSTEM_ALERT_WINDOW) == PackageManager.PERMISSION_GRANTED){
+        switch (requestCode) {
+            case CODE_SYSTEM_ALERT_WINDOW: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.SYSTEM_ALERT_WINDOW) == PackageManager.PERMISSION_GRANTED) {
                         //WE NOW HAVE THE PERSMISSIONS TO SHOW LAYOUTS IN THE PHONE SCREEN
                     }
                     textViewExtraInfo.setText("");
                     textViewLoadingApp.setText(getString(R.string.ss_confirm_permissions_2));
-                }
-                else if(STATUS_SYSTEM_ALERT_WINDOW) {
+                } else if (STATUS_SYSTEM_ALERT_WINDOW) {
                     textViewExtraInfo.setText(getString(R.string.permission_system_alert_window));
                     textViewLoadingApp.setText(getString(R.string.ss_confirm_permissions_3));
                     STATUS_SYSTEM_ALERT_WINDOW = false;
@@ -1347,15 +1400,14 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
                 getInitialAppPermissions();
                 break;
             }
-            case CODE_READ_EXTERNAL_STORAGE:{
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
+            case CODE_READ_EXTERNAL_STORAGE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                         //WE NOW HAVE THE PERSMISSIONS TO USE MAP LOCATION!
                     }
                     textViewExtraInfo.setText("");
                     textViewLoadingApp.setText(getString(R.string.ss_confirm_permissions_2));
-                }
-                else if (STATUS_READ_EXTERNAL_STORAGE) {
+                } else if (STATUS_READ_EXTERNAL_STORAGE) {
                     textViewExtraInfo.setText(getString(R.string.permission_read_external));
                     textViewLoadingApp.setText(getString(R.string.ss_confirm_permissions_3));
                     STATUS_READ_EXTERNAL_STORAGE = false;
@@ -1384,20 +1436,19 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
     //endregion
 
 
-    private void startMainApp () {
+    private void startMainApp() {
         // Single call to this method
-        if(started) return;
+        if (started) return;
         started = true;
 
         Intent intent = new Intent(SplashScreen.this, WelcomeActivity.class); //send to login;
-        overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
-        if(auth == null){
+        if (auth == null) {
             //worksOffline
-           // if(worksOffline) intent = new Intent(SplashScreen.this, PrevWaterActivity.class);
-            if(worksOffline) intent = new Intent(SplashScreen.this, WelcomeActivity.class);
-        }
-        else if (auth.getCurrentUser() != null){
+            // if(worksOffline) intent = new Intent(SplashScreen.this, PrevWaterActivity.class);
+            if (worksOffline) intent = new Intent(SplashScreen.this, WelcomeActivity.class);
+        } else if (auth.getCurrentUser() != null) {
 
             cUser = userManager.getCustomerData();
 
@@ -1405,15 +1456,13 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
                 //AUTENTICADO
                 //intent = new Intent(SplashScreen.this, PrevWaterActivity.class);
                 intent = new Intent(SplashScreen.this, WelcomeActivity.class);
-                overridePendingTransition(R.anim.fade_in,R.anim.fade_out);
-            }
-            else if (!cUser.getCurrentDevice().equalsIgnoreCase(utils.getDeviceName(SplashScreen.this))){
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+            } else if (!cUser.getCurrentDevice().equalsIgnoreCase(utils.getDeviceName(SplashScreen.this))) {
                 Toast.makeText(this, getString(R.string.text_session_in_other_device), Toast.LENGTH_SHORT).show();
                 auth.signOut();
                 userManager.removeCustomerData();
             }
-        }
-        else {
+        } else {
             // Without user
             auth.signOut();
             userManager.removeCustomerData();
@@ -1428,11 +1477,12 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
     //region TODO: CUSTOM CALLBACK
 
     @Override
-    public void onReturnCallback(boolean status, String message, int code) {}
+    public void onReturnCallback(boolean status, String message, int code) {
+    }
 
     @Override
     public void onYesResponse(String code, String message) {
-        if (code.equalsIgnoreCase(UPDATE_APP_FORCED) || code.equalsIgnoreCase(UPDATE_APP)){
+        if (code.equalsIgnoreCase(UPDATE_APP_FORCED) || code.equalsIgnoreCase(UPDATE_APP)) {
             //go to playstore
             final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
             try {
@@ -1441,8 +1491,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
             }
             System.exit(0);
-        }
-        else if (code.equalsIgnoreCase(DISABLED_APP)){
+        } else if (code.equalsIgnoreCase(DISABLED_APP)) {
             //close app
             System.exit(0);
         }
@@ -1450,17 +1499,16 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
 
     @Override
     public void onNoResponse(String code, String message) {
-        if (code.equalsIgnoreCase(UPDATE_APP_FORCED)){
+        if (code.equalsIgnoreCase(UPDATE_APP_FORCED)) {
             //close app
             System.exit(0);
-        }
-        else if(code.equalsIgnoreCase(UPDATE_APP)){
+        } else if (code.equalsIgnoreCase(UPDATE_APP)) {
             // Just continue, ill update the app later...
             updateLater = true;
             setAppInformation();
         }
     }
- 
+
     //endregion
 
     //region FIREBASE CONNECTION STATUS
@@ -1471,27 +1519,25 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
     //@Override
     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
         // La primera vez devuelve FALSE. Si esta conectado a internet primero regresa FALSE Y despues TRUE (conectado)
-        try{
+        try {
             boolean connected = dataSnapshot.getValue(Boolean.class);
-            if(connected) {
+            if (connected) {
                 Log.i(TAG_CONNECTED, "ESTA CONECTADO A INTERNET");
                 weHaveInternet = true;
-            }
-            else {
+            } else {
                 //OFFLINE
                 Log.i(TAG_CONNECTED, "SE DESCONECTO EL INTERNET");
                 weHaveInternet = false;
             }
-        }
-        catch (Exception ignore){
+        } catch (Exception ignore) {
             //OFFLINE
             Log.i(TAG_CONNECTED, "SE DESCONECTO EL INTERNET por exception");
             weHaveInternet = false;
         }
 
-        if(setApp != null) setApp.removeCallbacks(run);
+        if (setApp != null) setApp.removeCallbacks(run);
         setApp = new Handler();
-        setApp.postDelayed(run,1000);
+        setApp.postDelayed(run, 1000);
     }
 
     //@Override
@@ -1506,7 +1552,7 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(iaChecker != null) iaChecker.removeInternetConnectivityChangeListener(this);
+        if (iaChecker != null) iaChecker.removeInternetConnectivityChangeListener(this);
     }
 
 
@@ -1517,14 +1563,14 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
         weHaveInternet = isConnected;
         Log.i(TAG_CONNECTED, isConnected ? "OICC: Tienes conexion a INTERNET" : "OICC: SE DESCONECTO A INTERNET");
 
-        if(!worksOffline && !weHaveInternet) {
+        if (!worksOffline && !weHaveInternet) {
             textViewLoadingApp.setText(getString(R.string.ss_not_connected));
             return;
         }
 
         // si se desconecta y estabamos obteniendo datos, debemos cancelar esa peticion y entrar offline
         //wehaveInternet && !worksoffline
-        if(getAppInfoAgain || (!weHaveInternet && worksOffline)){
+        if (getAppInfoAgain || (!weHaveInternet && worksOffline)) {
             Log.i(TAG_CONNECTED, "OICC: SetAppInformation() invocado! (getAppInfoAgain = " + getAppInfoAgain + ") (weHaveInternet = " + weHaveInternet + ") (worksOffline = " + worksOffline + ")");
             getAppInfoAgain = false;
             setAppInformation();
@@ -1532,7 +1578,5 @@ public class SplashScreen extends AppCompatActivity implements Callbacks, Intern
             // - Despues puede volver a ser llamado si antes (en el proceso de obtener la info) el usuario se desconecto, y
             // recupero el flujo de internet, entonces ahi llamamos denuevo el metodo para reanudar el inicio de la app.
         }
-
     }
-
 }

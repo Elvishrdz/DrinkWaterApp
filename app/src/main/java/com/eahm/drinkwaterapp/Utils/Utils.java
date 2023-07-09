@@ -11,7 +11,6 @@ import android.os.Build;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -74,7 +73,7 @@ public class Utils {
 
     public static String getDayName(int day, Context context) {
 
-        switch (day){
+        switch (day) {
             case 1:
                 return context.getString(R.string.monday);
             case 2:
@@ -96,9 +95,9 @@ public class Utils {
 
     }
 
-    public static String getMonthName(int month, Context context){
+    public static String getMonthName(int month, Context context) {
 
-        switch (month){
+        switch (month) {
             case 1:
                 return context.getString(R.string.january);
             case 2:
@@ -135,15 +134,13 @@ public class Utils {
             final String simCountry = tm.getSimCountryIso();
             if (simCountry != null && simCountry.length() == 2) { // SIM country code is available
                 return simCountry.toLowerCase(Locale.US);
-            }
-            else if (tm.getPhoneType() != TelephonyManager.PHONE_TYPE_CDMA) { // device is not 3G (would be unreliable)
+            } else if (tm.getPhoneType() != TelephonyManager.PHONE_TYPE_CDMA) { // device is not 3G (would be unreliable)
                 String networkCountry = tm.getNetworkCountryIso();
                 if (networkCountry != null && networkCountry.length() == 2) { // network country code is available
                     return networkCountry.toLowerCase(Locale.US);
                 }
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
 
         }
         return null;
@@ -163,7 +160,7 @@ public class Utils {
                 if (ch[i] >= 'a' && ch[i] <= 'z') {
 
                     // Convert into Upper-case
-                    ch[i] = (char)(ch[i] - 'a' + 'A');
+                    ch[i] = (char) (ch[i] - 'a' + 'A');
                 }
             }
 
@@ -172,7 +169,7 @@ public class Utils {
             else if (ch[i] >= 'A' && ch[i] <= 'Z')
 
                 // Convert into Lower-Case
-                ch[i] = (char)(ch[i] + 'a' - 'A');
+                ch[i] = (char) (ch[i] + 'a' - 'A');
         }
 
         // Convert the char array to equivalent String
@@ -189,12 +186,12 @@ public class Utils {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, context.getResources().getDisplayMetrics());
     }
 
-    public String getDeviceName(Context context){
+    public String getDeviceName(Context context) {
         //https://developer.android.com/training/articles/user-data-ids.html
         //String uniqueID = UUID.randomUUID().toString();
-        @SuppressLint("HardwareIds") String android_id = Settings.Secure.getString(context.getContentResolver(),Settings.Secure.ANDROID_ID);
+        @SuppressLint("HardwareIds") String android_id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
         if (android_id == null) android_id = "117";
-        return  Build.MANUFACTURER
+        return Build.MANUFACTURER
                 + "_" + Build.MODEL + "_" + Build.VERSION.RELEASE
                 + "_" + Build.VERSION_CODES.class.getFields()[android.os.Build.VERSION.SDK_INT].getName()
                 + "_" + android_id;
@@ -202,26 +199,26 @@ public class Utils {
 
     public String validateEmail(String email, Context context) {
 
-        if (email.isEmpty()) { 
+        if (email.isEmpty()) {
             return context.getString(R.string.validate_email_empty);
-        }
-        else if (!email.contains("@") || !email.contains(".")){
+        } else if (!email.contains("@") || !email.contains(".")) {
             return context.getString(R.string.validate_email_invalid);
         }
 
         return "TRUE";
     }
-    public String validatePassword(String password, Context context){
+
+    public String validatePassword(String password, Context context) {
 
         if (password.isEmpty()) {
             return context.getString(R.string.validate_password_empty);
-        }
-        else if (password.length() < 6) {
+        } else if (password.length() < 6) {
             return context.getString(R.string.validate_password_too_short);
         }
 
         return "TRUE";
     }
+
     public String validatePhoneNumber(String phoneNumber, Context context) {
 
         if (phoneNumber.isEmpty()) {
@@ -237,13 +234,13 @@ public class Utils {
         return "TRUE";
     }
 
-    public void displayAlertDialogOneOption(Activity activity, final Callbacks callback, final String CODE, String message, String yesText, boolean isCancelable){
-       DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+    public void displayAlertDialogOneOption(Activity activity, final Callbacks callback, final String CODE, String message, String yesText, boolean isCancelable) {
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                switch (which){
+                switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
-                        callback.onYesResponse(CODE,"");
+                        callback.onYesResponse(CODE, "");
                         break;
                 }
             }
@@ -257,13 +254,13 @@ public class Utils {
 
     }
 
-    public void displayAlertDialogYesNo(Activity activity, final Callbacks callback, final String CODE, String message, String yesText, String noText, boolean isCancelable){
+    public void displayAlertDialogYesNo(Activity activity, final Callbacks callback, final String CODE, String message, String yesText, String noText, boolean isCancelable) {
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                switch (which){
+                switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
-                        callback.onYesResponse(CODE,"");
+                        callback.onYesResponse(CODE, "");
                         break;
 
                     case DialogInterface.BUTTON_NEGATIVE:
@@ -290,7 +287,7 @@ public class Utils {
         android.view.ViewGroup.LayoutParams lp = videoView.getLayoutParams();
 
         if (videoProportion < screenProportion) {
-            lp.height= screenHeight;
+            lp.height = screenHeight;
             lp.width = (int) ((float) screenHeight / videoProportion);
         } else {
             lp.width = screenWidth;
@@ -303,7 +300,7 @@ public class Utils {
     // I already know this ratio since my video is hardcoded, you can get the
     // height and width of your video and appropriately generate  the proportion
     //    as :height/width
-    private float getVideoProportion(){
+    private float getVideoProportion() {
         return 1.5f;
     }
 
@@ -321,11 +318,17 @@ public class Utils {
         return mDisplayMetrics.widthPixels;
     }
 
-    public boolean existAlarm(Context context, int RequestCode, Intent intent){
-        return (PendingIntent.getBroadcast( context, RequestCode, intent, PendingIntent.FLAG_NO_CREATE) != null);
+    public boolean existAlarm(Context context, int RequestCode, Intent intent) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return (PendingIntent.getBroadcast(context, RequestCode, intent, PendingIntent.FLAG_IMMUTABLE) != null);
+
+        } else {
+            return (PendingIntent.getBroadcast(context, RequestCode, intent, PendingIntent.FLAG_NO_CREATE) != null);
+        }
+
     }
 
-    public int getRandomNumber(int min,int max) {
+    public int getRandomNumber(int min, int max) {
         //This gives a random integer between max (inclusive) and min (exclusive).
         return (new Random()).nextInt((max - min) + 1) + min;
     }
@@ -342,10 +345,8 @@ public class Utils {
     }
 
 
-
-
     public long getMillis(String timestamp) {
-        return Long.parseLong(timestamp) * 1000  ;
+        return Long.parseLong(timestamp) * 1000;
     }
 
     public int getSeconds(int hour, int minute) {
@@ -353,15 +354,15 @@ public class Utils {
     }
 
     public int getSeconds(long timeInMillis) {
-        return ((int) (timeInMillis / 1000) % 60 );
+        return ((int) (timeInMillis / 1000) % 60);
     }
 
-    public int getMinutes(long timeInMillis){
-        return (int) ((timeInMillis / (1000*60)) % 60);
+    public int getMinutes(long timeInMillis) {
+        return (int) ((timeInMillis / (1000 * 60)) % 60);
     }
 
-    public int getHours(long timeInMillis){
-        return (int) ((timeInMillis / (1000*60*60)) % 24);
+    public int getHours(long timeInMillis) {
+        return (int) ((timeInMillis / (1000 * 60 * 60)) % 24);
     }
 
     public String getCurrentTimestamp() {
@@ -369,7 +370,7 @@ public class Utils {
     }
 
 
-    private DateTime getDateFromStringTimestamp(String timestamp){
+    private DateTime getDateFromStringTimestamp(String timestamp) {
         Timestamp stamp = new Timestamp(Long.parseLong(timestamp));
         Date date1 = new Date(stamp.getTime());
         DateTime datetime = new DateTime(date1);
@@ -384,11 +385,11 @@ public class Utils {
         TimeZone tz = TimeZone.getTimeZone("UTC");
         SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
         df.setTimeZone(tz);
-        return df.format(new Date(totalAmountOfSeconds*1000L));
+        return df.format(new Date(totalAmountOfSeconds * 1000L));
 
     }
 
-      public String calculateTimeBetweenDates(DateTime startRideDateTime, DateTime endRideDateTime, Context context ){
+    public String calculateTimeBetweenDates(DateTime startRideDateTime, DateTime endRideDateTime, Context context) {
 
         int startSeconds = (startRideDateTime.getHourOfDay() * 3600) + (startRideDateTime.getMinuteOfHour() * 60) + startRideDateTime.getSecondOfMinute();
         int endSeconds = (endRideDateTime.getHourOfDay() * 3600) + (endRideDateTime.getMinuteOfHour() * 60) + endRideDateTime.getSecondOfMinute();
@@ -398,9 +399,9 @@ public class Utils {
         String result = convertSecondTo_HHmmss_String(totalSecs);
 
         String[] parts = result.split(":");
-        int hours = Integer.parseInt( parts[0] );
-        int minutes = Integer.parseInt( parts[1] );
-        int secs = Integer.parseInt( parts[2] );
+        int hours = Integer.parseInt(parts[0]);
+        int minutes = Integer.parseInt(parts[1]);
+        int secs = Integer.parseInt(parts[2]);
 
         return getTimeString(hours, minutes, secs, context);
     }
@@ -413,19 +414,19 @@ public class Utils {
         String minutos = context.getResources().getString(R.string.text_minutes);
         String segundos = context.getResources().getString(R.string.text_seconds);
 
-        if(hourOfDay == 1) hora = context.getResources().getString(R.string.text_hour);
-        if(minute == 1) minutos = context.getResources().getString(R.string.text_minute);
-        if(seconds == 1) segundos = context.getResources().getString(R.string.text_second);
+        if (hourOfDay == 1) hora = context.getResources().getString(R.string.text_hour);
+        if (minute == 1) minutos = context.getResources().getString(R.string.text_minute);
+        if (seconds == 1) segundos = context.getResources().getString(R.string.text_second);
 
-        if(hourOfDay > 0){
+        if (hourOfDay > 0) {
             a = a + hourOfDay + " " + hora + " ";
         }
 
-        if(minute > 0) {
+        if (minute > 0) {
             a = a + minute + " " + minutos + " ";
         }
 
-        if(seconds != 0){
+        if (seconds != 0) {
             a = a + seconds + " " + segundos + " ";
         }
 
@@ -433,19 +434,19 @@ public class Utils {
     }
 
 
-    public int getTimeByPos(int allSeconds, int position){
+    public int getTimeByPos(int allSeconds, int position) {
         String result = convertSecondTo_HHmmss_String(allSeconds);
 
         String[] parts = result.split(":");
 
-        if(position == 0) return Integer.parseInt( parts[0] );
-        if(position == 1 ) return Integer.parseInt( parts[1] );
-        if(position == 2) return Integer.parseInt( parts[2] );
+        if (position == 0) return Integer.parseInt(parts[0]);
+        if (position == 1) return Integer.parseInt(parts[1]);
+        if (position == 2) return Integer.parseInt(parts[2]);
 
         return -7;
     }
 
-    public String getFormattedTimeAMPM(int hourOfDay, int minute, int seconds, boolean AMPM, boolean useSeconds){
+    public String getFormattedTimeAMPM(int hourOfDay, int minute, int seconds, boolean AMPM, boolean useSeconds) {
         /*long allSeconds = Long.parseLong( dataset.get(position));
         String stringTime = utils.getHours(allSeconds) + ":" + utils.getMinutes(allSeconds) + "." + utils.getSeconds(allSeconds);*/
 
@@ -458,24 +459,24 @@ public class Utils {
         final String ZERO = "0";
 
         //Formateo el hora obtenido: antepone el 0 si son menores de 10
-        String formattedHour =  (hourOfDay < 10)? String.valueOf(ZERO + hourOfDay) : String.valueOf(hourOfDay);
+        String formattedHour = (hourOfDay < 10) ? String.valueOf(ZERO + hourOfDay) : String.valueOf(hourOfDay);
 
         //Formateo el minuto obtenido: antepone el 0 si son menores de 10
-        String formattedMinute = (minute < 10)? String.valueOf(ZERO + minute):String.valueOf(minute);
+        String formattedMinute = (minute < 10) ? String.valueOf(ZERO + minute) : String.valueOf(minute);
 
         //Obtengo el valor a.m. o p.m., dependiendo de la selección del usuario
         String AM_PM;
-        if(hourOfDay < 12) {
-            if(hourOfDay == 0) formattedHour = "12";
+        if (hourOfDay < 12) {
+            if (hourOfDay == 0) formattedHour = "12";
             AM_PM = "a.m.";
         } else {
-            formattedHour = String.valueOf( hourOfDay - 12 );
+            formattedHour = String.valueOf(hourOfDay - 12);
             AM_PM = "p.m.";
         }
         //Muestro la hora con el formato deseado
         String formattedTime = formattedHour + ":" + formattedMinute + " " + AM_PM;
 
-        if(useSeconds){
+        if (useSeconds) {
             formattedTime = formattedHour + ":" + formattedMinute + " " + seconds + " " + AM_PM;
         }
 
@@ -492,7 +493,7 @@ public class Utils {
         tv.setLayoutParams(lp);
         tv.setPadding(10, 10, 10, 10);
         tv.setGravity(Gravity.CENTER);
-        tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP,textSizeDP);
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, textSizeDP);
         tv.setText(title);
         tv.setTextColor(textColor);
         tv.setBackgroundColor(backgroundColor);
@@ -504,7 +505,7 @@ public class Utils {
 
         DateTime datetime = Utils.getDateTimeByTimestamp(getCurrentTimestamp());
 
-        String stringDate = Utils.getDayName(datetime.getDayOfWeek(),context) + " " +
+        String stringDate = Utils.getDayName(datetime.getDayOfWeek(), context) + " " +
                 datetime.getDayOfMonth() + " " + context.getResources().getString(R.string.text_of) + " " +
                 Utils.getMonthName(datetime.getMonthOfYear(), context) + " " +
                 datetime.getYear();
@@ -521,30 +522,27 @@ public class Utils {
         String metricMililiters = context.getResources().getString(R.string.text_mililiters);
         String metricLiters = context.getResources().getString(R.string.text_liters);
 
-        if(useAbbreviations){
+        if (useAbbreviations) {
             metricMililiters = context.getResources().getString(R.string.text_vol_unit_mililiters);
             metricLiters = context.getResources().getString(R.string.text_vol_unit_liters);
         }
 
-        if(inLiters > 0.9){
-            if(!useAbbreviations) metricLiters = " " + metricLiters;
+        if (inLiters > 0.9) {
+            if (!useAbbreviations) metricLiters = " " + metricLiters;
 
-            if(inLiters % 1 == 0){
+            if (inLiters % 1 == 0) {
                 long integer = (long) inLiters;
                 myFinalProgress = integer + metricLiters;
-            }
-            else {
+            } else {
                 myFinalProgress = inLiters + metricLiters;
             }
-        }
-        else {
-            if(!useAbbreviations) metricMililiters = " " + metricMililiters;
+        } else {
+            if (!useAbbreviations) metricMililiters = " " + metricMililiters;
 
-            if(myProgressMl % 1 == 0){
+            if (myProgressMl % 1 == 0) {
                 long integer = (long) myProgressMl;
                 myFinalProgress = integer + metricMililiters;
-            }
-            else {
+            } else {
                 myFinalProgress = myProgressMl + metricMililiters;
             }
         }
@@ -562,30 +560,27 @@ public class Utils {
         String metricMililiters = context.getResources().getString(R.string.text_mililiters);
         String metricLiters = context.getResources().getString(R.string.text_liters);
 
-        if(useAbbreviations){
+        if (useAbbreviations) {
             metricMililiters = context.getResources().getString(R.string.text_vol_unit_mililiters);
             metricLiters = context.getResources().getString(R.string.text_vol_unit_liters);
         }
 
-        if(inLiters > 0.9){
-            if(!useAbbreviations) metricLiters = " " + metricLiters;
+        if (inLiters > 0.9) {
+            if (!useAbbreviations) metricLiters = " " + metricLiters;
 
-            if(inLiters % 1 == 0){
+            if (inLiters % 1 == 0) {
                 long integer = (long) inLiters;
                 myFinalGoal = integer + metricLiters;
-            }
-            else {
+            } else {
                 myFinalGoal = inLiters + metricLiters;
             }
-        }
-        else {
-            if(!useAbbreviations) metricMililiters = " " + metricMililiters;
+        } else {
+            if (!useAbbreviations) metricMililiters = " " + metricMililiters;
 
-            if(myGoalMl % 1 == 0){
+            if (myGoalMl % 1 == 0) {
                 long integer = (long) myGoalMl;
                 myFinalGoal = integer + metricMililiters;
-            }
-            else {
+            } else {
                 myFinalGoal = myGoalMl + metricMililiters;
             }
         }

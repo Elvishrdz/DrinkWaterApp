@@ -5,12 +5,20 @@
 
     <uses-permission android:name="android.permission.VIBRATE" /> <!-- Used for notification vibration -->
     <uses-permission android:name="android.permission.INTERNET" /> <!-- Retreive information from server, etc... -->
-    <!-- Required by FABRIC -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- To check if we have internet or not -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- To restart the alarms when  the phone is restarted... -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- To select a profile image -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />  <!-- To save profile pic -->
+
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" /> <!-- To select a profile image -->
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />  <!-- To save profile pic -->
+
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />  <!-- Para mostrar ventana flotante cuando logres tu meta! -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" /> <!-- required in android 13 and above -->
+
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" /> <!-- required in android 13 and above -->
 
     <application
         android:name=".ThisApplication"
