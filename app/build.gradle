@@ -5,6 +5,7 @@ plugins {
 }
 
 android {
+    namespace 'com.eahm.drinkwaterapp'
     compileSdkVersion 34
     defaultConfig {
         applicationId "com.eahm.drinkwaterapp"
