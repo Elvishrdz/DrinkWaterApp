@@ -1,11 +1,12 @@
 package com.eahm.drinkwaterapp.Class;
 
-import android.app.Notification;
+import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -14,9 +15,11 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Vibrator;
+import android.util.Log;
+
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-import android.util.Log;
 
 import com.eahm.drinkwaterapp.BroadcastReceiver.AlarmReceiver;
 import com.eahm.drinkwaterapp.R;
@@ -55,7 +58,15 @@ public class NotificationClass {
     }
 
     //Using AlarmReceiver.java BroadcastReceiver
-    public void showDrinkNotification(String CHANNEL_ID, int NOTIFICATION_ID, Context context, String title, String text, String bigText){
+    public void showDrinkNotification(String CHANNEL_ID,
+                                      int NOTIFICATION_ID,
+                                      Context context,
+                                      String title,
+                                      String text,
+                                      String bigText) {
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
 
         createNotificationChannel(CHANNEL_ID, context);
 
@@ -66,7 +77,7 @@ public class NotificationClass {
         intentNotification.putExtra("IS_FROM_NOTIFICATION", true);
         intentNotification.putExtra("IS_DRINK_TIME", true);
         intentNotification.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intentNotification, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intentNotification, PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_ONE_SHOT);
 
         //endregion THIS NOTIFICATION ON CLICK
 
@@ -99,11 +110,11 @@ public class NotificationClass {
         int notiSmallIcon;
         Bitmap notiLargeIcon = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);
 
-        if(new SettingsClass().isGoalReached()){
+        if (new SettingsClass().isGoalReached()) {
             notiLargeIcon = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_app_2);
 
             int random = new Utils().getRandomNumber(1, 5);
-            switch (random){
+            switch (random) {
                 case 1:
                     notiColor = context.getResources().getColor(R.color.purple);
                     notiSmallIcon = R.drawable.ic_trophy_white;
@@ -125,10 +136,9 @@ public class NotificationClass {
                     notiSmallIcon = R.drawable.ic_trophy_yellow;
                     break;
             }
-        }
-        else {
+        } else {
             int random = new Utils().getRandomNumber(1, 5);
-            switch (random){
+            switch (random) {
                 case 1:
                     notiColor = context.getResources().getColor(R.color.green_2);
                     notiSmallIcon = R.drawable.ic_drink_holo_dark;
@@ -171,16 +181,15 @@ public class NotificationClass {
                 //.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 //.setOnlyAlertOnce(true)
                 .setAutoCancel(true)
-                .setDeleteIntent(pendingIntentDeleted)
-                ;
+                .setDeleteIntent(pendingIntentDeleted);
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            builder.setBadgeIconType(Notification.BADGE_ICON_LARGE);
+            builder.setBadgeIconType(NotificationCompat.BADGE_ICON_LARGE);
         }
 
-        Uri uriAudio = Uri.parse("android.resource://"+ context.getPackageName() + "/" + R.raw.app_notification_sound);
-        long[] arrayVibrate = new long[] { 1000, 1000};
+        Uri uriAudio = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.app_notification_sound);
+        long[] arrayVibrate = new long[]{1000, 1000};
 
         builder.setSound(uriAudio);
         builder.setVibrate(arrayVibrate);
@@ -189,14 +198,22 @@ public class NotificationClass {
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
 
         // notificationId is a unique int for each notification that you must define
+        //notificationManager.notify(NOTIFICATION_ID, builder.build());
         notificationManager.notify(NOTIFICATION_ID, builder.build());
 
         //endregion CREATE THE NOTIFICATION
-
     }
 
 
-    public void showReportNotification(String CHANNEL_ID, int NOTIFICATION_ID, Context context, String title, String text, String bigText ){
+    public void showReportNotification(String CHANNEL_ID,
+                                       int NOTIFICATION_ID,
+                                       Context context,
+                                       String title,
+                                       String text,
+                                       String bigText) {
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
 
         createNotificationChannel(CHANNEL_ID, context);
 
@@ -209,7 +226,7 @@ public class NotificationClass {
         intentNotification.putExtra("IS_LAST_NOTIFICATION", true);
         intentNotification.putExtra("TIMESTAMP", new Utils().getCurrentTimestamp());
         intentNotification.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intentNotification, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intentNotification, PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_ONE_SHOT);
 
         //endregion THIS NOTIFICATION ON CLICK
 
@@ -218,9 +235,9 @@ public class NotificationClass {
         int notiSmallIcon;
         Bitmap notiLargeIcon = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_app_2);
 
-        if(new SettingsClass().isGoalReached()){
+        if (new SettingsClass().isGoalReached()) {
             int random = new Utils().getRandomNumber(1, 2);
-            switch (random){
+            switch (random) {
                 case 1:
                     notiColor = context.getResources().getColor(R.color.white);
                     notiSmallIcon = R.drawable.icon_trophie_yellow;
@@ -230,10 +247,9 @@ public class NotificationClass {
                     notiSmallIcon = R.drawable.icon_trophie_white;
                     break;
             }
-        }
-        else {
+        } else {
             int random = new Utils().getRandomNumber(1, 3);
-            switch (random){
+            switch (random) {
                 case 1:
                     notiColor = context.getResources().getColor(R.color.colorAccent);
                     notiSmallIcon = R.drawable.icon_report_analytics;
@@ -251,7 +267,7 @@ public class NotificationClass {
         //endregion CUSTOMIZE NOTIFICATION
 
         //region CREATE THE NOTIFICATION
-        NotificationCompat.Builder builder =  new NotificationCompat.Builder(context, CHANNEL_ID)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 //.setSmallIcon(R.mipmap.ic_launcher, 0) // pequeño circulo a la derecha del icono de la notificacion
                 .setSmallIcon(notiSmallIcon)
                 .setLargeIcon(notiLargeIcon)
@@ -265,15 +281,14 @@ public class NotificationClass {
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(bigText))
                 //.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 //.setOnlyAlertOnce(true)
-                .setAutoCancel(true)
-                ;
+                .setAutoCancel(true);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            builder.setBadgeIconType(Notification.BADGE_ICON_LARGE);
+            builder.setBadgeIconType(NotificationCompat.BADGE_ICON_LARGE);
         }
 
         //Uri uriAudio = Uri.parse("android.resource://"+ context.getPackageName() + "/" + R.raw.app_notification_sound);
-        long[] arrayVibrate = new long[] { 1000, 1000};
+        long[] arrayVibrate = new long[]{1000, 1000};
 
         //builder.setSound(uriAudio);
         builder.setVibrate(arrayVibrate);
@@ -289,7 +304,10 @@ public class NotificationClass {
     }
 
 
-    public void showReportNotificationBigPicture(String CHANNEL_ID, int NOTIFICATION_ID, Context context, String title, String text){
+    public void showReportNotificationBigPicture(String CHANNEL_ID, int NOTIFICATION_ID, Context context, String title, String text) {
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
 
         createNotificationChannel(CHANNEL_ID, context);
 
@@ -301,12 +319,12 @@ public class NotificationClass {
         intentNotification.putExtra("SHOW_REPORT", true);
         intentNotification.putExtra("IS_LAST_NOTIFICATION", true);
         intentNotification.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intentNotification, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intentNotification, PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_ONE_SHOT);
 
         //endregion THIS NOTIFICATION ON CLICK
 
         //region CREATE THE NOTIFICATION
-        NotificationCompat.Builder builder =  new NotificationCompat.Builder(context, CHANNEL_ID)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 //.setSmallIcon(R.mipmap.ic_launcher, 0) // pequeño circulo a la derecha del icono de la notificacion
                 .setSmallIcon(R.drawable.icon_report_analytics)
                 .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher))
@@ -319,22 +337,20 @@ public class NotificationClass {
                 .setCategory(NotificationCompat.CATEGORY_REMINDER)
                 //.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 //.setOnlyAlertOnce(true)
-                .setAutoCancel(true)
-                ;
+                .setAutoCancel(true);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            builder.setBadgeIconType(Notification.BADGE_ICON_LARGE);
+            builder.setBadgeIconType(NotificationCompat.BADGE_ICON_LARGE);
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.design_welcome_top);
             builder.setStyle(new NotificationCompat.BigPictureStyle()
-                    .bigPicture(bitmap)
-                    .bigLargeIcon(null));
+                    .bigPicture(bitmap));
         }
 
         //Uri uriAudio = Uri.parse("android.resource://"+ context.getPackageName() + "/" + R.raw.app_notification_sound);
-        long[] arrayVibrate = new long[] { 1000, 1000};
+        long[] arrayVibrate = new long[]{1000, 1000};
 
         //builder.setSound(uriAudio);
         builder.setVibrate(arrayVibrate);
@@ -353,7 +369,7 @@ public class NotificationClass {
     //endregion NOTIFICATIONS
 
     //region AUDIOS MANAGEMENT
-    private void playAudio(Context context, int audioResourceID){
+    private void playAudio(Context context, int audioResourceID) {
 
         final int APP_NOTIFICATION_SOUND = R.raw.app_notification_sound;
 
@@ -370,14 +386,14 @@ public class NotificationClass {
 
         switch (am.getRingerMode()) {
             case AudioManager.RINGER_MODE_SILENT:
-                Log.i("MyApp","Silent mode");
+                Log.i("MyApp", "Silent mode");
                 break;
             case AudioManager.RINGER_MODE_VIBRATE:
-                Log.i("MyApp","Vibrate mode");
+                Log.i("MyApp", "Vibrate mode");
                 vib.vibrate(400);
                 break;
             case AudioManager.RINGER_MODE_NORMAL:
-                Log.i("MyApp","Normal mode");
+                Log.i("MyApp", "Normal mode");
 
                 //  MediaPlayer.create(DriverMapActivity.this, soundID).start();
 
@@ -392,10 +408,9 @@ public class NotificationClass {
                 mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
                     @Override
                     public boolean onError(MediaPlayer mp, int what, int extra) {
-                        try{
+                        try {
                             mediaPlayer.release();
-                        }
-                        catch (Exception ignore){
+                        } catch (Exception ignore) {
 
                         }
 
