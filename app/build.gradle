@@ -6,11 +6,11 @@ plugins {
 
 android {
     namespace 'com.eahm.drinkwaterapp'
-    compileSdkVersion 34
+    compileSdkVersion 37
     defaultConfig {
         applicationId "com.eahm.drinkwaterapp"
         minSdkVersion 19
-        targetSdkVersion 34
+        targetSdkVersion 37
         multiDexEnabled true
         versionCode 18
         versionName "1.1.4"
