@@ -1,4 +1,4 @@
-package com.eahm.drinkwaterapp.designsystem.theme
+package com.eahm.drinkwaterapp.core.designsystem.theme
 
 import androidx.compose.ui.graphics.Color
 
