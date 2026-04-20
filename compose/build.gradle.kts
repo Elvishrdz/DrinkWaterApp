@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("com.android.built-in-kotlin")
     id("org.jetbrains.kotlin.plugin.compose")
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.3.20"
 }
 
 android {
@@ -56,7 +57,21 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
+    // Koin
+    val koinBom = "4.2.1"
+    implementation(platform("io.insert-koin:koin-bom:$koinBom"))
+    implementation("io.insert-koin:koin-android")
+    implementation("io.insert-koin:koin-core-coroutines")
+    implementation("io.insert-koin:koin-androidx-workmanager")
+    testImplementation("io.insert-koin:koin-test-junit4")
+    testImplementation("io.insert-koin:koin-android-test")
+    val koinVersion = "4.2.1"
+    implementation("io.insert-koin:koin-compose:${koinVersion}")
+    implementation("io.insert-koin:koin-compose-viewmodel:${koinVersion}")
+    implementation("io.insert-koin:koin-compose-viewmodel-navigation:${koinVersion}")
+
     // DataStore
     implementation("androidx.datastore:datastore:1.2.1")
     implementation("androidx.datastore:datastore-preferences:1.2.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
 }
