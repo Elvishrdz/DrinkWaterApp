@@ -34,6 +34,8 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.ui.PulsingRippleButton
 import com.eahm.drinkwaterapp.ui.RippleButtonConfig
 import com.eahm.drinkwaterapp.ui.RippleFadeCurve
+import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorButton
+import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -134,6 +136,17 @@ private fun Content(
                 text = "Stop Alarm",
             )
         }
+
+        var selected: TimeSelected? by remember { mutableStateOf(null) }
+
+        Text(
+            text = "alarm at $selected",
+        )
+        AppTimeSelectorButton(
+            text = "Set Alarm Time",
+            time = selected,
+            onTimeSelected = { selected = it },
+        )
 
         val scope = rememberCoroutineScope()
 
