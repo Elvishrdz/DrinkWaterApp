@@ -90,4 +90,7 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.paging)
     testImplementation(libs.androidx.room.testing)
+
+    // Kotlin DateTime
+    implementation(libs.kotlinx.datetime)
 }
