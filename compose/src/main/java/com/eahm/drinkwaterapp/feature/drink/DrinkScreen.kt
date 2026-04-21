@@ -12,13 +12,16 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,15 +29,18 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
+import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.database.entity.Status
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDateTime
 import org.koin.compose.koinInject
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 internal fun DrinkScreen() {
@@ -115,13 +121,61 @@ private fun Content(
     onDrink: () -> Unit,
     onDelete: (HistoryEntity) -> Unit,
 ) {
+    val context = LocalContext.current
+
     Column(modifier = modifier) {
+        val alarm = koinInject<DrinkAlarmManager>()
+        var time by remember { mutableStateOf("") }
+        Text(
+            text = "is active? ${alarm.active}",
+        )
+
+        alarm.interval?.let {
+            Text(
+                text = "interval: ${it.inWholeMilliseconds}",
+            )
+        }
+        Text(
+            text = "time: $time",
+        )
+
+        Button(
+            onClick = {
+                alarm.start(context)
+            },
+        ) {
+            Text(
+                text = "Start Alarm",
+            )
+        }
+
+        Button(
+            onClick = {
+                alarm.stop()
+            },
+        ) {
+            Text(
+                text = "Stop Alarm",
+            )
+        }
+
+        val scope = rememberCoroutineScope()
+
+        LaunchedEffect(scope) {
+            scope.launch {
+                while (true) {
+                    delay(1.seconds)
+                    time = alarm.remainingTime()
+                }
+            }
+        }
+
+
         Button(
             onClick = onDrink,
         ) {
             Text(
                 text = "Drink Water",
-                modifier = modifier
             )
         }
 
@@ -146,7 +200,6 @@ private fun Content(
                     ) {
                         Text(
                             text = "Delete",
-                            modifier = modifier
                         )
                     }
                 }
