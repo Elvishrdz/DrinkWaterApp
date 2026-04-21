@@ -1,0 +1,39 @@
+[versions]
+composeCompilerGradlePlugin = "2.2.10"
+googleServices = "4.3.14"
+firebaseCrashlyticsGradle = "2.9.2"
+gradle = "9.1.1"
+gradleKotlin = "9.1.1"
+kotlin = "2.2.20"
+ksp = "2.3.1"
+datastore = "1.2.1"
+kotlinxSerializationJson = "1.11.0"
+room = "2.8.4"
+roomGradlePlugin = "2.8.4"
+roomRuntime = "2.8.4"
+sqlite = "2.6.2"
+
+[libraries]
+# Data Store
+androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
+
+# Room
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
+androidx-room-paging = { module = "androidx.room:room-paging", version.ref = "roomRuntime" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "roomRuntime" }
+
+build-gradle-kotlin = { module = "com.android.tools.build:gradle-kotlin", version.ref = "gradleKotlin" }
+compose-compiler-gradle-plugin = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "composeCompilerGradlePlugin" }
+firebase-crashlytics-gradle = { module = "com.google.firebase:firebase-crashlytics-gradle", version.ref = "firebaseCrashlyticsGradle" }
+google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
+gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+room-gradle-plugin = { module = "androidx.room:room-gradle-plugin", version.ref = "roomGradlePlugin" }
+
+[plugins]
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+androidx-room = { id = "androidx.room", version.ref = "room" }

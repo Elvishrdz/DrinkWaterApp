@@ -3,6 +3,10 @@ plugins {
     id("com.android.built-in-kotlin")
     id("org.jetbrains.kotlin.plugin.compose")
     id("org.jetbrains.kotlin.plugin.serialization") version "2.3.20"
+
+    // Room
+    id("com.google.devtools.ksp")
+    id("androidx.room")
 }
 
 android {
@@ -39,6 +43,10 @@ android {
     }
 }
 
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+
 dependencies {
     implementation("androidx.core:core-ktx:1.18.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.10.0")
@@ -71,7 +79,15 @@ dependencies {
     implementation("io.insert-koin:koin-compose-viewmodel-navigation:${koinVersion}")
 
     // DataStore
-    implementation("androidx.datastore:datastore:1.2.1")
-    implementation("androidx.datastore:datastore-preferences:1.2.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
+    implementation(libs.androidx.datastore)
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.kotlinx.serialization.json)
+
+    // Room
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+    annotationProcessor(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.paging)
+    testImplementation(libs.androidx.room.testing)
 }
