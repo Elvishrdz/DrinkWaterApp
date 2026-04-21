@@ -66,17 +66,15 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     // Koin
-    val koinBom = "4.2.1"
-    implementation(platform("io.insert-koin:koin-bom:$koinBom"))
-    implementation("io.insert-koin:koin-android")
-    implementation("io.insert-koin:koin-core-coroutines")
-    implementation("io.insert-koin:koin-androidx-workmanager")
-    testImplementation("io.insert-koin:koin-test-junit4")
-    testImplementation("io.insert-koin:koin-android-test")
-    val koinVersion = "4.2.1"
-    implementation("io.insert-koin:koin-compose:${koinVersion}")
-    implementation("io.insert-koin:koin-compose-viewmodel:${koinVersion}")
-    implementation("io.insert-koin:koin-compose-viewmodel-navigation:${koinVersion}")
+    implementation(platform(libs.koin.bom))
+    implementation(libs.koin.android)
+    implementation(libs.koin.core.coroutines)
+    implementation(libs.koin.androidx.workmanager)
+    testImplementation(libs.koin.test.junit4)
+    testImplementation(libs.koin.android.test)
+    implementation(libs.koin.compose)
+    implementation(libs.koin.compose.viewmodel)
+    implementation(libs.koin.compose.viewmodel.navigation)
 
     // DataStore
     implementation(libs.androidx.datastore)
@@ -95,4 +93,14 @@ dependencies {
     implementation(libs.kotlinx.datetime)
 
     implementation(libs.picktime.compose)
+
+    // ViewModel
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.savedstate)
+    implementation(libs.androidx.lifecycle.service)
+    implementation(libs.androidx.lifecycle.process)
+    testImplementation(libs.androidx.lifecycle.runtime.testing)
 }

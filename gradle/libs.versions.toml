@@ -4,11 +4,13 @@ googleServices = "4.3.14"
 firebaseCrashlyticsGradle = "2.9.2"
 gradle = "9.1.1"
 gradleKotlin = "9.1.1"
+koin = "4.2.1"
 kotlin = "2.2.20"
 kotlinxDatetime = "0.7.1"
 ksp = "2.3.1"
 datastore = "1.2.1"
 kotlinxSerializationJson = "1.11.0"
+viewModel = "2.10.0"
 picktimeCompose = "1.1.6"
 room = "2.8.4"
 roomGradlePlugin = "2.8.4"
@@ -21,6 +23,14 @@ androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "d
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 
 # Room
+androidx-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "viewModel" }
+androidx-lifecycle-runtime-testing = { module = "androidx.lifecycle:lifecycle-runtime-testing", version.ref = "viewModel" }
+androidx-lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "viewModel" }
+androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "viewModel" }
+androidx-lifecycle-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "viewModel" }
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "viewModel" }
+androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "viewModel" }
+androidx-lifecycle-viewmodel-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "viewModel" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
 androidx-room-paging = { module = "androidx.room:room-paging", version.ref = "roomRuntime" }
@@ -32,6 +42,15 @@ compose-compiler-gradle-plugin = { module = "org.jetbrains.kotlin:compose-compil
 firebase-crashlytics-gradle = { module = "com.google.firebase:firebase-crashlytics-gradle", version.ref = "firebaseCrashlyticsGradle" }
 google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
 gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
+koin-android-test = { module = "io.insert-koin:koin-android-test" }
+koin-androidx-workmanager = { module = "io.insert-koin:koin-androidx-workmanager" }
+koin-android = { module = "io.insert-koin:koin-android" }
+koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin" }
+koin-compose-viewmodel-navigation = { module = "io.insert-koin:koin-compose-viewmodel-navigation", version.ref = "koin" }
+koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
+koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
+koin-test-junit4 = { module = "io.insert-koin:koin-test-junit4" }
+koin-core-coroutines = { module = "io.insert-koin:koin-core-coroutines" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
