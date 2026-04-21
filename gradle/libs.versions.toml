@@ -9,6 +9,7 @@ kotlinxDatetime = "0.7.1"
 ksp = "2.3.1"
 datastore = "1.2.1"
 kotlinxSerializationJson = "1.11.0"
+picktimeCompose = "1.1.6"
 room = "2.8.4"
 roomGradlePlugin = "2.8.4"
 roomRuntime = "2.8.4"
@@ -34,6 +35,7 @@ gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+picktime-compose = { module = "com.github.anhaki:PickTime-Compose", version.ref = "picktimeCompose" }
 room-gradle-plugin = { module = "androidx.room:room-gradle-plugin", version.ref = "roomGradlePlugin" }
 
 [plugins]

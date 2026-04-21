@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.anhaki.picktime.PickHourMinute
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.database.AppDatabase
@@ -146,6 +147,16 @@ private fun Content(
             text = "Set Alarm Time",
             time = selected,
             onTimeSelected = { selected = it },
+        )
+
+        val timeSelected = TimeSelected(0, 5)
+        var alarmTime by remember { mutableStateOf(timeSelected) }
+
+        PickHourMinute(
+            initialHour = alarmTime.hour,
+            onHourChange = { alarmTime = alarmTime.copy(hour = it) },
+            initialMinute = alarmTime.minute,
+            onMinuteChange = { alarmTime = alarmTime.copy(minute = it) },
         )
 
         val scope = rememberCoroutineScope()

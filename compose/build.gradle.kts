@@ -93,4 +93,6 @@ dependencies {
 
     // Kotlin DateTime
     implementation(libs.kotlinx.datetime)
+
+    implementation(libs.picktime.compose)
 }
