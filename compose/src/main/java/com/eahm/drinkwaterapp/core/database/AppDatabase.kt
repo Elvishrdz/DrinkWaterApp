@@ -1,6 +1,6 @@
 package com.eahm.drinkwaterapp.core.database
 
-import HistoryEntity
+import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
