@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.database.entity.Status
+import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.LocalDateTime
 
 @Dao
@@ -18,10 +19,10 @@ interface HistoryDao {
     fun delete(record: HistoryEntity)
 
     @Query("SELECT * FROM HistoryEntity")
-    fun getAll(): List<HistoryEntity>
+    fun getAll(): Flow<List<HistoryEntity>>
 
     @Query("SELECT * FROM HistoryEntity WHERE id IN (:ids)")
-    fun loadAllByIds(ids: IntArray): List<HistoryEntity>
+    fun loadAllByIds(ids: IntArray): Flow<List<HistoryEntity>>
 
     @Query(
         """
@@ -29,7 +30,7 @@ interface HistoryDao {
             WHERE status LIKE :status LIMIT 1       
         """
     )
-    fun findByStatus(status: Status): HistoryEntity
+    fun findByStatus(status: Status): Flow<HistoryEntity>
 
     @Query(
         """
@@ -37,5 +38,5 @@ interface HistoryDao {
             WHERE timestamp BETWEEN :start AND :end       
         """
     )
-    fun findByTimestamp(start: LocalDateTime, end: LocalDateTime): List<HistoryEntity>
+    fun findByTimestamp(start: LocalDateTime, end: LocalDateTime): Flow<List<HistoryEntity>>
 }
