@@ -21,15 +21,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.database.entity.Status
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
-import com.eahm.drinkwaterapp.ui.PulsingRippleButton
-import com.eahm.drinkwaterapp.ui.RippleButtonConfig
-import com.eahm.drinkwaterapp.ui.RippleFadeCurve
+import com.eahm.drinkwaterapp.ui.drinkbutton.DrinkButton
 import com.eahm.drinkwaterapp.ui.timepicker.AppTimePickerButton
 import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorButton
 import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
@@ -66,7 +63,7 @@ fun DrinkRoot() {
 @Composable
 internal fun DrinkScreen(
     state: DrinkState.Data,
-    onDrink: () -> Unit,
+    onDrink: (Float) -> Unit,
     onDelete: (HistoryEntity) -> Unit,
     onStopAlarm: () -> Unit,
     getRemainingAlarmTime: () -> String,
@@ -97,7 +94,7 @@ private fun Content(
     alarmInterval: AlarmInterval,
     alarmNextInterval: AlarmInterval?,
     modifier: Modifier = Modifier,
-    onDrink: () -> Unit,
+    onDrink: (Float) -> Unit,
     onDelete: (HistoryEntity) -> Unit,
     onStopAlarm: () -> Unit,
     getRemainingAlarmTime: () -> String,
@@ -166,15 +163,9 @@ private fun Content(
             }
         }
 
-        PulsingRippleButton(
+        DrinkButton(
             text = "Drink Water",
             onClick = onDrink,
-            config = RippleButtonConfig(
-                buttonSizeDp = 130.dp,
-                rippleFrequencyMs = 500L,
-                maxRipples = 8,
-                fadeCurve = RippleFadeCurve.EaseOutStrong,
-            ),
         )
 
         LazyColumn {

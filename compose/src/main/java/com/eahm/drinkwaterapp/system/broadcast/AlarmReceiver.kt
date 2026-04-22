@@ -65,7 +65,7 @@ class AlarmReceiver : BroadcastReceiver() {
         val dao = database.getHistoryDao()
         val record = HistoryEntity(
             amount = 300f,
-            status = Status.IN_APP,
+            status = Status.FROM_NOTIFICATION,
         )
 
         dao.insertAll(record)

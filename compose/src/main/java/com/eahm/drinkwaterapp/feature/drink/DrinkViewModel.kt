@@ -46,11 +46,11 @@ internal class DrinkViewModel(
         initialValue = DrinkState.Loading,
     )
 
-    fun onDrink() {
+    fun onDrink(amount: Float) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val record = HistoryEntity(
-                    amount = 200f,
+                    amount = amount,
                     status = Status.IN_APP,
                 )
 
