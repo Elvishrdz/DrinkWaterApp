@@ -34,8 +34,6 @@ import androidx.compose.ui.window.DialogProperties
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppTimeSelectorDialog(
-    // TODO: get and return always 24h systemm
-    // adjust to am/pm only for visuals.
     time: TimeSelected? = null,
     is24HourFormat: Boolean = rememberTimePickerState().is24hour,
     is24HourResult: Boolean = true,

@@ -23,7 +23,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.anhaki.picktime.PickHourMinute
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.database.entity.Status
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -31,6 +30,7 @@ import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import com.eahm.drinkwaterapp.ui.PulsingRippleButton
 import com.eahm.drinkwaterapp.ui.RippleButtonConfig
 import com.eahm.drinkwaterapp.ui.RippleFadeCurve
+import com.eahm.drinkwaterapp.ui.timepicker.AppTimePickerButton
 import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorButton
 import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
 import kotlinx.coroutines.delay
@@ -146,14 +146,12 @@ private fun Content(
             onTimeSelected = { selected = it },
         )
 
-        PickHourMinute(
-            initialHour = alarmInterval.hour,
-            onHourChange = {
-                onAlarmIntervalChange(alarmInterval.copy(hour = it))
-            },
-            initialMinute = alarmInterval.minute,
-            onMinuteChange = {
-                onAlarmIntervalChange(alarmInterval.copy(minute = it))
+        AppTimePickerButton(
+            text = "Set Alarm Interval",
+            time = TimeSelected(alarmInterval.hour, alarmInterval.minute),
+            onTimeSelected = {
+                val alarmInterval = AlarmInterval(it.hour, it.minute)
+                onAlarmIntervalChange(alarmInterval)
             },
         )
 
