@@ -35,7 +35,9 @@ internal class DrinkViewModel(
         drinkAlarmManager.state,
     ) { records, _, drinkAlarmState ->
         DrinkState.Data(
-            records = records,
+            records = records
+                .sortedBy { it.timestamp }
+                .reversed(),
             isAlarmActive = drinkAlarmState.active,
             alarmInterval = drinkAlarmState.interval,
             alarmNextInterval = drinkAlarmState.nextInterval,
