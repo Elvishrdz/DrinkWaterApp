@@ -1,18 +1,12 @@
 package com.eahm.drinkwaterapp.system.broadcast
 
-import android.Manifest
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Build
-import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
-import com.eahm.drinkwaterapp.R
+import com.eahm.drinkwaterapp.core.data.systemnotifications.NotificationService
+import com.eahm.drinkwaterapp.core.data.systemnotifications.model.Drink
+import com.eahm.drinkwaterapp.core.data.systemnotifications.model.NotificationRemoved
+import com.eahm.drinkwaterapp.core.data.systemnotifications.model.SkipDrink
 import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler
 import com.eahm.drinkwaterapp.system.foreground.AppVisibility
 
@@ -39,55 +33,25 @@ class AlarmReceiver : BroadcastReceiver() {
 //                    val notificationManager = NotificationManagerCompat.from(context)
 //                    notificationManager.cancel(notificationID)
                 } else {
-                    showNotification(context, alarmId)
+                    NotificationService.showDrinkAlarmNotification(context)
                 }
 
                 // 2. Auto-renovar: programar la siguiente
                 prepareNextAlarm(context, alarmId, intervalMs)
             }
-        }
-    }
 
-    private fun showNotification(context: Context, alarmId: Int) {
-        val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.POST_NOTIFICATIONS
-            )
-        } else {
-            PackageManager.PERMISSION_GRANTED // for VERSION.SDK_INT < TIRAMISU
-        }
+            Drink.action -> {
 
-        if (permission != PackageManager.PERMISSION_GRANTED) return
-
-
-        val channelId = "alarm_channel"
-
-        // Crear canal (Android 8+)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                "Alarmas",
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                enableVibration(true)
-                lockscreenVisibility = Notification.VISIBILITY_PUBLIC
             }
-            context.getSystemService(NotificationManager::class.java)
-                .createNotificationChannel(channel)
+
+            SkipDrink.action -> {
+
+            }
+
+            NotificationRemoved.action -> {
+
+            }
         }
-
-        val notification = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(R.drawable.ic_home)
-            .setContentTitle("Alarma #$alarmId")
-            .setContentText("Es hora!")
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setCategory(NotificationCompat.CATEGORY_ALARM)
-            .setAutoCancel(true)
-            .build()
-
-        NotificationManagerCompat.from(context)
-            .notify(alarmId, notification)
     }
 
     private fun restoreAlarmsFromStorage(context: Context) {
