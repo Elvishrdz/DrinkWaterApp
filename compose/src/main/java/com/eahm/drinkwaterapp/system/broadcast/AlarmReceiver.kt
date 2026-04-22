@@ -3,16 +3,23 @@ package com.eahm.drinkwaterapp.system.broadcast
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import androidx.core.app.NotificationManagerCompat
+import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.data.systemnotifications.NotificationService
 import com.eahm.drinkwaterapp.core.data.systemnotifications.model.Drink
 import com.eahm.drinkwaterapp.core.data.systemnotifications.model.NotificationRemoved
 import com.eahm.drinkwaterapp.core.data.systemnotifications.model.SkipDrink
+import com.eahm.drinkwaterapp.core.data.systemnotifications.notification.DrinkNotification.EXTRA_CODE
+import com.eahm.drinkwaterapp.core.data.systemnotifications.notification.DrinkNotification.EXTRA_NOTIFICATION_ID
 import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler
-import com.eahm.drinkwaterapp.system.foreground.AppVisibility
+import org.koin.core.context.GlobalContext
 
 class AlarmReceiver : BroadcastReceiver() {
 
+
     override fun onReceive(context: Context, intent: Intent) {
+        val code = intent.getIntExtra(EXTRA_CODE, -1)
+
         when (intent.action) {
             Intent.ACTION_BOOT_COMPLETED,
             Intent.ACTION_LOCKED_BOOT_COMPLETED,
@@ -21,37 +28,42 @@ class AlarmReceiver : BroadcastReceiver() {
             }
 
             ALARM_ACTION -> {
-                val alarmId = intent.getIntExtra("alarm_id", -1)
-                val intervalMs = intent.getLongExtra("interval_ms", 60_000L)
-
-                val isAppVisible = AppVisibility.isAppInForeground.value
-
-                if (isAppVisible) {
-                    // if app is in foreground, do not show notifications (remove existing)
-//                    val extras = intent.extras
-//                    val notificationID: Int = extras?.getInt("NOTI_ID") ?: -1
-//                    val notificationManager = NotificationManagerCompat.from(context)
-//                    notificationManager.cancel(notificationID)
-                } else {
-                    NotificationService.showDrinkAlarmNotification(context)
-                }
-
-                // 2. Auto-renovar: programar la siguiente
-                prepareNextAlarm(context, alarmId, intervalMs)
+                NotificationService.showDrinkNotification(context)
             }
 
             Drink.action -> {
-
+                if (code == Drink.code) {
+                    // TODO: save new drink to database
+                    scheduleNextAlarm(context)
+                    removeNotificationFromSystem(context, intent)
+                }
             }
 
             SkipDrink.action -> {
-
+                if (code == SkipDrink.code) {
+                    scheduleNextAlarm(context)
+                    removeNotificationFromSystem(context, intent)
+                }
             }
 
             NotificationRemoved.action -> {
-
+                if (code == NotificationRemoved.code) {
+                    scheduleNextAlarm(context)
+                    removeNotificationFromSystem(context, intent)
+                }
             }
         }
+    }
+
+    private fun scheduleNextAlarm(context: Context) {
+        val koin = GlobalContext.get()
+        val drinkAlarmManager = koin.get<DrinkAlarmManager>()
+        drinkAlarmManager.setupAlarm(context)
+    }
+
+    private fun removeNotificationFromSystem(context: Context, intent: Intent) {
+        val notificationId = intent.getIntExtra(EXTRA_NOTIFICATION_ID, -1)
+        NotificationManagerCompat.from(context).cancel(notificationId)
     }
 
     private fun restoreAlarmsFromStorage(context: Context) {
@@ -63,14 +75,6 @@ class AlarmReceiver : BroadcastReceiver() {
             val intervalMs = prefs.getLong("alarm_interval_$id", 60_000L)
             AlarmScheduler.scheduleAlarm(context, id, intervalMs)
         }
-    }
-
-    private fun prepareNextAlarm(
-        context: Context,
-        alarmId: Int,
-        intervalMs: Long
-    ) {
-        AlarmScheduler.scheduleAlarm(context, alarmId, intervalMs)
     }
 
     companion object {

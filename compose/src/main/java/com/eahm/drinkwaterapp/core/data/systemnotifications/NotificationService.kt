@@ -34,7 +34,7 @@ object NotificationService {
         DrinkNotificationChannel.createChannel(context)
     }
 
-    fun showDrinkAlarmNotification(context: Context) {
+    fun showDrinkNotification(context: Context) {
         if (!context.canShowNotifications) return
 
         val awesomeTexts = AwesomeTextsClass()

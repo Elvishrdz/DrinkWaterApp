@@ -4,6 +4,6 @@ import android.graphics.Bitmap
 
 data class NotificationConfig(
     val color: Int,
-    val smallIcon: Int,
-    var largeIcon: Bitmap,
+    val smallIconResId: Int,
+    var largeIcon: Bitmap?,
 )

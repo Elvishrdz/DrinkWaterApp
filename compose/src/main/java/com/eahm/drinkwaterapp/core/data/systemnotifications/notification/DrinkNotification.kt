@@ -24,6 +24,7 @@ import kotlin.random.Random
 internal object DrinkNotification {
     const val NOTIFICATION_ID = 1
     const val EXTRA_NOTIFICATION_ID = "NOTIFICATION_ID"
+    const val EXTRA_CODE = "CODE"
 
     fun showNotification(
         context: Context,
@@ -45,7 +46,7 @@ internal object DrinkNotification {
 
         val builder = NotificationCompat.Builder(context, channelId)
             //.setSmallIcon(R.mipmap.ic_launcher, 0) // pequeño circulo a la derecha del icono de la notificacion
-            .setSmallIcon(config.smallIcon)
+            .setSmallIcon(config.smallIconResId)
             .setLargeIcon(config.largeIcon)
             .setColor(config.color)
             .setColorized(true)
@@ -102,11 +103,13 @@ internal object DrinkNotification {
             R.mipmap.ic_launcher
         }
 
-        val largeIcon = BitmapFactory.decodeResource(context.resources, largeIconResId)
+        val largeIcon = runCatching {
+            BitmapFactory.decodeResource(context.resources, largeIconResId)
+        }.getOrNull()
 
         return NotificationConfig(
             color = color,
-            smallIcon = smallIconResId,
+            smallIconResId = smallIconResId,
             largeIcon = largeIcon,
         )
     }
@@ -155,13 +158,14 @@ internal object DrinkNotification {
         val intentNotification = Intent(context, MainActivity::class.java)
         intentNotification.action = NotificationClicked.action
         intentNotification.putExtra(EXTRA_NOTIFICATION_ID, NOTIFICATION_ID)
+        intentNotification.putExtra(EXTRA_CODE, NotificationClicked.code)
         intentNotification.flags = Intent.FLAG_ACTIVITY_NEW_TASK or
                 Intent.FLAG_ACTIVITY_SINGLE_TOP or
                 Intent.FLAG_ACTIVITY_CLEAR_TOP
 
         return PendingIntent.getActivity(
             context,
-            NotificationClicked.code,
+            NotificationClicked.intentCode,
             intentNotification,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
@@ -171,10 +175,11 @@ internal object DrinkNotification {
         val intentDeleted = Intent(context, AlarmReceiver::class.java)
         intentDeleted.action = NotificationRemoved.action
         intentDeleted.putExtra(EXTRA_NOTIFICATION_ID, NOTIFICATION_ID)
+        intentDeleted.putExtra(EXTRA_CODE, NotificationRemoved.code)
 
         return PendingIntent.getBroadcast(
             context,
-            NotificationRemoved.code,
+            NotificationRemoved.intentCode,
             intentDeleted,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
@@ -184,10 +189,11 @@ internal object DrinkNotification {
         val intentSkip = Intent(context, AlarmReceiver::class.java)
         intentSkip.action = SkipDrink.action
         intentSkip.putExtra(EXTRA_NOTIFICATION_ID, NOTIFICATION_ID)
+        intentSkip.putExtra(EXTRA_CODE, SkipDrink.code)
 
         return PendingIntent.getBroadcast(
             context,
-            SkipDrink.code,
+            SkipDrink.intentCode,
             intentSkip,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
@@ -197,10 +203,11 @@ internal object DrinkNotification {
         val intentDrink = Intent(context, AlarmReceiver::class.java)
         intentDrink.action = Drink.action
         intentDrink.putExtra(EXTRA_NOTIFICATION_ID, NOTIFICATION_ID)
+        intentDrink.putExtra(EXTRA_CODE, Drink.code)
 
         return PendingIntent.getBroadcast(
             context,
-            Drink.code,
+            Drink.intentCode,
             intentDrink,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
