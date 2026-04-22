@@ -1,5 +1,6 @@
 package com.eahm.drinkwaterapp.feature.drink
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
@@ -14,11 +15,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-internal data class DrinkState(
-    val records: List<HistoryEntity>,
-)
-
 internal class DrinkViewModel(
+    val application: Application,
     val drinkAlarmManager: DrinkAlarmManager,
     val database: AppDatabase,
     val prefsStorage: PrefsStorage,
@@ -28,28 +26,29 @@ internal class DrinkViewModel(
 
     private val records = dao.getAll()
 
-    val firstSetup = prefsStorage.getFirstSetupDone()
+    private val firstSetup = prefsStorage.getFirstSetupDone()
 
     val state = combine(
         records,
-        firstSetup
-    ) { records, _ ->
+        firstSetup,
+        drinkAlarmManager.state,
+    ) { records, _, drinkAlarmState ->
         DrinkState(
             records = records,
+            isAlarmActive = drinkAlarmState.active,
+            alarmInterval = drinkAlarmState.interval,
+            alarmRemainingTime = drinkAlarmManager.remainingTime(),
         )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
-        initialValue = DrinkState(records = emptyList()),
+        initialValue = DrinkState(
+            records = emptyList(),
+            isAlarmActive = false,
+            alarmInterval = null,
+            alarmRemainingTime = "",
+        ),
     )
-
-    // press the drink button to start
-    // set an alarm in the given time
-    // show notification
-    fun setAlarm() {
-        // when no alarm is set, update the interval immediately.
-        // when alarm is set, schedule an update of the interval at the next iteration.
-    }
 
     fun onDrink() {
         viewModelScope.launch {
@@ -60,6 +59,8 @@ internal class DrinkViewModel(
                 )
 
                 dao.insertAll(record)
+
+                drinkAlarmManager.setupAlarm(application)
             }
         }
     }
@@ -71,4 +72,7 @@ internal class DrinkViewModel(
             }
         }
     }
+
+    fun onStopAlarm() = drinkAlarmManager.stop()
+    fun getRemainingAlarmTime() = drinkAlarmManager.remainingTime()
 }

@@ -18,14 +18,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.anhaki.picktime.PickHourMinute
-import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.database.entity.Status
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -37,7 +35,6 @@ import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Duration.Companion.seconds
 
@@ -51,6 +48,8 @@ fun DrinkRoot() {
         state = state,
         onDrink = viewModel::onDrink,
         onDelete = viewModel::onDelete,
+        onStopAlarm = viewModel::onStopAlarm,
+        getRemainingAlarmTime = viewModel::getRemainingAlarmTime,
     )
 }
 
@@ -59,6 +58,8 @@ internal fun DrinkScreen(
     state: DrinkState,
     onDrink: () -> Unit,
     onDelete: (HistoryEntity) -> Unit,
+    onStopAlarm: () -> Unit,
+    getRemainingAlarmTime: () -> String,
 ) {
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Content(
@@ -66,8 +67,13 @@ internal fun DrinkScreen(
                 .padding(innerPadding)
                 .fillMaxSize(),
             records = state.records,
+            isAlarmActive = state.isAlarmActive,
+            alarmInterval = state.alarmInterval,
+            alarmRemainingTime = state.alarmRemainingTime,
             onDrink = onDrink,
             onDelete = onDelete,
+            onStopAlarm = onStopAlarm,
+            getRemainingAlarmTime = getRemainingAlarmTime,
         )
     }
 }
@@ -75,25 +81,28 @@ internal fun DrinkScreen(
 @Composable
 private fun Content(
     records: List<HistoryEntity>,
+    isAlarmActive: Boolean,
+    alarmInterval: Long?,
+    alarmRemainingTime: String,
     modifier: Modifier = Modifier,
     onDrink: () -> Unit,
     onDelete: (HistoryEntity) -> Unit,
+    onStopAlarm: () -> Unit,
+    getRemainingAlarmTime: () -> String,
 ) {
-    val context = LocalContext.current
+    var time by remember { mutableStateOf("") }
 
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        val alarm = koinInject<DrinkAlarmManager>()
-        var time by remember { mutableStateOf("") }
         Text(
-            text = "is active? ${alarm.active}",
+            text = "is active? $isAlarmActive",
         )
 
-        alarm.interval?.let {
+        alarmInterval?.let {
             Text(
-                text = "interval: ${it.inWholeMilliseconds}",
+                text = "interval: $it",
             )
         }
         Text(
@@ -101,19 +110,7 @@ private fun Content(
         )
 
         Button(
-            onClick = {
-                alarm.start(context)
-            },
-        ) {
-            Text(
-                text = "Start Alarm",
-            )
-        }
-
-        Button(
-            onClick = {
-                alarm.stop()
-            },
+            onClick = onStopAlarm,
         ) {
             Text(
                 text = "Stop Alarm",
@@ -147,7 +144,7 @@ private fun Content(
             scope.launch {
                 while (true) {
                     delay(1.seconds)
-                    time = alarm.remainingTime()
+                    time = getRemainingAlarmTime()
                 }
             }
         }
@@ -199,8 +196,13 @@ private fun DrinkScreenPreview() {
     DrinkWaterAppTheme {
         Content(
             records = recordsMock,
+            isAlarmActive = true,
+            alarmInterval = 10000,
+            alarmRemainingTime = "",
             onDrink = {},
             onDelete = {},
+            onStopAlarm = {},
+            getRemainingAlarmTime = { "" }
         )
     }
 }
