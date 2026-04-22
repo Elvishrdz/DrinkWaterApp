@@ -8,6 +8,7 @@ import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.database.entity.Status
+import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -19,7 +20,7 @@ internal class DrinkViewModel(
     val application: Application,
     val drinkAlarmManager: DrinkAlarmManager,
     val database: AppDatabase,
-    val prefsStorage: PrefsStorage,
+    prefsStorage: PrefsStorage,
 ) : ViewModel() {
 
     private val dao = database.getHistoryDao()
@@ -33,21 +34,16 @@ internal class DrinkViewModel(
         firstSetup,
         drinkAlarmManager.state,
     ) { records, _, drinkAlarmState ->
-        DrinkState(
+        DrinkState.Data(
             records = records,
             isAlarmActive = drinkAlarmState.active,
             alarmInterval = drinkAlarmState.interval,
-            alarmRemainingTime = drinkAlarmManager.remainingTime(),
+            alarmNextInterval = drinkAlarmState.nextInterval,
         )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
-        initialValue = DrinkState(
-            records = emptyList(),
-            isAlarmActive = false,
-            alarmInterval = null,
-            alarmRemainingTime = "",
-        ),
+        initialValue = DrinkState.Loading,
     )
 
     fun onDrink() {
@@ -71,6 +67,10 @@ internal class DrinkViewModel(
                 dao.delete(it)
             }
         }
+    }
+
+    fun onAlarmIntervalChange(alarmInterval: AlarmInterval) {
+        drinkAlarmManager.setInterval(alarmInterval.hour, alarmInterval.minute)
     }
 
     fun onStopAlarm() = drinkAlarmManager.stop()

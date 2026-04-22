@@ -2,6 +2,7 @@ package com.eahm.drinkwaterapp.core.data.drinkalarm
 
 import android.app.Application
 import android.content.Context
+import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,9 +13,7 @@ import kotlin.time.Duration.Companion.minutes
 class DrinkAlarmManager(
     private val application: Application
 ) {
-    private val _state = MutableStateFlow(
-        DrinkAlarmState(false, null, "")
-    )
+    private val _state = MutableStateFlow(getState())
 
     val state: StateFlow<DrinkAlarmState> = _state
 
@@ -23,9 +22,9 @@ class DrinkAlarmManager(
     }
 
     fun setupAlarm(context: Context) {
-        val exists = AlarmScheduler.isAlarmActive(context, DRINK_ALARM_ID)
+        val isAlarmActive = AlarmScheduler.isAlarmActive(context, DRINK_ALARM_ID)
 
-        if (exists) {
+        if (isAlarmActive) {
             AlarmScheduler.cancelAlarm(context, DRINK_ALARM_ID)
         }
 
@@ -47,17 +46,30 @@ class DrinkAlarmManager(
         update()
     }
 
-    private fun update() {
-        val active = AlarmScheduler.isAlarmActive(application, DRINK_ALARM_ID)
+    fun setInterval(hour: Int, minute: Int) {
+        val isAlarmActive = AlarmScheduler.isAlarmActive(application, DRINK_ALARM_ID)
 
-        val intervalInWholeMillis = getIntervalInWholeMillis(application)
+        if (isAlarmActive) {
+            AlarmIntervals.setNextInterval(application, hour, minute)
 
-        _state.update {
-            it.copy(
-                active = active,
-                interval = if (active) intervalInWholeMillis else null
-            )
+        } else {
+            AlarmIntervals.clearNextInterval(application)
+            AlarmIntervals.setInterval(application, hour, minute)
         }
+
+        update()
+    }
+
+    private fun update() {
+        _state.update { getState() }
+    }
+
+    private fun getState(): DrinkAlarmState {
+        return DrinkAlarmState(
+            active = AlarmScheduler.isAlarmActive(application, DRINK_ALARM_ID),
+            interval = AlarmIntervals.getInterval(application),
+            nextInterval = AlarmIntervals.getNextInterval(application),
+        )
     }
 
     fun remainingTime(): String {
@@ -65,10 +77,11 @@ class DrinkAlarmManager(
     }
 
     private fun getIntervalInWholeMillis(context: Context): Long {
-        val nextIntervals = AlarmIntervals.getNextInterval(context)
+        return (AlarmIntervals.getNextInterval(context) ?: AlarmIntervals.getInterval(context))
+            .inWholeMillis()
+    }
 
-        val (hour, minute) = nextIntervals ?: AlarmIntervals.getInterval(context)
-
+    private fun AlarmInterval.inWholeMillis(): Long {
         return hour.hours.inWholeMilliseconds + minute.minutes.inWholeMilliseconds
     }
 

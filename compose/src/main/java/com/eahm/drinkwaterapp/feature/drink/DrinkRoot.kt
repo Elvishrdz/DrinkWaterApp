@@ -27,6 +27,7 @@ import com.anhaki.picktime.PickHourMinute
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.database.entity.Status
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
+import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import com.eahm.drinkwaterapp.ui.PulsingRippleButton
 import com.eahm.drinkwaterapp.ui.RippleButtonConfig
 import com.eahm.drinkwaterapp.ui.RippleFadeCurve
@@ -44,22 +45,32 @@ fun DrinkRoot() {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    DrinkScreen(
-        state = state,
-        onDrink = viewModel::onDrink,
-        onDelete = viewModel::onDelete,
-        onStopAlarm = viewModel::onStopAlarm,
-        getRemainingAlarmTime = viewModel::getRemainingAlarmTime,
-    )
+    when (val data = state) {
+        DrinkState.Loading -> {
+            /* Idle */
+        }
+
+        is DrinkState.Data -> {
+            DrinkScreen(
+                state = data,
+                onDrink = viewModel::onDrink,
+                onDelete = viewModel::onDelete,
+                onStopAlarm = viewModel::onStopAlarm,
+                getRemainingAlarmTime = viewModel::getRemainingAlarmTime,
+                onAlarmIntervalChange = viewModel::onAlarmIntervalChange,
+            )
+        }
+    }
 }
 
 @Composable
 internal fun DrinkScreen(
-    state: DrinkState,
+    state: DrinkState.Data,
     onDrink: () -> Unit,
     onDelete: (HistoryEntity) -> Unit,
     onStopAlarm: () -> Unit,
     getRemainingAlarmTime: () -> String,
+    onAlarmIntervalChange: (AlarmInterval) -> Unit,
 ) {
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Content(
@@ -69,11 +80,12 @@ internal fun DrinkScreen(
             records = state.records,
             isAlarmActive = state.isAlarmActive,
             alarmInterval = state.alarmInterval,
-            alarmRemainingTime = state.alarmRemainingTime,
+            alarmNextInterval = state.alarmNextInterval,
             onDrink = onDrink,
             onDelete = onDelete,
             onStopAlarm = onStopAlarm,
             getRemainingAlarmTime = getRemainingAlarmTime,
+            onAlarmIntervalChange = onAlarmIntervalChange,
         )
     }
 }
@@ -82,31 +94,37 @@ internal fun DrinkScreen(
 private fun Content(
     records: List<HistoryEntity>,
     isAlarmActive: Boolean,
-    alarmInterval: Long?,
-    alarmRemainingTime: String,
+    alarmInterval: AlarmInterval,
+    alarmNextInterval: AlarmInterval?,
     modifier: Modifier = Modifier,
     onDrink: () -> Unit,
     onDelete: (HistoryEntity) -> Unit,
     onStopAlarm: () -> Unit,
     getRemainingAlarmTime: () -> String,
+    onAlarmIntervalChange: (AlarmInterval) -> Unit,
 ) {
-    var time by remember { mutableStateOf("") }
+    var timer by remember { mutableStateOf("") }
 
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = "is active? $isAlarmActive",
+            text = "Is alarm active: $isAlarmActive",
         )
 
-        alarmInterval?.let {
+        Text(
+            text = "Alarm interval: ${alarmInterval.hour}:${alarmInterval.minute}",
+        )
+
+        alarmNextInterval?.let {
             Text(
-                text = "interval: $it",
+                text = "Alarm next interval: ${it.hour}:${it.minute}",
             )
         }
+
         Text(
-            text = "time: $time",
+            text = "remaining time: $timer",
         )
 
         Button(
@@ -128,14 +146,15 @@ private fun Content(
             onTimeSelected = { selected = it },
         )
 
-        val timeSelected = TimeSelected(0, 5)
-        var alarmTime by remember { mutableStateOf(timeSelected) }
-
         PickHourMinute(
-            initialHour = alarmTime.hour,
-            onHourChange = { alarmTime = alarmTime.copy(hour = it) },
-            initialMinute = alarmTime.minute,
-            onMinuteChange = { alarmTime = alarmTime.copy(minute = it) },
+            initialHour = alarmInterval.hour,
+            onHourChange = {
+                onAlarmIntervalChange(alarmInterval.copy(hour = it))
+            },
+            initialMinute = alarmInterval.minute,
+            onMinuteChange = {
+                onAlarmIntervalChange(alarmInterval.copy(minute = it))
+            },
         )
 
         val scope = rememberCoroutineScope()
@@ -144,7 +163,7 @@ private fun Content(
             scope.launch {
                 while (true) {
                     delay(1.seconds)
-                    time = getRemainingAlarmTime()
+                    timer = getRemainingAlarmTime()
                 }
             }
         }
@@ -197,12 +216,13 @@ private fun DrinkScreenPreview() {
         Content(
             records = recordsMock,
             isAlarmActive = true,
-            alarmInterval = 10000,
-            alarmRemainingTime = "",
+            alarmInterval = AlarmInterval(0, 5),
+            alarmNextInterval = null,
             onDrink = {},
             onDelete = {},
             onStopAlarm = {},
-            getRemainingAlarmTime = { "" }
+            getRemainingAlarmTime = { "" },
+            onAlarmIntervalChange = {},
         )
     }
 }

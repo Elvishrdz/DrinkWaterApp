@@ -2,16 +2,17 @@ package com.eahm.drinkwaterapp.core.data.drinkalarm
 
 import android.content.Context
 import androidx.core.content.edit
+import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 
 object AlarmIntervals {
 
-    fun getInterval(context: Context): Pair<Int, Int> {
+    fun getInterval(context: Context): AlarmInterval {
         val prefs = context.getSharedPreferences(ALARM_PREFS_NAME, Context.MODE_PRIVATE)
 
         val currentHour = prefs.getInt(ALARM_INTERVAL_HOUR, ALARM_INTERVAL_HOUR_DEFAULT)
         val currentMinute = prefs.getInt(ALARM_INTERVAL_MINUTE, ALARM_INTERVAL_MINUTE_DEFAULT)
 
-        return Pair(currentHour, currentMinute)
+        return AlarmInterval(currentHour, currentMinute)
     }
 
     fun setInterval(context: Context, hour: Int, minute: Int) {
@@ -27,7 +28,7 @@ object AlarmIntervals {
         setNextInterval(context, ALARM_INTERVAL_HOUR_DEFAULT, ALARM_INTERVAL_MINUTE_DEFAULT)
     }
 
-    fun getNextInterval(context: Context): Pair<Int, Int>? {
+    fun getNextInterval(context: Context): AlarmInterval? {
         val prefs = context.getSharedPreferences(ALARM_PREFS_NAME, Context.MODE_PRIVATE)
 
         val currentHour =
@@ -41,7 +42,7 @@ object AlarmIntervals {
                 currentMinute
                     .takeIf { it != -1 }
                     ?.let { minute ->
-                        Pair(hour, minute)
+                        AlarmInterval(hour, minute)
                     }
             }
     }
