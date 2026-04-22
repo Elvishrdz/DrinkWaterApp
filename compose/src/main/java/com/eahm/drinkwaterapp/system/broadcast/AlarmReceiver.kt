@@ -14,13 +14,15 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler
+import com.eahm.drinkwaterapp.system.foreground.AppVisibility
 
 class AlarmReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
             Intent.ACTION_BOOT_COMPLETED,
-            "android.intent.action.LOCKED_BOOT_COMPLETED" -> {
+            Intent.ACTION_LOCKED_BOOT_COMPLETED,
+                -> {
                 restoreAlarmsFromStorage(context)
             }
 
@@ -28,8 +30,17 @@ class AlarmReceiver : BroadcastReceiver() {
                 val alarmId = intent.getIntExtra("alarm_id", -1)
                 val intervalMs = intent.getLongExtra("interval_ms", 60_000L)
 
-                // 1. Mostrar notificación
-                showNotification(context, alarmId)
+                val isAppVisible = AppVisibility.isAppInForeground.value
+
+                if (isAppVisible) {
+                    // if app is in foreground, do not show notifications (remove existing)
+//                    val extras = intent.extras
+//                    val notificationID: Int = extras?.getInt("NOTI_ID") ?: -1
+//                    val notificationManager = NotificationManagerCompat.from(context)
+//                    notificationManager.cancel(notificationID)
+                } else {
+                    showNotification(context, alarmId)
+                }
 
                 // 2. Auto-renovar: programar la siguiente
                 prepareNextAlarm(context, alarmId, intervalMs)
