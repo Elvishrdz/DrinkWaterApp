@@ -16,7 +16,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -102,99 +101,102 @@ private fun Content(
 ) {
     var timer by remember { mutableStateOf("") }
 
-    Column(
+    Adaptive(
         modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(
-            text = "Is alarm active: $isAlarmActive",
-        )
-
-        Text(
-            text = "Alarm interval: ${alarmInterval.hour}:${alarmInterval.minute}",
-        )
-
-        alarmNextInterval?.let {
+        stats = {
             Text(
-                text = "Alarm next interval: ${it.hour}:${it.minute}",
+                text = "Is alarm active: $isAlarmActive",
             )
-        }
 
-        Text(
-            text = "remaining time: $timer",
-        )
-
-        Button(
-            onClick = onStopAlarm,
-        ) {
             Text(
-                text = "Stop Alarm",
+                text = "Alarm interval: ${alarmInterval.hour}:${alarmInterval.minute}",
             )
-        }
 
-        var selected: TimeSelected? by remember { mutableStateOf(null) }
-
-        Text(
-            text = "alarm at $selected",
-        )
-        AppTimeSelectorButton(
-            text = "Set Alarm Time",
-            time = selected,
-            onTimeSelected = { selected = it },
-        )
-
-        AppTimePickerButton(
-            text = "Set Alarm Interval",
-            time = TimeSelected(alarmInterval.hour, alarmInterval.minute),
-            onTimeSelected = {
-                val alarmInterval = AlarmInterval(it.hour, it.minute)
-                onAlarmIntervalChange(alarmInterval)
-            },
-        )
-
-        val scope = rememberCoroutineScope()
-
-        LaunchedEffect(scope) {
-            scope.launch {
-                while (true) {
-                    delay(1.seconds)
-                    timer = getRemainingAlarmTime()
-                }
+            alarmNextInterval?.let {
+                Text(
+                    text = "Alarm next interval: ${it.hour}:${it.minute}",
+                )
             }
-        }
 
-        DrinkButton(
-            text = "Drink Water",
-            onClick = onDrink,
-        )
+            Text(
+                text = "remaining time: $timer",
+            )
 
-        LazyColumn {
-            items(records) { item ->
-                Row(modifier = Modifier.animateItem()) {
-                    Column {
-                        Text(
-                            text = item.id.takeLast(7),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                        Text(
-                            text = item.amount.toString(),
-                        )
-                        Text(
-                            text = item.timestamp.toString(),
-                        )
-                    }
-                    Button(
-                        onClick = { onDelete(item) },
-                    ) {
-                        Text(
-                            text = "Delete",
-                        )
+            Button(
+                onClick = onStopAlarm,
+            ) {
+                Text(
+                    text = "Stop Alarm",
+                )
+            }
+
+            var selected: TimeSelected? by remember { mutableStateOf(null) }
+
+            Text(
+                text = "alarm at $selected",
+            )
+            AppTimeSelectorButton(
+                text = "Set Alarm Time",
+                time = selected,
+                onTimeSelected = { selected = it },
+            )
+
+            AppTimePickerButton(
+                text = "Set Alarm Interval",
+                time = TimeSelected(alarmInterval.hour, alarmInterval.minute),
+                onTimeSelected = {
+                    val alarmInterval = AlarmInterval(it.hour, it.minute)
+                    onAlarmIntervalChange(alarmInterval)
+                },
+            )
+
+            val scope = rememberCoroutineScope()
+
+            LaunchedEffect(scope) {
+                scope.launch {
+                    while (true) {
+                        delay(1.seconds)
+                        timer = getRemainingAlarmTime()
                     }
                 }
             }
-        }
-    }
+
+        },
+        drink = {
+            DrinkButton(
+                text = "Drink Water",
+                onClick = onDrink,
+            )
+        },
+        history = {
+            LazyColumn {
+                items(records) { item ->
+                    Row(modifier = Modifier.animateItem()) {
+                        Column {
+                            Text(
+                                text = item.id.takeLast(7),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                            Text(
+                                text = item.amount.toString(),
+                            )
+                            Text(
+                                text = item.timestamp.toString(),
+                            )
+                        }
+                        Button(
+                            onClick = { onDelete(item) },
+                        ) {
+                            Text(
+                                text = "Delete",
+                            )
+                        }
+                    }
+                }
+            }
+        },
+    )
 }
 
 @PreviewScreenSizes
