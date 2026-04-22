@@ -11,13 +11,17 @@ import com.eahm.drinkwaterapp.core.data.systemnotifications.model.NotificationRe
 import com.eahm.drinkwaterapp.core.data.systemnotifications.model.SkipDrink
 import com.eahm.drinkwaterapp.core.data.systemnotifications.notification.DrinkNotification.EXTRA_CODE
 import com.eahm.drinkwaterapp.core.data.systemnotifications.notification.DrinkNotification.EXTRA_NOTIFICATION_ID
+import com.eahm.drinkwaterapp.core.database.AppDatabase
+import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
+import com.eahm.drinkwaterapp.core.database.entity.Status
 import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.koin.core.context.GlobalContext
 
 class AlarmReceiver : BroadcastReceiver() {
 
-
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(context: Context, intent: Intent) = goAsync { _ ->
         val code = intent.getIntExtra(EXTRA_CODE, -1)
 
         when (intent.action) {
@@ -33,7 +37,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
             Drink.action -> {
                 if (code == Drink.code) {
-                    // TODO: save new drink to database
+                    registerDrink()
                     scheduleNextAlarm(context)
                     removeNotificationFromSystem(context, intent)
                 }
@@ -53,6 +57,18 @@ class AlarmReceiver : BroadcastReceiver() {
                 }
             }
         }
+    }
+
+    private suspend fun registerDrink() = withContext(Dispatchers.IO) {
+        val koin = GlobalContext.get()
+        val database = koin.get<AppDatabase>()
+        val dao = database.getHistoryDao()
+        val record = HistoryEntity(
+            amount = 300f,
+            status = Status.IN_APP,
+        )
+
+        dao.insertAll(record)
     }
 
     private fun scheduleNextAlarm(context: Context) {
