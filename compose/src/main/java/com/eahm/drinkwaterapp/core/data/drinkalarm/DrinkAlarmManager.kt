@@ -7,6 +7,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class DrinkAlarmManager(
@@ -23,10 +25,13 @@ class DrinkAlarmManager(
     }
 
     fun start(context: Context) {
+        val (hour, minute) = AlarmIntervals.getInterval(context)
+        val inWholeMillis = hour.hours.inWholeMilliseconds + minute.minutes.inWholeMilliseconds
+
         AlarmScheduler.scheduleAlarm(
             context = context,
             alarmId = drinkAlarmId,
-            intervalMs = drinkAlarmInterval.inWholeMilliseconds,
+            intervalMs = inWholeMillis,
         )
         update()
     }
@@ -48,5 +53,4 @@ class DrinkAlarmManager(
     fun remainingTime(): String {
         return AlarmScheduler.getTimeUntilNextTrigger(application, drinkAlarmId).toString()
     }
-
 }

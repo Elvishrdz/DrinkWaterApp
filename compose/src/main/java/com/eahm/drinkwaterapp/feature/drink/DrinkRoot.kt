@@ -11,7 +11,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,9 +25,7 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.anhaki.picktime.PickHourMinute
-import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
-import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.database.entity.Status
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -37,55 +34,40 @@ import com.eahm.drinkwaterapp.ui.RippleButtonConfig
 import com.eahm.drinkwaterapp.ui.RippleFadeCurve
 import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorButton
 import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDateTime
 import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
-internal fun DrinkScreen() {
-    val prefsStorage = koinInject<PrefsStorage>()
-    val coroutineScope = rememberCoroutineScope()
-    val firstSetup by prefsStorage.getFirstSetupDone()
-        .collectAsState(
-            initial = false,
-            context = coroutineScope.coroutineContext,
-        )
+fun DrinkRoot() {
+    val viewModel: DrinkViewModel = koinViewModel()
 
-    val database = koinInject<AppDatabase>()
-    val dao = database.getHistoryDao()
-    val records by dao.getAll().collectAsStateWithLifecycle(
-        initialValue = emptyList(),
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    DrinkScreen(
+        state = state,
+        onDrink = viewModel::onDrink,
+        onDelete = viewModel::onDelete,
     )
+}
 
+@Composable
+internal fun DrinkScreen(
+    state: DrinkState,
+    onDrink: () -> Unit,
+    onDelete: (HistoryEntity) -> Unit,
+) {
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Content(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize(),
-            records = records,
-            onDrink = {
-                coroutineScope.launch {
-                    withContext(Dispatchers.IO) {
-                        val record = HistoryEntity(
-                            amount = 200f,
-                            status = Status.IN_APP,
-                        )
-
-                        dao.insertAll(record)
-                    }
-                }
-            },
-            onDelete = {
-                coroutineScope.launch {
-                    withContext(Dispatchers.IO) {
-                        dao.delete(it)
-                    }
-                }
-            }
+            records = state.records,
+            onDrink = onDrink,
+            onDelete = onDelete,
         )
     }
 }

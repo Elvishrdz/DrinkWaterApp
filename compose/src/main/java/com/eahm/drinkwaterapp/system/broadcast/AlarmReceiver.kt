@@ -32,7 +32,7 @@ class AlarmReceiver : BroadcastReceiver() {
                 showNotification(context, alarmId)
 
                 // 2. Auto-renovar: programar la siguiente
-                AlarmScheduler.scheduleAlarm(context, alarmId, intervalMs)
+                prepareNextAlarm(context, alarmId, intervalMs)
             }
         }
     }
@@ -88,6 +88,14 @@ class AlarmReceiver : BroadcastReceiver() {
             val intervalMs = prefs.getLong("alarm_interval_$id", 60_000L)
             AlarmScheduler.scheduleAlarm(context, id, intervalMs)
         }
+    }
+
+    private fun prepareNextAlarm(
+        context: Context,
+        alarmId: Int,
+        intervalMs: Long
+    ) {
+        AlarmScheduler.scheduleAlarm(context, alarmId, intervalMs)
     }
 
     companion object {
