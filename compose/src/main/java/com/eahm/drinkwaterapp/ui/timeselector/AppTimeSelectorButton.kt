@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 
@@ -19,7 +20,7 @@ fun AppTimeSelectorButton(
     is24HourFormat: Boolean = rememberTimePickerState().is24hour,
     onTimeSelected: (TimeSelected) -> Unit,
 ) {
-    var showModal by remember { mutableStateOf(false) }
+    var showModal by rememberSaveable { mutableStateOf(false) }
 
     OutlinedButton(
         onClick = { showModal = !showModal },
