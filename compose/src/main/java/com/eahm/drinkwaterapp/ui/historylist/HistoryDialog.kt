@@ -64,10 +64,12 @@ fun HistoryDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
-                    text = "Set time",
+                    text = "History",
                 )
 
-                LazyColumn {
+                LazyColumn(
+                    modifier = Modifier.weight(1f)
+                ) {
                     items(records) { item ->
                         Row(modifier = Modifier.animateItem()) {
                             Column {
