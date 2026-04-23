@@ -1,11 +1,7 @@
 package com.eahm.drinkwaterapp.feature.drink
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -17,21 +13,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.eahm.drinkwaterapp.core.bindings.toEntity
+import com.eahm.drinkwaterapp.core.bindings.toUI
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
-import com.eahm.drinkwaterapp.core.database.entity.Status
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
+import com.eahm.drinkwaterapp.core.domain.mock.Mock
+import com.eahm.drinkwaterapp.core.domain.mock.recordsMock
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import com.eahm.drinkwaterapp.ui.drinkbutton.DrinkButton
+import com.eahm.drinkwaterapp.ui.historylist.HistoryButton
 import com.eahm.drinkwaterapp.ui.timepicker.AppTimePickerButton
 import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorButton
 import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalDateTime
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Duration.Companion.seconds
 
@@ -169,32 +167,11 @@ private fun Content(
             )
         },
         history = {
-            LazyColumn {
-                items(records) { item ->
-                    Row(modifier = Modifier.animateItem()) {
-                        Column {
-                            Text(
-                                text = item.id.takeLast(7),
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                            Text(
-                                text = item.amount.toString(),
-                            )
-                            Text(
-                                text = item.timestamp.toString(),
-                            )
-                        }
-                        Button(
-                            onClick = { onDelete(item) },
-                        ) {
-                            Text(
-                                text = "Delete",
-                            )
-                        }
-                    }
-                }
-            }
+            HistoryButton(
+                text = "History",
+                records = records.toUI(),
+                onDelete = { onDelete(it.toEntity()) },
+            )
         },
     )
 }
@@ -205,7 +182,7 @@ private fun Content(
 private fun DrinkScreenPreview() {
     DrinkWaterAppTheme {
         Content(
-            records = recordsMock,
+            records = Mock.recordsMock,
             isAlarmActive = true,
             alarmInterval = AlarmInterval(0, 5),
             alarmNextInterval = null,
@@ -217,24 +194,3 @@ private fun DrinkScreenPreview() {
         )
     }
 }
-
-private val localDateTimeMock = LocalDateTime(
-    year = 2023,
-    month = 1,
-    day = 1,
-    hour = 10,
-    minute = 5,
-)
-
-private val recordsMock = listOf(
-    HistoryEntity(
-        amount = 200f,
-        status = Status.IN_APP,
-        timestamp = localDateTimeMock,
-    ),
-    HistoryEntity(
-        amount = 200f,
-        status = Status.IN_APP,
-        timestamp = localDateTimeMock,
-    )
-)
