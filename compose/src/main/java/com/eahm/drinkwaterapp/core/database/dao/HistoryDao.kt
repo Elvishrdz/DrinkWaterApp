@@ -38,5 +38,5 @@ interface HistoryDao {
             WHERE timestamp BETWEEN :start AND :end       
         """
     )
-    fun findByTimestamp(start: LocalDateTime, end: LocalDateTime): Flow<List<HistoryEntity>>
+    fun findByTimestamp(start: LocalDateTime, end: LocalDateTime): List<HistoryEntity>
 }

@@ -6,8 +6,7 @@ import kotlinx.datetime.LocalDateTime
 
 object Mock
 
-
-private val Mock.localDateTimeMock
+val Mock.localDateTimeMock
     get() = LocalDateTime(
         year = 2023,
         month = 1,

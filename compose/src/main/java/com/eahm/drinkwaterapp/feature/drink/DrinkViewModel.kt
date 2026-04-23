@@ -8,13 +8,23 @@ import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.database.entity.Status
+import com.eahm.drinkwaterapp.core.domain.extension.toEndOfDayTime
+import com.eahm.drinkwaterapp.core.domain.extension.toStartOfDayTime
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 internal class DrinkViewModel(
     val application: Application,
@@ -25,16 +35,34 @@ internal class DrinkViewModel(
 
     private val dao = database.getHistoryDao()
 
-    private val records = dao.getAll()
+    @OptIn(ExperimentalTime::class)
+    private val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+
+    private val historyDate = MutableStateFlow(today)
+
+    private val records = historyDate.map {
+        withContext(Dispatchers.IO) {
+            dao.findByTimestamp(
+                start = it.toStartOfDayTime,
+                end = it.toEndOfDayTime,
+            )
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Lazily,
+        initialValue = emptyList(),
+    )
 
     private val firstSetup = prefsStorage.getFirstSetupDone()
 
     val state = combine(
+        historyDate,
         records,
         firstSetup,
         drinkAlarmManager.state,
-    ) { records, _, drinkAlarmState ->
+    ) { date, records, _, drinkAlarmState ->
         DrinkState.Data(
+            date = date,
             records = records
                 .sortedBy { it.timestamp }
                 .reversed(),
@@ -69,6 +97,10 @@ internal class DrinkViewModel(
                 dao.delete(it)
             }
         }
+    }
+
+    fun onDateChanged(date: LocalDateTime) {
+        historyDate.update { date }
     }
 
     fun onAlarmIntervalChange(alarmInterval: AlarmInterval) {

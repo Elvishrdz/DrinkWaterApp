@@ -21,6 +21,7 @@ import com.eahm.drinkwaterapp.core.bindings.toUI
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.domain.mock.Mock
+import com.eahm.drinkwaterapp.core.domain.mock.localDateTimeMock
 import com.eahm.drinkwaterapp.core.domain.mock.recordsMock
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import com.eahm.drinkwaterapp.ui.drinkbutton.DrinkButton
@@ -30,6 +31,7 @@ import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorButton
 import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDateTime
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Duration.Companion.seconds
 
@@ -49,6 +51,7 @@ fun DrinkRoot() {
                 state = data,
                 onDrink = viewModel::onDrink,
                 onDelete = viewModel::onDelete,
+                onDateChanged = viewModel::onDateChanged,
                 onStopAlarm = viewModel::onStopAlarm,
                 getRemainingAlarmTime = viewModel::getRemainingAlarmTime,
                 onAlarmIntervalChange = viewModel::onAlarmIntervalChange,
@@ -62,6 +65,7 @@ internal fun DrinkScreen(
     state: DrinkState.Data,
     onDrink: (Float) -> Unit,
     onDelete: (HistoryEntity) -> Unit,
+    onDateChanged: (LocalDateTime) -> Unit,
     onStopAlarm: () -> Unit,
     getRemainingAlarmTime: () -> String,
     onAlarmIntervalChange: (AlarmInterval) -> Unit,
@@ -71,12 +75,14 @@ internal fun DrinkScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize(),
+            date = state.date,
             records = state.records,
             isAlarmActive = state.isAlarmActive,
             alarmInterval = state.alarmInterval,
             alarmNextInterval = state.alarmNextInterval,
             onDrink = onDrink,
             onDelete = onDelete,
+            onDateChanged = onDateChanged,
             onStopAlarm = onStopAlarm,
             getRemainingAlarmTime = getRemainingAlarmTime,
             onAlarmIntervalChange = onAlarmIntervalChange,
@@ -86,6 +92,7 @@ internal fun DrinkScreen(
 
 @Composable
 private fun Content(
+    date: LocalDateTime,
     records: List<HistoryEntity>,
     isAlarmActive: Boolean,
     alarmInterval: AlarmInterval,
@@ -93,6 +100,7 @@ private fun Content(
     modifier: Modifier = Modifier,
     onDrink: (Float) -> Unit,
     onDelete: (HistoryEntity) -> Unit,
+    onDateChanged: (LocalDateTime) -> Unit,
     onStopAlarm: () -> Unit,
     getRemainingAlarmTime: () -> String,
     onAlarmIntervalChange: (AlarmInterval) -> Unit,
@@ -169,8 +177,10 @@ private fun Content(
         history = {
             HistoryButton(
                 text = "History",
+                date = date,
                 records = records.toUI(),
                 onDelete = { onDelete(it.toEntity()) },
+                onDateChanged = onDateChanged,
             )
         },
     )
@@ -182,12 +192,14 @@ private fun Content(
 private fun DrinkScreenPreview() {
     DrinkWaterAppTheme {
         Content(
+            date = Mock.localDateTimeMock,
             records = Mock.recordsMock,
             isAlarmActive = true,
             alarmInterval = AlarmInterval(0, 5),
             alarmNextInterval = null,
             onDrink = {},
             onDelete = {},
+            onDateChanged = {},
             onStopAlarm = {},
             getRemainingAlarmTime = { "" },
             onAlarmIntervalChange = {},

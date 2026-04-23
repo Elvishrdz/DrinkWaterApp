@@ -11,7 +11,11 @@ fun List<HistoryEntity>.toUI(): List<HistoryUI> {
 fun HistoryEntity.toUI(): HistoryUI {
     return HistoryUI(
         id = id,
-        amount = amount,
+        amount = if (amount % 1 == 0f) {
+            amount.toInt().toString()
+        } else {
+            amount.toString()
+        },
         status = status.ordinal,
         timestamp = timestamp,
     )
@@ -20,7 +24,7 @@ fun HistoryEntity.toUI(): HistoryUI {
 fun HistoryUI.toEntity(): HistoryEntity {
     return HistoryEntity(
         id = id,
-        amount = amount,
+        amount = amount.toFloat(),
         status = runCatching { Status.entries[status] }
             .getOrElse { throw Exception("Failed to parse the status with ordinal: $status") },
         timestamp = timestamp,
