@@ -11,6 +11,8 @@ import com.eahm.drinkwaterapp.core.database.entity.Status
 import com.eahm.drinkwaterapp.core.domain.extension.toEndOfDayTime
 import com.eahm.drinkwaterapp.core.domain.extension.toStartOfDayTime
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
+import com.eahm.drinkwaterapp.ui.inputfield.goalAmountToString
+import com.eahm.drinkwaterapp.ui.inputfield.validateAmount
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -30,7 +32,7 @@ internal class DrinkViewModel(
     val application: Application,
     val drinkAlarmManager: DrinkAlarmManager,
     val database: AppDatabase,
-    prefsStorage: PrefsStorage,
+    val prefsStorage: PrefsStorage,
 ) : ViewModel() {
 
     private val dao = database.getHistoryDao()
@@ -39,6 +41,8 @@ internal class DrinkViewModel(
     private val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 
     private val historyDate = MutableStateFlow(today)
+
+    private val goalAmount = prefsStorage.getGoalAmount()
 
     private val records = historyDate.map {
         withContext(Dispatchers.IO) {
@@ -59,13 +63,15 @@ internal class DrinkViewModel(
         historyDate,
         records,
         firstSetup,
+        goalAmount,
         drinkAlarmManager.state,
-    ) { date, records, _, drinkAlarmState ->
+    ) { date, records, _, goalAmount, drinkAlarmState ->
         DrinkState.Data(
             date = date,
             records = records
                 .sortedBy { it.timestamp }
                 .reversed(),
+            goalAmount = goalAmount.goalAmountToString(),
             isAlarmActive = drinkAlarmState.active,
             alarmInterval = drinkAlarmState.interval,
             alarmNextInterval = drinkAlarmState.nextInterval,
@@ -101,6 +107,16 @@ internal class DrinkViewModel(
 
     fun onDateChanged(date: LocalDateTime) {
         historyDate.update { date }
+    }
+
+    fun onGoalChanged(goal: String) {
+        viewModelScope.launch {
+            goal.toFloatOrNull()
+                ?.takeIf { validateAmount(it).isValid }
+                ?.let { amount ->
+                    prefsStorage.setGoalAmount(amount)
+                }
+        }
     }
 
     fun onAlarmIntervalChange(alarmInterval: AlarmInterval) {

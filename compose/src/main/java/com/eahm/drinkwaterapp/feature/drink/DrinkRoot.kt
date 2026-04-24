@@ -1,6 +1,7 @@
 package com.eahm.drinkwaterapp.feature.drink
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
@@ -26,6 +27,7 @@ import com.eahm.drinkwaterapp.core.domain.mock.recordsMock
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import com.eahm.drinkwaterapp.ui.drinkbutton.DrinkButton
 import com.eahm.drinkwaterapp.ui.historylist.HistoryButton
+import com.eahm.drinkwaterapp.ui.inputfield.AmountInputField
 import com.eahm.drinkwaterapp.ui.timepicker.AppTimePickerButton
 import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorButton
 import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
@@ -53,6 +55,7 @@ fun DrinkRoot() {
                 onDelete = viewModel::onDelete,
                 onDateChanged = viewModel::onDateChanged,
                 onStopAlarm = viewModel::onStopAlarm,
+                onGoalAmountChanged = viewModel::onGoalChanged,
                 getRemainingAlarmTime = viewModel::getRemainingAlarmTime,
                 onAlarmIntervalChange = viewModel::onAlarmIntervalChange,
             )
@@ -67,6 +70,7 @@ internal fun DrinkScreen(
     onDelete: (HistoryEntity) -> Unit,
     onDateChanged: (LocalDateTime) -> Unit,
     onStopAlarm: () -> Unit,
+    onGoalAmountChanged: (String) -> Unit,
     getRemainingAlarmTime: () -> String,
     onAlarmIntervalChange: (AlarmInterval) -> Unit,
 ) {
@@ -77,6 +81,7 @@ internal fun DrinkScreen(
                 .fillMaxSize(),
             date = state.date,
             records = state.records,
+            goalAmount = state.goalAmount,
             isAlarmActive = state.isAlarmActive,
             alarmInterval = state.alarmInterval,
             alarmNextInterval = state.alarmNextInterval,
@@ -84,6 +89,7 @@ internal fun DrinkScreen(
             onDelete = onDelete,
             onDateChanged = onDateChanged,
             onStopAlarm = onStopAlarm,
+            onGoalAmountChanged = onGoalAmountChanged,
             getRemainingAlarmTime = getRemainingAlarmTime,
             onAlarmIntervalChange = onAlarmIntervalChange,
         )
@@ -94,6 +100,7 @@ internal fun DrinkScreen(
 private fun Content(
     date: LocalDateTime,
     records: List<HistoryEntity>,
+    goalAmount: String,
     isAlarmActive: Boolean,
     alarmInterval: AlarmInterval,
     alarmNextInterval: AlarmInterval?,
@@ -102,6 +109,7 @@ private fun Content(
     onDelete: (HistoryEntity) -> Unit,
     onDateChanged: (LocalDateTime) -> Unit,
     onStopAlarm: () -> Unit,
+    onGoalAmountChanged: (String) -> Unit,
     getRemainingAlarmTime: () -> String,
     onAlarmIntervalChange: (AlarmInterval) -> Unit,
 ) {
@@ -167,6 +175,14 @@ private fun Content(
                 }
             }
 
+            AmountInputField(
+                modifier = Modifier.fillMaxWidth(),
+                label = "Goal amount (mL)",
+                value = goalAmount,
+                onValueSaved = { newAmount ->
+                    onGoalAmountChanged(newAmount)
+                },
+            )
         },
         drink = {
             DrinkButton(
@@ -194,6 +210,7 @@ private fun DrinkScreenPreview() {
         Content(
             date = Mock.localDateTimeMock,
             records = Mock.recordsMock,
+            goalAmount = "1000",
             isAlarmActive = true,
             alarmInterval = AlarmInterval(0, 5),
             alarmNextInterval = null,
@@ -201,6 +218,7 @@ private fun DrinkScreenPreview() {
             onDelete = {},
             onDateChanged = {},
             onStopAlarm = {},
+            onGoalAmountChanged = {},
             getRemainingAlarmTime = { "" },
             onAlarmIntervalChange = {},
         )

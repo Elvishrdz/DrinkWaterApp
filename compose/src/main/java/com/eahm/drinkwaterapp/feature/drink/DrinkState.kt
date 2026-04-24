@@ -11,6 +11,7 @@ internal sealed interface DrinkState {
     data class Data(
         val date: LocalDateTime,
         val records: List<HistoryEntity>,
+        val goalAmount: String,
         val isAlarmActive: Boolean,
         val alarmInterval: AlarmInterval,
         val alarmNextInterval: AlarmInterval?,
