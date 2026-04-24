@@ -69,6 +69,7 @@ enum class RippleFadeCurve { Linear, EaseOut, EaseOutStrong, LateFade }
 data class RippleButtonConfig(
     val buttonSizeDp: Dp = 100.dp,
     val buttonColor: Color = Color(0xFF4DAEFF),
+    val buttonBrush: Brush? = null,
     val textColor: Color = Color.White,
     val fontSize: TextUnit = 18.sp,
     val fontWeight: FontWeight = FontWeight.Bold,
@@ -145,7 +146,13 @@ fun PulsingRippleButton(
                 )
             }
 
-            drawCircle(
+            config.buttonBrush?.let {
+                drawCircle(
+                    brush = it,
+                    radius = buttonRadiusPx,
+                    center = Offset(cx, cy)
+                )
+            } ?: drawCircle(
                 color = config.buttonColor,
                 radius = buttonRadiusPx,
                 center = Offset(cx, cy)

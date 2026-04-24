@@ -1,5 +1,7 @@
 package com.eahm.drinkwaterapp.feature.drink
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -21,6 +23,7 @@ import com.eahm.drinkwaterapp.core.bindings.toEntity
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.domain.mock.Mock
+import com.eahm.drinkwaterapp.core.domain.mock.drinkStatsMock
 import com.eahm.drinkwaterapp.core.domain.mock.hourGroupMock
 import com.eahm.drinkwaterapp.core.domain.mock.localDateTimeMock
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
@@ -28,6 +31,7 @@ import com.eahm.drinkwaterapp.ui.drinkbutton.DrinkButton
 import com.eahm.drinkwaterapp.ui.historylist.HistoryButton
 import com.eahm.drinkwaterapp.ui.historylist.HourGroup
 import com.eahm.drinkwaterapp.ui.inputfield.AmountInputField
+import com.eahm.drinkwaterapp.ui.inputfield.goalAmountToString
 import com.eahm.drinkwaterapp.ui.timepicker.AppTimePickerButton
 import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorButton
 import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
@@ -81,8 +85,7 @@ internal fun DrinkScreen(
                 .fillMaxSize(),
             date = state.date,
             historyRecords = state.historyRecords,
-            goalAmount = state.goalAmount,
-            drinkAmount = state.drinkAmount,
+            drinkStats = state.drinkStats,
             isAlarmActive = state.isAlarmActive,
             alarmInterval = state.alarmInterval,
             alarmNextInterval = state.alarmNextInterval,
@@ -101,8 +104,7 @@ internal fun DrinkScreen(
 private fun Content(
     date: LocalDateTime,
     historyRecords: List<HourGroup>,
-    goalAmount: String,
-    drinkAmount: Float,
+    drinkStats: DrinkStats?,
     isAlarmActive: Boolean,
     alarmInterval: AlarmInterval,
     alarmNextInterval: AlarmInterval?,
@@ -152,9 +154,24 @@ private fun Content(
                 text = "alarm at $selected",
             )
 
-            Text(
-                text = "total drink amount of today: $drinkAmount",
-            )
+            AnimatedVisibility(drinkStats != null) {
+                drinkStats?.let {
+                    Column {
+                        Text(
+                            text = "Goal: ${it.goalAmount}",
+                        )
+
+                        Text(
+                            text = "Current Drink Amount: ${it.drinkAmount}",
+                        )
+
+                        Text(
+                            text = "Goal reached: ${it.goalReached}",
+                        )
+                    }
+                }
+            }
+
             AppTimeSelectorButton(
                 text = "Set Alarm Time",
                 time = selected,
@@ -181,18 +198,23 @@ private fun Content(
                 }
             }
 
-            AmountInputField(
-                modifier = Modifier.fillMaxWidth(),
-                label = "Goal amount (mL)",
-                value = goalAmount,
-                onValueSaved = { newAmount ->
-                    onGoalAmountChanged(newAmount)
-                },
-            )
+            AnimatedVisibility(drinkStats != null) {
+                drinkStats?.let {
+                    AmountInputField(
+                        modifier = Modifier.fillMaxWidth(),
+                        label = "Goal amount (mL)",
+                        value = it.drinkAmount.goalAmountToString(),
+                        onValueSaved = { newAmount ->
+                            onGoalAmountChanged(newAmount)
+                        },
+                    )
+                }
+            }
         },
         drink = {
             DrinkButton(
                 text = "Drink Water",
+                isGoalReached = drinkStats?.goalReached == true,
                 onClick = onDrink,
             )
         },
@@ -216,8 +238,7 @@ private fun DrinkScreenPreview() {
         Content(
             date = Mock.localDateTimeMock,
             historyRecords = Mock.hourGroupMock,
-            goalAmount = "1000",
-            drinkAmount = 0f,
+            drinkStats = Mock.drinkStatsMock,
             isAlarmActive = true,
             alarmInterval = AlarmInterval(0, 5),
             alarmNextInterval = null,

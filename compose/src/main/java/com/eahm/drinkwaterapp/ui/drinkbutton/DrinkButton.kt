@@ -21,6 +21,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,19 +36,47 @@ import com.eahm.drinkwaterapp.ui.RippleFadeCurve
 @Composable
 fun DrinkButton(
     text: String,
+    isGoalReached: Boolean = false,
     onClick: (Float) -> Unit,
 ) {
     var showModal by rememberSaveable { mutableStateOf(false) }
 
-    PulsingRippleButton(
-        text = text,
-        onClick = { showModal = !showModal },
-        config = RippleButtonConfig(
+    val config = if (isGoalReached) {
+        val brush = Brush.radialGradient(
+            colors = listOf(
+                Color(0xFFFFD700),
+                Color(0xFFD1A41F),
+            ),
+            radius = 150f
+        )
+
+        RippleButtonConfig(
             buttonSizeDp = 130.dp,
             rippleFrequencyMs = 500L,
             maxRipples = 8,
             fadeCurve = RippleFadeCurve.EaseOutStrong,
-        ),
+            buttonBrush = brush,
+            textColor = Color.White,
+            rippleColorInner = Color.Yellow,
+            rippleColorOuter = Color.Yellow,
+        )
+    } else {
+        RippleButtonConfig(
+            buttonSizeDp = 130.dp,
+            rippleFrequencyMs = 500L,
+            maxRipples = 8,
+            fadeCurve = RippleFadeCurve.EaseOutStrong,
+            buttonColor = Color(0xFF4DAEFF),
+            textColor = Color.White,
+            rippleColorInner = Color(0xFF5EC8E8),
+            rippleColorOuter = Color(0xFF2196F3),
+        )
+    }
+
+    PulsingRippleButton(
+        text = text,
+        onClick = { showModal = !showModal },
+        config = config,
     )
 
     if (showModal) {

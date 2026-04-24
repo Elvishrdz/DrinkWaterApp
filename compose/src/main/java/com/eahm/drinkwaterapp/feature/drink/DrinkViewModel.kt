@@ -14,7 +14,6 @@ import com.eahm.drinkwaterapp.core.domain.extension.toStartOfDayTime
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import com.eahm.drinkwaterapp.ui.historylist.DayGroup
 import com.eahm.drinkwaterapp.ui.historylist.HourGroup
-import com.eahm.drinkwaterapp.ui.inputfield.goalAmountToString
 import com.eahm.drinkwaterapp.ui.inputfield.validateAmount
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -66,31 +65,28 @@ internal class DrinkViewModel(
             initialValue = emptyList(),
         )
 
-    private val firstSetup = prefsStorage.getFirstSetupDone()
-
-    private val stats = combine(
-        firstSetup,
+    private val drinkStats = combine(
         goalAmount,
         drinkAmount,
-    ) { _, goalAmount, drinkAmount ->
-        Pair(
-            goalAmount,
-            drinkAmount
+    ) { goalAmount, drinkAmount ->
+        DrinkStats(
+            goalAmount = goalAmount,
+            drinkAmount = drinkAmount,
+            goalReached = drinkAmount >= goalAmount,
         )
 
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
-        initialValue = Pair(0f, 0f),
+        initialValue = null,
     )
 
     val state = combine(
         historyDate,
         records,
-        stats,
+        drinkStats,
         drinkAlarmManager.state,
-    ) { date, records, stats, drinkAlarmState ->
-
+    ) { date, records, drinkStats, drinkAlarmState ->
         val historyRecords = records
             .sortedBy { it.timestamp }
             .reversed()
@@ -119,8 +115,7 @@ internal class DrinkViewModel(
         DrinkState.Data(
             date = date,
             historyRecords = historyRecords,
-            goalAmount = stats.first.goalAmountToString(),
-            drinkAmount = stats.second,
+            drinkStats = drinkStats,
             isAlarmActive = drinkAlarmState.active,
             alarmInterval = drinkAlarmState.interval,
             alarmNextInterval = drinkAlarmState.nextInterval,
