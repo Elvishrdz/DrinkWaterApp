@@ -9,10 +9,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
-import com.eahm.drinkwaterapp.core.bindings.toUI
 import com.eahm.drinkwaterapp.core.domain.mock.Mock
+import com.eahm.drinkwaterapp.core.domain.mock.hourGroupMock
 import com.eahm.drinkwaterapp.core.domain.mock.localDateTimeMock
-import com.eahm.drinkwaterapp.core.domain.mock.recordsMock
 import kotlinx.datetime.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -20,7 +19,7 @@ import kotlinx.datetime.LocalDateTime
 fun HistoryButton(
     text: String,
     date: LocalDateTime,
-    records: List<HistoryUI>,
+    historyRecords: List<HourGroup>,
     onDateChanged: (LocalDateTime) -> Unit,
     onDelete: (HistoryUI) -> Unit,
 ) {
@@ -35,7 +34,7 @@ fun HistoryButton(
     if (showModal) {
         HistoryDialog(
             date = date,
-            records = records,
+            historyRecords = historyRecords,
             onDelete = onDelete,
             onDateChanged = onDateChanged,
             onDismiss = { showModal = false },
@@ -49,7 +48,7 @@ private fun HistoryButtonPreview() {
     HistoryButton(
         text = "Time",
         date = Mock.localDateTimeMock,
-        records = Mock.recordsMock.toUI(),
+        historyRecords = Mock.hourGroupMock,
         onDateChanged = {},
         onDelete = {},
     )

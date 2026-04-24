@@ -18,15 +18,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.eahm.drinkwaterapp.core.bindings.toEntity
-import com.eahm.drinkwaterapp.core.bindings.toUI
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.domain.mock.Mock
+import com.eahm.drinkwaterapp.core.domain.mock.hourGroupMock
 import com.eahm.drinkwaterapp.core.domain.mock.localDateTimeMock
-import com.eahm.drinkwaterapp.core.domain.mock.recordsMock
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import com.eahm.drinkwaterapp.ui.drinkbutton.DrinkButton
 import com.eahm.drinkwaterapp.ui.historylist.HistoryButton
+import com.eahm.drinkwaterapp.ui.historylist.HourGroup
 import com.eahm.drinkwaterapp.ui.inputfield.AmountInputField
 import com.eahm.drinkwaterapp.ui.timepicker.AppTimePickerButton
 import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorButton
@@ -80,7 +80,7 @@ internal fun DrinkScreen(
                 .padding(innerPadding)
                 .fillMaxSize(),
             date = state.date,
-            records = state.records,
+            historyRecords = state.historyRecords,
             goalAmount = state.goalAmount,
             drinkAmount = state.drinkAmount,
             isAlarmActive = state.isAlarmActive,
@@ -100,7 +100,7 @@ internal fun DrinkScreen(
 @Composable
 private fun Content(
     date: LocalDateTime,
-    records: List<HistoryEntity>,
+    historyRecords: List<HourGroup>,
     goalAmount: String,
     drinkAmount: Float,
     isAlarmActive: Boolean,
@@ -200,7 +200,7 @@ private fun Content(
             HistoryButton(
                 text = "History",
                 date = date,
-                records = records.toUI(),
+                historyRecords = historyRecords,
                 onDelete = { onDelete(it.toEntity()) },
                 onDateChanged = onDateChanged,
             )
@@ -215,7 +215,7 @@ private fun DrinkScreenPreview() {
     DrinkWaterAppTheme {
         Content(
             date = Mock.localDateTimeMock,
-            records = Mock.recordsMock,
+            historyRecords = Mock.hourGroupMock,
             goalAmount = "1000",
             drinkAmount = 0f,
             isAlarmActive = true,

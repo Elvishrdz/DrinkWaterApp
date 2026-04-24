@@ -1,7 +1,7 @@
 package com.eahm.drinkwaterapp.feature.drink
 
-import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
+import com.eahm.drinkwaterapp.ui.historylist.HourGroup
 import kotlinx.datetime.LocalDateTime
 
 internal sealed interface DrinkState {
@@ -10,7 +10,7 @@ internal sealed interface DrinkState {
 
     data class Data(
         val date: LocalDateTime,
-        val records: List<HistoryEntity>,
+        val historyRecords: List<HourGroup>,
         val goalAmount: String,
         val drinkAmount: Float,
         val isAlarmActive: Boolean,

@@ -3,6 +3,7 @@ package com.eahm.drinkwaterapp.feature.drink
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.eahm.drinkwaterapp.core.bindings.toUI
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.database.AppDatabase
@@ -11,6 +12,8 @@ import com.eahm.drinkwaterapp.core.database.entity.Status
 import com.eahm.drinkwaterapp.core.domain.extension.toEndOfDayTime
 import com.eahm.drinkwaterapp.core.domain.extension.toStartOfDayTime
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
+import com.eahm.drinkwaterapp.ui.historylist.DayGroup
+import com.eahm.drinkwaterapp.ui.historylist.HourGroup
 import com.eahm.drinkwaterapp.ui.inputfield.goalAmountToString
 import com.eahm.drinkwaterapp.ui.inputfield.validateAmount
 import kotlinx.coroutines.Dispatchers
@@ -83,11 +86,35 @@ internal class DrinkViewModel(
         stats,
         drinkAlarmManager.state,
     ) { date, records, stats, drinkAlarmState ->
+
+        val historyRecords = records
+            .sortedBy { it.timestamp }
+            .reversed()
+            .map { it.toUI() }
+            .groupBy {
+                DayGroup(
+                    hour = it.timestamp.hour,
+                    day = it.timestamp.day,
+                    month = it.timestamp.month.ordinal,
+                    year = it.timestamp.year,
+                )
+            }
+            .toSortedMap(compareBy { it.hour })
+            .mapNotNull { (dayGroup, items) ->
+                HourGroup(
+                    hour = dayGroup.hour,
+                    isCurrentHour = dayGroup.hour == today.hour &&
+                            dayGroup.day == today.day &&
+                            dayGroup.month == today.month.ordinal &&
+                            dayGroup.year == today.year,
+                    items = items,
+                )
+            }
+            .sortedByDescending { it.hour }
+
         DrinkState.Data(
             date = date,
-            records = records
-                .sortedBy { it.timestamp }
-                .reversed(),
+            historyRecords = historyRecords,
             goalAmount = stats.first.goalAmountToString(),
             drinkAmount = stats.second,
             isAlarmActive = drinkAlarmState.active,

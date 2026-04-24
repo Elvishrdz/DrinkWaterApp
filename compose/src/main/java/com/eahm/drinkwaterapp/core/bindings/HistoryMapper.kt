@@ -4,10 +4,6 @@ import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.database.entity.Status
 import com.eahm.drinkwaterapp.ui.historylist.HistoryUI
 
-fun List<HistoryEntity>.toUI(): List<HistoryUI> {
-    return map { it.toUI() }
-}
-
 fun HistoryEntity.toUI(): HistoryUI {
     return HistoryUI(
         id = id,

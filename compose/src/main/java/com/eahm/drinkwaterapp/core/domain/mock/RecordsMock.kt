@@ -1,7 +1,9 @@
 package com.eahm.drinkwaterapp.core.domain.mock
 
+import com.eahm.drinkwaterapp.core.bindings.toUI
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.database.entity.Status
+import com.eahm.drinkwaterapp.ui.historylist.HourGroup
 import kotlinx.datetime.LocalDateTime
 
 object Mock
@@ -27,4 +29,18 @@ val Mock.recordsMock
             status = Status.IN_APP,
             timestamp = localDateTimeMock,
         )
+    )
+
+val Mock.hourGroupMock
+    get() = listOf(
+        HourGroup(
+            hour = 8,
+            isCurrentHour = false,
+            items = Mock.recordsMock.map { it.toUI() }
+        ),
+        HourGroup(
+            hour = 9,
+            isCurrentHour = false,
+            items = Mock.recordsMock.map { it.toUI() }
+        ),
     )

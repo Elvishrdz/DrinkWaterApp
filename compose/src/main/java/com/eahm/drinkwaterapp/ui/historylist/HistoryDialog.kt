@@ -34,13 +34,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.eahm.drinkwaterapp.R
-import com.eahm.drinkwaterapp.core.bindings.toUI
 import com.eahm.drinkwaterapp.core.domain.mock.Mock
+import com.eahm.drinkwaterapp.core.domain.mock.hourGroupMock
 import com.eahm.drinkwaterapp.core.domain.mock.localDateTimeMock
-import com.eahm.drinkwaterapp.core.domain.mock.recordsMock
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
 import java.util.Calendar
 import java.util.Locale
 import kotlin.time.ExperimentalTime
@@ -52,8 +49,16 @@ data class HistoryUI(
     val timestamp: LocalDateTime,
 )
 
+data class DayGroup(
+    val hour: Int,
+    val day: Int,
+    val month: Int,
+    val year: Int,
+)
+
 data class HourGroup(
     val hour: Int,
+    val isCurrentHour: Boolean,
     val items: List<HistoryUI>
 )
 
@@ -61,7 +66,7 @@ data class HourGroup(
 @Composable
 fun HistoryDialog(
     date: LocalDateTime,
-    records: List<HistoryUI>,
+    historyRecords: List<HourGroup>,
     onDelete: (HistoryUI) -> Unit,
     onDateChanged: (LocalDateTime) -> Unit,
     onDismiss: () -> Unit,
@@ -99,7 +104,7 @@ fun HistoryDialog(
                 )
 
                 HistoryTimeline(
-                    items = records,
+                    historyRecords = historyRecords,
                     onDelete = onDelete,
                     modifier = Modifier.weight(1f),
                 )
@@ -127,7 +132,7 @@ fun HistoryDialog(
 private fun HistoryDialogPreview() {
     HistoryDialog(
         date = Mock.localDateTimeMock,
-        records = Mock.recordsMock.toUI(),
+        historyRecords = Mock.hourGroupMock,
         onDismiss = {},
         onDelete = {},
         onDateChanged = {},
@@ -137,23 +142,10 @@ private fun HistoryDialogPreview() {
 @OptIn(ExperimentalTime::class)
 @Composable
 fun HistoryTimeline(
-    items: List<HistoryUI>,
+    historyRecords: List<HourGroup>,
     onDelete: (HistoryUI) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val groupedItems = items
-        .sortedByDescending { it.timestamp }
-        .groupBy { item ->
-            val calendar = Calendar.getInstance().apply {
-                timeInMillis =
-                    item.timestamp.toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
-            }
-            calendar.get(Calendar.HOUR_OF_DAY)
-        }
-        .toSortedMap(compareBy { it })
-        .map { (hour, items) -> HourGroup(hour, items) }
-        .sortedByDescending { it.hour }
-
     val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
 
     LazyColumn(
@@ -162,12 +154,10 @@ fun HistoryTimeline(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(groupedItems) { hourGroup ->
+        items(historyRecords) { hourGroup ->
             TimelineHourGroup(
                 hourGroup = hourGroup,
-                // TODO: fix: check if date matches today
-                isCurrentHour = hourGroup.hour == currentHour,
-                isLastGroup = hourGroup == groupedItems.last(),
+                isCurrentHour = hourGroup.isCurrentHour,
                 onDelete = onDelete,
                 modifier = Modifier.animateItem(),
             )
@@ -179,9 +169,8 @@ fun HistoryTimeline(
 private fun TimelineHourGroup(
     hourGroup: HourGroup,
     isCurrentHour: Boolean,
-    isLastGroup: Boolean,
     onDelete: (HistoryUI) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
         Row(
