@@ -82,6 +82,7 @@ internal fun DrinkScreen(
             date = state.date,
             records = state.records,
             goalAmount = state.goalAmount,
+            drinkAmount = state.drinkAmount,
             isAlarmActive = state.isAlarmActive,
             alarmInterval = state.alarmInterval,
             alarmNextInterval = state.alarmNextInterval,
@@ -101,6 +102,7 @@ private fun Content(
     date: LocalDateTime,
     records: List<HistoryEntity>,
     goalAmount: String,
+    drinkAmount: Float,
     isAlarmActive: Boolean,
     alarmInterval: AlarmInterval,
     alarmNextInterval: AlarmInterval?,
@@ -148,6 +150,10 @@ private fun Content(
 
             Text(
                 text = "alarm at $selected",
+            )
+
+            Text(
+                text = "total drink amount of today: $drinkAmount",
             )
             AppTimeSelectorButton(
                 text = "Set Alarm Time",
@@ -211,6 +217,7 @@ private fun DrinkScreenPreview() {
             date = Mock.localDateTimeMock,
             records = Mock.recordsMock,
             goalAmount = "1000",
+            drinkAmount = 0f,
             isAlarmActive = true,
             alarmInterval = AlarmInterval(0, 5),
             alarmNextInterval = null,

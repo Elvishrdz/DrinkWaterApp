@@ -39,4 +39,13 @@ interface HistoryDao {
         """
     )
     fun findByTimestamp(start: LocalDateTime, end: LocalDateTime): List<HistoryEntity>
+
+    @Query(
+        """
+        SELECT SUM(drink_amount) 
+        FROM HistoryEntity
+        WHERE timestamp BETWEEN :start AND :end       
+        """
+    )
+    fun getTotalDrinkAmount(start: LocalDateTime, end: LocalDateTime): Flow<Float>
 }

@@ -44,6 +44,8 @@ internal class DrinkViewModel(
 
     private val goalAmount = prefsStorage.getGoalAmount()
 
+    private val drinkAmount = dao.getTotalDrinkAmount(today.toStartOfDayTime, today.toEndOfDayTime)
+
     private val records = historyDate.map {
         withContext(Dispatchers.IO) {
             dao.findByTimestamp(
@@ -59,19 +61,35 @@ internal class DrinkViewModel(
 
     private val firstSetup = prefsStorage.getFirstSetupDone()
 
+    private val stats = combine(
+        firstSetup,
+        goalAmount,
+        drinkAmount,
+    ) { _, goalAmount, drinkAmount ->
+        Pair(
+            goalAmount,
+            drinkAmount
+        )
+
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Lazily,
+        initialValue = Pair(0f, 0f),
+    )
+
     val state = combine(
         historyDate,
         records,
-        firstSetup,
-        goalAmount,
+        stats,
         drinkAlarmManager.state,
-    ) { date, records, _, goalAmount, drinkAlarmState ->
+    ) { date, records, stats, drinkAlarmState ->
         DrinkState.Data(
             date = date,
             records = records
                 .sortedBy { it.timestamp }
                 .reversed(),
-            goalAmount = goalAmount.goalAmountToString(),
+            goalAmount = stats.first.goalAmountToString(),
+            drinkAmount = stats.second,
             isAlarmActive = drinkAlarmState.active,
             alarmInterval = drinkAlarmState.interval,
             alarmNextInterval = drinkAlarmState.nextInterval,
