@@ -101,6 +101,7 @@ public class FloatWidgetService extends Service {
             private int initialY;
             private float initialTouchX;
             private float initialTouchY;
+
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
@@ -127,7 +128,7 @@ public class FloatWidgetService extends Service {
                                                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                                                 PixelFormat.TRANSLUCENT);
                                     } else {
-                                       params = new WindowManager.LayoutParams(
+                                        params = new WindowManager.LayoutParams(
                                                 WindowManager.LayoutParams.MATCH_PARENT,
                                                 WindowManager.LayoutParams.WRAP_CONTENT,
                                                 WindowManager.LayoutParams.TYPE_PHONE,
@@ -168,7 +169,7 @@ public class FloatWidgetService extends Service {
         String description = getString(R.string.text_congratulations_01) + " " + new Utils().getFinalProgressString(false, this) + " " + getString(R.string.text_congratulations_02) + " " + new Utils().getGoalString(false, this) + " " + getString(R.string.text_congratulations_03);
 
         int random = new Utils().getRandomNumber(1, 6);
-        switch (random){
+        switch (random) {
             case 1:
                 imageViewIcon.setImageDrawable(getResources().getDrawable(R.drawable.icon_glass_of_water_01));
                 cardViewCongratulations.setCardBackgroundColor(getResources().getColor(R.color.blue_water));
@@ -244,5 +245,4 @@ public class FloatWidgetService extends Service {
         super.onDestroy();
         if (mFloatingWidget != null) mWindowManager.removeView(mFloatingWidget);
     }
-
 }

@@ -1,11 +1,14 @@
 package com.eahm.drinkwaterapp.feature.drink
 
 import android.app.Application
+import android.content.Intent
+import android.provider.Settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.core.bindings.toUI
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
+import com.eahm.drinkwaterapp.core.data.goalreachedwidget.GoalReachedWidget
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.database.entity.Status
@@ -137,6 +140,11 @@ internal class DrinkViewModel(
                 dao.insertAll(record)
 
                 drinkAlarmManager.setupAlarm(application)
+            }
+
+            if (Settings.canDrawOverlays(application)) {
+                val intent = Intent(application, GoalReachedWidget::class.java)
+                application.startService(intent)
             }
         }
     }

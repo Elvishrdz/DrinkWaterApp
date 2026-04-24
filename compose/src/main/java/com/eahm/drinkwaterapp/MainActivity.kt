@@ -2,9 +2,12 @@ package com.eahm.drinkwaterapp
 
 import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.core.app.ActivityCompat
+import androidx.core.net.toUri
 import com.eahm.drinkwaterapp.core.data.systemnotifications.handleNotificationIntentOnCreate
 import com.eahm.drinkwaterapp.core.data.systemnotifications.handleNotificationIntentOnNewIntent
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -19,6 +22,15 @@ class MainActivity : ComponentActivity() {
             DrinkWaterAppTheme {
                 DrinkRoot()
             }
+        }
+
+        if (!Settings.canDrawOverlays(application)) {
+            val intent = Intent(
+                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                ("package:" + application.packageName).toUri()
+            )
+
+            ActivityCompat.startActivityForResult(this, intent, 137, null)
         }
     }
 

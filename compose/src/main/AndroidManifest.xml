@@ -7,6 +7,9 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- Required to show the floating widget when reaching your daily goal -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
     <application
         android:name=".BaseApplication"
         android:allowBackup="true"
@@ -38,5 +41,11 @@
                 <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
+        <service
+            android:name=".core.data.goalreachedwidget.GoalReachedWidget"
+            android:enabled="true"
+            android:exported="false" />
+
     </application>
 </manifest>
