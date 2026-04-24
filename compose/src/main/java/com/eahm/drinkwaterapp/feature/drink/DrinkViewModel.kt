@@ -17,10 +17,12 @@ import com.eahm.drinkwaterapp.ui.historylist.HourGroup
 import com.eahm.drinkwaterapp.ui.inputfield.goalAmountToString
 import com.eahm.drinkwaterapp.ui.inputfield.validateAmount
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -49,18 +51,20 @@ internal class DrinkViewModel(
 
     private val drinkAmount = dao.getTotalDrinkAmount(today.toStartOfDayTime, today.toEndOfDayTime)
 
-    private val records = historyDate.map {
-        withContext(Dispatchers.IO) {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val records = historyDate
+        .flatMapLatest {
             dao.findByTimestamp(
                 start = it.toStartOfDayTime,
                 end = it.toEndOfDayTime,
             )
         }
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Lazily,
-        initialValue = emptyList(),
-    )
+        .flowOn(Dispatchers.IO)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Lazily,
+            initialValue = emptyList(),
+        )
 
     private val firstSetup = prefsStorage.getFirstSetupDone()
 
