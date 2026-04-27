@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.core.bindings.toUI
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
+import com.eahm.drinkwaterapp.core.data.goalreachedwidget.ComposeWidget
 import com.eahm.drinkwaterapp.core.data.goalreachedwidget.GoalReachedWidget
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
@@ -131,16 +132,16 @@ internal class DrinkViewModel(
 
     fun onDrink(amount: Float) {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                val record = HistoryEntity(
-                    amount = amount,
-                    status = Status.IN_APP,
-                )
-
-                dao.insertAll(record)
-
-                drinkAlarmManager.setupAlarm(application)
-            }
+//            withContext(Dispatchers.IO) {
+//                val record = HistoryEntity(
+//                    amount = amount,
+//                    status = Status.IN_APP,
+//                )
+//
+//                dao.insertAll(record)
+//
+//                drinkAlarmManager.setupAlarm(application)
+//            }
 
             if (Settings.canDrawOverlays(application)) {
                 val intent = Intent(application, GoalReachedWidget::class.java)

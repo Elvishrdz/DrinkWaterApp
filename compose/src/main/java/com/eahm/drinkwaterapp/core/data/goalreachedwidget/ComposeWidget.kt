@@ -11,11 +11,18 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
+import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -79,6 +86,8 @@ class ComposeWidget : Service(),
         params.gravity = Gravity.TOP or Gravity.START
         params.x = 0
         params.y = 100
+
+        showOverlay()
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -115,26 +124,33 @@ class ComposeWidget : Service(),
             setViewTreeSavedStateRegistryOwner(this@ComposeWidget)
             setContent {
                 Box(
-                    modifier = Modifier.Companion
+                    modifier = Modifier
                         .fillMaxSize()
                 ) {
+                    var clicks by remember { mutableStateOf(0) }
                     Card(
-                        modifier = Modifier.Companion
-                            .align(Alignment.Companion.TopCenter)
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .clickable(
+                                onClick = {
+                                    clicks++
+                                }
+                            )
                     ) {
-                        Image(
-                            modifier = Modifier.Companion
-                                .width(200.dp)
-                                .offset(y = 100.dp),
-                            painter = painterResource(id = R.drawable.icon_trophy_01),
-                            contentDescription = null
-                        )
+                        Column {
+                            Text("Clicks $clicks")
+                            Image(
+                                modifier = Modifier
+                                    .width(200.dp)
+                                    .offset(y = 100.dp),
+                                painter = painterResource(id = R.drawable.icon_trophy_01),
+                                contentDescription = null
+                            )
+                        }
                     }
                 }
             }
         }
-
-        windowManager.addView(overlayView, getLayoutParams())
 
         overlayView?.setOnTouchListener(object : View.OnTouchListener {
             private var initialX = 0
@@ -152,6 +168,38 @@ class ComposeWidget : Service(),
                         return true
                     }
 
+                    MotionEvent.ACTION_UP -> {
+                        val Xdiff = (event.getRawX() - initialTouchX).toInt()
+                        val Ydiff = (event.getRawY() - initialTouchY).toInt()
+                        if (Xdiff < 10 && Ydiff < 10) {
+
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                params = WindowManager.LayoutParams(
+                                    WindowManager.LayoutParams.MATCH_PARENT,
+                                    WindowManager.LayoutParams.WRAP_CONTENT,
+                                    WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                                    PixelFormat.TRANSLUCENT
+                                )
+                            } else {
+                                params = WindowManager.LayoutParams(
+                                    WindowManager.LayoutParams.MATCH_PARENT,
+                                    WindowManager.LayoutParams.WRAP_CONTENT,
+                                    WindowManager.LayoutParams.TYPE_PHONE,
+                                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                                    PixelFormat.TRANSLUCENT
+                                )
+                            }
+
+                            params.gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
+                            params.x = 0
+                            params.y = 0
+
+                            mWindowManager.updateViewLayout(overlayView, params)
+                        }
+                        return true
+                    }
+
                     MotionEvent.ACTION_MOVE -> {
                         params.x = initialX + (event.getRawX() - initialTouchX).toInt()
                         params.y = initialY + (event.getRawY() - initialTouchY).toInt()
@@ -164,6 +212,8 @@ class ComposeWidget : Service(),
                 return false
             }
         })
+        windowManager.addView(overlayView, getLayoutParams())
+
     }
 
     private fun hideOverlay() {
