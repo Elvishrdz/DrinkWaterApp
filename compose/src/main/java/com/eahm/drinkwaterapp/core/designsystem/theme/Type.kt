@@ -2,6 +2,7 @@ package com.eahm.drinkwaterapp.core.designsystem.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.googlefonts.Font
 import androidx.compose.ui.text.googlefonts.GoogleFont
@@ -14,7 +15,7 @@ private val provider = GoogleFont.Provider(
     certificates = R.array.com_google_android_gms_fonts_certs,
 )
 
-private val PlusJakartaSans = androidx.compose.ui.text.font.FontFamily(
+internal val PlusJakartaSans = FontFamily(
     Font(GoogleFont("Plus Jakarta Sans"), provider, FontWeight.Normal),
     Font(GoogleFont("Plus Jakarta Sans"), provider, FontWeight.Medium),
     Font(GoogleFont("Plus Jakarta Sans"), provider, FontWeight.SemiBold),
@@ -22,14 +23,14 @@ private val PlusJakartaSans = androidx.compose.ui.text.font.FontFamily(
     Font(GoogleFont("Plus Jakarta Sans"), provider, FontWeight.ExtraBold),
 )
 
-private val Nunito = androidx.compose.ui.text.font.FontFamily(
+internal val Nunito = FontFamily(
     Font(GoogleFont("Nunito"), provider, FontWeight.Normal),
     Font(GoogleFont("Nunito"), provider, FontWeight.SemiBold),
     Font(GoogleFont("Nunito"), provider, FontWeight.Bold),
     Font(GoogleFont("Nunito"), provider, FontWeight.ExtraBold),
 )
 
-private val JetBrainsMono = androidx.compose.ui.text.font.FontFamily(
+internal val JetBrainsMono: FontFamily = FontFamily(
     Font(GoogleFont("JetBrains Mono"), provider, FontWeight.Normal),
     Font(GoogleFont("JetBrains Mono"), provider, FontWeight.Medium),
 )
