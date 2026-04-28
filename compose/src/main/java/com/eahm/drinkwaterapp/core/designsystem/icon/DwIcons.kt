@@ -222,4 +222,185 @@ object DwIcons {
             }
         }.build()
     }
+
+    val Bell: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "DwBell",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).apply {
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(6f, 8f)
+                arcToRelative(6f, 6f, 0f, false, true, 12f, 0f)
+                curveToRelative(0f, 7f, 3f, 9f, 3f, 9f)
+                horizontalLineTo(3f)
+                reflectiveCurveToRelative(3f, -2f, 3f, -9f)
+            }
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(10.3f, 21f)
+                arcToRelative(1.94f, 1.94f, 0f, false, false, 3.4f, 0f)
+            }
+        }.build()
+    }
+
+    val Clock: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "DwClock",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).apply {
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(12f, 2f)
+                curveToRelative(5.523f, 0f, 10f, 4.477f, 10f, 10f)
+                curveToRelative(0f, 5.523f, -4.477f, 10f, -10f, 10f)
+                curveToRelative(-5.523f, 0f, -10f, -4.477f, -10f, -10f)
+                curveToRelative(0f, -5.523f, 4.477f, -10f, 10f, -10f)
+                close()
+            }
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(12f, 6f)
+                lineTo(12f, 12f)
+                lineTo(16f, 14f)
+            }
+        }.build()
+    }
+
+    val Sun: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "DwSun",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).apply {
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(12f, 8f)
+                curveToRelative(2.209f, 0f, 4f, 1.791f, 4f, 4f)
+                curveToRelative(0f, 2.209f, -1.791f, 4f, -4f, 4f)
+                curveToRelative(-2.209f, 0f, -4f, -1.791f, -4f, -4f)
+                curveToRelative(0f, -2.209f, 1.791f, -4f, 4f, -4f)
+                close()
+            }
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round
+            ) {
+                moveTo(12f, 2f); lineTo(12f, 4f)
+                moveTo(12f, 20f); lineTo(12f, 22f)
+                moveTo(2f, 12f); lineTo(4f, 12f)
+                moveTo(20f, 12f); lineTo(22f, 12f)
+                moveTo(4.93f, 4.93f); lineTo(6.34f, 6.34f)
+                moveTo(17.66f, 17.66f); lineTo(19.07f, 19.07f)
+                moveTo(4.93f, 19.07f); lineTo(6.34f, 17.66f)
+                moveTo(17.66f, 6.34f); lineTo(19.07f, 4.93f)
+            }
+        }.build()
+    }
+
+    val Moon: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "DwMoon",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).apply {
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(12f, 3f)
+                arcToRelative(6f, 6f, 0f, false, false, 9f, 9f)
+                arcToRelative(9f, 9f, 0f, true, true, -9f, -9f)
+                close()
+            }
+        }.build()
+    }
+
+    val Share: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "DwShare",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).apply {
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(4f, 12f)
+                verticalLineToRelative(8f)
+                arcToRelative(2f, 2f, 0f, false, false, 2f, 2f)
+                horizontalLineToRelative(12f)
+                arcToRelative(2f, 2f, 0f, false, false, 2f, -2f)
+                verticalLineToRelative(-8f)
+                moveTo(16f, 6f)
+                lineToRelative(-4f, -4f)
+                lineToRelative(-4f, 4f)
+                moveTo(12f, 2f)
+                verticalLineTo(15f)
+            }
+        }.build()
+    }
+
+    val Ruler: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "DwRuler",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).apply {
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(5f, 8f)
+                lineTo(10f, 3f)
+                lineTo(21f, 14f)
+                lineTo(16f, 19f)
+                close()
+                moveTo(7.5f, 10.5f); lineTo(10f, 8f)
+                moveTo(10.5f, 13.5f); lineTo(13f, 11f)
+                moveTo(13.5f, 16.5f); lineTo(16f, 14f)
+            }
+        }.build()
+    }
 }
