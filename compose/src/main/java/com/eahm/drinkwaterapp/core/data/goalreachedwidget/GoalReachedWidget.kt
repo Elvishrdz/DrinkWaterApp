@@ -11,7 +11,6 @@ import android.view.View
 import android.view.WindowManager
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
@@ -74,7 +73,7 @@ class GoalReachedWidget : Service(),
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             params = WindowManager.LayoutParams(
-                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
@@ -82,7 +81,7 @@ class GoalReachedWidget : Service(),
             )
         } else {
             params = WindowManager.LayoutParams(
-                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.TYPE_PHONE,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
@@ -90,9 +89,9 @@ class GoalReachedWidget : Service(),
             )
         }
 
-        params.gravity = Gravity.TOP or Gravity.START
+        params.gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
         params.x = 0
-        params.y = 100
+        params.y = 0
 
         mWindowManager.addView(widgetView, params)
 
@@ -102,7 +101,7 @@ class GoalReachedWidget : Service(),
             setContent {
                 ButtonContent(
                     modifier = Modifier
-                        .width(300.dp)
+                        .fillMaxWidth()
                         .padding(horizontal = 10.dp),
                     onClose = { stopSelf() },
                     onDrag = { dx, dy ->
@@ -117,8 +116,8 @@ class GoalReachedWidget : Service(),
 
     override fun onDestroy() {
         super.onDestroy()
+        if (widgetView != null) mWindowManager.removeView(widgetView)
         _lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
         _viewModelStore.clear()
-        if (widgetView != null) mWindowManager.removeView(widgetView)
     }
 }
