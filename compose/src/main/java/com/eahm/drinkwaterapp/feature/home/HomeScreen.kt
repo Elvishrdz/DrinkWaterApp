@@ -22,7 +22,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
 import com.eahm.drinkwaterapp.feature.drink.DrinkRoot
 import com.eahm.drinkwaterapp.feature.history.HistoryRoot
 import com.eahm.drinkwaterapp.feature.home.settings.SettingsScreen
-import com.eahm.drinkwaterapp.feature.home.stats.StatsScreen
+import com.eahm.drinkwaterapp.feature.stats.StatsScreen
 
 enum class HomeDestination(
     val label: String,

@@ -1,7 +1,6 @@
 package com.eahm.drinkwaterapp.feature.drink.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,18 +24,17 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.eahm.drinkwaterapp.core.designsystem.component.extension.outlineBorderStyle
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk100
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk900
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwPaper
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
 
-private val ChipShape = RoundedCornerShape(14.dp)
+
 private val presets = listOf(100, 250, 500)
 
 @Composable
@@ -73,9 +71,8 @@ private fun WaterChip(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = modifier
-            .clip(ChipShape)
-            .background(DwPaper)
-            .border(1.dp, DwInk100, ChipShape)
+
+            .outlineBorderStyle()
             .clickable(onClick = onClick)
             .padding(vertical = 10.dp, horizontal = 6.dp)
     ) {
@@ -122,7 +119,7 @@ private fun CustomChip(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = modifier
-            .clip(ChipShape)
+            .clip(RoundedCornerShape(14.dp))
             .background(DwTintMagenta)
             .clickable(onClick = onClick)
             .padding(vertical = 10.dp, horizontal = 6.dp)
