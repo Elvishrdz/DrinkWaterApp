@@ -1,6 +1,7 @@
 package com.eahm.drinkwaterapp.core.data.goalreachedwidget
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,16 +16,25 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.R
 
 @Composable
-fun ButtonContent() {
+fun ButtonContent(
+    modifier: Modifier = Modifier,
+    onClose: () -> Unit,
+    onDrag: (dx: Float, dy: Float) -> Unit,
+) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = modifier
+            .pointerInput(Unit) {
+                detectDragGestures { _, dragAmount ->
+                    onDrag(dragAmount.x, dragAmount.y)
+                }
+            },
         shape = CardDefaults.shape,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.background,
@@ -69,7 +79,7 @@ fun ButtonContent() {
         Button(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally),
-            onClick = {}
+            onClick = onClose,
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -91,5 +101,8 @@ fun ButtonContent() {
 @Preview(showBackground = true)
 @Composable
 private fun ButtonContentPreview() {
-    ButtonContent()
+    ButtonContent(
+        onClose = {},
+        onDrag = { _, _ -> },
+    )
 }
