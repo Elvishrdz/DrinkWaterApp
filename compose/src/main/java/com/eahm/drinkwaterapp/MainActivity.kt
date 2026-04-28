@@ -11,7 +11,7 @@ import androidx.core.net.toUri
 import com.eahm.drinkwaterapp.core.data.systemnotifications.handleNotificationIntentOnCreate
 import com.eahm.drinkwaterapp.core.data.systemnotifications.handleNotificationIntentOnNewIntent
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
-import com.eahm.drinkwaterapp.feature.drink.DrinkRoot
+import com.eahm.drinkwaterapp.feature.home.HomeScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,7 +20,7 @@ class MainActivity : ComponentActivity() {
         handleNotificationIntentOnCreate(intent)
         setContent {
             DrinkWaterAppTheme {
-                DrinkRoot()
+                HomeScreen()
             }
         }
 

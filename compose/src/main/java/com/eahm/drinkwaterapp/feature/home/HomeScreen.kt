@@ -20,6 +20,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
 import com.eahm.drinkwaterapp.feature.drink.DrinkRoot
+import com.eahm.drinkwaterapp.feature.history.HistoryRoot
 import com.eahm.drinkwaterapp.feature.home.settings.SettingsScreen
 import com.eahm.drinkwaterapp.feature.home.stats.StatsScreen
 
@@ -29,6 +30,7 @@ enum class HomeDestination(
 ) {
     TODAY("Today", DwIcons.Drop),
     STATS("Stats", DwIcons.Wave),
+    HISTORY("History", DwIcons.Plus), // TODO: set a different icon
     SETTINGS("Settings", DwIcons.Settings),
 }
 
@@ -73,6 +75,7 @@ internal fun HomeScreen() {
         when (currentDestination) {
             HomeDestination.TODAY -> DrinkRoot()
             HomeDestination.STATS -> StatsScreen()
+            HomeDestination.HISTORY -> HistoryRoot()
             HomeDestination.SETTINGS -> SettingsScreen()
         }
     }
