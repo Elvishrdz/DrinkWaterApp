@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(./gradlew:*)",
-      "Bash(bash gradlew :compose:assembleDebug)"
-    ]
-  }
-}
