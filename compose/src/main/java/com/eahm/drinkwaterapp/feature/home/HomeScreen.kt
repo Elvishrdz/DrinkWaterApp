@@ -1,87 +1,98 @@
 package com.eahm.drinkwaterapp.feature.home
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
-import com.eahm.drinkwaterapp.R
-import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
+import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
-import org.koin.compose.koinInject
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk100
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
+import com.eahm.drinkwaterapp.feature.home.settings.SettingsScreen
+import com.eahm.drinkwaterapp.feature.home.stats.StatsScreen
+import com.eahm.drinkwaterapp.feature.home.today.TodayScreen
+import com.eahm.drinkwaterapp.feature.home.today.previewLogEntries
+
+enum class HomeDestination(
+    val label: String,
+    val icon: ImageVector,
+) {
+    TODAY("Today", DwIcons.Drop),
+    STATS("Stats", DwIcons.Wave),
+    SETTINGS("Settings", DwIcons.Settings),
+}
 
 @PreviewScreenSizes
 @Composable
 internal fun HomeScreen() {
-    var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
+    var currentDestination by rememberSaveable { mutableStateOf(HomeDestination.TODAY) }
+
+    val itemColors = NavigationSuiteDefaults.itemColors(
+        navigationBarItemColors = NavigationBarItemDefaults.colors(
+            selectedIconColor = DwMagenta,
+            selectedTextColor = DwMagenta,
+            indicatorColor = DwTintMagenta,
+            unselectedIconColor = DwInk400,
+            unselectedTextColor = DwInk400,
+        )
+    )
+
+    val suiteColors = NavigationSuiteDefaults.colors(
+        navigationBarContainerColor = DwInk100.copy(alpha = 0.96f),
+    )
 
     NavigationSuiteScaffold(
+        navigationSuiteColors = suiteColors,
         navigationSuiteItems = {
-            AppDestinations.entries.forEach {
+            HomeDestination.entries.forEach { destination ->
                 item(
                     icon = {
                         Icon(
-                            painterResource(it.icon),
-                            contentDescription = it.label
+                            imageVector = destination.icon,
+                            contentDescription = destination.label
                         )
                     },
-                    label = { Text(it.label) },
-                    selected = it == currentDestination,
-                    onClick = { currentDestination = it }
+                    label = { Text(destination.label) },
+                    selected = destination == currentDestination,
+                    onClick = { currentDestination = destination },
+                    colors = itemColors,
                 )
             }
         }
     ) {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            val prefsStorage = koinInject<PrefsStorage>()
-            val coroutineScope = rememberCoroutineScope()
-            val firstSetup by prefsStorage.getFirstSetupDone()
-                .collectAsState(
-                    initial = false,
-                    context = coroutineScope.coroutineContext,
-                )
-
-            Greeting(
-                name = "Android : $firstSetup",
-                modifier = Modifier.padding(innerPadding)
+        when (currentDestination) {
+            HomeDestination.TODAY -> TodayScreen(
+                name = "Alex",
+                streak = 4,
+                current = 1500,
+                goal = 2400,
+                log = previewLogEntries,
+                onAdd = {},
+                onCustom = {},
+                onSeeAll = {},
             )
+
+            HomeDestination.STATS -> StatsScreen()
+            HomeDestination.SETTINGS -> SettingsScreen()
         }
     }
 }
 
-enum class AppDestinations(
-    val label: String,
-    val icon: Int,
-) {
-    HOME("Home", R.drawable.ic_home),
-    FAVORITES("Favorites", R.drawable.ic_favorite),
-    PROFILE("Profile", R.drawable.ic_account_box),
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
 @Preview(showBackground = true)
 @Composable
-fun HomeScreenPreview() {
+private fun HomeScreenPreview() {
     DrinkWaterAppTheme {
-        Greeting("Android")
+        HomeScreen()
     }
 }
