@@ -8,8 +8,9 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
+import com.eahm.drinkwaterapp.core.designsystem.preview.DwThemePreview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk200
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
@@ -44,11 +45,13 @@ fun DwSecondaryButton(
     }
 }
 
-@Preview
+@DwPreview
 @Composable
 private fun DwSecondaryButtonPreview() {
-    DwSecondaryButton(
-        text = "Secondary",
-        onClick = {},
-    )
+    DwThemePreview {
+        DwSecondaryButton(
+            text = "Secondary",
+            onClick = {},
+        )
+    }
 }

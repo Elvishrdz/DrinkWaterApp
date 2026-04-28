@@ -7,8 +7,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
+import com.eahm.drinkwaterapp.core.designsystem.preview.DwThemePreview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwPillShape
@@ -38,11 +39,13 @@ fun DwTertiaryButton(
     }
 }
 
-@Preview
+@DwPreview
 @Composable
 private fun DwTertiaryButtonPreview() {
-    DwTertiaryButton(
-        text = "Tertiary",
-        onClick = {},
-    )
+    DwThemePreview {
+        DwTertiaryButton(
+            text = "Tertiary",
+            onClick = {},
+        )
+    }
 }

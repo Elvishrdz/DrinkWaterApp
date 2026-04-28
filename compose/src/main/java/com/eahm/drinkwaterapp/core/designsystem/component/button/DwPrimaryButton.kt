@@ -11,8 +11,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
+import com.eahm.drinkwaterapp.core.designsystem.preview.DwThemePreview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk200
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagentaDark
@@ -50,11 +51,13 @@ fun DwPrimaryButton(
     }
 }
 
-@Preview
+@DwPreview
 @Composable
 private fun DwPrimaryButtonPreview() {
-    DwPrimaryButton(
-        text = "Primary",
-        onClick = {},
-    )
+    DwThemePreview {
+        DwPrimaryButton(
+            text = "Primary",
+            onClick = {},
+        )
+    }
 }
