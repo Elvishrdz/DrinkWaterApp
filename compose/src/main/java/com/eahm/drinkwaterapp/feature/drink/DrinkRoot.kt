@@ -27,11 +27,12 @@ import com.eahm.drinkwaterapp.core.domain.mock.drinkStatsMock
 import com.eahm.drinkwaterapp.core.domain.mock.hourGroupMock
 import com.eahm.drinkwaterapp.core.domain.mock.localDateTimeMock
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
+import com.eahm.drinkwaterapp.feature.drink.ui.DrinkScreen
 import com.eahm.drinkwaterapp.ui.drinkbutton.DrinkButton
 import com.eahm.drinkwaterapp.ui.historylist.HistoryButton
 import com.eahm.drinkwaterapp.ui.historylist.HourGroup
 import com.eahm.drinkwaterapp.ui.inputfield.AmountInputField
-import com.eahm.drinkwaterapp.ui.inputfield.goalAmountToString
+import com.eahm.drinkwaterapp.ui.inputfield.toDigitString
 import com.eahm.drinkwaterapp.ui.timepicker.AppTimePickerButton
 import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorButton
 import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
@@ -68,7 +69,7 @@ fun DrinkRoot() {
 }
 
 @Composable
-internal fun DrinkScreen(
+internal fun DrinkScreen2(
     state: DrinkState.Data,
     onDrink: (Float) -> Unit,
     onDelete: (HistoryEntity) -> Unit,
@@ -203,7 +204,7 @@ private fun Content(
                     AmountInputField(
                         modifier = Modifier.fillMaxWidth(),
                         label = "Goal amount (mL)",
-                        value = it.drinkAmount.goalAmountToString(),
+                        value = it.drinkAmount.toDigitString(),
                         onValueSaved = { newAmount ->
                             onGoalAmountChanged(newAmount)
                         },

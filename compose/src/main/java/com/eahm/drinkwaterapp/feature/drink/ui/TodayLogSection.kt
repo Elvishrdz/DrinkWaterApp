@@ -1,10 +1,11 @@
-package com.eahm.drinkwaterapp.feature.home.today
+package com.eahm.drinkwaterapp.feature.drink.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,8 +36,9 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.JetBrainsMono
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
+import com.eahm.drinkwaterapp.ui.inputfield.toDigitString
 
-data class DrinkLogEntry(val time: String, val amount: Int)
+data class DrinkLogEntry(val time: String, val amount: Float)
 
 @Composable
 fun TodayLogSection(
@@ -66,7 +68,7 @@ fun TodayLogSection(
             )
             TextButton(
                 onClick = onSeeAll,
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                contentPadding = PaddingValues(
                     horizontal = 4.dp,
                     vertical = 0.dp
                 )
@@ -135,7 +137,7 @@ private fun DrinkLogRow(entry: DrinkLogEntry) {
         }
 
         Text(
-            text = "${entry.amount} mL",
+            text = "${entry.amount.toDigitString()} mL",
             fontFamily = Nunito,
             fontWeight = FontWeight.Bold,
             fontSize = 14.sp,
@@ -155,11 +157,11 @@ private fun DrinkLogRow(entry: DrinkLogEntry) {
 }
 
 val previewLogEntries = listOf(
-    DrinkLogEntry("09:14", 250),
-    DrinkLogEntry("10:30", 500),
-    DrinkLogEntry("11:45", 100),
-    DrinkLogEntry("13:02", 250),
-    DrinkLogEntry("14:20", 400),
+    DrinkLogEntry("09:14", 250f),
+    DrinkLogEntry("10:30", 500f),
+    DrinkLogEntry("11:45", 100f),
+    DrinkLogEntry("13:02", 250f),
+    DrinkLogEntry("14:20", 400f),
 )
 
 @Preview(showBackground = true, backgroundColor = 0xFFF2F6F9)

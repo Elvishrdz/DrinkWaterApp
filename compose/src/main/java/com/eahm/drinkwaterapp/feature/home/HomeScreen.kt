@@ -19,10 +19,9 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk100
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
+import com.eahm.drinkwaterapp.feature.drink.DrinkRoot
 import com.eahm.drinkwaterapp.feature.home.settings.SettingsScreen
 import com.eahm.drinkwaterapp.feature.home.stats.StatsScreen
-import com.eahm.drinkwaterapp.feature.home.today.TodayScreen
-import com.eahm.drinkwaterapp.feature.home.today.previewLogEntries
 
 enum class HomeDestination(
     val label: String,
@@ -72,17 +71,7 @@ internal fun HomeScreen() {
         }
     ) {
         when (currentDestination) {
-            HomeDestination.TODAY -> TodayScreen(
-                name = "Alex",
-                streak = 4,
-                current = 1500,
-                goal = 2400,
-                log = previewLogEntries,
-                onAdd = {},
-                onCustom = {},
-                onSeeAll = {},
-            )
-
+            HomeDestination.TODAY -> DrinkRoot()
             HomeDestination.STATS -> StatsScreen()
             HomeDestination.SETTINGS -> SettingsScreen()
         }

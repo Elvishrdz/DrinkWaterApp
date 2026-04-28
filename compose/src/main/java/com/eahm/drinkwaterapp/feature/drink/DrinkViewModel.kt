@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.core.bindings.toUI
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
-import com.eahm.drinkwaterapp.core.data.goalreachedwidget.ComposeWidget
 import com.eahm.drinkwaterapp.core.data.goalreachedwidget.GoalReachedWidget
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
@@ -16,6 +15,7 @@ import com.eahm.drinkwaterapp.core.database.entity.Status
 import com.eahm.drinkwaterapp.core.domain.extension.toEndOfDayTime
 import com.eahm.drinkwaterapp.core.domain.extension.toStartOfDayTime
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
+import com.eahm.drinkwaterapp.feature.drink.ui.DrinkLogEntry
 import com.eahm.drinkwaterapp.ui.historylist.DayGroup
 import com.eahm.drinkwaterapp.ui.historylist.HourGroup
 import com.eahm.drinkwaterapp.ui.inputfield.validateAmount
@@ -31,7 +31,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format
+import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -116,9 +119,30 @@ internal class DrinkViewModel(
             }
             .sortedByDescending { it.hour }
 
+        val todayLogs = records
+            //  TODO: filter from current time to latest 4 records
+            .filter { it.timestamp in today.toStartOfDayTime..today.toEndOfDayTime }
+            //.take(4)
+            .sortedByDescending { it.timestamp }
+            .map {
+                DrinkLogEntry(
+                    time = it.timestamp.time.format(
+                        LocalTime.Format {
+                            hour()
+                            char(':')
+                            minute()
+                        }
+                    ),
+                    amount = it.amount,
+                )
+            }
+
         DrinkState.Data(
+            username = "Elvis",
+            currentStreak = 0,
             date = date,
             historyRecords = historyRecords,
+            todayLogs = todayLogs,
             drinkStats = drinkStats,
             isAlarmActive = drinkAlarmState.active,
             alarmInterval = drinkAlarmState.interval,
@@ -132,20 +156,15 @@ internal class DrinkViewModel(
 
     fun onDrink(amount: Float) {
         viewModelScope.launch {
-//            withContext(Dispatchers.IO) {
-//                val record = HistoryEntity(
-//                    amount = amount,
-//                    status = Status.IN_APP,
-//                )
-//
-//                dao.insertAll(record)
-//
-//                drinkAlarmManager.setupAlarm(application)
-//            }
+            withContext(Dispatchers.IO) {
+                val record = HistoryEntity(
+                    amount = amount,
+                    status = Status.IN_APP,
+                )
 
-            if (Settings.canDrawOverlays(application)) {
-                val intent = Intent(application, GoalReachedWidget::class.java)
-                application.startService(intent)
+                dao.insertAll(record)
+
+                drinkAlarmManager.setupAlarm(application)
             }
         }
     }
@@ -174,6 +193,13 @@ internal class DrinkViewModel(
 
     fun onAlarmIntervalChange(alarmInterval: AlarmInterval) {
         drinkAlarmManager.setInterval(alarmInterval.hour, alarmInterval.minute)
+    }
+
+    fun displayGoalReachedOverlay() {
+        if (Settings.canDrawOverlays(application)) {
+            val intent = Intent(application, GoalReachedWidget::class.java)
+            application.startService(intent)
+        }
     }
 
     fun onStopAlarm() = drinkAlarmManager.stop()

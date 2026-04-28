@@ -1,5 +1,6 @@
-package com.eahm.drinkwaterapp.feature.home.today
+package com.eahm.drinkwaterapp.feature.drink.ui
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
@@ -41,22 +43,27 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwPaper
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
+import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
+import com.eahm.drinkwaterapp.feature.drink.DrinkState
+import com.eahm.drinkwaterapp.feature.drink.DrinkStats
+import com.eahm.drinkwaterapp.ui.inputfield.AmountInputField
+import com.eahm.drinkwaterapp.ui.inputfield.toDigitString
+import kotlinx.datetime.LocalDateTime
 
 @Composable
-fun TodayScreen(
-    name: String,
-    streak: Int,
-    current: Int,
-    goal: Int,
-    log: List<DrinkLogEntry>,
-    onAdd: (Int) -> Unit,
-    onCustom: () -> Unit,
-    onSeeAll: () -> Unit,
+internal fun DrinkScreen(
+    state: DrinkState.Data,
+    onDrink: (Float) -> Unit,
+    onDelete: (HistoryEntity) -> Unit,
+    onDateChanged: (LocalDateTime) -> Unit,
+    onStopAlarm: () -> Unit,
+    onGoalAmountChanged: (String) -> Unit,
+    getRemainingAlarmTime: () -> String,
+    onAlarmIntervalChange: (AlarmInterval) -> Unit,
+    onCustom: () -> Unit = {},
+    onSeeAll: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
-    val percent = (current.toFloat() / goal.toFloat() * 100f).coerceIn(0f, 100f)
-    val remaining = (goal - current).coerceAtLeast(0)
-
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -65,8 +72,8 @@ fun TodayScreen(
             .padding(bottom = 16.dp)
     ) {
         TodayHeader(
-            name = name,
-            streak = streak,
+            name = state.username,
+            streak = state.currentStreak,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 20.dp, end = 20.dp, top = 20.dp)
@@ -81,20 +88,21 @@ fun TodayScreen(
                 .padding(horizontal = 24.dp)
         ) {
             ProgressRing(
-                percent = percent,
-                current = current,
-                goal = goal
+                current = state.drinkStats?.drinkAmount ?: 0f,
+                goal = state.drinkStats?.goalAmount ?: 0f,
             )
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            RemainingPill(remaining = remaining, current = current, goal = goal)
+            RemainingPill(
+                remaining = state.drinkStats?.remainingAmount ?: 0f,
+            )
         }
 
         Spacer(modifier = Modifier.height(20.dp))
 
         QuickAddRow(
-            onAdd = onAdd,
+            onDrink = onDrink,
             onCustom = onCustom,
             modifier = Modifier.padding(horizontal = 20.dp)
         )
@@ -102,12 +110,25 @@ fun TodayScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         TodayLogSection(
-            items = log,
+            items = state.todayLogs,
             onSeeAll = onSeeAll,
             modifier = Modifier.padding(horizontal = 20.dp)
         )
 
         Spacer(modifier = Modifier.height(8.dp))
+
+        AnimatedVisibility(state.drinkStats != null) {
+            state.drinkStats?.let {
+                AmountInputField(
+                    modifier = Modifier.fillMaxWidth(),
+                    label = "Goal amount (mL)",
+                    value = it.goalAmount.toDigitString(),
+                    onValueSaved = { newAmount ->
+                        onGoalAmountChanged(newAmount)
+                    },
+                )
+            }
+        }
     }
 }
 
@@ -177,11 +198,7 @@ private fun StreakBadge(streak: Int) {
 }
 
 @Composable
-private fun RemainingPill(
-    remaining: Int,
-    current: Int,
-    goal: Int,
-) {
+private fun RemainingPill(remaining: Float) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(999.dp))
@@ -198,7 +215,7 @@ private fun RemainingPill(
                             color = DwWater
                         )
                     ) {
-                        append("$remaining mL")
+                        append("${remaining.toDigitString()} mL")
                     }
                     append(" away from today's goal")
                 },
@@ -226,15 +243,18 @@ private fun RemainingPill(
 @PreviewScreenSizes
 @Preview(showBackground = true)
 @Composable
-private fun TodayScreenPreview() {
+private fun DrinkScreenPreview() {
     DrinkWaterAppTheme {
-        TodayScreen(
-            name = "Alex",
-            streak = 4,
-            current = 1500,
-            goal = 2400,
-            log = previewLogEntries,
-            onAdd = {},
+        DrinkScreen(
+            state = stateMock,
+            onDrink = {},
+            onDelete = {},
+            onDateChanged = {},
+            onStopAlarm = {},
+            onGoalAmountChanged = {},
+            getRemainingAlarmTime = { "" },
+            onAlarmIntervalChange = {},
+
             onCustom = {},
             onSeeAll = {}
         )
@@ -243,15 +263,18 @@ private fun TodayScreenPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun TodayScreenEmptyPreview() {
+private fun DrinkScreenEmptyPreview() {
     DrinkWaterAppTheme {
-        TodayScreen(
-            name = "Alex",
-            streak = 0,
-            current = 0,
-            goal = 2400,
-            log = emptyList(),
-            onAdd = {},
+        DrinkScreen(
+            state = stateMock,
+            onDrink = {},
+            onDelete = {},
+            onDateChanged = {},
+            onStopAlarm = {},
+            onGoalAmountChanged = {},
+            getRemainingAlarmTime = { "" },
+            onAlarmIntervalChange = {},
+
             onCustom = {},
             onSeeAll = {}
         )
@@ -260,17 +283,36 @@ private fun TodayScreenEmptyPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun TodayScreenGoalReachedPreview() {
+private fun DrinkScreenGoalReachedPreview() {
     DrinkWaterAppTheme {
-        TodayScreen(
-            name = "Alex",
-            streak = 12,
-            current = 2500,
-            goal = 2400,
-            log = previewLogEntries,
-            onAdd = {},
+        DrinkScreen(
+            state = stateMock,
+            onDrink = {},
+            onDelete = {},
+            onDateChanged = {},
+            onStopAlarm = {},
+            onGoalAmountChanged = {},
+            getRemainingAlarmTime = { "" },
+            onAlarmIntervalChange = {},
+
             onCustom = {},
             onSeeAll = {}
         )
     }
 }
+
+private val stateMock = DrinkState.Data(
+    username = "Dave",
+    currentStreak = 1,
+    date = LocalDateTime(2023, 1, 1, 12, 0),
+    historyRecords = emptyList(),
+    todayLogs = previewLogEntries,
+    drinkStats = DrinkStats(
+        goalAmount = 2400f,
+        drinkAmount = 1500f,
+        goalReached = false,
+    ),
+    isAlarmActive = false,
+    alarmInterval = AlarmInterval(0, 5),
+    alarmNextInterval = null,
+)

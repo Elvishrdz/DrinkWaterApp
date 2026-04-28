@@ -1,4 +1,4 @@
-package com.eahm.drinkwaterapp.feature.home.today
+package com.eahm.drinkwaterapp.feature.drink.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -41,7 +41,7 @@ private val presets = listOf(100, 250, 500)
 
 @Composable
 fun QuickAddRow(
-    onAdd: (Int) -> Unit,
+    onDrink: (Float) -> Unit,
     onCustom: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -52,7 +52,7 @@ fun QuickAddRow(
         presets.forEach { amount ->
             WaterChip(
                 amount = amount,
-                onClick = { onAdd(amount) },
+                onClick = { onDrink(amount.toFloat()) },
                 modifier = Modifier.weight(1f)
             )
         }
@@ -149,7 +149,7 @@ private fun CustomChip(
 private fun QuickAddRowPreview() {
     DrinkWaterAppTheme {
         QuickAddRow(
-            onAdd = {},
+            onDrink = {},
             onCustom = {},
             modifier = Modifier.padding(16.dp)
         )

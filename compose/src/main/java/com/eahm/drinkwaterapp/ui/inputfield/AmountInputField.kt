@@ -1,6 +1,5 @@
 package com.eahm.drinkwaterapp.ui.inputfield
 
-// ui/components/ValidatedTextField.kt
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -25,6 +24,7 @@ fun AmountInputField(
     onValueSaved: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var focused by rememberSaveable { mutableStateOf(false) }
     var inputValue by rememberSaveable { mutableStateOf(value) }
     var errorMessage by rememberSaveable { mutableStateOf("") }
 
@@ -39,7 +39,8 @@ fun AmountInputField(
             modifier = Modifier
                 .fillMaxWidth()
                 .onFocusChanged { focusState ->
-                    if (!focusState.isFocused) {
+                    // save only after leaving the focus
+                    if (focused && !focusState.isFocused) {
                         val validationResult = validateAmountInput(inputValue)
 
                         if (validationResult.isValid) {
@@ -49,6 +50,8 @@ fun AmountInputField(
                             errorMessage = validationResult.message
                         }
                     }
+
+                    focused = focusState.isFocused
                 },
             value = inputValue,
             onValueChange = { newValue ->
@@ -109,7 +112,7 @@ fun validateAmount(
     return ValidationResult(true, "")
 }
 
-fun Float.goalAmountToString(): String {
+fun Float.toDigitString(): String {
     return if (this % 1f == 0f) {
         toInt().toString()
     } else {

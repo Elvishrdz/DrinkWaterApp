@@ -1,4 +1,4 @@
-package com.eahm.drinkwaterapp.feature.home.today
+package com.eahm.drinkwaterapp.feature.drink.ui
 
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -36,15 +36,19 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterDeep
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterLight
 import com.eahm.drinkwaterapp.core.designsystem.theme.JetBrainsMono
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
+import kotlin.math.roundToInt
 
 @Composable
 fun ProgressRing(
-    percent: Float,
-    current: Int,
-    goal: Int,
+    current: Float,
+    goal: Float,
     modifier: Modifier = Modifier,
     size: Dp = 220.dp,
 ) {
+    val percent = ((current / goal) * 100f)
+        .takeIf { !it.isNaN() } ?: 0f
+        .coerceIn(0f, 100f)
+
     val animatedPercent by animateFloatAsState(
         targetValue = percent.coerceIn(0f, 100f),
         animationSpec = tween(durationMillis = 600, easing = FastOutSlowInEasing),
@@ -93,7 +97,9 @@ fun ProgressRing(
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "${animatedPercent.toInt()}%",
+                text = runCatching { animatedPercent.roundToInt() }
+                    .getOrDefault(0)
+                    .let { "${it}%" },
                 fontFamily = JetBrainsMono,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 11.sp,
@@ -139,12 +145,12 @@ fun ProgressRing(
     }
 }
 
-private fun Int.toLocaleString(): String = "%,d".format(this).replace(',', ' ')
+private fun Float.toLocaleString(): String = "%,d".format(this.toInt()).replace(',', ' ')
 
 @Preview(showBackground = true, backgroundColor = 0xFFF2F6F9)
 @Composable
 private fun ProgressRingPreview() {
     DrinkWaterAppTheme {
-        ProgressRing(percent = 62f, current = 1500, goal = 2400)
+        ProgressRing(current = 1500f, goal = 2400f)
     }
 }
