@@ -1,4 +1,4 @@
-package com.eahm.drinkwaterapp.core.designsystem.custom
+package com.eahm.drinkwaterapp.ui.confetti
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize

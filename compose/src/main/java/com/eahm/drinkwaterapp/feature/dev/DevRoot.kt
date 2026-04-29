@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -43,6 +44,9 @@ import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import com.eahm.drinkwaterapp.feature.drink.Adaptive
 import com.eahm.drinkwaterapp.feature.drink.DrinkStats
 import com.eahm.drinkwaterapp.ui.drinkbutton.DrinkButton
+import com.eahm.drinkwaterapp.ui.drinks.BubbleConfig
+import com.eahm.drinkwaterapp.ui.drinks.DrinkAppearance
+import com.eahm.drinkwaterapp.ui.drinks.DrinkShape
 import com.eahm.drinkwaterapp.ui.historylist.HistoryButton
 import com.eahm.drinkwaterapp.ui.historylist.HourGroup
 import com.eahm.drinkwaterapp.ui.inputfield.AmountInputField
@@ -316,6 +320,20 @@ private fun Content(
                     )
                 }
             }
+
+            DrinkShape(
+                modifier = Modifier
+                    .size(
+                        width = 90.dp,
+                        height = 180.dp,
+                    ),
+                fillFraction = 1f,
+                shape = DrinkShape.Bottle,
+                appearance = DrinkAppearance(),
+                bubbles = BubbleConfig(),
+                onFillChanged = {},
+            )
+
         },
         drink = {
             DrinkButton(
