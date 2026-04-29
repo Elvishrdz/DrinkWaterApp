@@ -21,6 +21,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.eahm.drinkwaterapp.core.data.datastore.DrinkPreset
 import com.eahm.drinkwaterapp.core.designsystem.component.extension.outlineBorderStyle
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -28,12 +29,12 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk900
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
-
-
-private val presets = listOf(100, 250, 500)
+import com.eahm.drinkwaterapp.feature.drink.drinkPresetsMock
+import com.eahm.drinkwaterapp.ui.inputfield.toDigitString
 
 @Composable
 fun QuickAddRow(
+    presets: List<DrinkPreset>,
     onDrink: (Float) -> Unit,
     onCustom: () -> Unit,
     modifier: Modifier = Modifier,
@@ -42,15 +43,16 @@ fun QuickAddRow(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        presets.forEach { amount ->
+        presets.forEach {
             WaterChip(
-                amount = amount,
-                onClick = { onDrink(amount.toFloat()) },
+                amount = it.amountMl,
+                onClick = { onDrink(it.amountMl) },
                 modifier = Modifier.weight(1f)
             )
         }
 
         AddDrinkButton(
+            presets = presets,
             onDrink = { onDrink(it) },
             onCreatePreset = {},
             modifier = Modifier.weight(1f)
@@ -60,7 +62,7 @@ fun QuickAddRow(
 
 @Composable
 fun WaterChip(
-    amount: Int,
+    amount: Float,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -89,7 +91,7 @@ fun WaterChip(
                         color = DwInk900
                     )
                 ) {
-                    append(amount.toString())
+                    append(amount.toDigitString())
                 }
                 withStyle(
                     SpanStyle(
@@ -111,6 +113,7 @@ fun WaterChip(
 private fun QuickAddRowPreview() {
     DrinkWaterAppTheme {
         QuickAddRow(
+            presets = drinkPresetsMock,
             onDrink = {},
             onCustom = {},
             modifier = Modifier.padding(16.dp)

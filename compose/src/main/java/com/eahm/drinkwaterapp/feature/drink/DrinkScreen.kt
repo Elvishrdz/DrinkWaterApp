@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.eahm.drinkwaterapp.core.data.datastore.DrinkPreset
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -104,6 +105,7 @@ internal fun DrinkScreen(
         Spacer(modifier = Modifier.height(20.dp))
 
         QuickAddRow(
+            presets = state.drinkPresets,
             onDrink = onDrink,
             onCustom = onCustom,
             modifier = Modifier.padding(horizontal = 20.dp)
@@ -307,9 +309,16 @@ private fun DrinkScreenGoalReachedPreview() {
     }
 }
 
+internal val drinkPresetsMock = listOf(
+    DrinkPreset(1, 100f),
+    DrinkPreset(2, 200f),
+    DrinkPreset(3, 300f),
+)
+
 private val stateMock = DrinkState.Data(
     username = "Dave",
     currentStreak = 1,
+    drinkPresets = drinkPresetsMock,
     date = LocalDateTime(2023, 1, 1, 12, 0),
     historyRecords = emptyList(),
     todayLogs = previewLogEntries,

@@ -146,19 +146,37 @@ internal class DrinkViewModel(
         initialValue = null,
     )
 
-    val state = combine(
+    private val extras = combine(
         prefsStorage.getUsername(),
+        prefsStorage.getDrinkPresets(),
+    ) { username, drinkPresets ->
+        DrinkExtras(
+            username = username,
+            drinkPresets = drinkPresets
+                .sortedBy { it.order }
+                .toList(),
+        )
+
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Lazily,
+        initialValue = null,
+    )
+
+    val state = combine(
+        extras,
         history,
         drinkStats,
         drinkAlarmManager.state,
-    ) { username, history, drinkStats, drinkAlarmState ->
-        if (history == null) {
+    ) { extras, history, drinkStats, drinkAlarmState ->
+        if (history == null || extras == null) {
             DrinkState.Loading
         } else {
             DrinkState.Data(
-                username = username,
+                username = extras.username,
                 currentStreak = 0,
                 date = history.date,
+                drinkPresets = extras.drinkPresets,
                 historyRecords = history.historyRecords,
                 todayLogs = history.todayLogs,
                 drinkStats = drinkStats,

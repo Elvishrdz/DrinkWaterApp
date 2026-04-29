@@ -1,5 +1,6 @@
 package com.eahm.drinkwaterapp.feature.drink
 
+import com.eahm.drinkwaterapp.core.data.datastore.DrinkPreset
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import com.eahm.drinkwaterapp.feature.drink.ui.DrinkLogEntry
 import com.eahm.drinkwaterapp.ui.historylist.HourGroup
@@ -12,6 +13,7 @@ internal sealed interface DrinkState {
     data class Data(
         val username: String?,
         val currentStreak: Int,
+        val drinkPresets: List<DrinkPreset>,
         val date: LocalDateTime,
         val historyRecords: List<HourGroup>,
         val todayLogs: List<DrinkLogEntry>,
@@ -29,3 +31,8 @@ data class DrinkStats(
 ) {
     val remainingAmount = (goalAmount - drinkAmount).coerceAtLeast(0f)
 }
+
+data class DrinkExtras(
+    val username: String?,
+    val drinkPresets: List<DrinkPreset>,
+)
