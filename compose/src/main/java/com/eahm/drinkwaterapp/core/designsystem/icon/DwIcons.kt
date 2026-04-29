@@ -378,6 +378,63 @@ object DwIcons {
         }.build()
     }
 
+    val History: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "DwHistory",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).apply {
+            // Almost-complete clock arc, leaving a gap at upper-left where the arrow emerges.
+            // First arc: large CCW sweep from (3,12) to (12,3) — most of the circle.
+            // Second arc: small CCW arc that curves into the arrow tip at (3,8).
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round,
+            ) {
+                moveTo(3f, 12f)
+                arcToRelative(9f, 9f, 0f,
+                    isMoreThanHalf = true,
+                    isPositiveArc = false,
+                    dx1 = 9f,
+                    dy1 = -9f,
+                )
+                arcToRelative(9.75f, 9.75f, 0f,
+                    isMoreThanHalf = false,
+                    isPositiveArc = false,
+                    dx1 = -6.74f,
+                    dy1 = 2.74f,
+                )
+                lineTo(3f, 8f)
+            }
+            // Counter-clockwise L-shaped arrow in the upper-left gap.
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(3f, 3f)
+                verticalLineToRelative(5f)
+                horizontalLineToRelative(5f)
+            }
+            // Clock hands: 12 o'clock → center → ~2 o'clock.
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(12f, 7f)
+                verticalLineTo(12f)
+                lineTo(16f, 14f)
+            }
+        }.build()
+    }
+
     val Ruler: ImageVector by lazy {
         ImageVector.Builder(
             name = "DwRuler",

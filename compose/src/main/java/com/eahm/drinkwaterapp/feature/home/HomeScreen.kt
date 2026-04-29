@@ -36,7 +36,7 @@ enum class HomeDestination(
 ) {
     TODAY("Today", DwIcons.Drop),
     STATS("Stats", DwIcons.Wave),
-    HISTORY("History", DwIcons.Plus), // TODO: set a different icon
+    HISTORY("History", DwIcons.History),
     SETTINGS("Settings", DwIcons.Settings),
     DEV("Development", DwIcons.Ruler),
 }
