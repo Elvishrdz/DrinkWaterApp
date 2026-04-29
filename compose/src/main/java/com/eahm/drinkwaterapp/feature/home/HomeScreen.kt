@@ -19,6 +19,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk100
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
+import com.eahm.drinkwaterapp.feature.dev.DevRoot
 import com.eahm.drinkwaterapp.feature.drink.DrinkRoot
 import com.eahm.drinkwaterapp.feature.history.HistoryRoot
 import com.eahm.drinkwaterapp.feature.settings.SettingsScreen
@@ -32,6 +33,7 @@ enum class HomeDestination(
     STATS("Stats", DwIcons.Wave),
     HISTORY("History", DwIcons.Plus), // TODO: set a different icon
     SETTINGS("Settings", DwIcons.Settings),
+    DEV("Development", DwIcons.Ruler),
 }
 
 @PreviewScreenSizes
@@ -77,6 +79,7 @@ internal fun HomeScreen() {
             HomeDestination.STATS -> StatsScreen()
             HomeDestination.HISTORY -> HistoryRoot()
             HomeDestination.SETTINGS -> SettingsScreen()
+            HomeDestination.DEV -> DevRoot { currentDestination = HomeDestination.TODAY }
         }
     }
 }

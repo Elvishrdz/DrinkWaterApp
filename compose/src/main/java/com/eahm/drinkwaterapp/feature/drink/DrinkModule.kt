@@ -1,5 +1,6 @@
 package com.eahm.drinkwaterapp.feature.drink
 
+import com.eahm.drinkwaterapp.feature.dev.DevViewModel
 import com.eahm.drinkwaterapp.feature.history.HistoryViewModel
 import com.eahm.drinkwaterapp.feature.settings.SettingsViewModel
 import com.eahm.drinkwaterapp.feature.stats.StatsViewModel
@@ -11,4 +12,5 @@ val featureDrinkModule = module {
     viewModelOf(::StatsViewModel)
     viewModelOf(::HistoryViewModel)
     viewModelOf(::SettingsViewModel)
+    viewModelOf(::DevViewModel)
 }

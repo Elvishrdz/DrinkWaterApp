@@ -1,5 +1,6 @@
 package com.eahm.drinkwaterapp.feature.dev
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.padding
@@ -11,10 +12,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.window.core.layout.WindowSizeClass
+import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.presentation.getLayoutType
 
 @Composable
-fun DevScreen() {
+internal fun AdaptiveScreen(
+    onBackClicked: () -> Unit,
+) {
+    BackHandler(
+        onBack = onBackClicked,
+    )
+
     val adaptiveInfo = currentWindowAdaptiveInfo()
 
     val window = adaptiveInfo.windowSizeClass
@@ -46,6 +54,13 @@ fun DevScreen() {
             WindowInsets.safeDrawing.asPaddingValues()
         ),
     ) {
+        item {
+            DwPrimaryButton(
+                text = "Back to Menu",
+                onClick = onBackClicked,
+            )
+        }
+
         item {
             Text(
                 text = "adaptive type is: $layoutType",
