@@ -4,41 +4,56 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.eahm.drinkwaterapp.R
+import com.eahm.drinkwaterapp.core.designsystem.component.extension.outlineBorderStyle
+import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk100
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk300
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk900
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
+import com.eahm.drinkwaterapp.core.designsystem.theme.JetBrainsMono
+import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 import com.eahm.drinkwaterapp.core.domain.mock.Mock
 import com.eahm.drinkwaterapp.core.domain.mock.hourGroupMock
 import com.eahm.drinkwaterapp.core.domain.mock.localDateTimeMock
 import kotlinx.datetime.LocalDateTime
-import java.util.Calendar
 import java.util.Locale
 import kotlin.time.ExperimentalTime
 
@@ -61,6 +76,8 @@ data class HourGroup(
     val isCurrentHour: Boolean,
     val items: List<HistoryUI>
 )
+
+private val iconBoxShape = RoundedCornerShape(9.dp)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -93,8 +110,12 @@ fun HistoryDialog(
                 Text(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(horizontal = 4.dp, vertical = 8.dp),
                     text = "History",
+                    fontFamily = PlusJakartaSans,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = DwInk900,
                 )
 
                 DateTimePickerButton(
@@ -115,9 +136,7 @@ fun HistoryDialog(
                 ) {
                     Button(
                         modifier = Modifier.padding(start = 8.dp),
-                        onClick = {
-                            onDismiss()
-                        }
+                        onClick = { onDismiss() }
                     ) {
                         Text(text = "Close")
                     }
@@ -146,13 +165,14 @@ fun HistoryTimeline(
     onDelete: (HistoryUI) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-
     LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        modifier = modifier.fillMaxSize(),
+        contentPadding = PaddingValues(
+            start = 18.dp,
+            end = 18.dp,
+            bottom = 18.dp
+        ),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         items(historyRecords) { hourGroup ->
             TimelineHourGroup(
@@ -172,55 +192,46 @@ private fun TimelineHourGroup(
     onDelete: (HistoryUI) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        // Section header — JetBrainsMono label matching SettingsSection style
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier.padding(horizontal = 4.dp),
         ) {
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.Center
-            ) {
+            Text(
+                text = String.format(Locale.getDefault(), "%02d:00", hourGroup.hour),
+                fontFamily = JetBrainsMono,
+                fontWeight = FontWeight.Medium,
+                fontSize = 11.sp,
+                color = if (isCurrentHour) DwWater else DwInk500,
+                letterSpacing = TextUnit(0.10f, TextUnitType.Em),
+            )
+            if (isCurrentHour) {
+                Spacer(modifier = Modifier.width(2.dp))
                 Text(
-                    text = String.format(
-                        Locale.getDefault(),
-                        "%02d:00", hourGroup.hour,
-                    ),
-                    fontSize = 18.sp,
+                    text = "NOW",
+                    fontFamily = JetBrainsMono,
                     fontWeight = FontWeight.Bold,
-                    color = if (isCurrentHour) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.onSurface
-                    }
+                    fontSize = 11.sp,
+                    color = DwWater,
+                    letterSpacing = TextUnit(0.10f, TextUnitType.Em),
                 )
-                if (isCurrentHour) {
-                    Text(
-                        text = "Ahora",
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+            }
+        }
+
+        // Items grouped in an outline-bordered card, separated by dividers
+        Column(modifier = Modifier.outlineBorderStyle()) {
+            hourGroup.items.forEachIndexed { index, item ->
+                TimelineItemCard(item = item, onDelete = onDelete)
+                if (index < hourGroup.items.lastIndex) {
+                    HorizontalDivider(color = DwInk100)
                 }
             }
         }
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            hourGroup.items.forEach { item ->
-                TimelineItemCard(
-                    item = item,
-                    onDelete = onDelete,
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
     }
 }
 
@@ -228,62 +239,61 @@ private fun TimelineHourGroup(
 private fun TimelineItemCard(
     item: HistoryUI,
     onDelete: (HistoryUI) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(
-                color = MaterialTheme.colorScheme.surface,
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
-            )
-            .padding(12.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(horizontal = 14.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+        // Icon box — same pattern as SettingRow
         Box(
-            modifier = Modifier
-                .size(36.dp)
-                .background(
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                    shape = CircleShape
-                ),
             contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size(32.dp)
+                .clip(iconBoxShape)
+                .background(DwTintWater),
         ) {
             Icon(
                 painter = painterResource(getIconResId(item.timestamp)),
                 contentDescription = null,
-                modifier = Modifier.size(20.dp)
+                tint = DwWater,
+                modifier = Modifier.size(18.dp),
             )
         }
 
-        Spacer(modifier = Modifier.width(12.dp))
-
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(vertical = 4.dp)
-        ) {
+        // Amount + timestamp
+        Column(modifier = Modifier.weight(1f)) {
             val unit = stringResource(R.string.text_vol_unit_mililiters)
-
             Text(
                 text = "${item.amount}$unit",
-                fontSize = 14.sp,
+                fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface
+                fontSize = 14.sp,
+                color = DwInk900,
             )
-
             Text(
                 text = formatTime(item.timestamp),
+                fontFamily = JetBrainsMono,
+                fontWeight = FontWeight.Normal,
                 fontSize = 11.sp,
-                color = MaterialTheme.colorScheme.outline,
-                modifier = Modifier.padding(top = 4.dp)
+                color = DwInk400,
             )
         }
 
-        Button(
+        // Delete — small icon button
+        IconButton(
             onClick = { onDelete(item) },
+            modifier = Modifier.size(32.dp),
         ) {
-            Text("Delete")
+            Icon(
+                imageVector = DwIcons.Trash,
+                contentDescription = "Delete",
+                tint = DwInk300,
+                modifier = Modifier.size(16.dp),
+            )
         }
     }
 }

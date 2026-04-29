@@ -396,13 +396,15 @@ object DwIcons {
                 strokeLineJoin = StrokeJoin.Round,
             ) {
                 moveTo(3f, 12f)
-                arcToRelative(9f, 9f, 0f,
+                arcToRelative(
+                    9f, 9f, 0f,
                     isMoreThanHalf = true,
                     isPositiveArc = false,
                     dx1 = 9f,
                     dy1 = -9f,
                 )
-                arcToRelative(9.75f, 9.75f, 0f,
+                arcToRelative(
+                    9.75f, 9.75f, 0f,
                     isMoreThanHalf = false,
                     isPositiveArc = false,
                     dx1 = -6.74f,
@@ -431,6 +433,50 @@ object DwIcons {
                 moveTo(12f, 7f)
                 verticalLineTo(12f)
                 lineTo(16f, 14f)
+            }
+        }.build()
+    }
+
+    val Trash: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "DwTrash",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f,
+        ).apply {
+            // Lid line
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+            ) {
+                moveTo(3f, 6f)
+                horizontalLineTo(21f)
+            }
+            // Handle
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round,
+            ) {
+                moveTo(8f, 6f)
+                verticalLineTo(4f)
+                horizontalLineTo(16f)
+                verticalLineTo(6f)
+            }
+            // Body
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round,
+            ) {
+                moveTo(5f, 6f)
+                lineToRelative(1f, 14f)
+                horizontalLineToRelative(12f)
+                lineToRelative(1f, -14f)
             }
         }.build()
     }
