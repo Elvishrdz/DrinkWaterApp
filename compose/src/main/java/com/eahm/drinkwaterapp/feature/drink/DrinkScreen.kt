@@ -1,4 +1,4 @@
-package com.eahm.drinkwaterapp.feature.drink.ui
+package com.eahm.drinkwaterapp.feature.drink
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -44,8 +44,10 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
-import com.eahm.drinkwaterapp.feature.drink.DrinkState
-import com.eahm.drinkwaterapp.feature.drink.DrinkStats
+import com.eahm.drinkwaterapp.feature.drink.ui.ProgressRing
+import com.eahm.drinkwaterapp.feature.drink.ui.QuickAddRow
+import com.eahm.drinkwaterapp.feature.drink.ui.TodayLogSection
+import com.eahm.drinkwaterapp.feature.drink.ui.previewLogEntries
 import com.eahm.drinkwaterapp.ui.inputfield.AmountInputField
 import com.eahm.drinkwaterapp.ui.inputfield.toDigitString
 import kotlinx.datetime.LocalDateTime

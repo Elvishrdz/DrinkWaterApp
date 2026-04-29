@@ -1,4 +1,4 @@
-package com.eahm.drinkwaterapp.feature.dev
+package com.eahm.drinkwaterapp.feature.dev.adaptive
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.WindowInsets

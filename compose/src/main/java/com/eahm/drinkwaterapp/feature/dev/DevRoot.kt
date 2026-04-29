@@ -41,7 +41,8 @@ import com.eahm.drinkwaterapp.core.domain.mock.drinkStatsMock
 import com.eahm.drinkwaterapp.core.domain.mock.hourGroupMock
 import com.eahm.drinkwaterapp.core.domain.mock.localDateTimeMock
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
-import com.eahm.drinkwaterapp.feature.drink.Adaptive
+import com.eahm.drinkwaterapp.feature.dev.adaptive.AdaptiveScreen
+import com.eahm.drinkwaterapp.feature.dev.ui.Adaptive
 import com.eahm.drinkwaterapp.feature.drink.DrinkStats
 import com.eahm.drinkwaterapp.ui.drinkbutton.DrinkButton
 import com.eahm.drinkwaterapp.ui.drinks.BubbleConfig
