@@ -75,7 +75,7 @@ internal class DevViewModel(
             initialValue = emptyList(),
         )
 
-    data class HistoryData(
+    private data class HistoryData(
         val date: LocalDateTime,
         val historyRecords: List<HourGroup>,
         val todayLogs: List<DrinkLogEntry>

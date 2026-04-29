@@ -10,7 +10,7 @@ internal sealed interface DrinkState {
     data object Loading : DrinkState
 
     data class Data(
-        val username: String,
+        val username: String?,
         val currentStreak: Int,
         val date: LocalDateTime,
         val historyRecords: List<HourGroup>,

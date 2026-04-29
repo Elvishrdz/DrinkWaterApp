@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.eahm.drinkwaterapp.ui.inputfield.data.ValidationResult
 
 @Composable
 fun AmountInputField(
@@ -77,11 +78,6 @@ fun AmountInputField(
         }
     }
 }
-
-data class ValidationResult(
-    val isValid: Boolean,
-    val message: String = ""
-)
 
 fun validateAmountInput(value: String): ValidationResult {
     val trimmed = value.trim()

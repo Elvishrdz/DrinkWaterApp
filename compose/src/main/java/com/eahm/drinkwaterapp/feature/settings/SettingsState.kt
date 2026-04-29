@@ -1,7 +1,7 @@
 package com.eahm.drinkwaterapp.feature.settings
 
 data class SettingsState(
-    val userName: String = "Alex",
+    val username: String?,
     val weightKg: Float = 68f,
     val dailyGoalMl: Int = 2200,
     val unit: WaterUnit = WaterUnit.ML,

@@ -16,6 +16,7 @@ import com.eahm.drinkwaterapp.core.database.entity.Status
 import com.eahm.drinkwaterapp.core.domain.extension.toEndOfDayTime
 import com.eahm.drinkwaterapp.core.domain.extension.toStartOfDayTime
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
+import com.eahm.drinkwaterapp.feature.drink.data.HistoryData
 import com.eahm.drinkwaterapp.feature.drink.ui.DrinkLogEntry
 import com.eahm.drinkwaterapp.ui.historylist.DayGroup
 import com.eahm.drinkwaterapp.ui.historylist.HourGroup
@@ -55,10 +56,6 @@ internal class DrinkViewModel(
 
     private val historyDate = MutableStateFlow(today)
 
-    private val goalAmount = prefsStorage.getGoalAmount()
-
-    private val drinkAmount = dao.getTotalDrinkAmount(today.toStartOfDayTime, today.toEndOfDayTime)
-
     @OptIn(ExperimentalCoroutinesApi::class)
     private val records = historyDate
         .flatMapLatest {
@@ -74,28 +71,10 @@ internal class DrinkViewModel(
             initialValue = emptyList(),
         )
 
-    private val drinkStats = combine(
-        goalAmount,
-        drinkAmount,
-    ) { goalAmount, drinkAmount ->
-        DrinkStats(
-            goalAmount = goalAmount,
-            drinkAmount = drinkAmount,
-            goalReached = drinkAmount >= goalAmount,
-        )
-
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Lazily,
-        initialValue = null,
-    )
-
-    val state = combine(
+    private val history = combine(
         historyDate,
         records,
-        drinkStats,
-        drinkAlarmManager.state,
-    ) { date, records, drinkStats, drinkAlarmState ->
+    ) { date, records ->
         val historyRecords = records
             .sortedBy { it.timestamp }
             .reversed()
@@ -139,17 +118,56 @@ internal class DrinkViewModel(
                 )
             }
 
-        DrinkState.Data(
-            username = "Elvis",
-            currentStreak = 0,
+        HistoryData(
             date = date,
             historyRecords = historyRecords,
-            todayLogs = todayLogs,
-            drinkStats = drinkStats,
-            isAlarmActive = drinkAlarmState.active,
-            alarmInterval = drinkAlarmState.interval,
-            alarmNextInterval = drinkAlarmState.nextInterval,
+            todayLogs = todayLogs
         )
+
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Lazily,
+        initialValue = null,
+    )
+
+    private val drinkStats = combine(
+        prefsStorage.getGoalAmount(),
+        dao.getTotalDrinkAmount(start = today.toStartOfDayTime, end = today.toEndOfDayTime),
+    ) { goalAmount, drinkAmount ->
+        DrinkStats(
+            goalAmount = goalAmount,
+            drinkAmount = drinkAmount,
+            goalReached = drinkAmount >= goalAmount,
+        )
+
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Lazily,
+        initialValue = null,
+    )
+
+    val state = combine(
+        prefsStorage.getUsername(),
+        history,
+        drinkStats,
+        drinkAlarmManager.state,
+    ) { username, history, drinkStats, drinkAlarmState ->
+        if (history == null) {
+            DrinkState.Loading
+        } else {
+            DrinkState.Data(
+                username = username,
+                currentStreak = 0,
+                date = history.date,
+                historyRecords = history.historyRecords,
+                todayLogs = history.todayLogs,
+                drinkStats = drinkStats,
+                isAlarmActive = drinkAlarmState.active,
+                alarmInterval = drinkAlarmState.interval,
+                alarmNextInterval = drinkAlarmState.nextInterval,
+            )
+        }
+
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,

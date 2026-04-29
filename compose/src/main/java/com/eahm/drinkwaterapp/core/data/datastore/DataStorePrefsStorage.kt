@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koin.core.module.dsl.singleOf
@@ -23,15 +24,19 @@ interface PrefsStorage {
     fun getGoalAmount(): Flow<Float>
     suspend fun setGoalAmount(amount: Float)
 
+    fun getUsername(): Flow<String?>
+    suspend fun setUsername(name: String)
+
     suspend fun clear()
 }
 
-class DataStorePrefsStorage(
+private class DataStorePrefsStorage(
     private val dataStore: DataStore<Preferences>,
 ) : PrefsStorage {
 
     private val firstSetupKey = booleanPreferencesKey("FIRST_SETUP")
     private val goalAmountKey = floatPreferencesKey("GOAL_AMOUNT")
+    private val usernameKey = stringPreferencesKey("USERNAME")
 
     override fun getFirstSetupDone(): Flow<Boolean> {
         return dataStore.data.map { preferences ->
@@ -63,11 +68,26 @@ class DataStorePrefsStorage(
         }
     }
 
+    override fun getUsername(): Flow<String?> {
+        return dataStore.data.map { preferences ->
+            preferences[usernameKey]
+        }
+    }
+
+    override suspend fun setUsername(name: String) {
+        dataStore.updateData { preferences ->
+            preferences.toMutablePreferences()
+                .also {
+                    it[usernameKey] = name
+                }
+        }
+    }
 
     override suspend fun clear() {
         dataStore.edit {
             it.remove(firstSetupKey)
             it.remove(goalAmountKey)
+            it.remove(usernameKey)
         }
     }
 }

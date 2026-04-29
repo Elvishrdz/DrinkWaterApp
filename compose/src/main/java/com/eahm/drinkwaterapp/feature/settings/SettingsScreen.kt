@@ -31,12 +31,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.component.extension.outlineBorderStyle
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -55,6 +57,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.JetBrainsMono
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
+import com.eahm.drinkwaterapp.feature.settings.ui.EditButton
 import org.koin.compose.viewmodel.koinViewModel
 
 private val gradientMagentaHero = Brush.verticalGradient(
@@ -70,7 +73,7 @@ internal fun SettingsScreen(
     SettingsContent(
         state = state,
         onNotificationsToggled = viewModel::onNotificationsToggled,
-        onEditProfile = {},
+        onUsernameChanged = viewModel::onUsernameChanged,
         onGoalTap = {},
         onUnitsTap = {},
         onIntervalTap = {},
@@ -86,7 +89,7 @@ internal fun SettingsScreen(
 internal fun SettingsContent(
     state: SettingsState,
     onNotificationsToggled: (Boolean) -> Unit,
-    onEditProfile: () -> Unit,
+    onUsernameChanged: (String) -> Unit,
     onGoalTap: () -> Unit,
     onUnitsTap: () -> Unit,
     onIntervalTap: () -> Unit,
@@ -116,7 +119,7 @@ internal fun SettingsContent(
         item {
             ProfileCard(
                 state = state,
-                onEditTap = onEditProfile,
+                onUsernameChanged = onUsernameChanged,
             )
         }
 
@@ -226,7 +229,7 @@ internal fun SettingsContent(
 @Composable
 private fun ProfileCard(
     state: SettingsState,
-    onEditTap: () -> Unit,
+    onUsernameChanged: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -245,18 +248,25 @@ private fun ProfileCard(
                 .clip(CircleShape)
                 .background(Color.White.copy(alpha = 0.25f)),
         ) {
-            Text(
-                text = state.userName.take(1).uppercase(),
-                fontFamily = Nunito,
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 18.sp,
-                color = Color.White,
-            )
+            state.username?.let {
+                Text(
+                    text = it.take(1).uppercase(),
+                    fontFamily = Nunito,
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 18.sp,
+                    color = Color.White,
+                )
+            }
+                ?: Icon(
+                    modifier = Modifier.size(24.dp),
+                    painter = painterResource(R.drawable.ic_drink_holo_dark),
+                    contentDescription = null,
+                )
         }
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = state.userName,
+                text = state.username ?: "Good morning",
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
@@ -272,23 +282,10 @@ private fun ProfileCard(
             )
         }
 
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .clip(RoundedCornerShape(999.dp))
-                .background(Color.White.copy(alpha = 0.20f))
-                .clickable(onClick = onEditTap)
-                .padding(horizontal = 14.dp, vertical = 8.dp),
-        ) {
-            Text(
-                text = "EDIT",
-                fontFamily = Nunito,
-                fontWeight = FontWeight.Bold,
-                fontSize = 11.sp,
-                letterSpacing = TextUnit(0.06f, TextUnitType.Em),
-                color = Color.White,
-            )
-        }
+        EditButton(
+            username = state.username,
+            onUsernameChanged = onUsernameChanged,
+        )
     }
 }
 
@@ -415,9 +412,9 @@ private fun formatTime(hour: Int, minute: Int): String {
 private fun SettingsScreenPreview() {
     DrinkWaterAppTheme {
         SettingsContent(
-            state = SettingsState(),
+            state = settingsStateMock,
             onNotificationsToggled = {},
-            onEditProfile = {},
+            onUsernameChanged = {},
             onGoalTap = {},
             onUnitsTap = {},
             onIntervalTap = {},
@@ -428,3 +425,7 @@ private fun SettingsScreenPreview() {
         )
     }
 }
+
+private val settingsStateMock = SettingsState(
+    username = null,
+)

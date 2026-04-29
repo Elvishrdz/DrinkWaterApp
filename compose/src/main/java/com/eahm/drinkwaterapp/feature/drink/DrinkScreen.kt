@@ -74,7 +74,7 @@ internal fun DrinkScreen(
             .padding(bottom = 16.dp)
     ) {
         TodayHeader(
-            name = state.username,
+            username = state.username,
             streak = state.currentStreak,
             modifier = Modifier
                 .fillMaxWidth()
@@ -136,7 +136,7 @@ internal fun DrinkScreen(
 
 @Composable
 private fun TodayHeader(
-    name: String,
+    username: String?,
     streak: Int,
     modifier: Modifier = Modifier,
 ) {
@@ -145,22 +145,26 @@ private fun TodayHeader(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.Top
     ) {
+
         Column {
             Text(
-                text = "Good morning,",
+                text = "Good morning${if (username != null) "," else ""}",
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Medium,
                 fontSize = 13.sp,
                 color = DwInk400
             )
-            Text(
-                text = name,
-                fontFamily = PlusJakartaSans,
-                fontWeight = FontWeight.Bold,
-                fontSize = 26.sp,
-                lineHeight = (26 * 1.2).sp,
-                color = DwInk900
-            )
+
+            username?.let {
+                Text(
+                    text = it,
+                    fontFamily = PlusJakartaSans,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 26.sp,
+                    lineHeight = (26 * 1.2).sp,
+                    color = DwInk900
+                )
+            }
         }
 
         StreakBadge(streak = streak)
