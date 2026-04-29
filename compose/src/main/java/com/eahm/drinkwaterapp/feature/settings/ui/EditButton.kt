@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
+import com.eahm.drinkwaterapp.ui.bottomsheet.AppBottomSheet
 import com.eahm.drinkwaterapp.ui.inputfield.TextInputField
 import kotlinx.coroutines.launch
 
@@ -63,11 +64,11 @@ internal fun EditButton(
     }
 
     if (showBottomSheet) {
-        ModalBottomSheet(
+        AppBottomSheet(
             onDismissRequest = {
                 showBottomSheet = false
             },
-            sheetState = sheetState
+            sheetState = sheetState,
         ) {
             Column(
                 modifier = Modifier
