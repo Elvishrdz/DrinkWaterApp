@@ -6,6 +6,7 @@ import android.provider.Settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.core.bindings.toUI
+import com.eahm.drinkwaterapp.core.data.confetti.ConfettiController
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.data.goalreachedwidget.GoalReachedWidget
@@ -45,6 +46,7 @@ internal class DevViewModel(
     val drinkAlarmManager: DrinkAlarmManager,
     val database: AppDatabase,
     val prefsStorage: PrefsStorage,
+    val confettiController: ConfettiController,
 ) : ViewModel() {
 
     private val dao = database.getHistoryDao()
@@ -73,28 +75,16 @@ internal class DevViewModel(
             initialValue = emptyList(),
         )
 
-    private val drinkStats = combine(
-        goalAmount,
-        drinkAmount,
-    ) { goalAmount, drinkAmount ->
-        DrinkStats(
-            goalAmount = goalAmount,
-            drinkAmount = drinkAmount,
-            goalReached = drinkAmount >= goalAmount,
-        )
-
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Lazily,
-        initialValue = null,
+    data class HistoryData(
+        val date: LocalDateTime,
+        val historyRecords: List<HourGroup>,
+        val todayLogs: List<DrinkLogEntry>
     )
 
-    val state = combine(
+    private val history = combine(
         historyDate,
         records,
-        drinkStats,
-        drinkAlarmManager.state,
-    ) { date, records, drinkStats, drinkAlarmState ->
+    ) { date, records ->
         val historyRecords = records
             .sortedBy { it.timestamp }
             .reversed()
@@ -138,17 +128,58 @@ internal class DevViewModel(
                 )
             }
 
-        DevState.Data(
-            username = "Elvis",
-            currentStreak = 0,
+        HistoryData(
             date = date,
             historyRecords = historyRecords,
-            todayLogs = todayLogs,
-            drinkStats = drinkStats,
-            isAlarmActive = drinkAlarmState.active,
-            alarmInterval = drinkAlarmState.interval,
-            alarmNextInterval = drinkAlarmState.nextInterval,
+            todayLogs = todayLogs
         )
+
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Lazily,
+        initialValue = null,
+    )
+
+    private val drinkStats = combine(
+        goalAmount,
+        drinkAmount,
+    ) { goalAmount, drinkAmount ->
+        DrinkStats(
+            goalAmount = goalAmount,
+            drinkAmount = drinkAmount,
+            goalReached = drinkAmount >= goalAmount,
+        )
+
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Lazily,
+        initialValue = null,
+    )
+
+    val state = combine(
+        history,
+        drinkStats,
+        drinkAlarmManager.state,
+        confettiController.state,
+    ) { history, drinkStats, drinkAlarmState, confettiActive ->
+
+        if (history == null) {
+            DevState.Loading
+        } else {
+            DevState.Data(
+                username = "Elvis",
+                currentStreak = 0,
+                date = history.date,
+                historyRecords = history.historyRecords,
+                todayLogs = history.todayLogs,
+                drinkStats = drinkStats,
+                isAlarmActive = drinkAlarmState.active,
+                alarmInterval = drinkAlarmState.interval,
+                alarmNextInterval = drinkAlarmState.nextInterval,
+                confettiButtonEnabled = !confettiActive,
+            )
+        }
+
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
@@ -168,6 +199,10 @@ internal class DevViewModel(
                 drinkAlarmManager.setupAlarm(application)
             }
         }
+    }
+
+    fun showConfetti() {
+        confettiController.showConfetti()
     }
 
     fun onDelete(it: HistoryEntity) {

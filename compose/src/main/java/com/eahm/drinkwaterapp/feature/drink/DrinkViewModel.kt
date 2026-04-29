@@ -6,6 +6,7 @@ import android.provider.Settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.core.bindings.toUI
+import com.eahm.drinkwaterapp.core.data.confetti.ConfettiController
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.data.goalreachedwidget.GoalReachedWidget
@@ -44,6 +45,7 @@ internal class DrinkViewModel(
     val drinkAlarmManager: DrinkAlarmManager,
     val database: AppDatabase,
     val prefsStorage: PrefsStorage,
+    val confettiController: ConfettiController,
 ) : ViewModel() {
 
     private val dao = database.getHistoryDao()
@@ -163,6 +165,9 @@ internal class DrinkViewModel(
                 )
 
                 dao.insertAll(record)
+
+                // TODO: check if we reached the goal now
+                confettiController.showConfetti()
 
                 drinkAlarmManager.setupAlarm(application)
             }

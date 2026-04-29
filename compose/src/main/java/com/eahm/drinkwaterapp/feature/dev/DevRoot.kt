@@ -22,6 +22,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -33,6 +34,7 @@ import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTealDark
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTealSoft
+import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 import com.eahm.drinkwaterapp.core.domain.mock.Mock
 import com.eahm.drinkwaterapp.core.domain.mock.drinkStatsMock
 import com.eahm.drinkwaterapp.core.domain.mock.hourGroupMock
@@ -131,6 +133,7 @@ private fun ValuesRoot(
             DevScreen(
                 state = data,
                 onDrink = viewModel::onDrink,
+                onShowConfetti = viewModel::showConfetti,
                 onDelete = viewModel::onDelete,
                 onDateChanged = viewModel::onDateChanged,
                 onStopAlarm = viewModel::onStopAlarm,
@@ -147,6 +150,7 @@ private fun ValuesRoot(
 internal fun DevScreen(
     state: DevState.Data,
     onDrink: (Float) -> Unit,
+    onShowConfetti: () -> Unit,
     onDelete: (HistoryEntity) -> Unit,
     onDateChanged: (LocalDateTime) -> Unit,
     onStopAlarm: () -> Unit,
@@ -166,7 +170,9 @@ internal fun DevScreen(
             isAlarmActive = state.isAlarmActive,
             alarmInterval = state.alarmInterval,
             alarmNextInterval = state.alarmNextInterval,
+            confettiButtonEnabled = state.confettiButtonEnabled,
             onDrink = onDrink,
+            onShowConfetti = onShowConfetti,
             onDelete = onDelete,
             onDateChanged = onDateChanged,
             onStopAlarm = onStopAlarm,
@@ -186,7 +192,9 @@ private fun Content(
     isAlarmActive: Boolean,
     alarmInterval: AlarmInterval,
     alarmNextInterval: AlarmInterval?,
+    confettiButtonEnabled: Boolean,
     modifier: Modifier = Modifier,
+    onShowConfetti: () -> Unit,
     onDrink: (Float) -> Unit,
     onDelete: (HistoryEntity) -> Unit,
     onDateChanged: (LocalDateTime) -> Unit,
@@ -229,6 +237,20 @@ private fun Content(
             ) {
                 Text(
                     text = "Stop Alarm",
+                )
+            }
+
+            Button(
+                onClick = onShowConfetti,
+                enabled = confettiButtonEnabled,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
+            ) {
+                Text(
+                    text = "Test Confetti",
+                    fontFamily = PlusJakartaSans,
+                    fontWeight = FontWeight.SemiBold,
                 )
             }
 
@@ -325,7 +347,9 @@ private fun DrinkScreenPreview() {
             isAlarmActive = true,
             alarmInterval = AlarmInterval(0, 5),
             alarmNextInterval = null,
+            confettiButtonEnabled = false,
             onDrink = {},
+            onShowConfetti = {},
             onDelete = {},
             onDateChanged = {},
             onStopAlarm = {},

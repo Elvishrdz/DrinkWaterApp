@@ -1,6 +1,7 @@
 package com.eahm.drinkwaterapp.di
 
 import com.eahm.drinkwaterapp.BaseApplication
+import com.eahm.drinkwaterapp.core.data.confetti.confettiModule
 import com.eahm.drinkwaterapp.core.data.datastore.dataStoreModule
 import com.eahm.drinkwaterapp.core.data.datastore.prefsStorageModule
 import com.eahm.drinkwaterapp.core.data.drinkalarm.drinkAlarmModule
@@ -14,13 +15,19 @@ internal fun startDI(application: BaseApplication) {
     startKoin {
         androidContext(application)
         modules(
-            drinkAlarmModule,
             androidDatabaseModule,
-            dataStoreModule,
-            prefsStorageModule,
+            dataModule,
             featureModule,
         )
     }
+}
+
+private val dataModule = module {
+    includes(confettiModule)
+    includes(dataStoreModule)
+    includes(prefsStorageModule)
+    includes(drinkAlarmModule)
+
 }
 
 private val featureModule = module {

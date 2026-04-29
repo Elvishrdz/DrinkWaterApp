@@ -13,6 +13,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.eahm.drinkwaterapp.core.data.confetti.ConfettiController
+import com.eahm.drinkwaterapp.core.designsystem.custom.ConfettiFadeMode
+import com.eahm.drinkwaterapp.core.designsystem.custom.ConfettiOverlay
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk100
@@ -24,6 +28,7 @@ import com.eahm.drinkwaterapp.feature.drink.DrinkRoot
 import com.eahm.drinkwaterapp.feature.history.HistoryRoot
 import com.eahm.drinkwaterapp.feature.settings.SettingsScreen
 import com.eahm.drinkwaterapp.feature.stats.StatsScreen
+import org.koin.compose.koinInject
 
 enum class HomeDestination(
     val label: String,
@@ -39,6 +44,8 @@ enum class HomeDestination(
 @PreviewScreenSizes
 @Composable
 internal fun HomeScreen() {
+    val confettiController = koinInject<ConfettiController>()
+    val state by confettiController.state.collectAsStateWithLifecycle()
     var currentDestination by rememberSaveable { mutableStateOf(HomeDestination.TODAY) }
 
     val itemColors = NavigationSuiteDefaults.itemColors(
@@ -82,6 +89,12 @@ internal fun HomeScreen() {
             HomeDestination.DEV -> DevRoot { currentDestination = HomeDestination.TODAY }
         }
     }
+
+    ConfettiOverlay(
+        active = state,
+        fadeMode = ConfettiFadeMode.NONE,
+        onFinished = confettiController::onFinished,
+    )
 }
 
 @Preview(showBackground = true)
