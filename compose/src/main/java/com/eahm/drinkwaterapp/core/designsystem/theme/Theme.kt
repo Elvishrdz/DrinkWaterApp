@@ -39,7 +39,10 @@ fun DrinkWaterAppTheme(
         }
     }
 
-    CompositionLocalProvider(LocalDwSpacing provides DwSpacing()) {
+    CompositionLocalProvider(
+        LocalDwSpacing provides DwSpacing(),
+        LocalDwExtendedTypography provides DwExtendedTypography(),
+    ) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = DwTypography,
