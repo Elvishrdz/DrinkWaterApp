@@ -17,6 +17,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -67,71 +68,78 @@ internal fun DrinkScreen(
     onSeeAll: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(DwInk50)
-            .verticalScroll(rememberScrollState())
-            .padding(bottom = 16.dp)
+    Scaffold(
+        containerColor = DwInk50,
     ) {
-        TodayHeader(
-            username = state.username,
-            streak = state.currentStreak,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 20.dp, end = 20.dp, top = 20.dp)
-        )
-
-        Spacer(modifier = Modifier.height(4.dp))
-
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
+            modifier = modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(bottom = 16.dp)
         ) {
-            ProgressRing(
-                current = state.drinkStats?.drinkAmount ?: 0f,
-                goal = state.drinkStats?.goalAmount ?: 0f,
+            Spacer(Modifier.height(it.calculateTopPadding()))
+
+            TodayHeader(
+                username = state.username,
+                streak = state.currentStreak,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 20.dp, end = 20.dp, top = 20.dp)
             )
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
-            RemainingPill(
-                remaining = state.drinkStats?.remainingAmount ?: 0f,
-            )
-        }
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+            ) {
+                ProgressRing(
+                    current = state.drinkStats?.drinkAmount ?: 0f,
+                    goal = state.drinkStats?.goalAmount ?: 0f,
+                )
 
-        Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
-        QuickAddRow(
-            presets = state.drinkPresets,
-            onDrink = onDrink,
-            onCustom = onCustom,
-            modifier = Modifier.padding(horizontal = 20.dp)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        TodayLogSection(
-            items = state.todayLogs,
-            onSeeAll = onSeeAll,
-            modifier = Modifier.padding(horizontal = 20.dp)
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        AnimatedVisibility(state.drinkStats != null) {
-            state.drinkStats?.let {
-                AmountInputField(
-                    modifier = Modifier.fillMaxWidth(),
-                    label = "Goal amount (mL)",
-                    value = it.goalAmount.toDigitString(),
-                    onValueSaved = { newAmount ->
-                        onGoalAmountChanged(newAmount)
-                    },
+                RemainingPill(
+                    remaining = state.drinkStats?.remainingAmount ?: 0f,
                 )
             }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            QuickAddRow(
+                presets = state.drinkPresets,
+                onDrink = onDrink,
+                onCustom = onCustom,
+                modifier = Modifier.padding(horizontal = 20.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            TodayLogSection(
+                items = state.todayLogs,
+                onSeeAll = onSeeAll,
+                modifier = Modifier.padding(horizontal = 20.dp)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            AnimatedVisibility(state.drinkStats != null) {
+                state.drinkStats?.let {
+                    AmountInputField(
+                        modifier = Modifier.fillMaxWidth(),
+                        label = "Goal amount (mL)",
+                        value = it.goalAmount.toDigitString(),
+                        onValueSaved = { newAmount ->
+                            onGoalAmountChanged(newAmount)
+                        },
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(it.calculateBottomPadding()))
         }
     }
 }
