@@ -1,7 +1,10 @@
 package com.eahm.drinkwaterapp.feature.drink
 
 import android.app.Application
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.provider.Settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -19,15 +22,20 @@ import com.eahm.drinkwaterapp.feature.drink.data.HistoryData
 import com.eahm.drinkwaterapp.feature.drink.ui.DrinkLogEntry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
@@ -46,10 +54,47 @@ internal class DrinkViewModel(
 
     private val dao = database.getHistoryDao()
 
+    // Emits the current LocalDateTime and re-emits whenever the calendar date changes
+    // (midnight rollover, manual date/time edit, or timezone switch).
+    // distinctUntilChangedBy ensures only a real day boundary triggers downstream work.
     @OptIn(ExperimentalTime::class)
-    private val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    private val currentDay: StateFlow<LocalDateTime> = callbackFlow {
+        trySend(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()))
 
-    private val historyDate = MutableStateFlow(today)
+        val receiver = object : BroadcastReceiver() {
+            @OptIn(ExperimentalTime::class)
+            override fun onReceive(context: Context, intent: Intent) {
+                trySend(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()))
+            }
+        }
+
+        application.registerReceiver(
+            receiver,
+            IntentFilter().apply {
+                addAction(Intent.ACTION_DATE_CHANGED)     // midnight rollover
+                addAction(Intent.ACTION_TIME_CHANGED)     // manual time edit
+                addAction(Intent.ACTION_TIMEZONE_CHANGED) // timezone switch
+            },
+        )
+
+        awaitClose { application.unregisterReceiver(receiver) }
+    }
+        .distinctUntilChangedBy { it.date } // only propagate when the date itself changes
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+        )
+
+    private val historyDate = MutableStateFlow(currentDay.value)
+
+    init {
+        // Keep historyDate in sync with the current calendar day.
+        // The distinctUntilChangedBy above ensures this only fires on real date changes.
+        viewModelScope.launch {
+            currentDay.collect { historyDate.value = it }
+        }
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val records = historyDate
@@ -71,8 +116,7 @@ internal class DrinkViewModel(
         records,
     ) { date, records ->
         val todayLogs = records
-            //  TODO: filter from current time to latest 4 records
-            .filter { it.timestamp in today.toStartOfDayTime..today.toEndOfDayTime }
+            .filter { it.timestamp in date.toStartOfDayTime..date.toEndOfDayTime }
             //.take(4)
             .sortedByDescending { it.timestamp }
             .map {
@@ -99,9 +143,12 @@ internal class DrinkViewModel(
         initialValue = null,
     )
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val drinkStats = combine(
         prefsStorage.getGoalAmount(),
-        dao.getTotalDrinkAmount(start = today.toStartOfDayTime, end = today.toEndOfDayTime),
+        currentDay.flatMapLatest { day ->
+            dao.getTotalDrinkAmount(start = day.toStartOfDayTime, end = day.toEndOfDayTime)
+        },
     ) { goalAmount, drinkAmount ->
         DrinkStats(
             goalAmount = goalAmount,
