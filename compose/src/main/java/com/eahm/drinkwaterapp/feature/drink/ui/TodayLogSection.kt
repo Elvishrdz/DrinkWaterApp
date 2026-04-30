@@ -1,5 +1,11 @@
 package com.eahm.drinkwaterapp.feature.drink.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,6 +23,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -95,15 +103,44 @@ fun TodayLogSection(
                     .padding(vertical = 12.dp)
             )
         } else {
+            // Keys present at first composition — these entries appear instantly with no animation.
+            // Items that arrive later (not in this set) animate in with expandVertically + fadeIn.
+            val initialKeys = remember { items.map { "${it.time}${it.amount}" }.toSet() }
+
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 items.forEachIndexed { index, entry ->
-                    DrinkLogRow(entry = entry)
-                    if (index < items.lastIndex) {
-                        HorizontalDivider(
-                            color = DwInk100,
-                            thickness = 1.dp,
-                            modifier = Modifier.padding(horizontal = 4.dp)
-                        )
+                    val entryKey = "${entry.time}${entry.amount}"
+                    key(entryKey) {
+                        // Initial items start already visible (no animation).
+                        // New items start invisible with targetState=true so the
+                        // transition fires immediately on first composition.
+                        val isInitial = remember { entryKey in initialKeys }
+                        val transitionState = remember {
+                            MutableTransitionState(isInitial).also {
+                                if (!isInitial) it.targetState = true
+                            }
+                        }
+                        AnimatedVisibility(
+                            visibleState = transitionState,
+                            enter = expandVertically(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioLowBouncy,
+                                    stiffness = Spring.StiffnessMediumLow,
+                                ),
+                                expandFrom = Alignment.Top,
+                            ) + fadeIn(animationSpec = spring()),
+                        ) {
+                            Column {
+                                DrinkLogRow(entry = entry)
+                                if (index < items.lastIndex) {
+                                    HorizontalDivider(
+                                        color = DwInk100,
+                                        thickness = 1.dp,
+                                        modifier = Modifier.padding(horizontal = 4.dp)
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
