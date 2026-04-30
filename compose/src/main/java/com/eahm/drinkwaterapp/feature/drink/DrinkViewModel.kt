@@ -189,6 +189,28 @@ internal class DrinkViewModel(
         }
     }
 
+    fun onDeletePreset(preset: DrinkPreset) {
+        viewModelScope.launch {
+            prefsStorage.getDrinkPresets().firstOrNull()?.let { currentPresets ->
+                val updated = currentPresets
+                    .filter { it.amountMl != preset.amountMl }
+                    .toSet()
+                prefsStorage.setDrinkPresets(updated)
+            }
+        }
+    }
+
+    fun onRestorePreset(preset: DrinkPreset) {
+        viewModelScope.launch {
+            prefsStorage.getDrinkPresets().firstOrNull()?.let { currentPresets ->
+                if (currentPresets.none { it.amountMl == preset.amountMl }) {
+                    val updated = currentPresets.toMutableSet().apply { add(preset) }
+                    prefsStorage.setDrinkPresets(updated)
+                }
+            }
+        }
+    }
+
     fun onPresetsReordered(newOrder: List<DrinkPreset>, reorderingQuickPresets: Boolean) {
         viewModelScope.launch {
             val reordered = newOrder.mapIndexed { index, preset ->

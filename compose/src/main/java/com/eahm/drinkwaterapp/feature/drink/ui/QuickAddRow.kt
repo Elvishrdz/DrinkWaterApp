@@ -37,6 +37,8 @@ fun QuickAddRow(
     onDrink: (Float) -> Unit,
     onCreatePreset: (Float) -> Unit,
     onReorder: (List<DrinkPreset>, Boolean) -> Unit,
+    onDelete: (DrinkPreset) -> Unit,
+    onRestorePreset: (DrinkPreset) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     DraggableQuickAddRow(
@@ -50,6 +52,8 @@ fun QuickAddRow(
                 onDrink = onDrink,
                 onCreatePreset = onCreatePreset,
                 onReorder = onReorder,
+                onDelete = onDelete,
+                onRestorePreset = onRestorePreset,
                 modifier = trailingModifier,
             )
         },
@@ -114,6 +118,8 @@ private fun QuickAddRowPreview() {
             onDrink = {},
             onCreatePreset = {},
             onReorder = { _, _ -> },
+            onDelete = {},
+            onRestorePreset = {},
             modifier = Modifier.padding(16.dp)
         )
     }

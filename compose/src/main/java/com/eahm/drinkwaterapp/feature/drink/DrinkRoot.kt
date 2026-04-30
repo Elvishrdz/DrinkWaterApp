@@ -23,6 +23,8 @@ internal fun DrinkRoot(
                 onDrink = viewModel::onDrink,
                 onReorderPresets = viewModel::onPresetsReordered,
                 onCreatePreset = viewModel::onCreatePreset,
+                onDeletePreset = viewModel::onDeletePreset,
+                onRestorePreset = viewModel::onRestorePreset,
                 onNavigateToHistory = onNavigateToHistory,
             )
         }

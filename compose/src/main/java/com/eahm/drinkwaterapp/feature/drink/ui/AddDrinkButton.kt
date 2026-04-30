@@ -1,8 +1,13 @@
 package com.eahm.drinkwaterapp.feature.drink.ui
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +17,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -19,17 +25,25 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -56,6 +70,8 @@ internal fun AddDrinkButton(
     onDrink: (Float) -> Unit,
     onCreatePreset: (Float) -> Unit,
     onReorder: (List<DrinkPreset>, Boolean) -> Unit,
+    onDelete: (DrinkPreset) -> Unit,
+    onRestorePreset: (DrinkPreset) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var showBottomSheet by rememberSaveable { mutableStateOf(false) }
@@ -65,6 +81,10 @@ internal fun AddDrinkButton(
         confirmValueChange = { canDismissBottomSheet }
     )
     val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    var isDragging by remember { mutableStateOf(false) }
+    var isOverDeleteZone by remember { mutableStateOf(false) }
 
     val dismissBottomSheet: () -> Unit = {
         showBottomSheet = false
@@ -83,48 +103,81 @@ internal fun AddDrinkButton(
             onDismissRequest = dismissBottomSheet,
             sheetState = sheetState,
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-            ) {
-                Column {
-                    Header(
-                        onCloseClicked = {
-                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                if (!sheetState.isVisible) {
-                                    dismissBottomSheet()
+            Box(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                ) {
+                    Column {
+                        Header(
+                            onCloseClicked = {
+                                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                    if (!sheetState.isVisible) {
+                                        dismissBottomSheet()
+                                    }
+                                }
+                            },
+                        )
+
+                        Spacer(Modifier.height(24.dp))
+                    }
+
+                    DraggablePresetGrid(
+                        modifier = Modifier
+                            .wrapContentHeight()
+                            .verticalScroll(rememberScrollState()),
+                        presets = presets,
+                        onDrink = { amount ->
+                            onDrink(amount)
+                            dismissBottomSheet()
+                        },
+                        onReorder = { onReorder(it, false) },
+                        onDelete = { preset ->
+                            onDelete(preset)
+                            scope.launch {
+                                val result = snackbarHostState.showSnackbar(
+                                    message = "Preset removed",
+                                    actionLabel = "Undo",
+                                    duration = SnackbarDuration.Short,
+                                )
+                                if (result == SnackbarResult.ActionPerformed) {
+                                    onRestorePreset(preset)
                                 }
                             }
                         },
+                        onDraggingChanged = { isDragging = it },
+                        onDeleteHover = { isOverDeleteZone = it },
                     )
 
-                    Spacer(Modifier.height(24.dp))
+                    Column {
+                        Spacer(Modifier.height(12.dp))
+
+                        Crossfade(
+                            targetState = isDragging,
+                            label = "delete_zone_toggle"
+                        ) { dragging ->
+                            if (dragging) {
+                                DeleteZone(isHovered = isOverDeleteZone)
+                            } else {
+                                InputFieldArea(
+                                    onCreatePreset = onCreatePreset,
+                                    onDrink = { amount ->
+                                        onDrink(amount)
+                                        dismissBottomSheet()
+                                    },
+                                )
+                            }
+                        }
+
+                        Spacer(Modifier.height(24.dp))
+                    }
                 }
 
-                DraggablePresetGrid(
-                    modifier = Modifier
-                        .weight(1f)
-                        .verticalScroll(rememberScrollState()),
-                    presets = presets,
-                    onDrink = { amount ->
-                        onDrink(amount)
-                        dismissBottomSheet()
-                    },
-                    onReorder = { onReorder(it, false) },
-                    // TODO: disable  dismiss when dragging item
-                    // canDismissBottomSheet = false
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                    modifier = Modifier.align(Alignment.BottomCenter),
                 )
-
-                Column {
-                    Spacer(Modifier.height(12.dp))
-
-                    InputFieldArea(
-                        onCreatePreset = onCreatePreset,
-                    )
-
-                    Spacer(Modifier.height(24.dp))
-                }
             }
         }
     }
@@ -164,6 +217,7 @@ fun Header(
 @Composable
 fun InputFieldArea(
     onCreatePreset: (Float) -> Unit,
+    onDrink: (Float) -> Unit,
 ) {
     var customAmount by rememberSaveable { mutableStateOf<Float?>(null) }
 
@@ -199,7 +253,11 @@ fun InputFieldArea(
 
             DwPrimaryButton(
                 text = "Drink",
-                onClick = {},
+                onClick = {
+                    customAmount?.let {
+                        onDrink(it)
+                    }
+                },
             )
         }
     }
@@ -238,6 +296,52 @@ internal fun ChipButton(
     }
 }
 
+@Composable
+private fun DeleteZone(isHovered: Boolean) {
+    val binScale by animateFloatAsState(
+        targetValue = if (isHovered) 1.4f else 1f,
+        animationSpec = spring(),
+        label = "delete_bin_scale",
+    )
+    val gradientAlpha by animateFloatAsState(
+        targetValue = if (isHovered) 1f else 0.5f,
+        animationSpec = spring(),
+        label = "delete_gradient_alpha",
+    )
+    val iconTint by animateColorAsState(
+        targetValue = if (isHovered) Color(0xFFE53935) else DwInk300,
+        animationSpec = spring(),
+        label = "delete_icon_tint",
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(88.dp)
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        Color.Transparent,
+                        Color(0xFFFFE5E5).copy(alpha = gradientAlpha)
+                    ),
+                )
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            imageVector = DwIcons.Trash,
+            contentDescription = "Drop here to delete",
+            tint = iconTint,
+            modifier = Modifier
+                .size(28.dp)
+                .graphicsLayer {
+                    scaleX = binScale
+                    scaleY = binScale
+                },
+        )
+    }
+}
+
 @Preview
 @Composable
 private fun AddDrinkButtonPreview() {
@@ -246,5 +350,7 @@ private fun AddDrinkButtonPreview() {
         onDrink = {},
         onCreatePreset = {},
         onReorder = { _, _ -> },
+        onDelete = {},
+        onRestorePreset = {},
     )
 }

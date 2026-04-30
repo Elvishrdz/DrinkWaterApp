@@ -55,6 +55,8 @@ internal fun DrinkScreen(
     onDrink: (Float) -> Unit,
     onReorderPresets: (List<DrinkPreset>, Boolean) -> Unit,
     onCreatePreset: (Float) -> Unit,
+    onDeletePreset: (DrinkPreset) -> Unit,
+    onRestorePreset: (DrinkPreset) -> Unit,
     onNavigateToHistory: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -105,6 +107,8 @@ internal fun DrinkScreen(
                 onDrink = onDrink,
                 onCreatePreset = onCreatePreset,
                 onReorder = onReorderPresets,
+                onDelete = onDeletePreset,
+                onRestorePreset = onRestorePreset,
                 modifier = Modifier.padding(horizontal = 20.dp)
             )
 
@@ -242,6 +246,8 @@ private fun DrinkScreenPreview() {
             onDrink = {},
             onReorderPresets = { _, _ -> },
             onCreatePreset = {},
+            onDeletePreset = {},
+            onRestorePreset = {},
             onNavigateToHistory = {}
         )
     }
@@ -256,6 +262,8 @@ private fun DrinkScreenEmptyPreview() {
             onDrink = {},
             onReorderPresets = { _, _ -> },
             onCreatePreset = {},
+            onDeletePreset = {},
+            onRestorePreset = {},
             onNavigateToHistory = {}
         )
     }
@@ -270,6 +278,8 @@ private fun DrinkScreenGoalReachedPreview() {
             onDrink = {},
             onReorderPresets = { _, _ -> },
             onCreatePreset = {},
+            onDeletePreset = {},
+            onRestorePreset = {},
             onNavigateToHistory = {}
         )
     }
@@ -291,5 +301,5 @@ private val stateMock = DrinkState.Data(
     ),
     quickDrinkPresets = drinkPresetsMock.take(3),
     allDrinkPresets = drinkPresetsMock,
-    todayLogs = previewLogEntries,
+    todayLogs = previewLogEntries.take(4),
 )
