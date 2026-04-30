@@ -2,7 +2,6 @@ package com.eahm.drinkwaterapp.feature.drink.ui
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,10 +16,10 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
@@ -108,16 +107,19 @@ fun DraggableQuickAddRow(
         modifier = modifier
             .fillMaxWidth()
             // required to draw child over other elements
-            .zIndex(5f)
-            .background(
-                Color.Cyan
-            ),
+            .zIndex(5f),
         horizontalArrangement = Arrangement.spacedBy(horizontalSpacing),
     ) {
         currentPresets.forEachIndexed { index, preset ->
             // key() ensures Compose moves this composable (preserving its pointerInput
             // gesture state) instead of destroying and recreating it on every swap.
             key(preset.amountMl) {
+                // rememberUpdatedState keeps this in sync with the current index on
+                // every recomposition without restarting the pointerInput coroutine.
+                // Without this, the gesture coroutine captures the index from when
+                // it first launched, so after a reorder onDragStart points at the
+                // wrong slot (the item's original position, not its current one).
+                val currentIndex by rememberUpdatedState(index)
                 val itemBeingDragged = draggedItemIndex == index
                 var itemPosX by remember { mutableStateOf(0f) }
                 var itemPosY by remember { mutableStateOf(0f) }
@@ -165,7 +167,7 @@ fun DraggableQuickAddRow(
                                 onDragStart = {
                                     previousPresets = currentPresets
                                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    draggedItemIndex = index
+                                    draggedItemIndex = currentIndex
                                     dragOffsetX = itemPosX
                                     dragOffsetY = itemPosY
                                 },
