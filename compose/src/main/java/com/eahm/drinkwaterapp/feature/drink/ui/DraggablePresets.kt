@@ -22,6 +22,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
@@ -37,6 +40,7 @@ private const val DRAG_Z_INDEX = 5f
 private const val GRID_COLUMNS = 3
 
 private val horizontalSpacing = 8.dp
+private val gridSpacing = 7.dp
 
 internal data class SwapResult(
     val presets: List<DrinkPreset>,
@@ -219,6 +223,10 @@ fun DraggableQuickAddRow(
 // Replaces LazyVerticalGrid in the bottom sheet. Same live-swap mechanic
 // extended to 2D: horizontal swaps fire first (same row), then vertical
 // (adjacent row), never both in the same drag event.
+//
+// A NestedScrollConnection consumes all scroll events while a drag is active
+// so the bottom sheet's anchoredDraggable cannot steal the gesture and trigger
+// an onDragCancel mid-reorder.
 // ─────────────────────────────────────────────────────────────────────────────
 
 @Composable
@@ -229,90 +237,112 @@ fun DraggablePresetGrid(
     columns: Int = GRID_COLUMNS,
     modifier: Modifier = Modifier,
 ) {
-    var items by remember { mutableStateOf(presets) }
-    var dragIndex by remember { mutableStateOf<Int?>(null) }
+    var currentPresets by remember { mutableStateOf(presets) }
+    var previousPresets by remember { mutableStateOf(emptyList<DrinkPreset>()) }
+
+    // Hold the state object explicitly so NestedScrollConnection can read the
+    // current value without capturing a stale reference.
+    val dragIndexState = remember { mutableStateOf<Int?>(null) }
+    var draggedItemIndex by dragIndexState
+    val isDraggingItem by derivedStateOf { draggedItemIndex != null }
+
     var dragOffset by remember { mutableStateOf(Offset.Zero) }
     var itemWidth by remember { mutableFloatStateOf(0f) }
     var itemHeight by remember { mutableFloatStateOf(0f) }
 
     val density = LocalDensity.current
-    val hSpacingPx = remember(density) { with(density) { 7.dp.toPx() } }
-    val vSpacingPx = remember(density) { with(density) { 7.dp.toPx() } }
+    val hSpacingPx = remember(density) { with(density) { gridSpacing.toPx() } }
+    val vSpacingPx = remember(density) { with(density) { gridSpacing.toPx() } }
     val haptic = LocalHapticFeedback.current
 
+    // Sync from ViewModel when not dragging
     LaunchedEffect(presets) {
-        if (dragIndex == null) items = presets
+        if (draggedItemIndex == null) currentPresets = presets
     }
 
-    val rowCount = (items.size + columns - 1) / columns
+    // While a drag is active, eat every scroll event before it reaches the
+    // parent bottom sheet. Without this the sheet moves and fires onDragCancel.
+    val nestedScrollConnection = remember(dragIndexState) {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset =
+                if (dragIndexState.value != null) available else Offset.Zero
+        }
+    }
+
+    val rowCount = (currentPresets.size + columns - 1) / columns
 
     Column(
         modifier = modifier
-            // required to draw child over other elements
-            .zIndex(10f),
-        verticalArrangement = Arrangement.spacedBy(7.dp),
+            .zIndex(10f)
+            .nestedScroll(nestedScrollConnection),
+        verticalArrangement = Arrangement.spacedBy(gridSpacing),
     ) {
         for (rowIdx in 0 until rowCount) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    // required to draw child over other elements
-                    .zIndex(10f),
-                horizontalArrangement = Arrangement.spacedBy(7.dp),
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(gridSpacing),
             ) {
                 for (colIdx in 0 until columns) {
                     val flatIdx = rowIdx * columns + colIdx
 
-                    if (flatIdx < items.size) {
-                        val preset = items[flatIdx]
+                    if (flatIdx < currentPresets.size) {
+                        val preset = currentPresets[flatIdx]
 
                         key(preset.amountMl) {
-                            val isDragging = dragIndex == flatIdx
+                            // Same stale-closure fix as DraggableQuickAddRow: the
+                            // pointerInput coroutine is never restarted on reorder
+                            // (key stays the same), so use rememberUpdatedState to
+                            // always reflect the item's current position in the grid.
+                            val currentFlatIdx by rememberUpdatedState(flatIdx)
+                            val itemBeingDragged = draggedItemIndex == flatIdx
+
                             val scale by animateFloatAsState(
-                                targetValue = if (isDragging) DRAG_SCALE else 1f,
+                                targetValue = if (itemBeingDragged) DRAG_SCALE else 1f,
                                 animationSpec = spring(),
                                 label = "grid_scale_$flatIdx",
                             )
                             val elevation by animateFloatAsState(
-                                targetValue = if (isDragging) DRAG_ELEVATION else 0f,
+                                targetValue = if (itemBeingDragged) DRAG_ELEVATION else 0f,
                                 label = "grid_elev_$flatIdx",
                             )
 
                             WaterChip(
                                 amount = preset.amountMl,
-                                onClick = { if (dragIndex == null) onDrink(preset.amountMl) },
+                                onClick = {
+                                    if (isDraggingItem) return@WaterChip
+                                    onDrink(preset.amountMl)
+                                },
                                 modifier = Modifier
                                     .weight(1f)
                                     .onSizeChanged {
                                         if (it.width > 0) itemWidth = it.width.toFloat()
                                         if (it.height > 0) itemHeight = it.height.toFloat()
                                     }
-                                    .zIndex(if (isDragging) 100f else 0f)
+                                    .zIndex(if (itemBeingDragged) DRAG_Z_INDEX else 0f)
                                     .graphicsLayer {
                                         scaleX = scale
                                         scaleY = scale
                                         shadowElevation = elevation
-                                        translationX = if (isDragging) dragOffset.x else 0f
-                                        translationY = if (isDragging) dragOffset.y else 0f
+                                        translationX = if (itemBeingDragged) dragOffset.x else 0f
+                                        translationY = if (itemBeingDragged) dragOffset.y else 0f
                                     }
                                     .pointerInput(preset.amountMl) {
-                                        var snapshot = emptyList<DrinkPreset>()
-
                                         detectDragGesturesAfterLongPress(
                                             onDragStart = {
-                                                snapshot = items
+                                                previousPresets = currentPresets
                                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                                dragIndex = flatIdx
+                                                draggedItemIndex = currentFlatIdx
                                                 dragOffset = Offset.Zero
                                             },
                                             onDrag = { _, delta ->
-                                                dragOffset += delta
-                                                val cur = dragIndex
+                                                val cur = draggedItemIndex
                                                     ?: return@detectDragGesturesAfterLongPress
                                                 val iw = itemWidth.takeIf { it > 0f }
                                                     ?: return@detectDragGesturesAfterLongPress
                                                 val ih = itemHeight.takeIf { it > 0f }
                                                     ?: return@detectDragGesturesAfterLongPress
+
+                                                dragOffset += delta
 
                                                 val hThreshold = iw / 2f + hSpacingPx / 2f
                                                 val vThreshold = ih / 2f + vSpacingPx / 2f
@@ -322,35 +352,35 @@ fun DraggablePresetGrid(
                                                 when {
                                                     dragOffset.x > hThreshold
                                                             && curCol < columns - 1
-                                                            && cur + 1 < items.size -> {
-                                                        val newList = items.toMutableList()
+                                                            && cur + 1 < currentPresets.size -> {
+                                                        val newList = currentPresets.toMutableList()
                                                         newList.add(cur + 1, newList.removeAt(cur))
-                                                        items = newList
-                                                        dragIndex = cur + 1
+                                                        currentPresets = newList
+                                                        draggedItemIndex = cur + 1
                                                         dragOffset = dragOffset.copy(
                                                             x = dragOffset.x - iw - hSpacingPx
                                                         )
                                                     }
 
                                                     dragOffset.x < -hThreshold && curCol > 0 -> {
-                                                        val newList = items.toMutableList()
+                                                        val newList = currentPresets.toMutableList()
                                                         newList.add(cur - 1, newList.removeAt(cur))
-                                                        items = newList
-                                                        dragIndex = cur - 1
+                                                        currentPresets = newList
+                                                        draggedItemIndex = cur - 1
                                                         dragOffset = dragOffset.copy(
                                                             x = dragOffset.x + iw + hSpacingPx
                                                         )
                                                     }
 
                                                     dragOffset.y > vThreshold
-                                                            && cur + columns < items.size -> {
-                                                        val newList = items.toMutableList()
+                                                            && cur + columns < currentPresets.size -> {
+                                                        val newList = currentPresets.toMutableList()
                                                         newList.add(
                                                             cur + columns,
                                                             newList.removeAt(cur)
                                                         )
-                                                        items = newList
-                                                        dragIndex = cur + columns
+                                                        currentPresets = newList
+                                                        draggedItemIndex = cur + columns
                                                         dragOffset = dragOffset.copy(
                                                             y = dragOffset.y - ih - vSpacingPx
                                                         )
@@ -358,13 +388,13 @@ fun DraggablePresetGrid(
 
                                                     dragOffset.y < -vThreshold
                                                             && cur - columns >= 0 -> {
-                                                        val newList = items.toMutableList()
+                                                        val newList = currentPresets.toMutableList()
                                                         newList.add(
                                                             cur - columns,
                                                             newList.removeAt(cur)
                                                         )
-                                                        items = newList
-                                                        dragIndex = cur - columns
+                                                        currentPresets = newList
+                                                        draggedItemIndex = cur - columns
                                                         dragOffset = dragOffset.copy(
                                                             y = dragOffset.y + ih + vSpacingPx
                                                         )
@@ -372,13 +402,13 @@ fun DraggablePresetGrid(
                                                 }
                                             },
                                             onDragEnd = {
-                                                onReorder(items)
-                                                dragIndex = null
+                                                onReorder(currentPresets)
+                                                draggedItemIndex = null
                                                 dragOffset = Offset.Zero
                                             },
                                             onDragCancel = {
-                                                items = snapshot
-                                                dragIndex = null
+                                                currentPresets = previousPresets
+                                                draggedItemIndex = null
                                                 dragOffset = Offset.Zero
                                             },
                                         )
