@@ -47,7 +47,7 @@ class DraggableQuickAddRowTest {
                 DraggableQuickAddRow(
                     presets = listOf(presetA, presetB, presetC),
                     onDrink = {},
-                    onReorder = { capturedOrder = it },
+                    onReorder = { it, _ -> capturedOrder = it },
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
@@ -80,7 +80,7 @@ class DraggableQuickAddRowTest {
                 DraggableQuickAddRow(
                     presets = startingOrder,
                     onDrink = {},
-                    onReorder = { capturedOrder = it },
+                    onReorder = { it, _ -> capturedOrder = it },
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
@@ -111,7 +111,7 @@ class DraggableQuickAddRowTest {
                 DraggableQuickAddRow(
                     presets = listOf(presetA, presetB, presetC),
                     onDrink = {},
-                    onReorder = { reorderEvents.add(it) },
+                    onReorder = { it, _ -> reorderEvents.add(it) },
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
@@ -159,7 +159,7 @@ class DraggableQuickAddRowTest {
                 DraggableQuickAddRow(
                     presets = listOf(presetA, presetB, presetC),
                     onDrink = {},
-                    onReorder = { capturedOrder = it },
+                    onReorder = { it, _ -> capturedOrder = it },
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
