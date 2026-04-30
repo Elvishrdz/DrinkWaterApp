@@ -149,4 +149,37 @@ class DraggableQuickAddRowTest {
         assertEquals(presetC, afterSecondDrag[1])
         assertEquals(presetA, afterSecondDrag[2])
     }
+
+    @Test
+    fun movingItemToEndAndBackRestoresOriginalOrder() {
+        var capturedOrder: List<DrinkPreset>? = null
+
+        composeTestRule.setContent {
+            DrinkWaterAppTheme {
+                DraggableQuickAddRow(
+                    presets = listOf(presetA, presetB, presetC),
+                    onDrink = {},
+                    onReorder = { capturedOrder = it },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        }
+
+        composeTestRule.onNodeWithTag("chip_100").performTouchInput {
+            val step = visibleSize.width.toFloat()
+            down(center)
+            advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100L)
+            moveBy(Offset(step, 0f))    // index 0 → 1
+            moveBy(Offset(step, 0f))    // index 1 → 2  (at the end)
+            moveBy(Offset(-step, 0f))   // index 2 → 1
+            moveBy(Offset(-step, 0f))   // index 1 → 0  (back to start)
+            up()
+        }
+        composeTestRule.waitForIdle()
+
+        assertNotNull("onReorder must be called after the gesture ends", capturedOrder)
+        assertEquals(presetA, capturedOrder!![0])
+        assertEquals(presetB, capturedOrder!![1])
+        assertEquals(presetC, capturedOrder!![2])
+    }
 }

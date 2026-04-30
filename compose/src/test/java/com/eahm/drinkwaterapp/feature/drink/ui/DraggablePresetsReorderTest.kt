@@ -144,6 +144,70 @@ class DraggablePresetsReorderTest {
     }
 
     @Test
+    fun `moving item all the way to the end and back restores original order`() {
+        val initial = listOf(presetA, presetB, presetC)
+
+        // ── Phase 1: drag A from index 0 to the last position (index 2) ─────
+        // Each call simulates one threshold crossing during the same continuous drag.
+
+        // A: 0 → 1
+        val step1 = applyHorizontalSwap(
+            list = initial,
+            dragIndex = 0,
+            dragOffsetX = threshold + 1f,
+            itemWidth = itemWidth,
+            spacingPx = spacingPx,
+        )!!
+        assertEquals(listOf(presetB, presetA, presetC), step1.presets)
+        assertEquals(1, step1.newIndex)
+
+        // A: 1 → 2  (offset was reset after the previous swap)
+        val step2 = applyHorizontalSwap(
+            list = step1.presets,
+            dragIndex = step1.newIndex,
+            dragOffsetX = threshold + 1f,
+            itemWidth = itemWidth,
+            spacingPx = spacingPx,
+        )!!
+        assertEquals(listOf(presetB, presetC, presetA), step2.presets)
+        assertEquals(2, step2.newIndex)
+
+        // A is at the last index — dragging further right should be blocked.
+        val blockedRight = applyHorizontalSwap(
+            list = step2.presets,
+            dragIndex = step2.newIndex,
+            dragOffsetX = threshold + 1f,
+            itemWidth = itemWidth,
+            spacingPx = spacingPx,
+        )
+        assertNull("item at last position cannot move right", blockedRight)
+
+        // ── Phase 2: drag A back from index 2 to the start (index 0) ────────
+
+        // A: 2 → 1
+        val step3 = applyHorizontalSwap(
+            list = step2.presets,
+            dragIndex = step2.newIndex,
+            dragOffsetX = -(threshold + 1f),
+            itemWidth = itemWidth,
+            spacingPx = spacingPx,
+        )!!
+        assertEquals(listOf(presetB, presetA, presetC), step3.presets)
+        assertEquals(1, step3.newIndex)
+
+        // A: 1 → 0
+        val step4 = applyHorizontalSwap(
+            list = step3.presets,
+            dragIndex = step3.newIndex,
+            dragOffsetX = -(threshold + 1f),
+            itemWidth = itemWidth,
+            spacingPx = spacingPx,
+        )!!
+        assertEquals(listOf(presetA, presetB, presetC), step4.presets)
+        assertEquals(0, step4.newIndex)
+    }
+
+    @Test
     fun `cannot swap the first item further left`() {
         val initial = listOf(presetA, presetB, presetC)
 
