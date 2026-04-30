@@ -5,12 +5,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -46,6 +44,7 @@ internal fun AddDrinkButton(
     presets: List<DrinkPreset>,
     onDrink: (Float) -> Unit,
     onCreatePreset: (Float) -> Unit,
+    onReorder: (List<DrinkPreset>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var showBottomSheet by rememberSaveable { mutableStateOf(false) }
@@ -70,25 +69,19 @@ internal fun AddDrinkButton(
         ) {
             Column(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(horizontal = 16.dp),
             ) {
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(100.dp),
-                    horizontalArrangement = Arrangement.spacedBy(7.dp),
-                    verticalArrangement = Arrangement.spacedBy(7.dp),
-                ) {
-                    items(presets) {
-                        WaterChip(
-                            amount = it.amountMl,
-                            onClick = {
-                                onDrink(it.amountMl)
-                                dismissBottomSheet()
-                            },
-                        )
-                    }
-                }
+                DraggablePresetGrid(
+                    presets = presets,
+                    onDrink = { amount ->
+                        onDrink(amount)
+                        dismissBottomSheet()
+                    },
+                    onReorder = onReorder,
+                )
 
-                if (true/*debug*/) {
+                if (true /*debug*/) {
                     Spacer(Modifier.height(7.dp))
 
                     Button(onClick = {
@@ -147,5 +140,6 @@ private fun AddDrinkButtonPreview() {
         presets = drinkPresetsMock,
         onDrink = {},
         onCreatePreset = {},
+        onReorder = {},
     )
 }

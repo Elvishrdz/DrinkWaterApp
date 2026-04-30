@@ -64,6 +64,7 @@ internal fun DrinkScreen(
     onGoalAmountChanged: (String) -> Unit,
     getRemainingAlarmTime: () -> String,
     onAlarmIntervalChange: (AlarmInterval) -> Unit,
+    onReorder: (List<DrinkPreset>) -> Unit = {},
     onCustom: () -> Unit = {},
     onSeeAll: () -> Unit = {},
     modifier: Modifier = Modifier,
@@ -113,6 +114,7 @@ internal fun DrinkScreen(
                 presets = state.drinkPresets,
                 onDrink = onDrink,
                 onCustom = onCustom,
+                onReorder = onReorder,
                 modifier = Modifier.padding(horizontal = 20.dp)
             )
 

@@ -26,6 +26,7 @@ internal fun DrinkRoot(
                 onGoalAmountChanged = viewModel::onGoalChanged,
                 getRemainingAlarmTime = viewModel::getRemainingAlarmTime,
                 onAlarmIntervalChange = viewModel::onAlarmIntervalChange,
+                onReorder = viewModel::onPresetsReordered,
             )
         }
     }

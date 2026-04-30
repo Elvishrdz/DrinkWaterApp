@@ -3,9 +3,7 @@ package com.eahm.drinkwaterapp.feature.drink.ui
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -37,27 +35,24 @@ fun QuickAddRow(
     presets: List<DrinkPreset>,
     onDrink: (Float) -> Unit,
     onCustom: () -> Unit,
+    onReorder: (List<DrinkPreset>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        presets.forEach {
-            WaterChip(
-                amount = it.amountMl,
-                onClick = { onDrink(it.amountMl) },
-                modifier = Modifier.weight(1f)
+    DraggableQuickAddRow(
+        presets = presets,
+        onDrink = onDrink,
+        onReorder = onReorder,
+        modifier = modifier,
+        trailingContent = { trailingModifier ->
+            AddDrinkButton(
+                presets = presets,
+                onDrink = onDrink,
+                onCreatePreset = {},
+                onReorder = onReorder,
+                modifier = trailingModifier,
             )
-        }
-
-        AddDrinkButton(
-            presets = presets,
-            onDrink = { onDrink(it) },
-            onCreatePreset = {},
-            modifier = Modifier.weight(1f)
-        )
-    }
+        },
+    )
 }
 
 @Composable
@@ -116,6 +111,7 @@ private fun QuickAddRowPreview() {
             presets = drinkPresetsMock,
             onDrink = {},
             onCustom = {},
+            onReorder = {},
             modifier = Modifier.padding(16.dp)
         )
     }

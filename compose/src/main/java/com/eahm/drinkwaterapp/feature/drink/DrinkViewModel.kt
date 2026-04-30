@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.core.bindings.toUI
 import com.eahm.drinkwaterapp.core.data.confetti.ConfettiController
+import com.eahm.drinkwaterapp.core.data.datastore.DrinkPreset
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.data.goalreachedwidget.GoalReachedWidget
@@ -240,6 +241,15 @@ internal class DrinkViewModel(
         if (Settings.canDrawOverlays(application)) {
             val intent = Intent(application, GoalReachedWidget::class.java)
             application.startService(intent)
+        }
+    }
+
+    fun onPresetsReordered(newOrder: List<DrinkPreset>) {
+        viewModelScope.launch {
+            val reordered = newOrder.mapIndexed { index, preset ->
+                preset.copy(order = index + 1)
+            }.toSet()
+            prefsStorage.setDrinkPresets(reordered)
         }
     }
 
