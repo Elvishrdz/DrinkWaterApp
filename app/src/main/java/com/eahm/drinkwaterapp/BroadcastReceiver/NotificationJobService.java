@@ -234,6 +234,7 @@ public class NotificationJobService extends JobIntentService {
                 // añadir ajuste de cantidad por defecto para la notificacion... al presionar siempre contar 500ml (por ejemplo)
 
                 // Tiempo para la siguiente alarma
+
                 long timeInMillis = utils.getMillis(settings.getIntervalValue());
                 long alarmNextTime = SystemClock.elapsedRealtime() + timeInMillis; // cada X minutos
 
