@@ -1,0 +1,510 @@
+package com.eahm.drinkwaterapp.feature.dev
+
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.eahm.drinkwaterapp.core.data.drinkalarm.DayTime
+import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmCalculator2
+import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkSchedule
+import com.eahm.drinkwaterapp.core.data.drinkalarm.calculateTimeDifference
+import com.eahm.drinkwaterapp.core.data.drinkalarm.inWholeMinutes
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterDeep
+import com.eahm.drinkwaterapp.core.designsystem.theme.JetBrainsMono
+import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
+import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
+import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorButton
+import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
+import kotlin.math.roundToInt
+
+// ─── Schedule mode ────────────────────────────────────────────────────────────
+
+private enum class ScheduleMode(val label: String) {
+    BY_AMOUNT("By Amount"),
+    BY_INTERVAL("By Interval"),
+}
+
+private val calculator = DrinkAlarmCalculator2()
+
+// ─── Screen ───────────────────────────────────────────────────────────────────
+
+@Composable
+internal fun AlarmCalculatorScreen(onBackClicked: () -> Unit) {
+    BackHandler(onBack = onBackClicked)
+
+    var startTime by remember { mutableStateOf(DayTime(7, 0)) }
+    var endTime by remember { mutableStateOf(DayTime(22, 0)) }
+    var goalAmountMl by remember { mutableIntStateOf(2_000) }
+    var mode by remember { mutableStateOf(ScheduleMode.BY_AMOUNT) }
+    var amountPerDrink by remember { mutableFloatStateOf(250f) }
+    var desiredIntervalMin by remember { mutableIntStateOf(120) }
+
+    // Recomputes whenever any input changes — no side effects needed.
+    val schedule = remember(startTime, endTime, goalAmountMl, mode, amountPerDrink, desiredIntervalMin) {
+        runCatching {
+            when (mode) {
+                ScheduleMode.BY_AMOUNT -> calculator.scheduleByAmount(
+                    startTime = startTime,
+                    endTime = endTime,
+                    goalAmountMl = goalAmountMl,
+                    amountPerDrinkMl = amountPerDrink,
+                )
+                ScheduleMode.BY_INTERVAL -> calculator.scheduleByInterval(
+                    startTime = startTime,
+                    endTime = endTime,
+                    goalAmountMl = goalAmountMl,
+                    desiredIntervalMinutes = desiredIntervalMin,
+                )
+            }
+        }.getOrNull()
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 20.dp, vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        // ── Header ────────────────────────────────────────────────────────────
+        TextButton(onClick = onBackClicked) {
+            Text("← Back to Menu")
+        }
+
+        Text(
+            text = "Alarm Calculator",
+            fontFamily = PlusJakartaSans,
+            fontWeight = FontWeight.Bold,
+            fontSize = 22.sp,
+        )
+
+        // ── Time range ────────────────────────────────────────────────────────
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            AppTimeSelectorButton(
+                text = "Start  ${startTime.hour.pad()}:${startTime.minute.pad()}",
+                time = TimeSelected(startTime.hour, startTime.minute),
+                onTimeSelected = { startTime = DayTime(it.hour, it.minute) },
+            )
+            AppTimeSelectorButton(
+                text = "End  ${endTime.hour.pad()}:${endTime.minute.pad()}",
+                time = TimeSelected(endTime.hour, endTime.minute),
+                onTimeSelected = { endTime = DayTime(it.hour, it.minute) },
+            )
+        }
+
+        // ── Goal amount ───────────────────────────────────────────────────────
+        val goalFraction = goalAmountMl / 4_000f
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = "Goal amount",
+                    fontFamily = PlusJakartaSans,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 14.sp,
+                    color = DwInk500,
+                )
+                Text(
+                    text = "$goalAmountMl mL",
+                    fontFamily = Nunito,
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 16.sp,
+                    color = DwWaterDeep,
+                )
+            }
+            LinearProgressIndicator(
+                progress = { goalFraction },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(6.dp),
+                color = DwWater,
+                trackColor = DwTintWater,
+            )
+            Slider(
+                value = goalAmountMl.toFloat(),
+                onValueChange = { goalAmountMl = it.roundToInt() },
+                valueRange = 500f..4_000f,
+                steps = 34,       // 100 mL increments
+                colors = SliderDefaults.colors(
+                    thumbColor = DwWater,
+                    activeTrackColor = DwWater,
+                    inactiveTrackColor = DwTintWater,
+                ),
+            )
+        }
+
+        // ── Mode toggle ───────────────────────────────────────────────────────
+        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+            ScheduleMode.entries.forEachIndexed { idx, m ->
+                SegmentedButton(
+                    selected = mode == m,
+                    onClick = { mode = m },
+                    shape = SegmentedButtonDefaults.itemShape(idx, ScheduleMode.entries.size),
+                    label = { Text(m.label, fontFamily = PlusJakartaSans) },
+                    colors = SegmentedButtonDefaults.colors(
+                        activeContainerColor = DwTintWater,
+                        activeContentColor = DwWaterDeep,
+                    ),
+                )
+            }
+        }
+
+        // ── Mode-specific control ─────────────────────────────────────────────
+        when (mode) {
+            ScheduleMode.BY_AMOUNT -> {
+                val amountFraction = (amountPerDrink - 50f) / (500f - 50f)
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = "Amount per drink",
+                            fontFamily = PlusJakartaSans,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 14.sp,
+                            color = DwInk500,
+                        )
+                        Text(
+                            text = "${amountPerDrink.roundToInt()} mL",
+                            fontFamily = Nunito,
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 16.sp,
+                            color = DwMagenta,
+                        )
+                    }
+                    LinearProgressIndicator(
+                        progress = { amountFraction },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(6.dp),
+                        color = DwMagenta,
+                        trackColor = DwTintMagenta,
+                    )
+                    Slider(
+                        value = amountPerDrink,
+                        onValueChange = { amountPerDrink = it },
+                        valueRange = 50f..500f,
+                        steps = 17,       // 25 mL increments
+                        colors = SliderDefaults.colors(
+                            thumbColor = DwMagenta,
+                            activeTrackColor = DwMagenta,
+                            inactiveTrackColor = DwTintMagenta,
+                        ),
+                    )
+                }
+            }
+
+            ScheduleMode.BY_INTERVAL -> {
+                val h = desiredIntervalMin / 60
+                val m = desiredIntervalMin % 60
+                val intervalLabel = buildString {
+                    if (h > 0) append("${h}h ")
+                    if (m > 0 || h == 0) append("${m}m")
+                }
+                val intervalFraction = (desiredIntervalMin - 15f) / (240f - 15f)
+
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = "Desired interval",
+                            fontFamily = PlusJakartaSans,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 14.sp,
+                            color = DwInk500,
+                        )
+                        Text(
+                            text = intervalLabel,
+                            fontFamily = Nunito,
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 16.sp,
+                            color = DwMagenta,
+                        )
+                    }
+                    LinearProgressIndicator(
+                        progress = { intervalFraction },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(6.dp),
+                        color = DwMagenta,
+                        trackColor = DwTintMagenta,
+                    )
+                    Slider(
+                        value = desiredIntervalMin.toFloat(),
+                        onValueChange = { desiredIntervalMin = it.roundToInt() },
+                        valueRange = 15f..240f,
+                        steps = 14,       // 15-min increments
+                        colors = SliderDefaults.colors(
+                            thumbColor = DwMagenta,
+                            activeTrackColor = DwMagenta,
+                            inactiveTrackColor = DwTintMagenta,
+                        ),
+                    )
+                }
+            }
+        }
+
+        HorizontalDivider()
+
+        // ── Results ───────────────────────────────────────────────────────────
+        if (schedule != null) {
+            ScheduleVisualization(
+                schedule = schedule,
+                startTime = startTime,
+                endTime = endTime,
+            )
+        } else {
+            Text(
+                text = "Invalid configuration — make sure start time is before end time.",
+                color = DwMagenta,
+                fontFamily = PlusJakartaSans,
+                fontSize = 14.sp,
+            )
+        }
+    }
+}
+
+// ─── Results section ──────────────────────────────────────────────────────────
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun ScheduleVisualization(
+    schedule: DrinkSchedule,
+    startTime: DayTime,
+    endTime: DayTime,
+) {
+    // Day coverage = active window / 24 h
+    val windowMinutes = DayTime.calculateTimeDifference(startTime, endTime).inWholeMinutes
+    val dayCoverageFraction = (windowMinutes / (24 * 60).toFloat()).coerceIn(0f, 1f)
+    val dayCoveragePct = (dayCoverageFraction * 100).roundToInt()
+
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+
+        // ── Summary chips ─────────────────────────────────────────────────────
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            SummaryChip(label = "Drinks", value = "${schedule.count}")
+
+            val iv = schedule.actualInterval
+            val intervalLabel = buildString {
+                if (iv.hour > 0) append("${iv.hour}h ")
+                if (iv.minute > 0 || iv.hour == 0) append("${iv.minute}m")
+            }
+            SummaryChip(label = "Interval", value = intervalLabel)
+
+            val base = schedule.slots.firstOrNull()?.amountMl?.roundToInt() ?: 0
+            SummaryChip(label = "Per drink", value = "${base}mL")
+        }
+
+        // ── Timeline chart ────────────────────────────────────────────────────
+        if (schedule.slots.size >= 2) {
+            TimelineChart(schedule = schedule)
+        }
+
+        // ── Day coverage progress ─────────────────────────────────────────────
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    text = "Day coverage",
+                    fontFamily = PlusJakartaSans,
+                    fontSize = 13.sp,
+                    color = DwInk500,
+                )
+                Text(
+                    text = "$dayCoveragePct% of 24 h",
+                    fontFamily = Nunito,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 13.sp,
+                    color = DwWaterDeep,
+                )
+            }
+            LinearProgressIndicator(
+                progress = { dayCoverageFraction },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(8.dp),
+                color = DwWater,
+                trackColor = DwTintWater,
+            )
+        }
+
+        // ── Slot chips ────────────────────────────────────────────────────────
+        Text(
+            text = "Schedule",
+            fontFamily = PlusJakartaSans,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 14.sp,
+            color = DwInk500,
+        )
+
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            schedule.slots.forEachIndexed { idx, slot ->
+                SlotChip(
+                    time = "${slot.time.hour.pad()}:${slot.time.minute.pad()}",
+                    amount = "${slot.amountMl.roundToInt()}mL",
+                    isEdge = idx == 0 || idx == schedule.slots.lastIndex,
+                )
+            }
+        }
+    }
+}
+
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
+@Composable
+private fun SummaryChip(label: String, value: String) {
+    Column(
+        modifier = Modifier
+            .background(DwTintWater, RoundedCornerShape(12.dp))
+            .padding(horizontal = 14.dp, vertical = 10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = value,
+            fontFamily = Nunito,
+            fontWeight = FontWeight.ExtraBold,
+            fontSize = 22.sp,
+            color = DwWaterDeep,
+        )
+        Text(
+            text = label,
+            fontFamily = PlusJakartaSans,
+            fontSize = 11.sp,
+            color = DwInk500,
+        )
+    }
+}
+
+@Composable
+private fun TimelineChart(schedule: DrinkSchedule) {
+    val slots = schedule.slots
+    val firstTime = slots.first().time
+    val lastTime = slots.last().time
+    val totalMin = DayTime.calculateTimeDifference(firstTime, lastTime)
+        .inWholeMinutes.toFloat().coerceAtLeast(1f)
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .background(DwTintWater, RoundedCornerShape(14.dp))
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+    ) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val cy = size.height / 2f
+
+            // Timeline bar
+            drawLine(
+                color = DwWater,
+                start = Offset(0f, cy),
+                end = Offset(size.width, cy),
+                strokeWidth = 3.dp.toPx(),
+            )
+
+            // Drink markers
+            slots.forEachIndexed { index, slot ->
+                val minFromStart = DayTime.calculateTimeDifference(firstTime, slot.time)
+                    .inWholeMinutes.toFloat()
+                val x = (minFromStart / totalMin) * size.width
+                val isEdge = index == 0 || index == slots.lastIndex
+
+                drawCircle(
+                    color = if (isEdge) DwWaterDeep else DwMagenta,
+                    radius = if (isEdge) 7.dp.toPx() else 4.dp.toPx(),
+                    center = Offset(x, cy),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SlotChip(
+    time: String,
+    amount: String,
+    isEdge: Boolean,
+) {
+    val bg by animateColorAsState(
+        targetValue = if (isEdge) DwTintMagenta else DwTintWater,
+        label = "chip_bg",
+    )
+    Column(
+        modifier = Modifier
+            .background(bg, RoundedCornerShape(8.dp))
+            .padding(horizontal = 8.dp, vertical = 6.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = time,
+            fontFamily = JetBrainsMono,
+            fontWeight = FontWeight.Medium,
+            fontSize = 12.sp,
+            color = if (isEdge) DwMagenta else DwWaterDeep,
+        )
+        Text(
+            text = amount,
+            fontFamily = Nunito,
+            fontWeight = FontWeight.Bold,
+            fontSize = 10.sp,
+            color = DwInk500,
+        )
+    }
+}
+
+private fun Int.pad(): String = toString().padStart(2, '0')

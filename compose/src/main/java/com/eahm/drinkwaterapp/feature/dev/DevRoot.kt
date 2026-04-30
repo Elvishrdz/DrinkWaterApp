@@ -68,6 +68,7 @@ enum class DevDestination(
     MENU("Menu", DwIcons.Drop),
     VALUES("Values", DwIcons.Drop),
     ADAPTIVE("Adaptive", DwIcons.Wave),
+    ALARM_CALCULATOR("Calculator", DwIcons.Clock),
 }
 
 
@@ -93,6 +94,10 @@ internal fun DevRoot(onBackClicked: () -> Unit) {
         )
 
         DevDestination.ADAPTIVE -> AdaptiveScreen(
+            onBackClicked = onBackClicked,
+        )
+
+        DevDestination.ALARM_CALCULATOR -> AlarmCalculatorScreen(
             onBackClicked = onBackClicked,
         )
     }
