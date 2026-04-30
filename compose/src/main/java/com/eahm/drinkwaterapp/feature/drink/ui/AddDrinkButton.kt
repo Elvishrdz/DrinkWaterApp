@@ -46,6 +46,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
 import com.eahm.drinkwaterapp.feature.drink.drinkPresetsMock
 import com.eahm.drinkwaterapp.ui.bottomsheet.AppBottomSheet
 import com.eahm.drinkwaterapp.ui.inputfield.AppInputField
+import com.eahm.drinkwaterapp.ui.inputfield.toDigitString
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -129,7 +130,13 @@ internal fun AddDrinkButton(
                         dismissBottomSheet()
                     },
                     onReorder = onReorder,
+                    // TODO: disable  dismiss when dragging item
+                    // canDismissBottomSheet = false
                 )
+
+                Spacer(Modifier.height(12.dp))
+
+                var customAmount by rememberSaveable { mutableStateOf<Float?>(null) }
 
                 Column(
                     verticalArrangement = Arrangement.spacedBy(7.dp),
@@ -137,8 +144,10 @@ internal fun AddDrinkButton(
                     AppInputField(
                         modifier = Modifier.fillMaxWidth(),
                         label = "Custom Amount",
-                        value = "",
-                        onValueChanged = {},
+                        value = customAmount?.toDigitString().orEmpty(),
+                        onValueChanged = {
+                            customAmount = it.toFloatOrNull()
+                        },
                     )
 
                     Row(
@@ -148,9 +157,11 @@ internal fun AddDrinkButton(
                     ) {
                         DwSecondaryButton(
                             text = "Create",
+                            enabled = customAmount != null,
                             onClick = {
-                                // TODO: disable  dismiss when dragging item
-                                // canDismissBottomSheet = false
+                                customAmount?.let {
+                                    onCreatePreset(it)
+                                }
                             },
                         )
 

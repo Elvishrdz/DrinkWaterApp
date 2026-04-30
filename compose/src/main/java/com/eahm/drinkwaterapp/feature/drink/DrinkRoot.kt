@@ -20,6 +20,7 @@ internal fun DrinkRoot(
             DrinkScreen(
                 state = data,
                 onDrink = viewModel::onDrink,
+                onCreatePreset = viewModel::onCreatePreset,
                 onDelete = viewModel::onDelete,
                 onDateChanged = viewModel::onDateChanged,
                 onStopAlarm = viewModel::onStopAlarm,

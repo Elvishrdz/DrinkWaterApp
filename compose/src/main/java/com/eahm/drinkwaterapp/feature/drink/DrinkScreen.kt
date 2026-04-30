@@ -65,7 +65,7 @@ internal fun DrinkScreen(
     getRemainingAlarmTime: () -> String,
     onAlarmIntervalChange: (AlarmInterval) -> Unit,
     onReorder: (List<DrinkPreset>) -> Unit = {},
-    onCustom: () -> Unit = {},
+    onCreatePreset: (Float) -> Unit,
     onSeeAll: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
@@ -113,7 +113,7 @@ internal fun DrinkScreen(
             QuickAddRow(
                 presets = state.drinkPresets,
                 onDrink = onDrink,
-                onCustom = onCustom,
+                onCreatePreset = onCreatePreset,
                 onReorder = onReorder,
                 modifier = Modifier.padding(horizontal = 20.dp)
             )
@@ -273,7 +273,7 @@ private fun DrinkScreenPreview() {
             getRemainingAlarmTime = { "" },
             onAlarmIntervalChange = {},
 
-            onCustom = {},
+            onCreatePreset = {},
             onSeeAll = {}
         )
     }
@@ -293,7 +293,7 @@ private fun DrinkScreenEmptyPreview() {
             getRemainingAlarmTime = { "" },
             onAlarmIntervalChange = {},
 
-            onCustom = {},
+            onCreatePreset = {},
             onSeeAll = {}
         )
     }
@@ -313,7 +313,7 @@ private fun DrinkScreenGoalReachedPreview() {
             getRemainingAlarmTime = { "" },
             onAlarmIntervalChange = {},
 
-            onCustom = {},
+            onCreatePreset = {},
             onSeeAll = {}
         )
     }

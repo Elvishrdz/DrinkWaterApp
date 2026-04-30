@@ -42,12 +42,12 @@ fun AppInputField(
 
                 if (validationResult.isValid) {
                     clearErrorMessage()
+                    onValueChanged(newValue)
                 } else {
                     errorMessage = validationResult.message
                 }
 
                 inputValue = newValue
-                onValueChanged(newValue)
             },
             label = { Text(label) },
             isError = errorMessage.isNotEmpty(),

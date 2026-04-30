@@ -34,7 +34,7 @@ import com.eahm.drinkwaterapp.ui.inputfield.toDigitString
 fun QuickAddRow(
     presets: List<DrinkPreset>,
     onDrink: (Float) -> Unit,
-    onCustom: () -> Unit,
+    onCreatePreset: (Float) -> Unit,
     onReorder: (List<DrinkPreset>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -47,7 +47,7 @@ fun QuickAddRow(
             AddDrinkButton(
                 presets = presets,
                 onDrink = onDrink,
-                onCreatePreset = {},
+                onCreatePreset = onCreatePreset,
                 onReorder = onReorder,
                 modifier = trailingModifier,
             )
@@ -110,7 +110,7 @@ private fun QuickAddRowPreview() {
         QuickAddRow(
             presets = drinkPresetsMock,
             onDrink = {},
-            onCustom = {},
+            onCreatePreset = {},
             onReorder = {},
             modifier = Modifier.padding(16.dp)
         )

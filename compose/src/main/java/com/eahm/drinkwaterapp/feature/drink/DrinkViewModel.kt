@@ -27,6 +27,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
@@ -211,6 +212,38 @@ internal class DrinkViewModel(
         }
     }
 
+    fun onCreatePreset(amount: Float) {
+        viewModelScope.launch {
+            prefsStorage.getDrinkPresets().firstOrNull()?.let { currentPresets ->
+                val isUnique = !currentPresets.any { it.amountMl.equals(amount) }
+
+                if (isUnique) {
+                    val new = DrinkPreset(
+                        order = currentPresets.size.plus(1),
+                        amountMl = amount,
+                    )
+
+                    val updated = currentPresets
+                        .toMutableSet()
+                        .apply { add(new) }
+                        .sortedBy { it.order }
+                        .toSet()
+
+                    prefsStorage.setDrinkPresets(updated)
+                }
+            }
+        }
+    }
+
+    fun onPresetsReordered(newOrder: List<DrinkPreset>) {
+        viewModelScope.launch {
+            val reordered = newOrder.mapIndexed { index, preset ->
+                preset.copy(order = index + 1)
+            }.toSet()
+            prefsStorage.setDrinkPresets(reordered)
+        }
+    }
+
     fun onDelete(it: HistoryEntity) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
@@ -241,15 +274,6 @@ internal class DrinkViewModel(
         if (Settings.canDrawOverlays(application)) {
             val intent = Intent(application, GoalReachedWidget::class.java)
             application.startService(intent)
-        }
-    }
-
-    fun onPresetsReordered(newOrder: List<DrinkPreset>) {
-        viewModelScope.launch {
-            val reordered = newOrder.mapIndexed { index, preset ->
-                preset.copy(order = index + 1)
-            }.toSet()
-            prefsStorage.setDrinkPresets(reordered)
         }
     }
 
