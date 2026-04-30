@@ -7,6 +7,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 internal fun DrinkRoot(
+    onNavigateToHistory: () -> Unit,
     viewModel: DrinkViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -27,6 +28,7 @@ internal fun DrinkRoot(
                 onGoalAmountChanged = viewModel::onGoalChanged,
                 getRemainingAlarmTime = viewModel::getRemainingAlarmTime,
                 onAlarmIntervalChange = viewModel::onAlarmIntervalChange,
+                onNavigateToHistory = onNavigateToHistory,
                 onReorder = viewModel::onPresetsReordered,
             )
         }

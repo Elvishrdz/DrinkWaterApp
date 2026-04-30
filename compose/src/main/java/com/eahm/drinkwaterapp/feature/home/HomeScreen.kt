@@ -82,7 +82,10 @@ internal fun HomeScreen() {
         }
     ) {
         when (currentDestination) {
-            HomeDestination.TODAY -> DrinkRoot()
+            HomeDestination.TODAY -> DrinkRoot(
+                onNavigateToHistory = { currentDestination = HomeDestination.HISTORY },
+            )
+
             HomeDestination.STATS -> StatsScreen()
             HomeDestination.HISTORY -> HistoryRoot()
             HomeDestination.SETTINGS -> SettingsScreen()

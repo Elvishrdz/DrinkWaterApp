@@ -1,6 +1,5 @@
 package com.eahm.drinkwaterapp.feature.drink
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -50,7 +49,6 @@ import com.eahm.drinkwaterapp.feature.drink.ui.ProgressRing
 import com.eahm.drinkwaterapp.feature.drink.ui.QuickAddRow
 import com.eahm.drinkwaterapp.feature.drink.ui.TodayLogSection
 import com.eahm.drinkwaterapp.feature.drink.ui.previewLogEntries
-import com.eahm.drinkwaterapp.ui.inputfield.AmountInputField
 import com.eahm.drinkwaterapp.ui.inputfield.toDigitString
 import kotlinx.datetime.LocalDateTime
 
@@ -66,7 +64,7 @@ internal fun DrinkScreen(
     onAlarmIntervalChange: (AlarmInterval) -> Unit,
     onReorder: (List<DrinkPreset>, Boolean) -> Unit = { _, _ -> },
     onCreatePreset: (Float) -> Unit,
-    onSeeAll: () -> Unit = {},
+    onNavigateToHistory: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -123,24 +121,9 @@ internal fun DrinkScreen(
 
             TodayLogSection(
                 items = state.todayLogs,
-                onSeeAll = onSeeAll,
+                onSeeAll = onNavigateToHistory,
                 modifier = Modifier.padding(horizontal = 20.dp)
             )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            AnimatedVisibility(state.drinkStats != null) {
-                state.drinkStats?.let {
-                    AmountInputField(
-                        modifier = Modifier.fillMaxWidth(),
-                        label = "Goal amount (mL)",
-                        value = it.goalAmount.toDigitString(),
-                        onValueSaved = { newAmount ->
-                            onGoalAmountChanged(newAmount)
-                        },
-                    )
-                }
-            }
 
             Spacer(Modifier.height(it.calculateBottomPadding()))
         }
@@ -275,7 +258,7 @@ private fun DrinkScreenPreview() {
             onAlarmIntervalChange = {},
 
             onCreatePreset = {},
-            onSeeAll = {}
+            onNavigateToHistory = {}
         )
     }
 }
@@ -295,7 +278,7 @@ private fun DrinkScreenEmptyPreview() {
             onAlarmIntervalChange = {},
 
             onCreatePreset = {},
-            onSeeAll = {}
+            onNavigateToHistory = {}
         )
     }
 }
@@ -315,7 +298,7 @@ private fun DrinkScreenGoalReachedPreview() {
             onAlarmIntervalChange = {},
 
             onCreatePreset = {},
-            onSeeAll = {}
+            onNavigateToHistory = {}
         )
     }
 }
