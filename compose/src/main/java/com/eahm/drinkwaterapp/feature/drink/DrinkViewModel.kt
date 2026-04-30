@@ -81,7 +81,6 @@ internal class DrinkViewModel(
     ) { date, records ->
         val todayLogs = records
             .filter { it.timestamp in date.toStartOfDayTime..date.toEndOfDayTime }
-            //.take(4)
             .sortedByDescending { it.timestamp }
             .map {
                 DrinkLogEntry(
@@ -95,10 +94,11 @@ internal class DrinkViewModel(
                     amount = it.amount,
                 )
             }
+            .take(TODAY_LOGS_AMOUNT)
 
         HistoryData(
             date = date,
-            todayLogs = todayLogs
+            todayLogs = todayLogs,
         )
 
     }.stateIn(
@@ -221,5 +221,6 @@ internal class DrinkViewModel(
     companion object {
 
         const val QUICK_DRINK_PRESETS_AMOUNT = 3
+        const val TODAY_LOGS_AMOUNT = 4
     }
 }
