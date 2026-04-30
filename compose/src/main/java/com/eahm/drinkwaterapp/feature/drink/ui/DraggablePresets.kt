@@ -27,6 +27,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.eahm.drinkwaterapp.core.data.datastore.DrinkPreset
@@ -37,6 +38,41 @@ private const val DRAG_Z_INDEX = 5f
 private const val GRID_COLUMNS = 3
 
 private val horizontalSpacing = 8.dp
+
+internal data class SwapResult(
+    val presets: List<DrinkPreset>,
+    val newIndex: Int,
+    val newOffsetX: Float,
+)
+
+/**
+ * Returns the new list, drag index, and adjusted offset after a horizontal
+ * threshold-based swap, or null if no swap threshold was crossed.
+ */
+internal fun applyHorizontalSwap(
+    list: List<DrinkPreset>,
+    dragIndex: Int,
+    dragOffsetX: Float,
+    itemWidth: Float,
+    spacingPx: Float,
+): SwapResult? {
+    val threshold = itemWidth / 2f + spacingPx / 2f
+    return when {
+        dragOffsetX > threshold && dragIndex < list.lastIndex -> {
+            val newList = list.toMutableList()
+            newList.add(dragIndex + 1, newList.removeAt(dragIndex))
+            SwapResult(newList, dragIndex + 1, dragOffsetX - itemWidth - spacingPx)
+        }
+
+        dragOffsetX < -threshold && dragIndex > 0 -> {
+            val newList = list.toMutableList()
+            newList.add(dragIndex - 1, newList.removeAt(dragIndex))
+            SwapResult(newList, dragIndex - 1, dragOffsetX + itemWidth + spacingPx)
+        }
+
+        else -> null
+    }
+}
 
 @Composable
 fun DraggableQuickAddRow(
@@ -105,6 +141,7 @@ fun DraggableQuickAddRow(
                         onDrink(preset.amountMl)
                     },
                     modifier = Modifier
+                        .testTag("chip_${preset.amountMl.toInt()}")
                         .weight(1f)
                         .onSizeChanged { size ->
                             if (size.width > 0) itemWidth = size.width.toFloat()
@@ -135,39 +172,22 @@ fun DraggableQuickAddRow(
                                 onDrag = { _, delta ->
                                     val currentDragIndex = draggedItemIndex
                                         ?: return@detectDragGesturesAfterLongPress
-
                                     val currentItemWidth = itemWidth.takeIf { it > 0f }
                                         ?: return@detectDragGesturesAfterLongPress
 
                                     dragOffsetX += delta.x
                                     dragOffsetY += delta.y
 
-                                    val threshold = currentItemWidth / 2f + spacingPx / 2f
-
-                                    when {
-                                        dragOffsetX > threshold && currentDragIndex < currentPresets.lastIndex
-                                            -> {
-                                            val newList = currentPresets.toMutableList()
-                                            newList.add(
-                                                currentDragIndex + 1,
-                                                newList.removeAt(currentDragIndex)
-                                            )
-                                            currentPresets = newList
-                                            draggedItemIndex = currentDragIndex + 1
-                                            dragOffsetX -= currentItemWidth + spacingPx
-                                        }
-
-                                        dragOffsetX < -threshold && currentDragIndex > 0
-                                            -> {
-                                            val newList = currentPresets.toMutableList()
-                                            newList.add(
-                                                currentDragIndex - 1,
-                                                newList.removeAt(currentDragIndex)
-                                            )
-                                            currentPresets = newList
-                                            draggedItemIndex = currentDragIndex - 1
-                                            dragOffsetX += currentItemWidth + spacingPx
-                                        }
+                                    applyHorizontalSwap(
+                                        list = currentPresets,
+                                        dragIndex = currentDragIndex,
+                                        dragOffsetX = dragOffsetX,
+                                        itemWidth = currentItemWidth,
+                                        spacingPx = spacingPx,
+                                    )?.let { result ->
+                                        currentPresets = result.presets
+                                        draggedItemIndex = result.newIndex
+                                        dragOffsetX = result.newOffsetX
                                     }
                                 },
                                 onDragEnd = {
@@ -225,12 +245,16 @@ fun DraggablePresetGrid(
     val rowCount = (items.size + columns - 1) / columns
 
     Column(
-        modifier = modifier,
+        modifier = modifier
+            // required to draw child over other elements
+            .zIndex(10f),
         verticalArrangement = Arrangement.spacedBy(7.dp),
     ) {
         for (rowIdx in 0 until rowCount) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+                    // required to draw child over other elements
+                    .zIndex(10f),
                 horizontalArrangement = Arrangement.spacedBy(7.dp),
             ) {
                 for (colIdx in 0 until columns) {
@@ -260,7 +284,7 @@ fun DraggablePresetGrid(
                                         if (it.width > 0) itemWidth = it.width.toFloat()
                                         if (it.height > 0) itemHeight = it.height.toFloat()
                                     }
-                                    .zIndex(if (isDragging) 10f else 0f)
+                                    .zIndex(if (isDragging) 100f else 0f)
                                     .graphicsLayer {
                                         scaleX = scale
                                         scaleY = scale
