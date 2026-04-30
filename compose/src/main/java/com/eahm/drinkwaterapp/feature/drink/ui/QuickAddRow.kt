@@ -76,13 +76,49 @@ fun WaterChip(
     amount: Float,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    animateOnClick: Boolean = false,
+    fillColor: Color = DwWater,
+    fillDurationMs: Int = 450,
+    fadeDurationMs: Int = 300,
 ) {
+    val animatable = remember { Animatable(0f) }
+    val scope = rememberCoroutineScope()
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = modifier
             .outlineBorderStyle()
-            .clickable(onClick = onClick)
+            .clickable {
+                onClick()
+                if (animateOnClick) {
+                    scope.launch {
+                        animatable.snapTo(0f)
+                        animatable.animateTo(
+                            targetValue = 1f,
+                            animationSpec = tween(fillDurationMs, easing = FastOutSlowInEasing),
+                        )
+                        animatable.animateTo(
+                            targetValue = 2f,
+                            animationSpec = tween(fadeDurationMs, easing = LinearEasing),
+                        )
+                        animatable.snapTo(0f)
+                    }
+                }
+            }
+            .drawBehind {
+                val v = animatable.value
+                if (v > 0f) {
+                    val fillProgress = v.coerceIn(0f, 1f)
+                    val fadeAlpha = 1f - (v - 1f).coerceIn(0f, 1f)
+                    val fillHeight = size.height * fillProgress
+                    drawRect(
+                        color = fillColor.copy(alpha = 0.28f * fadeAlpha),
+                        topLeft = Offset(0f, size.height - fillHeight),
+                        size = Size(size.width, fillHeight),
+                    )
+                }
+            }
             .padding(vertical = 10.dp, horizontal = 6.dp)
     ) {
         Icon(

@@ -146,6 +146,7 @@ fun DraggableQuickAddRow(
 
                         onDrink(preset.amountMl)
                     },
+                    animateOnClick = !isDraggingItem,
                     modifier = Modifier
                         .testTag("chip_${preset.amountMl.toInt()}")
                         .weight(1f)
