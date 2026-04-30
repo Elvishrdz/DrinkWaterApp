@@ -55,7 +55,7 @@ internal fun AddDrinkButton(
     presets: List<DrinkPreset>,
     onDrink: (Float) -> Unit,
     onCreatePreset: (Float) -> Unit,
-    onReorder: (List<DrinkPreset>) -> Unit,
+    onReorder: (List<DrinkPreset>, Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var showBottomSheet by rememberSaveable { mutableStateOf(false) }
@@ -129,7 +129,7 @@ internal fun AddDrinkButton(
                         onDrink(amount)
                         dismissBottomSheet()
                     },
-                    onReorder = onReorder,
+                    onReorder = { onReorder(it, false) },
                     // TODO: disable  dismiss when dragging item
                     // canDismissBottomSheet = false
                 )
@@ -220,6 +220,6 @@ private fun AddDrinkButtonPreview() {
         presets = drinkPresetsMock,
         onDrink = {},
         onCreatePreset = {},
-        onReorder = {},
+        onReorder = { _, _ -> },
     )
 }

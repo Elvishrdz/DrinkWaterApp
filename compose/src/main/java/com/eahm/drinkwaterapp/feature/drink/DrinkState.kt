@@ -13,7 +13,8 @@ internal sealed interface DrinkState {
     data class Data(
         val username: String?,
         val currentStreak: Int,
-        val drinkPresets: List<DrinkPreset>,
+        val quickDrinkPresets: List<DrinkPreset>,
+        val allDrinkPresets: List<DrinkPreset>,
         val date: LocalDateTime,
         val historyRecords: List<HourGroup>,
         val todayLogs: List<DrinkLogEntry>,
@@ -34,5 +35,6 @@ data class DrinkStats(
 
 data class DrinkExtras(
     val username: String?,
-    val drinkPresets: List<DrinkPreset>,
+    val quickDrinkPresets: List<DrinkPreset>,
+    val allDrinkPresets: List<DrinkPreset>,
 )

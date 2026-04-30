@@ -152,11 +152,14 @@ internal class DrinkViewModel(
         prefsStorage.getUsername(),
         prefsStorage.getDrinkPresets(),
     ) { username, drinkPresets ->
+        val allDrinkPresets = drinkPresets
+            .sortedBy { it.order }
+            .toList()
+
         DrinkExtras(
             username = username,
-            drinkPresets = drinkPresets
-                .sortedBy { it.order }
-                .toList(),
+            quickDrinkPresets = allDrinkPresets.take(QUICK_DRINK_PRESETS_AMOUNT),
+            allDrinkPresets = allDrinkPresets,
         )
 
     }.stateIn(
@@ -178,7 +181,8 @@ internal class DrinkViewModel(
                 username = extras.username,
                 currentStreak = 0,
                 date = history.date,
-                drinkPresets = extras.drinkPresets,
+                quickDrinkPresets = extras.quickDrinkPresets,
+                allDrinkPresets = extras.allDrinkPresets,
                 historyRecords = history.historyRecords,
                 todayLogs = history.todayLogs,
                 drinkStats = drinkStats,
@@ -235,11 +239,24 @@ internal class DrinkViewModel(
         }
     }
 
-    fun onPresetsReordered(newOrder: List<DrinkPreset>) {
+    fun onPresetsReordered(newOrder: List<DrinkPreset>, reorderingQuickPresets: Boolean) {
         viewModelScope.launch {
             val reordered = newOrder.mapIndexed { index, preset ->
                 preset.copy(order = index + 1)
-            }.toSet()
+            }.toMutableSet()
+
+            if (reorderingQuickPresets) {
+                val currentPresets = prefsStorage.getDrinkPresets().firstOrNull()
+                    ?.toMutableSet()
+
+                val remainingPresets = currentPresets
+                    ?.filterIndexed { index, _ -> index >= QUICK_DRINK_PRESETS_AMOUNT }
+
+                remainingPresets?.let {
+                    reordered.addAll(it)
+                }
+            }
+
             prefsStorage.setDrinkPresets(reordered)
         }
     }
@@ -279,4 +296,9 @@ internal class DrinkViewModel(
 
     fun onStopAlarm() = drinkAlarmManager.stop()
     fun getRemainingAlarmTime() = drinkAlarmManager.remainingTime()
+
+    companion object {
+
+        const val QUICK_DRINK_PRESETS_AMOUNT = 3
+    }
 }

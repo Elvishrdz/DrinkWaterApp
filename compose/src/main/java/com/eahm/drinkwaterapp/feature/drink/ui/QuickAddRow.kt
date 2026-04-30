@@ -32,20 +32,21 @@ import com.eahm.drinkwaterapp.ui.inputfield.toDigitString
 
 @Composable
 fun QuickAddRow(
-    presets: List<DrinkPreset>,
+    quickPresets: List<DrinkPreset>,
+    allPresets: List<DrinkPreset>,
     onDrink: (Float) -> Unit,
     onCreatePreset: (Float) -> Unit,
-    onReorder: (List<DrinkPreset>) -> Unit,
+    onReorder: (List<DrinkPreset>, Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     DraggableQuickAddRow(
-        presets = presets,
+        presets = quickPresets,
         onDrink = onDrink,
         onReorder = onReorder,
         modifier = modifier,
         trailingContent = { trailingModifier ->
             AddDrinkButton(
-                presets = presets,
+                presets = allPresets,
                 onDrink = onDrink,
                 onCreatePreset = onCreatePreset,
                 onReorder = onReorder,
@@ -108,10 +109,11 @@ fun WaterChip(
 private fun QuickAddRowPreview() {
     DrinkWaterAppTheme {
         QuickAddRow(
-            presets = drinkPresetsMock,
+            quickPresets = drinkPresetsMock.take(3),
+            allPresets = drinkPresetsMock,
             onDrink = {},
             onCreatePreset = {},
-            onReorder = {},
+            onReorder = { _, _ -> },
             modifier = Modifier.padding(16.dp)
         )
     }

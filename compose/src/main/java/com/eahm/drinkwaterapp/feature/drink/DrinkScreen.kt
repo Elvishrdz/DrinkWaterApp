@@ -64,7 +64,7 @@ internal fun DrinkScreen(
     onGoalAmountChanged: (String) -> Unit,
     getRemainingAlarmTime: () -> String,
     onAlarmIntervalChange: (AlarmInterval) -> Unit,
-    onReorder: (List<DrinkPreset>) -> Unit = {},
+    onReorder: (List<DrinkPreset>, Boolean) -> Unit = { _, _ -> },
     onCreatePreset: (Float) -> Unit,
     onSeeAll: () -> Unit = {},
     modifier: Modifier = Modifier,
@@ -111,7 +111,8 @@ internal fun DrinkScreen(
             Spacer(modifier = Modifier.height(20.dp))
 
             QuickAddRow(
-                presets = state.drinkPresets,
+                quickPresets = state.quickDrinkPresets,
+                allPresets = state.allDrinkPresets,
                 onDrink = onDrink,
                 onCreatePreset = onCreatePreset,
                 onReorder = onReorder,
@@ -328,7 +329,8 @@ internal val drinkPresetsMock = listOf(
 private val stateMock = DrinkState.Data(
     username = "Dave",
     currentStreak = 1,
-    drinkPresets = drinkPresetsMock,
+    quickDrinkPresets = drinkPresetsMock.take(3),
+    allDrinkPresets = drinkPresetsMock,
     date = LocalDateTime(2023, 1, 1, 12, 0),
     historyRecords = emptyList(),
     todayLogs = previewLogEntries,

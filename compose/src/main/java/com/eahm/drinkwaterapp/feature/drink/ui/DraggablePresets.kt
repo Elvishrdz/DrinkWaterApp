@@ -78,7 +78,7 @@ internal fun applyHorizontalSwap(
 fun DraggableQuickAddRow(
     presets: List<DrinkPreset>,
     onDrink: (Float) -> Unit,
-    onReorder: (List<DrinkPreset>) -> Unit,
+    onReorder: (List<DrinkPreset>, Boolean) -> Unit,
     modifier: Modifier = Modifier,
     trailingContent: @Composable (Modifier) -> Unit = {},
 ) {
@@ -191,7 +191,7 @@ fun DraggableQuickAddRow(
                                     }
                                 },
                                 onDragEnd = {
-                                    onReorder(currentPresets)
+                                    onReorder(currentPresets, true)
                                     draggedItemIndex = null
                                     dragOffsetX = 0f
                                     dragOffsetY = 0f
@@ -252,7 +252,8 @@ fun DraggablePresetGrid(
     ) {
         for (rowIdx in 0 until rowCount) {
             Row(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     // required to draw child over other elements
                     .zIndex(10f),
                 horizontalArrangement = Arrangement.spacedBy(7.dp),
