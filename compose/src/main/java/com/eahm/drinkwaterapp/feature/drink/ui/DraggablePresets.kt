@@ -224,9 +224,15 @@ fun DraggableQuickAddRow(
 // extended to 2D: horizontal swaps fire first (same row), then vertical
 // (adjacent row), never both in the same drag event.
 //
-// A NestedScrollConnection consumes all scroll events while a drag is active
-// so the bottom sheet's anchoredDraggable cannot steal the gesture and trigger
-// an onDragCancel mid-reorder.
+// IMPORTANT: gesture detection lives on the Column, NOT on individual items.
+// With per-item pointerInput, a vertical swap moves a key() node from one Row
+// to another — Compose destroys and recreates it, which cancels the active
+// gesture and snaps the item back. A single pointerInput on the Column
+// survives all swaps intact. Items are purely visual: they read grid-level
+// state to render scale, elevation and translation.
+//
+// A NestedScrollConnection also consumes all scroll while dragging so the
+// bottom sheet's anchoredDraggable cannot steal the gesture.
 // ─────────────────────────────────────────────────────────────────────────────
 
 @Composable
@@ -274,7 +280,96 @@ fun DraggablePresetGrid(
     Column(
         modifier = modifier
             .zIndex(10f)
-            .nestedScroll(nestedScrollConnection),
+            .nestedScroll(nestedScrollConnection)
+            // Single grid-level gesture — survives cross-row swaps intact.
+            // onDragStart finds the hit cell from the touch offset and item
+            // dimensions; subsequent onDrag events update grid-level state.
+            .pointerInput(columns) {
+                detectDragGesturesAfterLongPress(
+                    onDragStart = { offset ->
+                        val iw = itemWidth.takeIf { it > 0f }
+                            ?: return@detectDragGesturesAfterLongPress
+                        val ih = itemHeight.takeIf { it > 0f }
+                            ?: return@detectDragGesturesAfterLongPress
+
+                        val col = (offset.x / (iw + hSpacingPx))
+                            .toInt().coerceIn(0, columns - 1)
+                        val row = (offset.y / (ih + vSpacingPx))
+                            .toInt().coerceAtLeast(0)
+                        val idx = row * columns + col
+
+                        if (idx >= currentPresets.size) return@detectDragGesturesAfterLongPress
+
+                        previousPresets = currentPresets
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        draggedItemIndex = idx
+                        dragOffset = Offset.Zero
+                    },
+                    onDrag = { _, delta ->
+                        val cur = draggedItemIndex
+                            ?: return@detectDragGesturesAfterLongPress
+                        val iw = itemWidth.takeIf { it > 0f }
+                            ?: return@detectDragGesturesAfterLongPress
+                        val ih = itemHeight.takeIf { it > 0f }
+                            ?: return@detectDragGesturesAfterLongPress
+
+                        dragOffset += delta
+
+                        val hThreshold = iw / 2f + hSpacingPx / 2f
+                        val vThreshold = ih / 2f + vSpacingPx / 2f
+                        val curCol = cur % columns
+
+                        // One swap per drag event — horizontal first
+                        when {
+                            dragOffset.x > hThreshold
+                                    && curCol < columns - 1
+                                    && cur + 1 < currentPresets.size -> {
+                                val newList = currentPresets.toMutableList()
+                                newList.add(cur + 1, newList.removeAt(cur))
+                                currentPresets = newList
+                                draggedItemIndex = cur + 1
+                                dragOffset = dragOffset.copy(x = dragOffset.x - iw - hSpacingPx)
+                            }
+
+                            dragOffset.x < -hThreshold && curCol > 0 -> {
+                                val newList = currentPresets.toMutableList()
+                                newList.add(cur - 1, newList.removeAt(cur))
+                                currentPresets = newList
+                                draggedItemIndex = cur - 1
+                                dragOffset = dragOffset.copy(x = dragOffset.x + iw + hSpacingPx)
+                            }
+
+                            dragOffset.y > vThreshold
+                                    && cur + columns < currentPresets.size -> {
+                                val newList = currentPresets.toMutableList()
+                                newList.add(cur + columns, newList.removeAt(cur))
+                                currentPresets = newList
+                                draggedItemIndex = cur + columns
+                                dragOffset = dragOffset.copy(y = dragOffset.y - ih - vSpacingPx)
+                            }
+
+                            dragOffset.y < -vThreshold
+                                    && cur - columns >= 0 -> {
+                                val newList = currentPresets.toMutableList()
+                                newList.add(cur - columns, newList.removeAt(cur))
+                                currentPresets = newList
+                                draggedItemIndex = cur - columns
+                                dragOffset = dragOffset.copy(y = dragOffset.y + ih + vSpacingPx)
+                            }
+                        }
+                    },
+                    onDragEnd = {
+                        onReorder(currentPresets)
+                        draggedItemIndex = null
+                        dragOffset = Offset.Zero
+                    },
+                    onDragCancel = {
+                        currentPresets = previousPresets
+                        draggedItemIndex = null
+                        dragOffset = Offset.Zero
+                    },
+                )
+            },
         verticalArrangement = Arrangement.spacedBy(gridSpacing),
     ) {
         for (rowIdx in 0 until rowCount) {
@@ -288,12 +383,10 @@ fun DraggablePresetGrid(
                     if (flatIdx < currentPresets.size) {
                         val preset = currentPresets[flatIdx]
 
+                        // key() preserves animation state for same-row swaps.
+                        // Cross-row swaps recreate the node, but that is fine
+                        // now that gesture state lives on the Column.
                         key(preset.amountMl) {
-                            // Same stale-closure fix as DraggableQuickAddRow: the
-                            // pointerInput coroutine is never restarted on reorder
-                            // (key stays the same), so use rememberUpdatedState to
-                            // always reflect the item's current position in the grid.
-                            val currentFlatIdx by rememberUpdatedState(flatIdx)
                             val itemBeingDragged = draggedItemIndex == flatIdx
 
                             val scale by animateFloatAsState(
@@ -325,93 +418,6 @@ fun DraggablePresetGrid(
                                         shadowElevation = elevation
                                         translationX = if (itemBeingDragged) dragOffset.x else 0f
                                         translationY = if (itemBeingDragged) dragOffset.y else 0f
-                                    }
-                                    .pointerInput(preset.amountMl) {
-                                        detectDragGesturesAfterLongPress(
-                                            onDragStart = {
-                                                previousPresets = currentPresets
-                                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                                draggedItemIndex = currentFlatIdx
-                                                dragOffset = Offset.Zero
-                                            },
-                                            onDrag = { _, delta ->
-                                                val cur = draggedItemIndex
-                                                    ?: return@detectDragGesturesAfterLongPress
-                                                val iw = itemWidth.takeIf { it > 0f }
-                                                    ?: return@detectDragGesturesAfterLongPress
-                                                val ih = itemHeight.takeIf { it > 0f }
-                                                    ?: return@detectDragGesturesAfterLongPress
-
-                                                dragOffset += delta
-
-                                                val hThreshold = iw / 2f + hSpacingPx / 2f
-                                                val vThreshold = ih / 2f + vSpacingPx / 2f
-                                                val curCol = cur % columns
-
-                                                // One swap per drag event — horizontal first
-                                                when {
-                                                    dragOffset.x > hThreshold
-                                                            && curCol < columns - 1
-                                                            && cur + 1 < currentPresets.size -> {
-                                                        val newList = currentPresets.toMutableList()
-                                                        newList.add(cur + 1, newList.removeAt(cur))
-                                                        currentPresets = newList
-                                                        draggedItemIndex = cur + 1
-                                                        dragOffset = dragOffset.copy(
-                                                            x = dragOffset.x - iw - hSpacingPx
-                                                        )
-                                                    }
-
-                                                    dragOffset.x < -hThreshold && curCol > 0 -> {
-                                                        val newList = currentPresets.toMutableList()
-                                                        newList.add(cur - 1, newList.removeAt(cur))
-                                                        currentPresets = newList
-                                                        draggedItemIndex = cur - 1
-                                                        dragOffset = dragOffset.copy(
-                                                            x = dragOffset.x + iw + hSpacingPx
-                                                        )
-                                                    }
-
-                                                    dragOffset.y > vThreshold
-                                                            && cur + columns < currentPresets.size -> {
-                                                        val newList = currentPresets.toMutableList()
-                                                        newList.add(
-                                                            cur + columns,
-                                                            newList.removeAt(cur)
-                                                        )
-                                                        currentPresets = newList
-                                                        draggedItemIndex = cur + columns
-                                                        dragOffset = dragOffset.copy(
-                                                            y = dragOffset.y - ih - vSpacingPx
-                                                        )
-                                                    }
-
-                                                    dragOffset.y < -vThreshold
-                                                            && cur - columns >= 0 -> {
-                                                        val newList = currentPresets.toMutableList()
-                                                        newList.add(
-                                                            cur - columns,
-                                                            newList.removeAt(cur)
-                                                        )
-                                                        currentPresets = newList
-                                                        draggedItemIndex = cur - columns
-                                                        dragOffset = dragOffset.copy(
-                                                            y = dragOffset.y + ih + vSpacingPx
-                                                        )
-                                                    }
-                                                }
-                                            },
-                                            onDragEnd = {
-                                                onReorder(currentPresets)
-                                                draggedItemIndex = null
-                                                dragOffset = Offset.Zero
-                                            },
-                                            onDragCancel = {
-                                                currentPresets = previousPresets
-                                                draggedItemIndex = null
-                                                dragOffset = Offset.Zero
-                                            },
-                                        )
                                     },
                             )
                         }
