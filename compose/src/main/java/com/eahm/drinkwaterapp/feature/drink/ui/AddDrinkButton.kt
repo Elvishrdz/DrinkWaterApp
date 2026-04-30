@@ -4,15 +4,21 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -30,12 +36,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.core.data.datastore.DrinkPreset
+import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
+import com.eahm.drinkwaterapp.core.designsystem.component.button.DwSecondaryButton
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk300
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
 import com.eahm.drinkwaterapp.feature.drink.drinkPresetsMock
 import com.eahm.drinkwaterapp.ui.bottomsheet.AppBottomSheet
+import com.eahm.drinkwaterapp.ui.inputfield.AppInputField
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,7 +58,11 @@ internal fun AddDrinkButton(
     modifier: Modifier = Modifier,
 ) {
     var showBottomSheet by rememberSaveable { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState()
+    var canDismissBottomSheet by rememberSaveable { mutableStateOf(true) }
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true,
+        confirmValueChange = { canDismissBottomSheet }
+    )
     val scope = rememberCoroutineScope()
 
     val dismissBottomSheet: () -> Unit = {
@@ -64,14 +78,50 @@ internal fun AddDrinkButton(
 
     if (showBottomSheet) {
         AppBottomSheet(
+            modifier = Modifier.imePadding(),
             onDismissRequest = dismissBottomSheet,
             sheetState = sheetState,
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
                     .padding(horizontal = 16.dp),
             ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .weight(1f),
+                        text = "Drink Presets",
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+
+                    IconButton(
+                        modifier = Modifier
+                            .size(48.dp),
+                        onClick = {
+                            scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                if (!sheetState.isVisible) {
+                                    dismissBottomSheet()
+                                }
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = DwIcons.Trash,
+                            contentDescription = "Close",
+                            tint = DwInk300,
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(24.dp))
+
                 DraggablePresetGrid(
                     presets = presets,
                     onDrink = { amount ->
@@ -81,24 +131,43 @@ internal fun AddDrinkButton(
                     onReorder = onReorder,
                 )
 
-                if (true /*debug*/) {
-                    Spacer(Modifier.height(7.dp))
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(7.dp),
+                ) {
+                    AppInputField(
+                        modifier = Modifier.fillMaxWidth(),
+                        label = "Custom Amount",
+                        value = "",
+                        onValueChanged = {},
+                    )
 
-                    Button(onClick = {
-                        scope.launch { sheetState.hide() }.invokeOnCompletion {
-                            if (!sheetState.isVisible) {
-                                dismissBottomSheet()
-                            }
-                        }
-                    }) {
-                        Text("Close")
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                    ) {
+                        DwSecondaryButton(
+                            text = "Create",
+                            onClick = {
+                                // TODO: disable  dismiss when dragging item
+                                // canDismissBottomSheet = false
+                            },
+                        )
+
+                        Spacer(Modifier.width(7.dp))
+
+                        DwPrimaryButton(
+                            text = "Drink",
+                            onClick = {},
+                        )
                     }
                 }
+
+                Spacer(Modifier.height(24.dp))
             }
         }
     }
 }
-
 
 @Composable
 internal fun ChipButton(
