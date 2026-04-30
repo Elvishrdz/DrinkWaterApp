@@ -14,11 +14,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -27,16 +31,22 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DayTime
@@ -80,24 +90,26 @@ internal fun AlarmCalculatorScreen(onBackClicked: () -> Unit) {
     var desiredIntervalMin by remember { mutableIntStateOf(120) }
 
     // Recomputes whenever any input changes — no side effects needed.
-    val schedule = remember(startTime, endTime, goalAmountMl, mode, amountPerDrink, desiredIntervalMin) {
-        runCatching {
-            when (mode) {
-                ScheduleMode.BY_AMOUNT -> calculator.scheduleByAmount(
-                    startTime = startTime,
-                    endTime = endTime,
-                    goalAmountMl = goalAmountMl,
-                    amountPerDrinkMl = amountPerDrink,
-                )
-                ScheduleMode.BY_INTERVAL -> calculator.scheduleByInterval(
-                    startTime = startTime,
-                    endTime = endTime,
-                    goalAmountMl = goalAmountMl,
-                    desiredIntervalMinutes = desiredIntervalMin,
-                )
-            }
-        }.getOrNull()
-    }
+    val schedule =
+        remember(startTime, endTime, goalAmountMl, mode, amountPerDrink, desiredIntervalMin) {
+            runCatching {
+                when (mode) {
+                    ScheduleMode.BY_AMOUNT -> calculator.scheduleByAmount(
+                        startTime = startTime,
+                        endTime = endTime,
+                        goalAmountMl = goalAmountMl,
+                        amountPerDrinkMl = amountPerDrink,
+                    )
+
+                    ScheduleMode.BY_INTERVAL -> calculator.scheduleByInterval(
+                        startTime = startTime,
+                        endTime = endTime,
+                        goalAmountMl = goalAmountMl,
+                        desiredIntervalMinutes = desiredIntervalMin,
+                    )
+                }
+            }.getOrNull()
+        }
 
     Column(
         modifier = Modifier
@@ -136,48 +148,16 @@ internal fun AlarmCalculatorScreen(onBackClicked: () -> Unit) {
         }
 
         // ── Goal amount ───────────────────────────────────────────────────────
-        val goalFraction = goalAmountMl / 4_000f
-        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = "Goal amount",
-                    fontFamily = PlusJakartaSans,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 14.sp,
-                    color = DwInk500,
-                )
-                Text(
-                    text = "$goalAmountMl mL",
-                    fontFamily = Nunito,
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 16.sp,
-                    color = DwWaterDeep,
-                )
-            }
-            LinearProgressIndicator(
-                progress = { goalFraction },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(6.dp),
-                color = DwWater,
-                trackColor = DwTintWater,
-            )
-            Slider(
-                value = goalAmountMl.toFloat(),
-                onValueChange = { goalAmountMl = it.roundToInt() },
-                valueRange = 500f..4_000f,
-                steps = 34,       // 100 mL increments
-                colors = SliderDefaults.colors(
-                    thumbColor = DwWater,
-                    activeTrackColor = DwWater,
-                    inactiveTrackColor = DwTintWater,
-                ),
-            )
-        }
+        LabeledSlider(
+            label = "Goal amount",
+            value = goalAmountMl.toFloat(),
+            onValueChange = { goalAmountMl = it.roundToInt() },
+            valueRange = 500f..4_000f,
+            steps = 34,
+            unit = "mL",
+            accentColor = DwWater,
+            tintColor = DwTintWater,
+        )
 
         // ── Mode toggle ───────────────────────────────────────────────────────
         SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
@@ -197,101 +177,35 @@ internal fun AlarmCalculatorScreen(onBackClicked: () -> Unit) {
 
         // ── Mode-specific control ─────────────────────────────────────────────
         when (mode) {
-            ScheduleMode.BY_AMOUNT -> {
-                val amountFraction = (amountPerDrink - 50f) / (500f - 50f)
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = "Amount per drink",
-                            fontFamily = PlusJakartaSans,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 14.sp,
-                            color = DwInk500,
-                        )
-                        Text(
-                            text = "${amountPerDrink.roundToInt()} mL",
-                            fontFamily = Nunito,
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 16.sp,
-                            color = DwMagenta,
-                        )
-                    }
-                    LinearProgressIndicator(
-                        progress = { amountFraction },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(6.dp),
-                        color = DwMagenta,
-                        trackColor = DwTintMagenta,
-                    )
-                    Slider(
-                        value = amountPerDrink,
-                        onValueChange = { amountPerDrink = it },
-                        valueRange = 50f..500f,
-                        steps = 17,       // 25 mL increments
-                        colors = SliderDefaults.colors(
-                            thumbColor = DwMagenta,
-                            activeTrackColor = DwMagenta,
-                            inactiveTrackColor = DwTintMagenta,
-                        ),
-                    )
-                }
-            }
+            ScheduleMode.BY_AMOUNT -> LabeledSlider(
+                label = "Amount per drink",
+                value = amountPerDrink,
+                onValueChange = { amountPerDrink = it },
+                valueRange = 50f..500f,
+                steps = 17,
+                unit = "mL",
+                accentColor = DwMagenta,
+                tintColor = DwTintMagenta,
+            )
 
             ScheduleMode.BY_INTERVAL -> {
                 val h = desiredIntervalMin / 60
                 val m = desiredIntervalMin % 60
-                val intervalLabel = buildString {
+                val formatted = buildString {
                     if (h > 0) append("${h}h ")
                     if (m > 0 || h == 0) append("${m}m")
                 }
-                val intervalFraction = (desiredIntervalMin - 15f) / (240f - 15f)
-
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = "Desired interval",
-                            fontFamily = PlusJakartaSans,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 14.sp,
-                            color = DwInk500,
-                        )
-                        Text(
-                            text = intervalLabel,
-                            fontFamily = Nunito,
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 16.sp,
-                            color = DwMagenta,
-                        )
-                    }
-                    LinearProgressIndicator(
-                        progress = { intervalFraction },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(6.dp),
-                        color = DwMagenta,
-                        trackColor = DwTintMagenta,
-                    )
-                    Slider(
-                        value = desiredIntervalMin.toFloat(),
-                        onValueChange = { desiredIntervalMin = it.roundToInt() },
-                        valueRange = 15f..240f,
-                        steps = 14,       // 15-min increments
-                        colors = SliderDefaults.colors(
-                            thumbColor = DwMagenta,
-                            activeTrackColor = DwMagenta,
-                            inactiveTrackColor = DwTintMagenta,
-                        ),
-                    )
-                }
+                LabeledSlider(
+                    label = "Desired interval",
+                    value = desiredIntervalMin.toFloat(),
+                    onValueChange = { desiredIntervalMin = it.roundToInt() },
+                    valueRange = 15f..240f,
+                    steps = 14,
+                    unit = "min",
+                    hint = "= $formatted",
+                    accentColor = DwMagenta,
+                    tintColor = DwTintMagenta,
+                )
             }
         }
 
@@ -503,6 +417,127 @@ private fun SlotChip(
             fontWeight = FontWeight.Bold,
             fontSize = 10.sp,
             color = DwInk500,
+        )
+    }
+}
+
+// ─── LabeledSlider ────────────────────────────────────────────────────────────
+
+/**
+ * A slider with a progress bar and an inline editable text field.
+ *
+ * - Slider and text field are always in sync.
+ * - Typing a valid value in range updates the slider immediately.
+ * - On focus loss, the text field resets to the current valid value.
+ * - An optional [hint] (e.g. "= 2h 0m") is shown below the text field.
+ */
+@Composable
+private fun LabeledSlider(
+    label: String,
+    value: Float,
+    onValueChange: (Float) -> Unit,
+    valueRange: ClosedFloatingPointRange<Float>,
+    steps: Int,
+    unit: String,
+    accentColor: Color,
+    tintColor: Color,
+    hint: String? = null,
+    modifier: Modifier = Modifier,
+) {
+    var textInput by rememberSaveable { mutableStateOf(value.roundToInt().toString()) }
+    var isFocused by remember { mutableStateOf(false) }
+
+    // Keep text in sync with slider when user is not typing
+    LaunchedEffect(value) {
+        if (!isFocused) {
+            textInput = value.roundToInt().toString()
+        }
+    }
+
+    val progressFraction =
+        ((value - valueRange.start) / (valueRange.endInclusive - valueRange.start))
+            .coerceIn(0f, 1f)
+
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = label,
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Medium,
+                fontSize = 14.sp,
+                color = DwInk500,
+                modifier = Modifier.weight(1f),
+            )
+            Column(horizontalAlignment = Alignment.End) {
+                OutlinedTextField(
+                    value = textInput,
+                    onValueChange = { new ->
+                        val filtered = new.filter { it.isDigit() }.take(5)
+                        textInput = filtered
+                        val parsed = filtered.toFloatOrNull()
+                        if (parsed != null && parsed >= valueRange.start && parsed <= valueRange.endInclusive) {
+                            onValueChange(parsed)
+                        }
+                    },
+                    modifier = Modifier
+                        .width(104.dp)
+                        .onFocusChanged { focusState ->
+                            isFocused = focusState.isFocused
+                            if (!focusState.isFocused) {
+                                // Reset to current valid value if field was left with invalid input
+                                textInput = value.roundToInt().toString()
+                            }
+                        },
+                    textStyle = LocalTextStyle.current.copy(
+                        fontFamily = Nunito,
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 15.sp,
+                        color = accentColor,
+                        textAlign = TextAlign.End,
+                    ),
+                    suffix = {
+                        Text(
+                            text = unit,
+                            fontFamily = PlusJakartaSans,
+                            fontSize = 11.sp,
+                            color = DwInk500,
+                        )
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true,
+                )
+                if (hint != null) {
+                    Text(
+                        text = hint,
+                        fontFamily = PlusJakartaSans,
+                        fontSize = 10.sp,
+                        color = DwInk500,
+                    )
+                }
+            }
+        }
+        LinearProgressIndicator(
+            progress = { progressFraction },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(6.dp),
+            color = accentColor,
+            trackColor = tintColor,
+        )
+        Slider(
+            value = value,
+            onValueChange = onValueChange,
+            valueRange = valueRange,
+            steps = steps,
+            colors = SliderDefaults.colors(
+                thumbColor = accentColor,
+                activeTrackColor = accentColor,
+                inactiveTrackColor = tintColor,
+            ),
         )
     }
 }
