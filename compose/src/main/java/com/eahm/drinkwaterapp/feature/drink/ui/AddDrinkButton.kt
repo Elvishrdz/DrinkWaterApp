@@ -86,44 +86,26 @@ internal fun AddDrinkButton(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .verticalScroll(rememberScrollState())
                     .padding(horizontal = 16.dp),
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        modifier = Modifier
-                            .weight(1f),
-                        text = "Drink Presets",
-                        style = MaterialTheme.typography.titleLarge,
-                    )
-
-                    IconButton(
-                        modifier = Modifier
-                            .size(48.dp),
-                        onClick = {
+                Column {
+                    Header(
+                        onCloseClicked = {
                             scope.launch { sheetState.hide() }.invokeOnCompletion {
                                 if (!sheetState.isVisible) {
                                     dismissBottomSheet()
                                 }
                             }
-                        }
-                    ) {
-                        Icon(
-                            imageVector = DwIcons.Trash,
-                            contentDescription = "Close",
-                            tint = DwInk300,
-                        )
-                    }
+                        },
+                    )
+
+                    Spacer(Modifier.height(24.dp))
                 }
 
-                Spacer(Modifier.height(24.dp))
-
                 DraggablePresetGrid(
+                    modifier = Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState()),
                     presets = presets,
                     onDrink = { amount ->
                         onDrink(amount)
@@ -134,48 +116,91 @@ internal fun AddDrinkButton(
                     // canDismissBottomSheet = false
                 )
 
-                Spacer(Modifier.height(12.dp))
+                Column {
+                    Spacer(Modifier.height(12.dp))
 
-                var customAmount by rememberSaveable { mutableStateOf<Float?>(null) }
-
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(7.dp),
-                ) {
-                    AppInputField(
-                        modifier = Modifier.fillMaxWidth(),
-                        label = "Custom Amount",
-                        value = customAmount?.toDigitString().orEmpty(),
-                        onValueChanged = {
-                            customAmount = it.toFloatOrNull()
-                        },
+                    InputFieldArea(
+                        onCreatePreset = onCreatePreset,
                     )
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center,
-                    ) {
-                        DwSecondaryButton(
-                            text = "Create",
-                            enabled = customAmount != null,
-                            onClick = {
-                                customAmount?.let {
-                                    onCreatePreset(it)
-                                }
-                            },
-                        )
-
-                        Spacer(Modifier.width(7.dp))
-
-                        DwPrimaryButton(
-                            text = "Drink",
-                            onClick = {},
-                        )
-                    }
+                    Spacer(Modifier.height(24.dp))
                 }
-
-                Spacer(Modifier.height(24.dp))
             }
+        }
+    }
+}
+
+@Composable
+fun Header(
+    onCloseClicked: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            modifier = Modifier
+                .weight(1f),
+            text = "Drink Presets",
+            style = MaterialTheme.typography.titleLarge,
+        )
+
+        IconButton(
+            modifier = Modifier
+                .size(48.dp),
+            onClick = onCloseClicked,
+        ) {
+            Icon(
+                imageVector = DwIcons.Trash,
+                contentDescription = "Close",
+                tint = DwInk300,
+            )
+        }
+    }
+}
+
+@Composable
+fun InputFieldArea(
+    onCreatePreset: (Float) -> Unit,
+) {
+    var customAmount by rememberSaveable { mutableStateOf<Float?>(null) }
+
+    Column(
+        modifier = Modifier,
+        verticalArrangement = Arrangement.spacedBy(7.dp),
+    ) {
+        AppInputField(
+            modifier = Modifier.fillMaxWidth(),
+            label = "Custom Amount",
+            value = customAmount?.toDigitString().orEmpty(),
+            onValueChanged = {
+                customAmount = it.toFloatOrNull()
+            },
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+        ) {
+            DwSecondaryButton(
+                text = "Create",
+                enabled = customAmount != null,
+                onClick = {
+                    customAmount?.let {
+                        onCreatePreset(it)
+                    }
+                },
+            )
+
+            Spacer(Modifier.width(7.dp))
+
+            DwPrimaryButton(
+                text = "Drink",
+                onClick = {},
+            )
         }
     }
 }
