@@ -29,11 +29,9 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.core.data.datastore.DrinkPreset
-import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
@@ -44,25 +42,17 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwPaper
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
-import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import com.eahm.drinkwaterapp.feature.drink.ui.ProgressRing
 import com.eahm.drinkwaterapp.feature.drink.ui.QuickAddRow
 import com.eahm.drinkwaterapp.feature.drink.ui.TodayLogSection
 import com.eahm.drinkwaterapp.feature.drink.ui.previewLogEntries
 import com.eahm.drinkwaterapp.ui.inputfield.toDigitString
-import kotlinx.datetime.LocalDateTime
 
 @Composable
 internal fun DrinkScreen(
     state: DrinkState.Data,
     onDrink: (Float) -> Unit,
-    onDelete: (HistoryEntity) -> Unit,
-    onDateChanged: (LocalDateTime) -> Unit,
-    onStopAlarm: () -> Unit,
-    onGoalAmountChanged: (String) -> Unit,
-    getRemainingAlarmTime: () -> String,
-    onAlarmIntervalChange: (AlarmInterval) -> Unit,
-    onReorder: (List<DrinkPreset>, Boolean) -> Unit = { _, _ -> },
+    onReorderPresets: (List<DrinkPreset>, Boolean) -> Unit,
     onCreatePreset: (Float) -> Unit,
     onNavigateToHistory: () -> Unit,
     modifier: Modifier = Modifier,
@@ -113,7 +103,7 @@ internal fun DrinkScreen(
                 allPresets = state.allDrinkPresets,
                 onDrink = onDrink,
                 onCreatePreset = onCreatePreset,
-                onReorder = onReorder,
+                onReorder = onReorderPresets,
                 modifier = Modifier.padding(horizontal = 20.dp)
             )
 
@@ -242,61 +232,42 @@ private fun RemainingPill(remaining: Float) {
     }
 }
 
-@PreviewScreenSizes
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun DrinkScreenPreview() {
     DrinkWaterAppTheme {
         DrinkScreen(
             state = stateMock,
             onDrink = {},
-            onDelete = {},
-            onDateChanged = {},
-            onStopAlarm = {},
-            onGoalAmountChanged = {},
-            getRemainingAlarmTime = { "" },
-            onAlarmIntervalChange = {},
-
+            onReorderPresets = { _, _ -> },
             onCreatePreset = {},
             onNavigateToHistory = {}
         )
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun DrinkScreenEmptyPreview() {
     DrinkWaterAppTheme {
         DrinkScreen(
             state = stateMock,
             onDrink = {},
-            onDelete = {},
-            onDateChanged = {},
-            onStopAlarm = {},
-            onGoalAmountChanged = {},
-            getRemainingAlarmTime = { "" },
-            onAlarmIntervalChange = {},
-
+            onReorderPresets = { _, _ -> },
             onCreatePreset = {},
             onNavigateToHistory = {}
         )
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
 private fun DrinkScreenGoalReachedPreview() {
     DrinkWaterAppTheme {
         DrinkScreen(
             state = stateMock,
             onDrink = {},
-            onDelete = {},
-            onDateChanged = {},
-            onStopAlarm = {},
-            onGoalAmountChanged = {},
-            getRemainingAlarmTime = { "" },
-            onAlarmIntervalChange = {},
-
+            onReorderPresets = { _, _ -> },
             onCreatePreset = {},
             onNavigateToHistory = {}
         )
@@ -312,17 +283,12 @@ internal val drinkPresetsMock = listOf(
 private val stateMock = DrinkState.Data(
     username = "Dave",
     currentStreak = 1,
-    quickDrinkPresets = drinkPresetsMock.take(3),
-    allDrinkPresets = drinkPresetsMock,
-    date = LocalDateTime(2023, 1, 1, 12, 0),
-    historyRecords = emptyList(),
-    todayLogs = previewLogEntries,
     drinkStats = DrinkStats(
         goalAmount = 2400f,
         drinkAmount = 1500f,
         goalReached = false,
     ),
-    isAlarmActive = false,
-    alarmInterval = AlarmInterval(0, 5),
-    alarmNextInterval = null,
+    quickDrinkPresets = drinkPresetsMock.take(3),
+    allDrinkPresets = drinkPresetsMock,
+    todayLogs = previewLogEntries,
 )

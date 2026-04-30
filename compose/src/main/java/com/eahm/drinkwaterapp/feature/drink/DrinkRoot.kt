@@ -21,15 +21,9 @@ internal fun DrinkRoot(
             DrinkScreen(
                 state = data,
                 onDrink = viewModel::onDrink,
+                onReorderPresets = viewModel::onPresetsReordered,
                 onCreatePreset = viewModel::onCreatePreset,
-                onDelete = viewModel::onDelete,
-                onDateChanged = viewModel::onDateChanged,
-                onStopAlarm = viewModel::onStopAlarm,
-                onGoalAmountChanged = viewModel::onGoalChanged,
-                getRemainingAlarmTime = viewModel::getRemainingAlarmTime,
-                onAlarmIntervalChange = viewModel::onAlarmIntervalChange,
                 onNavigateToHistory = onNavigateToHistory,
-                onReorder = viewModel::onPresetsReordered,
             )
         }
     }

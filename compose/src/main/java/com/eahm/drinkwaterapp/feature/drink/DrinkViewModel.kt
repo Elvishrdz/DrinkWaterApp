@@ -5,7 +5,6 @@ import android.content.Intent
 import android.provider.Settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.eahm.drinkwaterapp.core.bindings.toUI
 import com.eahm.drinkwaterapp.core.data.confetti.ConfettiController
 import com.eahm.drinkwaterapp.core.data.datastore.DrinkPreset
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
@@ -16,12 +15,8 @@ import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.database.entity.Status
 import com.eahm.drinkwaterapp.core.domain.extension.toEndOfDayTime
 import com.eahm.drinkwaterapp.core.domain.extension.toStartOfDayTime
-import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import com.eahm.drinkwaterapp.feature.drink.data.HistoryData
 import com.eahm.drinkwaterapp.feature.drink.ui.DrinkLogEntry
-import com.eahm.drinkwaterapp.ui.historylist.DayGroup
-import com.eahm.drinkwaterapp.ui.historylist.HourGroup
-import com.eahm.drinkwaterapp.ui.inputfield.validateAmount
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,10 +26,8 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
@@ -77,31 +70,6 @@ internal class DrinkViewModel(
         historyDate,
         records,
     ) { date, records ->
-        val historyRecords = records
-            .sortedBy { it.timestamp }
-            .reversed()
-            .map { it.toUI() }
-            .groupBy {
-                DayGroup(
-                    hour = it.timestamp.hour,
-                    day = it.timestamp.day,
-                    month = it.timestamp.month.ordinal,
-                    year = it.timestamp.year,
-                )
-            }
-            .toSortedMap(compareBy { it.hour })
-            .mapNotNull { (dayGroup, items) ->
-                HourGroup(
-                    hour = dayGroup.hour,
-                    isCurrentHour = dayGroup.hour == today.hour &&
-                            dayGroup.day == today.day &&
-                            dayGroup.month == today.month.ordinal &&
-                            dayGroup.year == today.year,
-                    items = items,
-                )
-            }
-            .sortedByDescending { it.hour }
-
         val todayLogs = records
             //  TODO: filter from current time to latest 4 records
             .filter { it.timestamp in today.toStartOfDayTime..today.toEndOfDayTime }
@@ -122,7 +90,6 @@ internal class DrinkViewModel(
 
         HistoryData(
             date = date,
-            historyRecords = historyRecords,
             todayLogs = todayLogs
         )
 
@@ -172,23 +139,17 @@ internal class DrinkViewModel(
         extras,
         history,
         drinkStats,
-        drinkAlarmManager.state,
-    ) { extras, history, drinkStats, drinkAlarmState ->
+    ) { extras, history, drinkStats ->
         if (history == null || extras == null) {
             DrinkState.Loading
         } else {
             DrinkState.Data(
                 username = extras.username,
                 currentStreak = 0,
-                date = history.date,
                 quickDrinkPresets = extras.quickDrinkPresets,
                 allDrinkPresets = extras.allDrinkPresets,
-                historyRecords = history.historyRecords,
                 todayLogs = history.todayLogs,
                 drinkStats = drinkStats,
-                isAlarmActive = drinkAlarmState.active,
-                alarmInterval = drinkAlarmState.interval,
-                alarmNextInterval = drinkAlarmState.nextInterval,
             )
         }
 
@@ -261,41 +222,12 @@ internal class DrinkViewModel(
         }
     }
 
-    fun onDelete(it: HistoryEntity) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                dao.delete(it)
-            }
-        }
-    }
-
-    fun onDateChanged(date: LocalDateTime) {
-        historyDate.update { date }
-    }
-
-    fun onGoalChanged(goal: String) {
-        viewModelScope.launch {
-            goal.toFloatOrNull()
-                ?.takeIf { validateAmount(it).isValid }
-                ?.let { amount ->
-                    prefsStorage.setGoalAmount(amount)
-                }
-        }
-    }
-
-    fun onAlarmIntervalChange(alarmInterval: AlarmInterval) {
-        drinkAlarmManager.setInterval(alarmInterval.hour, alarmInterval.minute)
-    }
-
     fun displayGoalReachedOverlay() {
         if (Settings.canDrawOverlays(application)) {
             val intent = Intent(application, GoalReachedWidget::class.java)
             application.startService(intent)
         }
     }
-
-    fun onStopAlarm() = drinkAlarmManager.stop()
-    fun getRemainingAlarmTime() = drinkAlarmManager.remainingTime()
 
     companion object {
 
