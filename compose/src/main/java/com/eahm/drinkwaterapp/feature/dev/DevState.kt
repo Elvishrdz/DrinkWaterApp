@@ -1,7 +1,7 @@
 package com.eahm.drinkwaterapp.feature.dev
 
+import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStats
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
-import com.eahm.drinkwaterapp.feature.drink.DrinkStats
 import com.eahm.drinkwaterapp.feature.drink.ui.DrinkLogEntry
 import com.eahm.drinkwaterapp.ui.historylist.HourGroup
 import kotlinx.datetime.LocalDateTime

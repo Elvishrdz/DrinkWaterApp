@@ -19,12 +19,13 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 val dateTimeObserverModule = module {
-    single { DateTimeObserver(get()) }
+    singleOf(::DateTimeObserver)
 }
 
 // TODO: make it lifecycle aware to not keep it alive when app is in background

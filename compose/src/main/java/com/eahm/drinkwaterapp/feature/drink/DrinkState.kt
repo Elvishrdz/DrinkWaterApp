@@ -1,6 +1,7 @@
 package com.eahm.drinkwaterapp.feature.drink
 
 import com.eahm.drinkwaterapp.core.data.datastore.DrinkPreset
+import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStats
 import com.eahm.drinkwaterapp.feature.drink.ui.DrinkLogEntry
 
 internal sealed interface DrinkState {
@@ -15,14 +16,6 @@ internal sealed interface DrinkState {
         val allDrinkPresets: List<DrinkPreset>,
         val todayLogs: List<DrinkLogEntry>,
     ) : DrinkState
-}
-
-data class DrinkStats(
-    val goalAmount: Float,
-    val drinkAmount: Float,
-    val goalReached: Boolean,
-) {
-    val remainingAmount = (goalAmount - drinkAmount).coerceAtLeast(0f)
 }
 
 data class DrinkExtras(

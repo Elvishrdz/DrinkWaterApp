@@ -1,9 +1,9 @@
 package com.eahm.drinkwaterapp.core.domain.mock
 
 import com.eahm.drinkwaterapp.core.bindings.toUI
+import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStats
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.database.entity.Status
-import com.eahm.drinkwaterapp.feature.drink.DrinkStats
 import com.eahm.drinkwaterapp.ui.historylist.HourGroup
 import kotlinx.datetime.LocalDateTime
 

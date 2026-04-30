@@ -9,7 +9,7 @@ import com.eahm.drinkwaterapp.core.data.confetti.ConfettiController
 import com.eahm.drinkwaterapp.core.data.datastore.DrinkPreset
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
-import com.eahm.drinkwaterapp.core.data.goalreachedobserver.GoalReachedObserver
+import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStatsObserver
 import com.eahm.drinkwaterapp.core.data.goalreachedwidget.GoalReachedWidget
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
@@ -40,23 +40,10 @@ internal class DrinkViewModel(
     val prefsStorage: PrefsStorage,
     val confettiController: ConfettiController,
     val dateTimeObserver: DateTimeObserver,
-    val goalReachedObserver: GoalReachedObserver,
+    val drinkStatsObserver: DrinkStatsObserver,
 ) : ViewModel() {
 
     private val dao = database.getHistoryDao()
-
-    // Shared StateFlow so drinkStats and goalReachedObserver both reuse the same Room query.
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val currentDrinkAmount = dateTimeObserver.currentDay
-        .flatMapLatest { day ->
-            dao.getTotalDrinkAmount(start = day.toStartOfDayTime, end = day.toEndOfDayTime)
-        }
-        .flowOn(Dispatchers.IO)
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Lazily,
-            initialValue = 0f,
-        )
 
     private val historyDate = MutableStateFlow(dateTimeObserver.currentDay.value)
 
@@ -64,8 +51,9 @@ internal class DrinkViewModel(
         viewModelScope.launch {
             dateTimeObserver.currentDay.collect { historyDate.value = it }
         }
+
         viewModelScope.launch {
-            goalReachedObserver.observe(currentDrinkAmount).collect {
+            drinkStatsObserver.goalReachedEvent.collect {
                 confettiController.showConfetti()
                 displayGoalReachedOverlay()
             }
@@ -119,22 +107,6 @@ internal class DrinkViewModel(
         initialValue = null,
     )
 
-    private val drinkStats = combine(
-        prefsStorage.getGoalAmount(),
-        currentDrinkAmount,
-    ) { goalAmount, drinkAmount ->
-        DrinkStats(
-            goalAmount = goalAmount,
-            drinkAmount = drinkAmount,
-            goalReached = drinkAmount >= goalAmount,
-        )
-
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Lazily,
-        initialValue = null,
-    )
-
     private val extras = combine(
         prefsStorage.getUsername(),
         prefsStorage.getDrinkPresets(),
@@ -158,7 +130,7 @@ internal class DrinkViewModel(
     val state = combine(
         extras,
         history,
-        drinkStats,
+        drinkStatsObserver.drinkStats,
     ) { extras, history, drinkStats ->
         if (history == null || extras == null) {
             DrinkState.Loading
