@@ -30,8 +30,11 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.format.char
+import kotlinx.datetime.toInstant
+import kotlin.time.ExperimentalTime
 
 internal class DrinkViewModel(
     val application: Application,
@@ -75,6 +78,7 @@ internal class DrinkViewModel(
             initialValue = emptyList(),
         )
 
+    @OptIn(ExperimentalTime::class)
     private val history = combine(
         historyDate,
         records,
@@ -92,6 +96,10 @@ internal class DrinkViewModel(
                         }
                     ),
                     amount = it.amount,
+                    timestamp = it.timestamp
+                        .toInstant(TimeZone.currentSystemDefault())
+                        .toEpochMilliseconds()
+                        .toString(),
                 )
             }
             .take(TODAY_LOGS_AMOUNT)

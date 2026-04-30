@@ -37,6 +37,7 @@ import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.format.char
+import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -81,6 +82,7 @@ internal class DevViewModel(
         val todayLogs: List<DrinkLogEntry>
     )
 
+    @OptIn(ExperimentalTime::class)
     private val history = combine(
         historyDate,
         records,
@@ -125,6 +127,10 @@ internal class DevViewModel(
                         }
                     ),
                     amount = it.amount,
+                    timestamp = it.timestamp
+                        .toInstant(TimeZone.currentSystemDefault())
+                        .toEpochMilliseconds()
+                        .toString(),
                 )
             }
 

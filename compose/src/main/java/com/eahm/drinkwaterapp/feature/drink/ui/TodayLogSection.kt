@@ -46,7 +46,11 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 import com.eahm.drinkwaterapp.ui.inputfield.toDigitString
 
-data class DrinkLogEntry(val time: String, val amount: Float)
+data class DrinkLogEntry(
+    val time: String,
+    val amount: Float,
+    val timestamp: String,
+)
 
 @Composable
 fun TodayLogSection(
@@ -105,11 +109,11 @@ fun TodayLogSection(
         } else {
             // Keys present at first composition — these entries appear instantly with no animation.
             // Items that arrive later (not in this set) animate in with expandVertically + fadeIn.
-            val initialKeys = remember { items.map { "${it.time}${it.amount}" }.toSet() }
+            val initialKeys = remember { items.map { it.timestamp }.toSet() }
 
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 items.forEachIndexed { index, entry ->
-                    val entryKey = "${entry.time}${entry.amount}"
+                    val entryKey = entry.timestamp
                     key(entryKey) {
                         // Initial items start already visible (no animation).
                         // New items start invisible with targetState=true so the
@@ -125,7 +129,7 @@ fun TodayLogSection(
                             enter = expandVertically(
                                 animationSpec = spring(
                                     dampingRatio = Spring.DampingRatioLowBouncy,
-                                    stiffness = Spring.StiffnessMediumLow,
+                                    stiffness = Spring.StiffnessLow,
                                 ),
                                 expandFrom = Alignment.Top,
                             ) + fadeIn(animationSpec = spring()),
@@ -192,11 +196,11 @@ private fun DrinkLogRow(entry: DrinkLogEntry) {
 }
 
 val previewLogEntries = listOf(
-    DrinkLogEntry("09:14", 250f),
-    DrinkLogEntry("10:30", 500f),
-    DrinkLogEntry("11:45", 100f),
-    DrinkLogEntry("13:02", 250f),
-    DrinkLogEntry("14:20", 400f),
+    DrinkLogEntry("09:14", 250f, "1"),
+    DrinkLogEntry("10:30", 500f, "2"),
+    DrinkLogEntry("11:45", 100f, "3"),
+    DrinkLogEntry("13:02", 250f, "4"),
+    DrinkLogEntry("14:20", 400f, "5"),
 )
 
 @Preview(showBackground = true, backgroundColor = 0xFFF2F6F9)
