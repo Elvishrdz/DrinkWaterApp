@@ -9,6 +9,7 @@ import com.eahm.drinkwaterapp.core.data.confetti.ConfettiController
 import com.eahm.drinkwaterapp.core.data.datastore.DrinkPreset
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
+import com.eahm.drinkwaterapp.core.data.goalreachedobserver.GoalReachedObserver
 import com.eahm.drinkwaterapp.core.data.goalreachedwidget.GoalReachedWidget
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
@@ -39,20 +40,35 @@ internal class DrinkViewModel(
     val prefsStorage: PrefsStorage,
     val confettiController: ConfettiController,
     val dateTimeObserver: DateTimeObserver,
+    val goalReachedObserver: GoalReachedObserver,
 ) : ViewModel() {
 
     private val dao = database.getHistoryDao()
 
+    // Shared StateFlow so drinkStats and goalReachedObserver both reuse the same Room query.
     @OptIn(ExperimentalCoroutinesApi::class)
-    val currentDrinkAmount = dateTimeObserver.currentDay.flatMapLatest { day ->
-        dao.getTotalDrinkAmount(start = day.toStartOfDayTime, end = day.toEndOfDayTime)
-    }
+    val currentDrinkAmount = dateTimeObserver.currentDay
+        .flatMapLatest { day ->
+            dao.getTotalDrinkAmount(start = day.toStartOfDayTime, end = day.toEndOfDayTime)
+        }
+        .flowOn(Dispatchers.IO)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Lazily,
+            initialValue = 0f,
+        )
 
     private val historyDate = MutableStateFlow(dateTimeObserver.currentDay.value)
 
     init {
         viewModelScope.launch {
             dateTimeObserver.currentDay.collect { historyDate.value = it }
+        }
+        viewModelScope.launch {
+            goalReachedObserver.observe(currentDrinkAmount).collect {
+                confettiController.showConfetti()
+                displayGoalReachedOverlay()
+            }
         }
     }
 
@@ -172,9 +188,6 @@ internal class DrinkViewModel(
                 )
 
                 dao.insertAll(record)
-
-                // TODO: check if we reached the goal now
-                confettiController.showConfetti()
 
                 drinkAlarmManager.setupAlarm(application)
             }
