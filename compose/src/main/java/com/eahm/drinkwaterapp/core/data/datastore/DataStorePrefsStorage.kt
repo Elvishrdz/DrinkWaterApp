@@ -32,9 +32,23 @@ interface PrefsStorage {
     fun getDrinkPresets(): Flow<Set<DrinkPreset>>
     suspend fun setDrinkPresets(presets: Set<DrinkPreset>)
 
+    fun getStartTime(): Flow<ActiveTime>
+    suspend fun setStartTime(time: ActiveTime)
+
+    fun getEndTime(): Flow<ActiveTime>
+    suspend fun setEndTime(time: ActiveTime)
+
+    fun getAmountPerDrink(): Flow<Float>
+    suspend fun setAmountPerDrink(milliliters: Float)
 
     suspend fun clear()
 }
+
+@Serializable
+data class ActiveTime(
+    val hour: Int,
+    val minute: Int,
+)
 
 @Serializable
 data class DrinkPreset(
@@ -57,6 +71,9 @@ private class DataStorePrefsStorage(
     private val goalAmountKey = floatPreferencesKey("GOAL_AMOUNT")
     private val usernameKey = stringPreferencesKey("USERNAME")
     private val drinkPresetsKey = stringPreferencesKey("DRINKS_PRESETS")
+    private val startTimeKey = stringPreferencesKey("START_TIME")
+    private val endTimeKey = stringPreferencesKey("END_TIME")
+    private val amountPerDrinkKey = floatPreferencesKey("AMOUNT_PER_DRINK")
 
     private val json = Json {
         ignoreUnknownKeys = true
@@ -111,11 +128,8 @@ private class DataStorePrefsStorage(
         return dataStore.data.map { preferences ->
             val jsonString = preferences[drinkPresetsKey]
             jsonString?.let {
-                runCatching {
-                    json.decodeFromString<Set<DrinkPreset>>(it)
-                }.getOrElse {
-                    null
-                }
+                runCatching { json.decodeFromString<Set<DrinkPreset>>(it) }
+                    .getOrNull()
             } ?: drinkDefaultPresets
         }
     }
@@ -126,6 +140,61 @@ private class DataStorePrefsStorage(
                 .also {
                     val jsonString = Json.encodeToString(presets)
                     it[drinkPresetsKey] = jsonString
+                }
+        }
+    }
+
+    override fun getStartTime(): Flow<ActiveTime> {
+        return dataStore.data.map { preferences ->
+            val jsonString = preferences[startTimeKey]
+            jsonString?.let {
+                runCatching { json.decodeFromString<ActiveTime>(it) }
+                    .getOrNull()
+            } ?: ActiveTime(10, 0)
+        }
+    }
+
+    override suspend fun setStartTime(time: ActiveTime) {
+        dataStore.updateData { preferences ->
+            preferences.toMutablePreferences()
+                .also {
+                    val jsonString = Json.encodeToString(time)
+                    it[startTimeKey] = jsonString
+                }
+        }
+    }
+
+    override fun getEndTime(): Flow<ActiveTime> {
+        return dataStore.data.map { preferences ->
+            val jsonString = preferences[endTimeKey]
+            jsonString?.let {
+                runCatching { json.decodeFromString<ActiveTime>(it) }
+                    .getOrNull()
+            } ?: ActiveTime(16, 0)
+        }
+    }
+
+    override suspend fun setEndTime(time: ActiveTime) {
+        dataStore.updateData { preferences ->
+            preferences.toMutablePreferences()
+                .also {
+                    val jsonString = Json.encodeToString(time)
+                    it[endTimeKey] = jsonString
+                }
+        }
+    }
+
+    override fun getAmountPerDrink(): Flow<Float> {
+        return dataStore.data.map { preferences ->
+            preferences[amountPerDrinkKey] ?: 250f
+        }
+    }
+
+    override suspend fun setAmountPerDrink(milliliters: Float) {
+        dataStore.updateData { preferences ->
+            preferences.toMutablePreferences()
+                .also {
+                    it[amountPerDrinkKey] = milliliters
                 }
         }
     }

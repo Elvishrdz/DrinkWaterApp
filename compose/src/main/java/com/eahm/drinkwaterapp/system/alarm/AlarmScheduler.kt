@@ -8,7 +8,10 @@ import android.os.Build
 import android.os.SystemClock
 import android.provider.Settings
 import androidx.core.content.edit
+import com.eahm.drinkwaterapp.core.data.drinkalarm.DayTime
+import com.eahm.drinkwaterapp.core.data.drinkalarm.createWithSeconds
 import com.eahm.drinkwaterapp.system.broadcast.AlarmReceiver
+import kotlin.time.Duration.Companion.milliseconds
 
 object AlarmScheduler {
 
@@ -102,10 +105,15 @@ object AlarmScheduler {
         val ids = prefs.getStringSet("active_alarms", mutableSetOf())!!
             .toMutableSet().also { it.add(alarmId.toString()) }
 
+        val seconds = intervalMs.milliseconds.inWholeSeconds.toInt()
+        val dayTime = DayTime.createWithSeconds(seconds)
+
         prefs.edit {
             putStringSet("active_alarms", ids)
                 .putLong("alarm_interval_$alarmId", intervalMs)
                 .putLong("alarm_trigger_at_$alarmId", triggerAt)
+                .putInt("alarm_trigger_at_hour_$alarmId", dayTime.hour)
+                .putInt("alarm_trigger_at_minute_$alarmId", dayTime.minute)
         }
     }
 }
