@@ -29,7 +29,7 @@ class DrinkAlarmCalculator2Test {
         val result = calculator.scheduleByAmount(
             startTime = DayTime(7, 0),
             endTime = DayTime(22, 0),
-            goalAmountMl = 2_000,
+            goalAmountMl = 2_000f,
             amountPerDrinkMl = 250f,
         )
 
@@ -43,7 +43,7 @@ class DrinkAlarmCalculator2Test {
         val result = calculator.scheduleByAmount(
             startTime = DayTime(7, 0),
             endTime = DayTime(22, 0),
-            goalAmountMl = 2_000,
+            goalAmountMl = 2_000f,
             amountPerDrinkMl = 250f,
         )
 
@@ -53,7 +53,7 @@ class DrinkAlarmCalculator2Test {
 
     @Test
     fun `scheduleByAmount - sum of amounts equals goalAmountMl`() {
-        val goalAmountMl = 2_000
+        val goalAmountMl = 2_000f
         val result = calculator.scheduleByAmount(
             startTime = DayTime(7, 0),
             endTime = DayTime(22, 0),
@@ -71,7 +71,7 @@ class DrinkAlarmCalculator2Test {
         val result = calculator.scheduleByAmount(
             startTime = DayTime(7, 0),
             endTime = DayTime(22, 0),
-            goalAmountMl = 2_000,
+            goalAmountMl = 2_000f,
             amountPerDrinkMl = 300f,
         )
 
@@ -83,7 +83,7 @@ class DrinkAlarmCalculator2Test {
 
     @Test
     fun `scheduleByAmount - sum equals goal when last slot adjusts`() {
-        val goalAmountMl = 2_000
+        val goalAmountMl = 2_000f
         val result = calculator.scheduleByAmount(
             startTime = DayTime(7, 0),
             endTime = DayTime(22, 0),
@@ -101,7 +101,7 @@ class DrinkAlarmCalculator2Test {
         val result = calculator.scheduleByAmount(
             startTime = DayTime(7, 0),
             endTime = DayTime(22, 0),
-            goalAmountMl = 2_000,
+            goalAmountMl = 2_000f,
             amountPerDrinkMl = 250f,
         )
 
@@ -121,7 +121,7 @@ class DrinkAlarmCalculator2Test {
         val result = calculator.scheduleByAmount(
             startTime = DayTime(7, 0),
             endTime = DayTime(22, 0),
-            goalAmountMl = 2_000,
+            goalAmountMl = 2_000f,
             amountPerDrinkMl = 250f,
         )
 
@@ -142,7 +142,7 @@ class DrinkAlarmCalculator2Test {
         val result = calculator.scheduleByAmount(
             startTime = DayTime(7, 0),
             endTime = DayTime(22, 0),
-            goalAmountMl = 2_100,
+            goalAmountMl = 2_100f,
             amountPerDrinkMl = 300f,
         )
 
@@ -158,7 +158,7 @@ class DrinkAlarmCalculator2Test {
         val result = calculator.scheduleByAmount(
             startTime = DayTime(7, 0),
             endTime = DayTime(22, 0),
-            goalAmountMl = 50,
+            goalAmountMl = 50f,
             amountPerDrinkMl = 300f,
         )
 
@@ -174,7 +174,7 @@ class DrinkAlarmCalculator2Test {
         val result = calculator.scheduleByAmount(
             startTime = DayTime(8, 0),
             endTime = DayTime(20, 0),
-            goalAmountMl = 500,
+            goalAmountMl = 500f,
             amountPerDrinkMl = 300f,
         )
 
@@ -192,7 +192,7 @@ class DrinkAlarmCalculator2Test {
         val result = calculator.scheduleByInterval(
             startTime = DayTime(7, 0),
             endTime = DayTime(22, 0),
-            goalAmountMl = 2_000,
+            goalAmountMl = 2_000f,
             desiredIntervalMinutes = 120,
         )
 
@@ -207,7 +207,7 @@ class DrinkAlarmCalculator2Test {
         val result = calculator.scheduleByInterval(
             startTime = DayTime(7, 0),
             endTime = DayTime(22, 0),
-            goalAmountMl = 2_000,
+            goalAmountMl = 2_000f,
             desiredIntervalMinutes = 120,
         )
 
@@ -222,7 +222,7 @@ class DrinkAlarmCalculator2Test {
         val result = calculator.scheduleByInterval(
             startTime = DayTime(8, 0),
             endTime = DayTime(20, 0),
-            goalAmountMl = 2_000,
+            goalAmountMl = 2_000f,
             desiredIntervalMinutes = 120,
         )
 
@@ -238,7 +238,7 @@ class DrinkAlarmCalculator2Test {
         val result = calculator.scheduleByInterval(
             startTime = DayTime(7, 0),
             endTime = DayTime(22, 0),
-            goalAmountMl = 2_000,
+            goalAmountMl = 2_000f,
             desiredIntervalMinutes = 60,
         )
 
@@ -252,7 +252,7 @@ class DrinkAlarmCalculator2Test {
         val result = calculator.scheduleByInterval(
             startTime = DayTime(7, 0),
             endTime = DayTime(22, 0),
-            goalAmountMl = 2_000,
+            goalAmountMl = 2_000f,
             desiredIntervalMinutes = 120,
         )
 
@@ -265,7 +265,7 @@ class DrinkAlarmCalculator2Test {
         val result = calculator.scheduleByInterval(
             startTime = DayTime(8, 0),
             endTime = DayTime(10, 0),
-            goalAmountMl = 1_000,
+            goalAmountMl = 1_000f,
             desiredIntervalMinutes = 180,
         )
 
@@ -276,7 +276,7 @@ class DrinkAlarmCalculator2Test {
 
     @Test
     fun `scheduleByInterval - sum of amounts equals goalAmountMl`() {
-        val goalAmountMl = 2_000
+        val goalAmountMl = 2_000f
         val result = calculator.scheduleByInterval(
             startTime = DayTime(7, 0),
             endTime = DayTime(22, 0),
@@ -301,7 +301,7 @@ class DrinkAlarmCalculator2Test {
         val result = calculator.scheduleByInterval(
             startTime = DayTime(7, 0),
             endTime = DayTime(22, 0),
-            goalAmountMl = 2_000,
+            goalAmountMl = 2_000f,
             desiredIntervalMinutes = 120,
         )
 
@@ -329,7 +329,7 @@ class DrinkAlarmCalculator2Test {
         val result = calculator.scheduleByInterval(
             startTime = DayTime(7, 0),
             endTime = DayTime(22, 0),
-            goalAmountMl = 2_000,
+            goalAmountMl = 2_000f,
             desiredIntervalMinutes = 120,
         )
 

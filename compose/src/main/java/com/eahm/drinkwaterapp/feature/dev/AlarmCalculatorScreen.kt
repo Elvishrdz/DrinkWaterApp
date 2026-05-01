@@ -84,7 +84,7 @@ internal fun AlarmCalculatorScreen(onBackClicked: () -> Unit) {
 
     var startTime by remember { mutableStateOf(DayTime(7, 0)) }
     var endTime by remember { mutableStateOf(DayTime(22, 0)) }
-    var goalAmountMl by remember { mutableIntStateOf(2_000) }
+    var goalAmountMl by remember { mutableFloatStateOf(2_000f) }
     var mode by remember { mutableStateOf(ScheduleMode.BY_AMOUNT) }
     var amountPerDrink by remember { mutableFloatStateOf(250f) }
     var desiredIntervalMin by remember { mutableIntStateOf(120) }
@@ -150,8 +150,8 @@ internal fun AlarmCalculatorScreen(onBackClicked: () -> Unit) {
         // ── Goal amount ───────────────────────────────────────────────────────
         LabeledSlider(
             label = "Goal amount",
-            value = goalAmountMl.toFloat(),
-            onValueChange = { goalAmountMl = it.roundToInt() },
+            value = goalAmountMl,
+            onValueChange = { goalAmountMl = it.roundToInt().toFloat() },
             valueRange = 500f..4_000f,
             steps = 34,
             unit = "mL",

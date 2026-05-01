@@ -44,7 +44,7 @@ class DrinkAlarmCalculator2 {
     fun scheduleByAmount(
         startTime: DayTime,
         endTime: DayTime,
-        goalAmountMl: Int,
+        goalAmountMl: Float,
         amountPerDrinkMl: Float,
     ): DrinkSchedule {
         require(amountPerDrinkMl > 0f) { "amountPerDrinkMl must be positive" }
@@ -78,7 +78,7 @@ class DrinkAlarmCalculator2 {
     fun scheduleByInterval(
         startTime: DayTime,
         endTime: DayTime,
-        goalAmountMl: Int,
+        goalAmountMl: Float,
         desiredIntervalMinutes: Int,
     ): DrinkSchedule {
         require(desiredIntervalMinutes > 0) { "desiredIntervalMinutes must be positive" }
@@ -93,7 +93,7 @@ class DrinkAlarmCalculator2 {
         val gaps = gapsFloat.roundToInt().coerceAtLeast(1)
         val count = gaps + 1
 
-        val baseAmountPerDrink = goalAmountMl.toFloat() / count.toFloat()
+        val baseAmountPerDrink = goalAmountMl / count.toFloat()
         return buildSchedule(
             startTime = startTime,
             endTime = endTime,
@@ -109,13 +109,13 @@ class DrinkAlarmCalculator2 {
         startTime: DayTime,
         endTime: DayTime,
         count: Int,
-        goalAmountMl: Int,
+        goalAmountMl: Float,
         baseAmountPerDrinkMl: Float,
     ): DrinkSchedule {
         // Edge case: single drink — no meaningful interval, no endTime pin.
         if (count == 1) {
             return DrinkSchedule(
-                slots = listOf(DrinkSlot(time = startTime, amountMl = goalAmountMl.toFloat())),
+                slots = listOf(DrinkSlot(time = startTime, amountMl = goalAmountMl)),
                 actualInterval = DayTime(0, 0),
                 count = 1,
             )
@@ -141,7 +141,7 @@ class DrinkAlarmCalculator2 {
             }
             val amount = if (i == count - 1) {
                 // Adjust last slot so the total equals goalAmountMl exactly.
-                goalAmountMl.toFloat() - (gaps * baseAmountPerDrinkMl)
+                goalAmountMl - (gaps * baseAmountPerDrinkMl)
             } else {
                 baseAmountPerDrinkMl
             }

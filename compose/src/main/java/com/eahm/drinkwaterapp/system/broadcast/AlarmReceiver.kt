@@ -71,7 +71,7 @@ class AlarmReceiver : BroadcastReceiver() {
         dao.insertAll(record)
     }
 
-    private fun scheduleNextAlarm(context: Context) {
+    private suspend fun scheduleNextAlarm(context: Context) {
         val koin = GlobalContext.get()
         val drinkAlarmManager = koin.get<DrinkAlarmManager>()
         drinkAlarmManager.setupAlarm(context)
