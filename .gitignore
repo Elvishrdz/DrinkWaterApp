@@ -16,5 +16,4 @@ app/release/*
 *.apk
 *.aab
 /.idea/shelf/*
-/docs/*
 /.claude
