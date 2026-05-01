@@ -11,9 +11,14 @@ data class SettingsState(
     val intervalMinutes: Int = 45,
     val startTime: ActiveTime?,
     val endTime: ActiveTime?,
+    val timeRangeError: TimeRangeError? = null,
 )
 
 enum class WaterUnit(val label: String) {
     ML("Milliliters"),
     FL_OZ("Fl. oz"),
+}
+
+enum class TimeRangeError {
+    SAME_TIME,
 }

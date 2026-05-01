@@ -81,19 +81,47 @@ internal class SettingsViewModel(
 
     fun onStartTimeChanged(time: TimeSelected) {
         viewModelScope.launch {
-            // TODO: validate range makes sense with end time
-            val start = ActiveTime(time.hour, time.minute)
-            prefsStorage.setStartTime(start)
-            _state.update { it.copy(startTime = start) }
+            val newStart = ActiveTime(time.hour, time.minute)
+            val currentEnd = state.value.endTime
+
+            val error = currentEnd?.let { validateTimeRange(newStart, it) }
+            if (error != null) {
+                _state.update { it.copy(timeRangeError = error) }
+                return@launch
+            }
+
+            _state.update { it.copy(timeRangeError = null) }
+            prefsStorage.setStartTime(newStart)
         }
     }
 
     fun onEndTimeChanged(time: TimeSelected) {
         viewModelScope.launch {
-            // TODO: validate range makes sense with start time
-            val end = ActiveTime(time.hour, time.minute)
-            prefsStorage.setEndTime(end)
-            _state.update { it.copy(endTime = end) }
+            val newEnd = ActiveTime(time.hour, time.minute)
+            val currentStart = state.value.startTime
+
+            val error = currentStart?.let { validateTimeRange(it, newEnd) }
+            if (error != null) {
+                _state.update { it.copy(timeRangeError = error) }
+                return@launch
+            }
+
+            _state.update { it.copy(timeRangeError = null) }
+            prefsStorage.setEndTime(newEnd)
         }
+    }
+
+    /**
+     * Returns a [TimeRangeError] if the [start]/[end] pair is invalid, null if the range is fine.
+     *
+     * Rules:
+     * - [start] == [end] (same minute) → [TimeRangeError.SAME_TIME] — zero-duration window.
+     * - [start] < [end] → normal same-day window, always valid.
+     * - [start] > [end] → midnight-spanning window (e.g. 23:00 → 02:00), always valid.
+     */
+    private fun validateTimeRange(start: ActiveTime, end: ActiveTime): TimeRangeError? {
+        val startMinutes = start.hour * 60 + start.minute
+        val endMinutes = end.hour * 60 + end.minute
+        return if (startMinutes == endMinutes) TimeRangeError.SAME_TIME else null
     }
 }
