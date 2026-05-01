@@ -1,5 +1,8 @@
 package com.eahm.drinkwaterapp.feature.dev
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
@@ -23,9 +26,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.eahm.drinkwaterapp.core.bindings.toEntity
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStats
@@ -215,6 +220,16 @@ private fun Content(
     onBackClicked: () -> Unit,
 ) {
     var timer by remember { mutableStateOf("") }
+    val context = LocalContext.current
+
+    val notificationsAllowed = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.POST_NOTIFICATIONS
+        ) == PackageManager.PERMISSION_GRANTED
+    } else {
+        true
+    }
 
     Adaptive(
         modifier = modifier,
@@ -222,6 +237,10 @@ private fun Content(
             DwPrimaryButton(
                 text = "Back to Menu",
                 onClick = onBackClicked,
+            )
+
+            Text(
+                text = "Notification permissions granted: $notificationsAllowed",
             )
 
             Text(
