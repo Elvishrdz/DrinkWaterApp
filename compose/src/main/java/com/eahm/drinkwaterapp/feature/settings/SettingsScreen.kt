@@ -1,5 +1,13 @@
 package com.eahm.drinkwaterapp.feature.settings
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,6 +25,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -28,6 +37,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -36,6 +46,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,7 +54,10 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import com.eahm.drinkwaterapp.R
+import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
+import com.eahm.drinkwaterapp.core.designsystem.component.button.DwSecondaryButton
 import com.eahm.drinkwaterapp.core.designsystem.component.extension.outlineBorderStyle
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -63,6 +77,9 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.JetBrainsMono
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 import com.eahm.drinkwaterapp.feature.settings.ui.EditButton
+import com.eahm.drinkwaterapp.feature.settings.ui.GoalBottomSheet
+import com.eahm.drinkwaterapp.feature.settings.ui.IntervalBottomSheet
+import com.eahm.drinkwaterapp.feature.settings.ui.UnitsBottomSheet
 import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorDialog
 import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
 import org.koin.compose.viewmodel.koinViewModel
@@ -77,35 +94,117 @@ internal fun SettingsScreen(
     viewModel: SettingsViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
+    val context = LocalContext.current
+
+    // ── Notification permission ───────────────────────────────────────────────
+    var showPermissionDeniedDialog by rememberSaveable { mutableStateOf(false) }
+
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+    ) { isGranted ->
+        if (isGranted) {
+            viewModel.onNotificationsToggled(true)
+        } else {
+            showPermissionDeniedDialog = true
+        }
+    }
+
+    fun handleNotificationToggle(enabled: Boolean) {
+        if (!enabled) {
+            viewModel.onNotificationsToggled(false)
+            return
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val granted = ContextCompat.checkSelfPermission(
+                context, Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+            if (granted) {
+                viewModel.onNotificationsToggled(true)
+            } else {
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        } else {
+            // No runtime permission needed below Android 13
+            viewModel.onNotificationsToggled(true)
+        }
+    }
+
+    // ── Share & Rate ──────────────────────────────────────────────────────────
+    fun handleShare() {
+        val shareIntent = Intent.createChooser(
+            Intent(Intent.ACTION_SEND).apply {
+                putExtra(Intent.EXTRA_TEXT, "Stay hydrated! I use DrinkWater to track my daily water intake. Check it out!")
+                type = "text/plain"
+            },
+            null,
+        )
+        context.startActivity(shareIntent)
+    }
+
+    fun handleRate() {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com"))
+        context.startActivity(intent)
+    }
+
+    // ── Content ───────────────────────────────────────────────────────────────
     SettingsContent(
         state = state,
-        onNotificationsToggled = viewModel::onNotificationsToggled,
+        onNotificationsToggled = ::handleNotificationToggle,
         onUsernameChanged = viewModel::onUsernameChanged,
-        onGoalTap = {},
-        onUnitsTap = {},
-        onIntervalTap = {},
+        onGoalChanged = viewModel::onGoalChanged,
+        onUnitChanged = viewModel::onUnitChanged,
+        onIntervalChanged = viewModel::onIntervalChanged,
         onStartTimeChanged = viewModel::onStartTimeChanged,
         onEndTimeChanged = viewModel::onEndTimeChanged,
-        onShareTap = {},
-        onRateTap = {},
+        onShareTap = ::handleShare,
+        onRateTap = ::handleRate,
         modifier = modifier,
     )
+
+    // ── Permission denied dialog ──────────────────────────────────────────────
+    if (showPermissionDeniedDialog) {
+        NotificationPermissionDeniedDialog(
+            onDismiss = { showPermissionDeniedDialog = false },
+            onGoToSettings = {
+                showPermissionDeniedDialog = false
+                val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                    .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                context.startActivity(intent)
+            },
+        )
+    }
 }
+
+// ── Content composable ────────────────────────────────────────────────────────
 
 @Composable
 internal fun SettingsContent(
     state: SettingsState,
     onNotificationsToggled: (Boolean) -> Unit,
     onUsernameChanged: (String) -> Unit,
-    onGoalTap: () -> Unit,
-    onUnitsTap: () -> Unit,
-    onIntervalTap: () -> Unit,
+    onGoalChanged: (Int) -> Unit,
+    onUnitChanged: (WaterUnit, WeightUnit) -> Unit,
+    onIntervalChanged: (Int) -> Unit,
     onStartTimeChanged: (TimeSelected) -> Unit,
     onEndTimeChanged: (TimeSelected) -> Unit,
     onShareTap: () -> Unit,
     onRateTap: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    // Window duration used to cap the reminder interval
+    val windowMinutes = remember(state.startTime, state.endTime) {
+        val s = state.startTime ?: return@remember 24 * 60
+        val e = state.endTime ?: return@remember 24 * 60
+        val startMin = s.hour * 60 + s.minute
+        val endMin = e.hour * 60 + e.minute
+        if (endMin > startMin) endMin - startMin else (24 * 60 - startMin) + endMin
+    }
+
+    // Bottom-sheet visibility flags
+    var showGoalSheet by rememberSaveable { mutableStateOf(false) }
+    var showUnitsSheet by rememberSaveable { mutableStateOf(false) }
+    var showIntervalSheet by rememberSaveable { mutableStateOf(false) }
+
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
@@ -137,7 +236,7 @@ internal fun SettingsContent(
                     iconBg = DwTintWater,
                     iconTint = DwWater,
                     label = "Daily goal",
-                    onClick = onGoalTap,
+                    onClick = { showGoalSheet = true },
                 ) {
                     RowValueTrailing(value = formatGoal(state.dailyGoalMl))
                 }
@@ -147,9 +246,9 @@ internal fun SettingsContent(
                     iconBg = DwTintMagenta,
                     iconTint = DwMagenta,
                     label = "Units",
-                    onClick = onUnitsTap,
+                    onClick = { showUnitsSheet = true },
                 ) {
-                    RowValueTrailing(value = "${state.unit.label} · kg")
+                    RowValueTrailing(value = "${state.unit.label} · ${state.weightUnit.label}")
                 }
             }
         }
@@ -180,18 +279,13 @@ internal fun SettingsContent(
                     iconBg = DwTintWater,
                     iconTint = DwWater,
                     label = "Interval",
-                    onClick = onIntervalTap,
+                    onClick = { showIntervalSheet = true },
                 ) {
                     RowValueTrailing(value = "every ${state.intervalMinutes} min")
                 }
                 HorizontalDivider(color = DwInk100)
                 SettingRowTimeSelector(
-                    time = state.startTime?.let {
-                        TimeSelected(
-                            hour = it.hour,
-                            minute = it.minute,
-                        )
-                    },
+                    time = state.startTime?.let { TimeSelected(it.hour, it.minute) },
                     icon = DwIcons.Sun,
                     iconBg = DwTintWater,
                     iconTint = DwWater,
@@ -200,12 +294,7 @@ internal fun SettingsContent(
                 )
                 HorizontalDivider(color = DwInk100)
                 SettingRowTimeSelector(
-                    time = state.endTime?.let {
-                        TimeSelected(
-                            hour = it.hour,
-                            minute = it.minute,
-                        )
-                    },
+                    time = state.endTime?.let { TimeSelected(it.hour, it.minute) },
                     icon = DwIcons.Moon,
                     iconBg = DwTintMagenta,
                     iconTint = DwMagenta,
@@ -239,7 +328,81 @@ internal fun SettingsContent(
             }
         }
     }
+
+    // ── Bottom sheets ─────────────────────────────────────────────────────────
+    if (showGoalSheet) {
+        GoalBottomSheet(
+            currentGoalMl = state.dailyGoalMl,
+            onGoalChanged = onGoalChanged,
+            onDismiss = { showGoalSheet = false },
+        )
+    }
+
+    if (showUnitsSheet) {
+        UnitsBottomSheet(
+            currentUnit = state.unit,
+            onUnitChanged = onUnitChanged,
+            onDismiss = { showUnitsSheet = false },
+        )
+    }
+
+    if (showIntervalSheet) {
+        IntervalBottomSheet(
+            currentMinutes = state.intervalMinutes,
+            windowMinutes = windowMinutes,
+            onIntervalChanged = onIntervalChanged,
+            onDismiss = { showIntervalSheet = false },
+        )
+    }
 }
+
+// ── Permission denied dialog ──────────────────────────────────────────────────
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun NotificationPermissionDeniedDialog(
+    onDismiss: () -> Unit,
+    onGoToSettings: () -> Unit,
+) {
+    BasicAlertDialog(onDismissRequest = onDismiss) {
+        Column(
+            modifier = Modifier
+                .clip(RoundedCornerShape(20.dp))
+                .background(DwPaper)
+                .padding(24.dp),
+        ) {
+            Text(
+                text = "Notifications disabled",
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                color = DwInk900,
+            )
+            Spacer(Modifier.height(10.dp))
+            Text(
+                text = "To receive drink reminders, please enable notifications for DrinkWater in your phone's Settings.",
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp,
+                color = DwInk500,
+            )
+            Spacer(Modifier.height(24.dp))
+            DwPrimaryButton(
+                text = "Open Settings",
+                onClick = onGoToSettings,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(Modifier.height(8.dp))
+            DwSecondaryButton(
+                text = "Not now",
+                onClick = onDismiss,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+}
+
+// ── Reusable setting row composables ─────────────────────────────────────────
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -308,12 +471,11 @@ private fun ProfileCard(
                     fontSize = 18.sp,
                     color = Color.White,
                 )
-            }
-                ?: Icon(
-                    modifier = Modifier.size(24.dp),
-                    painter = painterResource(R.drawable.ic_drink_holo_dark),
-                    contentDescription = null,
-                )
+            } ?: Icon(
+                modifier = Modifier.size(24.dp),
+                painter = painterResource(R.drawable.ic_drink_holo_dark),
+                contentDescription = null,
+            )
         }
 
         Column(modifier = Modifier.weight(1f)) {
@@ -326,7 +488,7 @@ private fun ProfileCard(
             )
             Spacer(modifier = Modifier.height(1.dp))
             Text(
-                text = "${state.weightKg.toInt()} kg · daily goal ${formatGoal(state.dailyGoalMl)}",
+                text = "${state.weightKg.toInt()} ${state.weightUnit.label} · daily goal ${formatGoal(state.dailyGoalMl)}",
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Normal,
                 fontSize = 12.sp,
@@ -443,6 +605,8 @@ private fun RowChevronTrailing() {
     )
 }
 
+// ── Formatters ────────────────────────────────────────────────────────────────
+
 private fun formatGoal(ml: Int): String {
     if (ml < 1000) return "$ml mL"
     val litres = ml / 1000f
@@ -459,6 +623,8 @@ private fun formatTime(hour: Int, minute: Int): String {
     return "$displayHour:${minute.toString().padStart(2, '0')} $ampm"
 }
 
+// ── Preview ───────────────────────────────────────────────────────────────────
+
 @Preview(showBackground = true, backgroundColor = 0xFFF2F6F9)
 @Composable
 private fun SettingsScreenPreview() {
@@ -467,9 +633,9 @@ private fun SettingsScreenPreview() {
             state = settingsStateMock,
             onNotificationsToggled = {},
             onUsernameChanged = {},
-            onGoalTap = {},
-            onUnitsTap = {},
-            onIntervalTap = {},
+            onGoalChanged = {},
+            onUnitChanged = { _, _ -> },
+            onIntervalChanged = {},
             onStartTimeChanged = {},
             onEndTimeChanged = {},
             onShareTap = {},

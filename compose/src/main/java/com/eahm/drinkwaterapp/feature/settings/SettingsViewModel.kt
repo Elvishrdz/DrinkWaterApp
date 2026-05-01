@@ -27,7 +27,6 @@ internal class SettingsViewModel(
         prefsStorage.getEndTime(),
     ) { startTime, endTime ->
         ActiveTimes(startTime, endTime)
-
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
@@ -36,17 +35,19 @@ internal class SettingsViewModel(
 
     private val _state =
         MutableStateFlow(SettingsState(username = null, startTime = null, endTime = null))
+
     val state = combine(
         prefsStorage.getUsername(),
+        prefsStorage.getGoalAmount(),
         activeTimes,
-        _state
-    ) { username, activeTimes, state ->
+        _state,
+    ) { username, goal, activeTimes, state ->
         state.copy(
             username = username,
+            dailyGoalMl = goal.toInt(),
             startTime = activeTimes?.start,
             endTime = activeTimes?.end,
         )
-
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
@@ -61,18 +62,18 @@ internal class SettingsViewModel(
         viewModelScope.launch {
             username
                 .takeIf { validateText(it).isValid }
-                ?.let {
-                    prefsStorage.setUsername(it)
-                }
+                ?.let { prefsStorage.setUsername(it) }
         }
     }
 
     fun onGoalChanged(goalMl: Int) {
-        _state.update { it.copy(dailyGoalMl = goalMl) }
+        viewModelScope.launch {
+            prefsStorage.setGoalAmount(goalMl.toFloat())
+        }
     }
 
-    fun onUnitChanged(unit: WaterUnit) {
-        _state.update { it.copy(unit = unit) }
+    fun onUnitChanged(unit: WaterUnit, weightUnit: WeightUnit) {
+        _state.update { it.copy(unit = unit, weightUnit = weightUnit) }
     }
 
     fun onIntervalChanged(minutes: Int) {
