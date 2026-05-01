@@ -1,5 +1,7 @@
 package com.eahm.drinkwaterapp.feature.settings
 
+import com.eahm.drinkwaterapp.core.data.datastore.ActiveTime
+
 data class SettingsState(
     val username: String?,
     val weightKg: Float = 68f,
@@ -7,10 +9,8 @@ data class SettingsState(
     val unit: WaterUnit = WaterUnit.ML,
     val notificationsEnabled: Boolean = true,
     val intervalMinutes: Int = 45,
-    val startHour: Int = 6,
-    val startMinute: Int = 5,
-    val endHour: Int = 23,
-    val endMinute: Int = 55,
+    val startTime: ActiveTime?,
+    val endTime: ActiveTime?,
 )
 
 enum class WaterUnit(val label: String) {

@@ -48,6 +48,7 @@ import com.eahm.drinkwaterapp.core.domain.mock.hourGroupMock
 import com.eahm.drinkwaterapp.core.domain.mock.localDateTimeMock
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import com.eahm.drinkwaterapp.feature.dev.adaptive.AdaptiveScreen
+import com.eahm.drinkwaterapp.feature.dev.alarmcalculator.AlarmCalculatorRoot
 import com.eahm.drinkwaterapp.feature.dev.ui.Adaptive
 import com.eahm.drinkwaterapp.ui.drinkbutton.DrinkButton
 import com.eahm.drinkwaterapp.ui.drinks.BubbleConfig
@@ -102,7 +103,7 @@ internal fun DevRoot(onBackClicked: () -> Unit) {
             onBackClicked = onBackClicked,
         )
 
-        DevDestination.ALARM_CALCULATOR -> AlarmCalculatorScreen(
+        DevDestination.ALARM_CALCULATOR -> AlarmCalculatorRoot(
             onBackClicked = onBackClicked,
         )
     }

@@ -1,4 +1,4 @@
-package com.eahm.drinkwaterapp.feature.dev
+package com.eahm.drinkwaterapp.feature.dev.alarmcalculator
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateColorAsState
@@ -49,6 +49,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DayTime
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmCalculator2
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkSchedule
@@ -65,6 +66,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorButton
 import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
+import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.roundToInt
 
 // ─── Schedule mode ────────────────────────────────────────────────────────────
@@ -76,14 +78,16 @@ private enum class ScheduleMode(val label: String) {
 
 private val calculator = DrinkAlarmCalculator2()
 
-// ─── Screen ───────────────────────────────────────────────────────────────────
-
 @Composable
-internal fun AlarmCalculatorScreen(onBackClicked: () -> Unit) {
+internal fun AlarmCalculatorScreen(
+    startTime: DayTime,
+    endTime: DayTime,
+    onBackClicked: () -> Unit,
+) {
     BackHandler(onBack = onBackClicked)
 
-    var startTime by remember { mutableStateOf(DayTime(7, 0)) }
-    var endTime by remember { mutableStateOf(DayTime(22, 0)) }
+    var startTime by remember { mutableStateOf(startTime) }
+    var endTime by remember { mutableStateOf(endTime) }
     var goalAmountMl by remember { mutableFloatStateOf(2_000f) }
     var mode by remember { mutableStateOf(ScheduleMode.BY_AMOUNT) }
     var amountPerDrink by remember { mutableFloatStateOf(250f) }

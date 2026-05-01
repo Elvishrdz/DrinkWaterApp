@@ -17,14 +17,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,6 +63,8 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.JetBrainsMono
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 import com.eahm.drinkwaterapp.feature.settings.ui.EditButton
+import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorDialog
+import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
 import org.koin.compose.viewmodel.koinViewModel
 
 private val gradientMagentaHero = Brush.verticalGradient(
@@ -77,8 +84,8 @@ internal fun SettingsScreen(
         onGoalTap = {},
         onUnitsTap = {},
         onIntervalTap = {},
-        onStartTimeTap = {},
-        onEndTimeTap = {},
+        onStartTimeChanged = viewModel::onStartTimeChanged,
+        onEndTimeChanged = viewModel::onEndTimeChanged,
         onShareTap = {},
         onRateTap = {},
         modifier = modifier,
@@ -93,8 +100,8 @@ internal fun SettingsContent(
     onGoalTap: () -> Unit,
     onUnitsTap: () -> Unit,
     onIntervalTap: () -> Unit,
-    onStartTimeTap: () -> Unit,
-    onEndTimeTap: () -> Unit,
+    onStartTimeChanged: (TimeSelected) -> Unit,
+    onEndTimeChanged: (TimeSelected) -> Unit,
     onShareTap: () -> Unit,
     onRateTap: () -> Unit,
     modifier: Modifier = Modifier,
@@ -178,25 +185,33 @@ internal fun SettingsContent(
                     RowValueTrailing(value = "every ${state.intervalMinutes} min")
                 }
                 HorizontalDivider(color = DwInk100)
-                SettingRow(
+                SettingRowTimeSelector(
+                    time = state.startTime?.let {
+                        TimeSelected(
+                            hour = it.hour,
+                            minute = it.minute,
+                        )
+                    },
                     icon = DwIcons.Sun,
                     iconBg = DwTintWater,
                     iconTint = DwWater,
                     label = "Start time",
-                    onClick = onStartTimeTap,
-                ) {
-                    RowValueTrailing(value = formatTime(state.startHour, state.startMinute))
-                }
+                    onStartTimeTap = onStartTimeChanged,
+                )
                 HorizontalDivider(color = DwInk100)
-                SettingRow(
+                SettingRowTimeSelector(
+                    time = state.endTime?.let {
+                        TimeSelected(
+                            hour = it.hour,
+                            minute = it.minute,
+                        )
+                    },
                     icon = DwIcons.Moon,
                     iconBg = DwTintMagenta,
                     iconTint = DwMagenta,
                     label = "End time",
-                    onClick = onEndTimeTap,
-                ) {
-                    RowValueTrailing(value = formatTime(state.endHour, state.endMinute))
-                }
+                    onStartTimeTap = onEndTimeChanged,
+                )
             }
         }
 
@@ -223,6 +238,43 @@ internal fun SettingsContent(
                 }
             }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SettingRowTimeSelector(
+    time: TimeSelected?,
+    icon: ImageVector,
+    iconBg: Color,
+    iconTint: Color,
+    label: String,
+    modifier: Modifier = Modifier,
+    is24HourFormat: Boolean = rememberTimePickerState().is24hour,
+    onStartTimeTap: (TimeSelected) -> Unit,
+) {
+    var showModal by rememberSaveable { mutableStateOf(false) }
+
+    SettingRow(
+        modifier = modifier,
+        icon = icon,
+        iconBg = iconBg,
+        iconTint = iconTint,
+        label = label,
+        onClick = { showModal = !showModal },
+    ) {
+        RowValueTrailing(
+            value = time?.let { formatTime(it.hour, it.minute) }.orEmpty(),
+        )
+    }
+
+    if (showModal) {
+        AppTimeSelectorDialog(
+            time = time,
+            is24HourFormat = is24HourFormat,
+            onTimeSelected = onStartTimeTap,
+            onDismiss = { showModal = false },
+        )
     }
 }
 
@@ -418,8 +470,8 @@ private fun SettingsScreenPreview() {
             onGoalTap = {},
             onUnitsTap = {},
             onIntervalTap = {},
-            onStartTimeTap = {},
-            onEndTimeTap = {},
+            onStartTimeChanged = {},
+            onEndTimeChanged = {},
             onShareTap = {},
             onRateTap = {},
         )
@@ -428,4 +480,6 @@ private fun SettingsScreenPreview() {
 
 private val settingsStateMock = SettingsState(
     username = null,
+    startTime = null,
+    endTime = null,
 )
