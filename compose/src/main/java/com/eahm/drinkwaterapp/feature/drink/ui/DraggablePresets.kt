@@ -89,7 +89,7 @@ fun DraggableQuickAddRow(
     var previousPresets by remember { mutableStateOf(emptyList<DrinkPreset>()) }
 
     var draggedItemIndex by remember { mutableStateOf<Int?>(null) }
-    val isDraggingItem by derivedStateOf { draggedItemIndex != null }
+    val isDraggingItem by remember { derivedStateOf { draggedItemIndex != null } }
 
     var dragOffsetX by remember { mutableFloatStateOf(0f) }
     var dragOffsetY by remember { mutableFloatStateOf(0f) }
@@ -254,7 +254,7 @@ fun DraggablePresetGrid(
     // current value without capturing a stale reference.
     val dragIndexState = remember { mutableStateOf<Int?>(null) }
     var draggedItemIndex by dragIndexState
-    val isDraggingItem by derivedStateOf { draggedItemIndex != null }
+    val isDraggingItem by remember { derivedStateOf { draggedItemIndex != null } }
 
     var dragOffset by remember { mutableStateOf(Offset.Zero) }
     var itemWidth by remember { mutableFloatStateOf(0f) }

@@ -61,10 +61,13 @@ private class DataStorePrefsStorage(
 ) : PrefsStorage {
 
     private val drinkDefaultPresets = setOf(
-        DrinkPreset(1, 1f),
-        DrinkPreset(2, 2f),
-        DrinkPreset(3, 3f),
-        DrinkPreset(4, 4f),
+        DrinkPreset(1, 50f),
+        DrinkPreset(2, 100f),
+        DrinkPreset(3, 200f),
+
+        DrinkPreset(4, 10f),
+        DrinkPreset(5, 150f),
+        DrinkPreset(6, 250f),
     )
 
     private val firstSetupKey = booleanPreferencesKey("FIRST_SETUP")
