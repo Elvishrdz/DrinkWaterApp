@@ -189,7 +189,7 @@ private class DataStorePrefsStorage(
 
     override fun getAmountPerDrink(): Flow<Float> {
         return dataStore.data.map { preferences ->
-            preferences[amountPerDrinkKey] ?: 250f
+            preferences[amountPerDrinkKey] ?: 150f
         }
     }
 
