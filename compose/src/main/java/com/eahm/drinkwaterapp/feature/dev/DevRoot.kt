@@ -49,6 +49,7 @@ import com.eahm.drinkwaterapp.core.domain.mock.localDateTimeMock
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import com.eahm.drinkwaterapp.feature.dev.adaptive.AdaptiveScreen
 import com.eahm.drinkwaterapp.feature.dev.alarmcalculator.AlarmCalculatorRoot
+import com.eahm.drinkwaterapp.feature.dev.alarms.AlarmsRoot
 import com.eahm.drinkwaterapp.feature.dev.ui.Adaptive
 import com.eahm.drinkwaterapp.ui.drinkbutton.DrinkButton
 import com.eahm.drinkwaterapp.ui.drinks.BubbleConfig
@@ -75,6 +76,7 @@ enum class DevDestination(
     VALUES("Values", DwIcons.Drop),
     ADAPTIVE("Adaptive", DwIcons.Wave),
     ALARM_CALCULATOR("Calculator", DwIcons.Clock),
+    ALARMS("Alarms", DwIcons.Bell),
 }
 
 
@@ -104,6 +106,10 @@ internal fun DevRoot(onBackClicked: () -> Unit) {
         )
 
         DevDestination.ALARM_CALCULATOR -> AlarmCalculatorRoot(
+            onBackClicked = onBackClicked,
+        )
+
+        DevDestination.ALARMS -> AlarmsRoot(
             onBackClicked = onBackClicked,
         )
     }
