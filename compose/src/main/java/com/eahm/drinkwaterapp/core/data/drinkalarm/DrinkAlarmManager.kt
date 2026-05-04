@@ -2,8 +2,10 @@ package com.eahm.drinkwaterapp.core.data.drinkalarm
 
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStatsObserver
+import com.eahm.drinkwaterapp.core.data.systemnotifications.extension.canShowNotifications
 import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,6 +21,9 @@ class DrinkAlarmManager(
     private val prefsStorage: PrefsStorage,
     private val drinkStatsObserver: DrinkStatsObserver,
 ) {
+    private val isAlarmActive
+        get() = AlarmScheduler.isAlarmActive(application, DRINK_ALARM_ID)
+
     private val _state = MutableStateFlow(getState())
 
     val state: StateFlow<DrinkAlarmState> = _state
@@ -130,11 +135,36 @@ class DrinkAlarmManager(
             active = AlarmScheduler.isAlarmActive(application, DRINK_ALARM_ID),
             interval = AlarmIntervals.getInterval(application),
             nextInterval = AlarmIntervals.getNextInterval(application),
+            hasNotificationPermissions = application.canShowNotifications,
+            isAlarmActive = isAlarmActive,
         )
     }
 
     fun remainingTime(): String {
         return AlarmScheduler.getTimeUntilNextTrigger(application, DRINK_ALARM_ID).toString()
+    }
+
+
+    // New
+    data class AlarmConfiguration(
+        val source: String, // drink button / onboarding / etc
+    )
+
+    fun scheduleAlarm(configuration: AlarmConfiguration) {
+
+    }
+
+    fun onResume() {
+        Log.i("TESTING_THIS", "onResume: called now")
+        update()
+
+        if (application.canShowNotifications) {
+            // notification
+        }
+
+        if (isAlarmActive) {
+            // notification
+        }
     }
 
     companion object {
