@@ -6,13 +6,17 @@ import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStatsObserver
 import com.eahm.drinkwaterapp.core.data.systemnotifications.extension.canShowNotifications
 import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler
+import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler.asDayTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
@@ -162,26 +166,65 @@ class DrinkAlarmManager(
         testScheduleAlarm()
     }
 
+    private val testInterval = 7.seconds.inWholeMilliseconds
+
     fun testScheduleAlarm(configuration: AlarmConfiguration = AlarmConfiguration()) {
         AlarmScheduler.scheduleAlarm(
             context = application,
             alarmId = DRINK_ALARM_ID,
-            triggerInTimeFromNowMillis = 7.seconds.inWholeMilliseconds,
+            triggerInTimeFromNowMillis = testInterval,
         )
 
         update()
     }
 
+    @OptIn(ExperimentalTime::class)
     fun restoreAlarms() {
         val alarmStorageInfos = AlarmScheduler.getAlarmStorageInfos(application)
 
         alarmStorageInfos.forEach {
             // TODO: if alarm is in the past, recalculate new time
+            val now = Clock.System.now()
+            val currentTime = now.toLocalDateTime(TimeZone.currentSystemDefault())
+            val alarmTime = LocalDateTime(
+                year = currentTime.year,
+                month = currentTime.month,
+                day = currentTime.day,
+                hour = it.alarmTriggerAt.hour,
+                minute = it.alarmTriggerAt.minute,
+            )
+
+            val isInThePast = alarmTime < currentTime
+
+            val time = if (isInThePast) {
+                // TODO: to the current time add a new interval value, sum at millis level
+                val currentInstant = currentTime.toInstant(TimeZone.currentSystemDefault())
+                val newTime = currentInstant.plus(testInterval.milliseconds)
+                val triggerAt = newTime.toEpochMilliseconds()
+                triggerAt.asDayTime
+
+            } else {
+                // use same time
+                it.alarmTriggerAt
+            }
+
+            val alarmTime2 = LocalDateTime(
+                year = currentTime.year,
+                month = currentTime.month,
+                day = currentTime.day,
+                hour = time.hour,
+                minute = time.minute,
+            )
+
+            if (alarmTime2 < currentTime) {
+                throw Exception("Time is still in the past")
+            }
+
             AlarmScheduler.scheduleAlarm(
                 context = application,
                 alarmId = it.alarmId,
-                hour = it.alarmTriggerAt.hour,
-                minute = it.alarmTriggerAt.minute,
+                hour = time.hour,
+                minute = time.minute,
             )
         }
 

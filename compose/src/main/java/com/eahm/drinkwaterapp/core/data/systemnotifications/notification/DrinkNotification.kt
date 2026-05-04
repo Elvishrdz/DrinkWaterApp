@@ -1,14 +1,15 @@
 package com.eahm.drinkwaterapp.core.data.systemnotifications.notification
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.net.Uri
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.net.toUri
 import com.eahm.drinkwaterapp.MainActivity
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.data.systemnotifications.channel.DrinkNotificationChannel
@@ -26,6 +27,7 @@ internal object DrinkNotification {
     const val EXTRA_NOTIFICATION_ID = "NOTIFICATION_ID"
     const val EXTRA_CODE = "CODE"
 
+    @SuppressLint("MissingPermission")
     fun showNotification(
         context: Context,
         title: String?,
@@ -62,7 +64,8 @@ internal object DrinkNotification {
             ) //R.drawable.icon_skip
             .addAction(
                 0,
-                context.resources.getString(R.string.text_drink),
+                // TODO:context.resources.getString(R.string.text_drink),
+                "+150ml",
                 drinkIntent
             ) //R.drawable.icon_drink
             //.setCategory(NotificationCompat.CATEGORY_REMINDER)
@@ -77,7 +80,7 @@ internal object DrinkNotification {
         }
 
         val uriAudio =
-            Uri.parse("android.resource://" + context.packageName + "/" + R.raw.app_notification_sound)
+            ("android.resource://" + context.packageName + "/" + R.raw.app_notification_sound).toUri()
         val arrayVibrate = longArrayOf(1000, 1000)
 
         builder.setSound(uriAudio)

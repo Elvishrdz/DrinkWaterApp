@@ -27,6 +27,7 @@ class AlarmReceiver : BroadcastReceiver() {
         when (intent.action) {
             Intent.ACTION_BOOT_COMPLETED,
             Intent.ACTION_LOCKED_BOOT_COMPLETED,
+            Intent.ACTION_MY_PACKAGE_REPLACED,
                 -> {
                 restoreAlarms()
             }
@@ -38,7 +39,6 @@ class AlarmReceiver : BroadcastReceiver() {
                 // TODO: get correct alarm id
                 drinkAlarmManager.onAlarmReceived(code)
 
-                // reschedule
                 NotificationService.showDrinkNotification(context)
             }
 

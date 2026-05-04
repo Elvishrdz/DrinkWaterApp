@@ -35,6 +35,10 @@ object NotificationService {
     }
 
     fun showDrinkNotification(context: Context) {
+        // TODO: check if exists, update messages based on:
+        //  the status (is this notification visible for too long?
+        // time (is midnight? close to end hours? or early morning?
+        // goal amount, display how much
         if (!context.canShowNotifications) return
 
         val awesomeTexts = AwesomeTextsClass()

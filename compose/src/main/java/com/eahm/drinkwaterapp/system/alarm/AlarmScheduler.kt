@@ -164,13 +164,23 @@ object AlarmScheduler {
 
         val triggerAtMillis = prefs.getLong(keyTriggerAtMillis(id), -1)
 
-        // triggerAtMillis is an elapsedRealtime value, not a Unix timestamp.
-        // Offset it to wall-clock time, then extract hour and minute.
-        val triggerAt = if (triggerAtMillis == -1L) {
+        return AlarmStorageInfo(
+            alarmId = id,
+            alarmTriggerTimeMillis = triggerTimeMillis,
+            alarmTriggerTime = triggerTime,
+            alarmTriggerAtMillis = triggerAtMillis,
+            alarmTriggerAt = triggerAtMillis.asDayTime,
+        )
+    }
+
+    // triggerAtMillis is an elapsedRealtime value, not a Unix timestamp.
+    // Offset it to wall-clock time, then extract hour and minute.
+    val Long.asDayTime
+        get() = if (this <= 0) {
             DayTime(0, 0)
         } else {
             val wallClockMs = System.currentTimeMillis() +
-                    (triggerAtMillis - SystemClock.elapsedRealtime())
+                    (this - SystemClock.elapsedRealtime())
 
             val calendar = Calendar.getInstance().apply {
                 timeInMillis = wallClockMs
@@ -182,14 +192,6 @@ object AlarmScheduler {
             )
         }
 
-        return AlarmStorageInfo(
-            alarmId = id,
-            alarmTriggerTimeMillis = triggerTimeMillis,
-            alarmTriggerTime = triggerTime,
-            alarmTriggerAtMillis = triggerAtMillis,
-            alarmTriggerAt = triggerAt,
-        )
-    }
 
     private fun removeAlarmFromStorage(context: Context, alarmId: Int) {
         val prefs = context.getSharedPreferences(ALARM_PREFS_NAME, Context.MODE_PRIVATE)
