@@ -1,23 +1,53 @@
 package com.eahm.drinkwaterapp.feature.dev.alarms
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import android.os.SystemClock
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.eahm.drinkwaterapp.core.data.drinkalarm.DayTime
+import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
+import com.eahm.drinkwaterapp.core.designsystem.component.button.DwTertiaryButton
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
+import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
+import com.eahm.drinkwaterapp.feature.dev.alarms.countdown.AlarmCountdown
+import com.eahm.drinkwaterapp.feature.dev.alarms.countdown.CountdownConfig
+import com.eahm.drinkwaterapp.feature.dev.alarms.countdown.CountdownUnit
+import com.eahm.drinkwaterapp.feature.dev.alarms.countdown.pad
+import com.eahm.drinkwaterapp.system.alarm.AlarmStorageInfo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,19 +57,16 @@ internal fun AlarmsScreen(
     onBackClicked: () -> Unit,
 ) {
     val lifecycle = LocalLifecycleOwner.current
-
-
     val lifecycleState by lifecycle.lifecycle.currentStateFlow.collectAsStateWithLifecycle()
 
-    when (lifecycleState) {
-        Lifecycle.State.INITIALIZED -> {}
-        Lifecycle.State.CREATED -> {}
-        Lifecycle.State.STARTED -> {}
-        Lifecycle.State.RESUMED -> {
-            onAction(AlarmsAction.OnResumeCalled)
+    LaunchedEffect(lifecycleState) {
+        when (lifecycleState) {
+            Lifecycle.State.INITIALIZED -> {}
+            Lifecycle.State.CREATED -> {}
+            Lifecycle.State.STARTED -> {}
+            Lifecycle.State.RESUMED -> onAction(AlarmsAction.OnResumeCalled)
+            Lifecycle.State.DESTROYED -> {}
         }
-
-        Lifecycle.State.DESTROYED -> {}
     }
 
     Scaffold(
@@ -47,9 +74,7 @@ internal fun AlarmsScreen(
             TopAppBar(
                 title = { Text("Alarms") },
                 navigationIcon = {
-                    TextButton(onClick = onBackClicked) {
-                        Text("← Back")
-                    }
+                    TextButton(onClick = onBackClicked) { Text("← Back") }
                 },
             )
         },
@@ -62,32 +87,212 @@ internal fun AlarmsScreen(
         ) {
             when (state) {
                 is AlarmsState.Loading -> CircularProgressIndicator()
-                is AlarmsState.Data -> DataContent(state)
+                is AlarmsState.Data -> DataContent(state, onAction)
             }
         }
     }
 }
 
 @Composable
-private fun DataContent(state: AlarmsState.Data) {
-    Column {
-        Text("Alarms playground")
-        Text("Has notification permission: ${state.hasNotificationPermissions} ")
-        Text("Is drink alarm active: ${state.isAlarmActive} ")
+private fun DataContent(state: AlarmsState.Data, onAction: (AlarmsAction) -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 20.dp, vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        state.hasNotificationPermissions.let {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = "Has notification permission: $it",
+                    color = if (it) MaterialTheme.colorScheme.onBackground
+                    else MaterialTheme.colorScheme.error,
+                    fontWeight = if (it) FontWeight.Normal
+                    else FontWeight.Bold,
+                )
+
+                if (!it) {
+                    RequestNotificationPermissionButton(
+                        onGranted = { onAction(AlarmsAction.NotificationPermissionGranted) },
+                        onOpenSettings = { onAction(AlarmsAction.OpenAppPermissionSettings) },
+                    )
+                }
+            }
+        }
+
+        state.isAlarmActive.let {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = "Is drink alarm active: $it",
+                    color = if (it) MaterialTheme.colorScheme.onBackground
+                    else MaterialTheme.colorScheme.error,
+                    fontWeight = if (it) FontWeight.Normal
+                    else FontWeight.Bold,
+                )
+
+                if (!it) {
+                    DwTertiaryButton(
+                        text = "Start Alarm",
+                        onClick = { onAction(AlarmsAction.SetupAlarm) },
+                    )
+                }
+            }
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        state.alarmStorageInfo?.let {
+            AlarmCountdownContent(
+                isAlarmActive = state.isAlarmActive,
+                info = it,
+                onAction = onAction,
+            )
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        state.alarmStorageInfo?.let {
+            Column {
+                Text("Alarm id: ${it.alarmId}")
+                Text("Alarm trigger time: ${it.alarmTriggerTime}")
+                Text("Alarm trigger time (millis): ${it.alarmTriggerTimeMillis}")
+                Text("Alarm trigger at: ${it.alarmTriggerAt}")
+                Text("Alarm trigger at (millis): ${it.alarmTriggerAtMillis}")
+            }
+        }
+    }
+}
+
+@Composable
+private fun RequestNotificationPermissionButton(
+    onGranted: () -> Unit,
+    onOpenSettings: () -> Unit,
+) {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+
+    val context = LocalContext.current
+    var goToSettings by remember { mutableStateOf(false) }
+
+    // TODO: onResume check goToSettings state again
+
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            onGranted()
+
+        } else {
+            goToSettings = true
+        }
+    }
+
+    val requestPermission: () -> Unit = {
+        val status = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.POST_NOTIFICATIONS
+        )
+
+        when (PackageManager.PERMISSION_GRANTED) {
+            status -> {
+                onGranted()
+            }
+
+            else -> {
+                // Display permission request
+                launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
+
+
+    DwTertiaryButton(
+        text = if (goToSettings) "Grant permission in app settings" else "Request Permission",
+        onClick = {
+            if (goToSettings) {
+                onOpenSettings()
+            } else {
+                requestPermission()
+            }
+        },
+    )
+}
+
+@Composable
+private fun AlarmCountdownContent(
+    isAlarmActive: Boolean,
+    info: AlarmStorageInfo,
+    onAction: (AlarmsAction) -> Unit,
+) {
+    if (isAlarmActive && info.alarmTriggerAtMillis != -1L) {
+        Text(
+            text = "Next alarm at ${info.alarmTriggerAt.hour.pad()}:${info.alarmTriggerAt.minute.pad()}",
+            fontFamily = PlusJakartaSans,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 14.sp,
+            color = DwInk500,
+        )
+        Spacer(Modifier.height(12.dp))
+        AlarmCountdown(
+            triggerAtElapsedMs = info.alarmTriggerAtMillis,
+            config = CountdownConfig(
+                units = setOf(
+                    CountdownUnit.HOURS,
+                    CountdownUnit.MINUTES,
+                    CountdownUnit.SECONDS,
+                ),
+                hideLeadingZeroUnits = true,
+            ),
+        )
+
+        DwPrimaryButton(
+            text = "Stop alarm",
+            onClick = { onAction(AlarmsAction.StopAlarm) },
+        )
+
+    } else {
+        Text(
+            text = "No active alarm",
+            fontFamily = PlusJakartaSans,
+            color = DwInk500,
+        )
     }
 }
 
 @Preview
 @Composable
-private fun AlarmsScreenPreview() {
+private fun ActiveAlarmPreview() {
     AlarmsScreen(
-        state = alarmStateMock,
+        state = AlarmsState.Data(
+            hasNotificationPermissions = true,
+            isAlarmActive = true,
+            alarmStorageInfo = AlarmStorageInfo(
+                alarmId = 127,
+                alarmTriggerTimeMillis = 60_000L,
+                alarmTriggerTime = DayTime(0, 1),
+                alarmTriggerAtMillis = SystemClock.elapsedRealtime() + 3_661_000L,
+                alarmTriggerAt = DayTime(15, 30),
+            ),
+        ),
         onAction = {},
         onBackClicked = {},
     )
 }
 
-private val alarmStateMock = AlarmsState.Data(
-    hasNotificationPermissions = true,
-    isAlarmActive = true,
-)
+@Preview
+@Composable
+private fun NoActiveAlarmPreview() {
+    AlarmsScreen(
+        state = AlarmsState.Data(
+            hasNotificationPermissions = false,
+            isAlarmActive = false,
+            alarmStorageInfo = null,
+        ),
+        onAction = {},
+        onBackClicked = {},
+    )
+}

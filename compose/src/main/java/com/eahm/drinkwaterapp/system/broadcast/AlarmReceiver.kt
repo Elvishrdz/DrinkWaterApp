@@ -28,10 +28,17 @@ class AlarmReceiver : BroadcastReceiver() {
             Intent.ACTION_BOOT_COMPLETED,
             Intent.ACTION_LOCKED_BOOT_COMPLETED,
                 -> {
-                restoreAlarmsFromStorage(context)
+                restoreAlarms()
             }
 
             ALARM_ACTION -> {
+                val koin = GlobalContext.get()
+                val drinkAlarmManager = koin.get<DrinkAlarmManager>()
+
+                // TODO: get correct alarm id
+                drinkAlarmManager.onAlarmReceived(code)
+
+                // reschedule
                 NotificationService.showDrinkNotification(context)
             }
 
@@ -59,6 +66,12 @@ class AlarmReceiver : BroadcastReceiver() {
         }
     }
 
+    private fun restoreAlarms() {
+        val koin = GlobalContext.get()
+        val drinkAlarmManager = koin.get<DrinkAlarmManager>()
+        drinkAlarmManager.restoreAlarms()
+    }
+
     private suspend fun registerDrink() = withContext(Dispatchers.IO) {
         val koin = GlobalContext.get()
         val database = koin.get<AppDatabase>()
@@ -82,7 +95,7 @@ class AlarmReceiver : BroadcastReceiver() {
         NotificationManagerCompat.from(context).cancel(notificationId)
     }
 
-    private fun restoreAlarmsFromStorage(context: Context) {
+    fun restoreAlarmsFromStorage(context: Context) {
         val prefs = context.getSharedPreferences("alarms", Context.MODE_PRIVATE)
         val alarmIds = prefs.getStringSet("active_alarms", emptySet()) ?: return
 

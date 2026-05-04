@@ -6,6 +6,10 @@ import android.os.Build
 import android.os.SystemClock
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler.ALARM_PREFS_NAME
+import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler.KEY_ACTIVE_ALARMS
+import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler.keyTriggerAtMillis
+import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler.keyTriggerTimeMillis
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -37,7 +41,7 @@ class AlarmSchedulerTest {
     @Before
     fun setup() {
         context = InstrumentationRegistry.getInstrumentation().targetContext
-        context.getSharedPreferences("alarms", Context.MODE_PRIVATE)
+        context.getSharedPreferences(ALARM_PREFS_NAME, Context.MODE_PRIVATE)
             .edit().clear().commit()
         AlarmScheduler.cancelAlarm(context, ALARM_ID)
     }
@@ -45,7 +49,7 @@ class AlarmSchedulerTest {
     @After
     fun tearDown() {
         AlarmScheduler.cancelAlarm(context, ALARM_ID)
-        context.getSharedPreferences("alarms", Context.MODE_PRIVATE)
+        context.getSharedPreferences(ALARM_PREFS_NAME, Context.MODE_PRIVATE)
             .edit().clear().commit()
     }
 
@@ -66,8 +70,8 @@ class AlarmSchedulerTest {
 
         AlarmScheduler.scheduleAlarm(context, ALARM_ID, INTERVAL_MS)
 
-        val ids = context.getSharedPreferences("alarms", Context.MODE_PRIVATE)
-            .getStringSet("active_alarms", emptySet())
+        val ids = context.getSharedPreferences(ALARM_PREFS_NAME, Context.MODE_PRIVATE)
+            .getStringSet(KEY_ACTIVE_ALARMS, emptySet())
         assertTrue(ids?.contains(ALARM_ID.toString()) == true)
     }
 
@@ -77,8 +81,8 @@ class AlarmSchedulerTest {
 
         AlarmScheduler.scheduleAlarm(context, ALARM_ID, INTERVAL_MS)
 
-        val saved = context.getSharedPreferences("alarms", Context.MODE_PRIVATE)
-            .getLong("alarm_interval_$ALARM_ID", -1L)
+        val saved = context.getSharedPreferences(ALARM_PREFS_NAME, Context.MODE_PRIVATE)
+            .getLong(keyTriggerTimeMillis(ALARM_ID), -1L)
         assertEquals(INTERVAL_MS, saved)
     }
 
@@ -90,8 +94,8 @@ class AlarmSchedulerTest {
         AlarmScheduler.scheduleAlarm(context, ALARM_ID, INTERVAL_MS)
         val after = SystemClock.elapsedRealtime()
 
-        val triggerAt = context.getSharedPreferences("alarms", Context.MODE_PRIVATE)
-            .getLong("alarm_trigger_at_$ALARM_ID", -1L)
+        val triggerAt = context.getSharedPreferences(ALARM_PREFS_NAME, Context.MODE_PRIVATE)
+            .getLong(keyTriggerAtMillis(ALARM_ID), -1L)
 
         assertTrue("triggerAt should be >= before + interval", triggerAt >= before + INTERVAL_MS)
         assertTrue("triggerAt should be <= after + interval", triggerAt <= after + INTERVAL_MS)
@@ -106,8 +110,8 @@ class AlarmSchedulerTest {
         AlarmScheduler.scheduleAlarm(context, ALARM_ID, INTERVAL_MS)
         AlarmScheduler.cancelAlarm(context, ALARM_ID)
 
-        val ids = context.getSharedPreferences("alarms", Context.MODE_PRIVATE)
-            .getStringSet("active_alarms", emptySet())
+        val ids = context.getSharedPreferences(ALARM_PREFS_NAME, Context.MODE_PRIVATE)
+            .getStringSet(KEY_ACTIVE_ALARMS, emptySet())
         assertFalse(ids?.contains(ALARM_ID.toString()) == true)
     }
 
@@ -118,8 +122,8 @@ class AlarmSchedulerTest {
         AlarmScheduler.scheduleAlarm(context, ALARM_ID, INTERVAL_MS)
         AlarmScheduler.cancelAlarm(context, ALARM_ID)
 
-        val saved = context.getSharedPreferences("alarms", Context.MODE_PRIVATE)
-            .getLong("alarm_interval_$ALARM_ID", -1L)
+        val saved = context.getSharedPreferences(ALARM_PREFS_NAME, Context.MODE_PRIVATE)
+            .getLong(keyTriggerTimeMillis(ALARM_ID), -1L)
         assertEquals(-1L, saved)
     }
 

@@ -2,7 +2,6 @@ package com.eahm.drinkwaterapp.core.data.drinkalarm
 
 import android.app.Application
 import android.content.Context
-import android.util.Log
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStatsObserver
 import com.eahm.drinkwaterapp.core.data.systemnotifications.extension.canShowNotifications
@@ -14,6 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
 class DrinkAlarmManager(
@@ -36,7 +36,9 @@ class DrinkAlarmManager(
 
     @OptIn(ExperimentalTime::class)
     suspend fun setupAlarm(context: Context) {
-        if (AlarmScheduler.isAlarmActive(context, DRINK_ALARM_ID)) {
+        return// TODO: remove todo later, is for testing
+
+        if (isAlarmActive) {
             AlarmScheduler.cancelAlarm(context, DRINK_ALARM_ID)
         }
 
@@ -71,43 +73,35 @@ class DrinkAlarmManager(
 
         when (result) {
             is NextAlarmResult.Schedule -> AlarmScheduler.scheduleAlarm(
-                context,
-                DRINK_ALARM_ID,
-                result.delayMillis
+                context = context,
+                alarmId = DRINK_ALARM_ID,
+                triggerInTimeFromNowMillis = result.delayMillis,
             )
 
             is NextAlarmResult.BeforeWindow -> AlarmScheduler.scheduleAlarm(
-                context,
-                DRINK_ALARM_ID,
-                result.delayMillis
+                context = context,
+                alarmId = DRINK_ALARM_ID,
+                triggerInTimeFromNowMillis = result.delayMillis,
             )
 
             is NextAlarmResult.AfterWindow -> AlarmScheduler.scheduleAlarm(
-                context,
-                DRINK_ALARM_ID,
-                result.delayMillis
+                context = context,
+                alarmId = DRINK_ALARM_ID,
+                triggerInTimeFromNowMillis = result.delayMillis,
             )
 
             is NextAlarmResult.LastDrink -> AlarmScheduler.scheduleAlarm(
-                context,
-                DRINK_ALARM_ID,
-                result.delayMillis
+                context = context,
+                alarmId = DRINK_ALARM_ID,
+                triggerInTimeFromNowMillis = result.delayMillis,
             )
 
-            NextAlarmResult.GoalReached -> { /* alarm already cancelled above; nothing to schedule */
+            NextAlarmResult.GoalReached -> {
+                /* alarm already canceled above; nothing to schedule */
             }
         }
 
         AlarmIntervals.clearNextInterval(context)
-
-        update()
-    }
-
-    fun stop() {
-        AlarmScheduler.cancelAlarm(
-            context = application,
-            alarmId = DRINK_ALARM_ID,
-        )
 
         update()
     }
@@ -131,12 +125,15 @@ class DrinkAlarmManager(
     }
 
     private fun getState(): DrinkAlarmState {
+        val alarmStorageInfo = AlarmScheduler.getAlarmStorageInfo(application, DRINK_ALARM_ID)
+
         return DrinkAlarmState(
             active = AlarmScheduler.isAlarmActive(application, DRINK_ALARM_ID),
             interval = AlarmIntervals.getInterval(application),
             nextInterval = AlarmIntervals.getNextInterval(application),
             hasNotificationPermissions = application.canShowNotifications,
             isAlarmActive = isAlarmActive,
+            alarmStorageInfo = alarmStorageInfo,
         )
     }
 
@@ -144,28 +141,73 @@ class DrinkAlarmManager(
         return AlarmScheduler.getTimeUntilNextTrigger(application, DRINK_ALARM_ID).toString()
     }
 
-
-    // New
-    data class AlarmConfiguration(
-        val source: String, // drink button / onboarding / etc
-    )
-
-    fun scheduleAlarm(configuration: AlarmConfiguration) {
-
-    }
-
     fun onResume() {
-        Log.i("TESTING_THIS", "onResume: called now")
-        update()
-
         if (application.canShowNotifications) {
-            // notification
+            // if we can show notifications, then we just need the alarm
+        } else {
+            // we need the notification permission otherwise users will receive the app reminder
+            // display in the app this information to the user.
         }
 
         if (isAlarmActive) {
-            // notification
+            // all good, waiting for the next reminder
+        } else {
+            // we need to restore the alarm to trigger the reminder
         }
+
+        update()
+
+        if (isAlarmActive) return
+
+        testScheduleAlarm()
     }
+
+    fun testScheduleAlarm(configuration: AlarmConfiguration = AlarmConfiguration()) {
+        AlarmScheduler.scheduleAlarm(
+            context = application,
+            alarmId = DRINK_ALARM_ID,
+            triggerInTimeFromNowMillis = 7.seconds.inWholeMilliseconds,
+        )
+
+        update()
+    }
+
+    fun restoreAlarms() {
+        val alarmStorageInfos = AlarmScheduler.getAlarmStorageInfos(application)
+
+        alarmStorageInfos.forEach {
+            // TODO: if alarm is in the past, recalculate new time
+            AlarmScheduler.scheduleAlarm(
+                context = application,
+                alarmId = it.alarmId,
+                hour = it.alarmTriggerAt.hour,
+                minute = it.alarmTriggerAt.minute,
+            )
+        }
+
+        update()
+    }
+
+    fun stopAlarms() {
+        AlarmScheduler.cancelAlarm(
+            context = application,
+            alarmId = DRINK_ALARM_ID,
+        )
+
+        update()
+    }
+
+    fun refresh() = update()
+
+    fun onAlarmReceived(alarmId: Int) {
+        testScheduleAlarm()
+
+        update()
+    }
+
+    data class AlarmConfiguration(
+        val source: String = "app", // drink button / onboarding / etc
+    )
 
     companion object {
         private const val DRINK_ALARM_ID = 127
