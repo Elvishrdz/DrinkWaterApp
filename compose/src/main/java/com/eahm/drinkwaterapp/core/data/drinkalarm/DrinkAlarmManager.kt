@@ -2,9 +2,12 @@ package com.eahm.drinkwaterapp.core.data.drinkalarm
 
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import androidx.compose.ui.util.fastRoundToInt
 import com.eahm.drinkwaterapp.core.data.datastore.ActiveTime
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.WhatToDoNow
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.decideWhatToDoNow
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStatsObserver
 import com.eahm.drinkwaterapp.core.data.systemnotifications.extension.canShowNotifications
 import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler
@@ -178,13 +181,16 @@ class DrinkAlarmManager(
     }
 
     @OptIn(ExperimentalTime::class)
-    suspend fun restoreAlarms() {
-        // se llama muchas veces,
-        // restore deberia pasar solo una vez.
-        // no se establece ninguna alarma si ya paso el tiempo, y debe ser llamado ahora.
-        // en ese caso no se hace nada...
+    suspend fun restoreAlarm(source: String = "unknown") {
+        Log.i("DRINK_ALARM_MANAGER", "restoreAlarms: Source: $source")
 
-        val whatToDo = whatShouldIDoNow()
+        when (whatShouldIDoNow()) {
+            WhatToDoNow.DoNothing -> TODO()
+            WhatToDoNow.RemindNow -> TODO()
+            WhatToDoNow.RescheduleInterval -> TODO()
+            WhatToDoNow.ScheduleForActiveStart -> TODO()
+            WhatToDoNow.ScheduleNextInterval -> TODO()
+        }
 
         val alarmStorageInfos = AlarmScheduler.getAlarmStorageInfos(application)
 
@@ -239,46 +245,43 @@ class DrinkAlarmManager(
                     minute = time.minute,
                     second = time.second,
                 )
-
             }
         }
 
         update()
     }
 
-    sealed interface WhatToDoNow {
-        data object RemindNow : WhatToDoNow
-    }
-
     @OptIn(ExperimentalTime::class)
     private suspend fun whatShouldIDoNow(): WhatToDoNow {
-        val now = Clock.System.now()
-        val dateTime = now.toLocalDateTime(TimeZone.currentSystemDefault())
+        val dateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
         val startTime = prefsStorage.getStartTime().firstOrNull()?.toLocalDateTime() ?: dateTime
         val endTime = prefsStorage.getEndTime().firstOrNull()?.toLocalDateTime() ?: dateTime
 
-        val isInActiveTime = startTime != endTime && dateTime in startTime..endTime
+        val alarmInfo = AlarmScheduler.getAlarmStorageInfo(application, DRINK_ALARM_ID)
+        val storedTrigger = alarmInfo?.alarmTriggerAt?.toLocalDateTime()
 
-        return if (isInActiveTime) {
-            // check time.
-            // si estamos dentro de horas activas:
-            // 1. si no esta la alarma y el tiempo ya paso: llamar recordatorio ahora mismo y programar sig. intervalo.
-            WhatToDoNow.RemindNow
-            // 2. si no esta la alarma y el tiempo no ha pasado: programar alarma para siguiente intervalo.
-            // 3. si ya esta la alarma y el tiempo NO esta en el intervalo requerido: programar alarma para el proximo intervalo
-            // 3. si ya esta la alarma y el tiempo esta en el intervalo requerido: no hacer nada
+        return decideWhatToDoNow(
+            now = dateTime,
+            startTime = startTime,
+            endTime = endTime,
+            alarmActive = isAlarmActive,
+            storedTrigger = storedTrigger,
+        )
+    }
 
-            WhatToDoNow.RemindNow
+    @OptIn(ExperimentalTime::class)
+    fun AlarmTime.toLocalDateTime(timeZone: TimeZone = TimeZone.currentSystemDefault()): LocalDateTime {
+        val now = Clock.System.now()
+        val localDateTime = now.toLocalDateTime(timeZone)
 
-        } else {
-            // si estamos fuera de horas activas:
-            // 1. si no esta la alarma y el tiempo ya paso: programar alarma para inicio de proxima hora activa.
-            // 2. si no esta la alarma y el tiempo no ha pasado: programar alarma para inicio de proxima hora activa.
-            // 3. si ya esta la alarma y el tiempo NO esta en el intervalo requerido: programar alarma para inicio de proxima hora activa.
-            // 4. si ya esta la alarma y el tiempo esta en el intervalo requerido: no hacer nada
-
-            WhatToDoNow.RemindNow
-        }
+        return LocalDateTime(
+            year = localDateTime.year,
+            month = localDateTime.month,
+            day = localDateTime.day,
+            hour = hour,
+            minute = minute,
+            second = second,
+        )
     }
 
     @OptIn(ExperimentalTime::class)

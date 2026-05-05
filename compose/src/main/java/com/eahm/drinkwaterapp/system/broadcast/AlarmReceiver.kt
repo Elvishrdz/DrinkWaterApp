@@ -30,7 +30,7 @@ class AlarmReceiver : BroadcastReceiver() {
             Intent.ACTION_MY_PACKAGE_REPLACED,
                 -> {
                 // this is called multiple times depending on the action
-                restoreAlarms()
+                restoreDrinkAlarm()
             }
 
             ALARM_ACTION -> {
@@ -67,10 +67,10 @@ class AlarmReceiver : BroadcastReceiver() {
         }
     }
 
-    private suspend fun restoreAlarms() {
+    private suspend fun restoreDrinkAlarm() {
         val koin = GlobalContext.get()
         val drinkAlarmManager = koin.get<DrinkAlarmManager>()
-        drinkAlarmManager.restoreAlarms()
+        drinkAlarmManager.restoreAlarm()
     }
 
     private suspend fun registerDrink() = withContext(Dispatchers.IO) {
