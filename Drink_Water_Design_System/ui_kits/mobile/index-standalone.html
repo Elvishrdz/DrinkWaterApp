@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Drink Water — Mobile UI Kit</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="ext-resource-dependency" content="../../assets/logo.png" data-resource-id="logo"/>
+<link rel="stylesheet" href="../../colors_and_type.css"/>
+<link rel="stylesheet" href="components.css"/>
+<link rel="stylesheet" href="screens.css"/>
+<style>
+  body { background: var(--ink-100); padding: 24px; min-height: 100vh; }
+  .stage { display: flex; flex-wrap: wrap; gap: 24px; justify-content: center; align-items: flex-start; }
+  .frame-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .frame-label {
+    font-family: var(--font-mono); font-size: 11px; color: var(--fg-2);
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .nav-bar { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 28px; }
+  .nav-btn {
+    padding: 8px 14px; border-radius: 999px; border: 1.5px solid var(--brand-magenta);
+    background: var(--paper); color: var(--brand-magenta); cursor: pointer;
+    font-family: var(--font-rounded); font-weight: 700; font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+  .nav-btn.active { background: var(--brand-magenta); color: #fff; box-shadow: var(--shadow-magenta);}
+
+  /* Tab-host inside the frame: stacks screen content + tab bar */
+  .tab-host { width: 100%; height: 100%; display: flex; flex-direction: column; }
+  .tab-host > .dw-screen { flex: 1; min-height: 0; }
+  .sheet-overlay {
+    position: absolute; inset: 0; background: rgba(14,26,32,0.55);
+    display: flex; align-items: flex-end; z-index: 10;
+  }
+  .sheet-overlay > div { width: 100%; height: 80%; }
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="android-frame.jsx"></script>
+<script type="text/babel" src="Components.jsx"></script>
+<script type="text/babel" src="Screens-standalone.jsx"></script>
+<script type="text/babel" src="History.jsx"></script>
+</head>
+<body>
+<template id="__bundler_thumbnail" data-bg-color="#1C8EBF">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="dropG" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#7DCDED"/>
+        <stop offset="100%" stop-color="#0E5A82"/>
+      </linearGradient>
+    </defs>
+    <rect width="1200" height="800" fill="#1C8EBF"/>
+    <g transform="translate(600 400)">
+      <circle r="280" fill="rgba(255,255,255,0.08)"/>
+      <circle r="220" fill="rgba(255,255,255,0.10)"/>
+      <circle r="160" fill="rgba(255,255,255,0.14)"/>
+      <path d="M 0 -180 C 110 -60 140 30 140 90 A 140 140 0 1 1 -140 90 C -140 30 -110 -60 0 -180 Z"
+            fill="url(#dropG)" stroke="#fff" stroke-width="6"/>
+      <ellipse cx="-40" cy="40" rx="30" ry="50" fill="rgba(255,255,255,0.45)" transform="rotate(-20 -40 40)"/>
+    </g>
+  </svg>
+</template>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState } = React;
+
+const initialLog = [
+  { time: "08:42 a.m.", amount: 250 },
+  { time: "10:15 a.m.", amount: 200 },
+  { time: "12:08 p.m.", amount: 330 },
+  { time: "01:40 p.m.", amount: 200 },
+];
+
+/* History sample data — keyed by date */
+const todayKey = "2026-05-05";
+const historyData = {
+  "2026-05-05": [
+    { id: "h1", hour: 7,  time: "07:12 a.m.", amount: 250 },
+    { id: "h2", hour: 7,  time: "07:48 a.m.", amount: 150 },
+    { id: "h3", hour: 10, time: "10:05 a.m.", amount: 330 },
+    { id: "h4", hour: 13, time: "01:22 p.m.", amount: 200 },
+    { id: "h5", hour: 13, time: "01:55 p.m.", amount: 250 },
+    { id: "h6", hour: 18, time: "06:40 p.m.", amount: 200 },
+    { id: "h7", hour: 22, time: "10:15 p.m.", amount: 150 },
+  ],
+  "2026-05-04": [
+    { id: "y1", hour: 8,  time: "08:30 a.m.", amount: 250 },
+    { id: "y2", hour: 11, time: "11:10 a.m.", amount: 250 },
+    { id: "y3", hour: 14, time: "02:05 p.m.", amount: 330 },
+    { id: "y4", hour: 16, time: "04:22 p.m.", amount: 200 },
+    { id: "y5", hour: 19, time: "07:15 p.m.", amount: 500 },
+    { id: "y6", hour: 21, time: "09:48 p.m.", amount: 200 },
+  ],
+  "2026-05-03": [
+    { id: "d1", hour: 9,  time: "09:00 a.m.", amount: 200 },
+    { id: "d2", hour: 12, time: "12:30 p.m.", amount: 250 },
+    { id: "d3", hour: 17, time: "05:40 p.m.", amount: 250 },
+  ],
+  "2026-05-02": [
+    { id: "e1", hour: 8,  time: "08:18 a.m.", amount: 250 },
+    { id: "e2", hour: 13, time: "01:00 p.m.", amount: 330 },
+    { id: "e3", hour: 18, time: "06:25 p.m.", amount: 250 },
+    { id: "e4", hour: 20, time: "08:50 p.m.", amount: 200 },
+  ],
+  "2026-05-01": [],
+  "2026-04-30": [
+    { id: "f1", hour: 7,  time: "07:30 a.m.", amount: 250 },
+    { id: "f2", hour: 12, time: "12:15 p.m.", amount: 250 },
+    { id: "f3", hour: 18, time: "06:00 p.m.", amount: 330 },
+  ],
+  "2026-04-29": [
+    { id: "g1", hour: 9,  time: "09:12 a.m.", amount: 200 },
+    { id: "g2", hour: 14, time: "02:40 p.m.", amount: 330 },
+    { id: "g3", hour: 19, time: "07:30 p.m.", amount: 500 },
+  ],
+};
+
+const dayStrip = [
+  { key: "2026-04-29", weekday: "Wed", dayNum: "29", fullLabel: "Wed, Apr 29", met: false },
+  { key: "2026-04-30", weekday: "Thu", dayNum: "30", fullLabel: "Thu, Apr 30", met: false },
+  { key: "2026-05-01", weekday: "Fri", dayNum: "1",  fullLabel: "Fri, May 1",  met: false },
+  { key: "2026-05-02", weekday: "Sat", dayNum: "2",  fullLabel: "Sat, May 2",  met: false },
+  { key: "2026-05-03", weekday: "Sun", dayNum: "3",  fullLabel: "Sun, May 3",  met: false },
+  { key: "2026-05-04", weekday: "Mon", dayNum: "4",  fullLabel: "Mon, May 4",  met: true  },
+  { key: "2026-05-05", weekday: "Tue", dayNum: "5",  fullLabel: "Today, May 5", met: false, isToday: true },
+];
+
+const weekData = [
+  { day: "M", amount: 2200 },
+  { day: "T", amount: 1850 },
+  { day: "W", amount: 2400 },
+  { day: "T", amount: 2100 },
+  { day: "F", amount: 1700 },
+  { day: "S", amount: 2300 },
+  { day: "S", amount: 1620, today: true },
+];
+
+function App() {
+  const [route, setRoute] = useState("today");
+  const [tab, setTab] = useState("today");
+  const [log, setLog] = useState(initialLog);
+  const [showSheet, setShowSheet] = useState(false);
+  const [notif, setNotif] = useState(true);
+  const [history, setHistory] = useState(historyData);
+  const [activeDay, setActiveDay] = useState(todayKey);
+  const goal = 2200;
+  const current = log.reduce((s, x) => s + x.amount, 0);
+
+  const screens = [
+    { id: "splash",   label: "Splash" },
+    { id: "welcome",  label: "Welcome" },
+    { id: "weight",   label: "Weight" },
+    { id: "ready",    label: "Ready" },
+    { id: "today",    label: "Today + Tabs" },
+    { id: "history",  label: "History screen" },
+    { id: "stats",    label: "Stats screen" },
+    { id: "settings", label: "Settings screen" },
+    { id: "sheet",    label: "Add drink sheet" },
+    { id: "notif",    label: "Push notification" },
+  ];
+
+  const addDrink = (amt) => {
+    const now = new Date();
+    const time = now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }).toLowerCase();
+    setLog([{ time: time.replace(/(am|pm)/, m => m[0] + "." + m[1] + ".") , amount: amt }, ...log]);
+    setShowSheet(false);
+  };
+
+  const renderTabHost = (initialTab) => {
+    const t = initialTab;
+    let inner;
+    if (t === "today") inner = (
+      <TodayScreen
+        current={current} goal={goal} log={log}
+        onAdd={addDrink} onCustom={() => setShowSheet(true)} onSeeAll={() => {}}
+      />
+    );
+    else if (t === "stats") inner = (
+      <StatsScreen
+        days={weekData}
+        weekly={{ goal: 2200 }}
+        avg={2024} streak={4} best={2680}
+      />
+    );
+    else if (t === "history") inner = (
+      <HistoryScreen
+        days={dayStrip}
+        activeKey={activeDay}
+        onPickDay={setActiveDay}
+        onPrev={() => {
+          const i = dayStrip.findIndex(d => d.key === activeDay);
+          if (i > 0) setActiveDay(dayStrip[i - 1].key);
+        }}
+        onNext={() => {
+          const i = dayStrip.findIndex(d => d.key === activeDay);
+          if (i < dayStrip.length - 1) setActiveDay(dayStrip[i + 1].key);
+        }}
+        records={history[activeDay] || []}
+        goal={goal}
+        onUpdateRecord={(r) => setHistory({ ...history, [activeDay]: history[activeDay].map(x => x.id === r.id ? r : x) })}
+        onDeleteRecord={(r) => setHistory({ ...history, [activeDay]: history[activeDay].filter(x => x.id !== r.id) })}
+        allHistory={history}
+      />
+    );
+    else inner = (
+      <SettingsScreen
+        goal={goal} interval={45} startTime="6:05 a.m." endTime="11:55 p.m."
+        units="Milliliters · kg" notif={notif} setNotif={setNotif}
+        onEdit={() => {}}
+      />
+    );
+    return (
+      <div className="tab-host">
+        {inner}
+        <TabBar active={t} onChange={setTab}/>
+      </div>
+    );
+  };
+
+  const renderScreen = (id) => {
+    if (id === "splash")   return <SplashScreen/>;
+    if (id === "welcome")  return <WelcomeStep onNext={() => setRoute("weight")}/>;
+    if (id === "weight")   return <WeightStateful onBack={() => setRoute("welcome")} onNext={() => setRoute("ready")}/>;
+    if (id === "ready")    return <ReadyStep goalMl={2200} onStart={() => setRoute("today")} onBack={() => setRoute("weight")}/>;
+    if (id === "history")  return renderTabHost("history");
+    if (id === "stats")    return renderTabHost("stats");
+    if (id === "settings") return renderTabHost("settings");
+    if (id === "sheet") return (
+      <div style={{ position: "relative", width: "100%", height: "100%" }}>
+        {renderTabHost("today")}
+        <div className="sheet-overlay">
+          <div><AddDrinkSheet onClose={() => setRoute("today")} onAdd={(a) => { addDrink(a); setRoute("today"); }}/></div>
+        </div>
+      </div>
+    );
+    if (id === "notif")    return <NotificationDemo/>;
+
+    /* main today route — tab-driven */
+    return (
+      <div style={{ position: "relative", width: "100%", height: "100%" }}>
+        {renderTabHost(tab)}
+        {showSheet && (
+          <div className="sheet-overlay">
+            <div><AddDrinkSheet onClose={() => setShowSheet(false)} onAdd={addDrink}/></div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <>
+      <div className="nav-bar">
+        {screens.map(s => (
+          <button key={s.id}
+            className={`nav-btn ${route === s.id ? "active" : ""}`}
+            onClick={() => setRoute(s.id)}>{s.label}</button>
+        ))}
+      </div>
+      <div className="stage">
+        <div className="frame-wrap">
+          <AndroidDevice width={390} height={780}>{renderScreen(route)}</AndroidDevice>
+          <div className="frame-label">{screens.find(s => s.id === route).label}</div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function WeightStateful({ onBack, onNext }) {
+  const [w, setW] = useState("150");
+  const [u, setU] = useState("lb");
+  return <WeightStep weight={w} setWeight={setW} unit={u} setUnit={setU} onBack={onBack} onNext={onNext}/>;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>

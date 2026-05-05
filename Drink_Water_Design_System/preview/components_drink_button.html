@@ -1,0 +1,14 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../colors_and_type.css">
+<style>body { background: var(--grad-water-hero); padding: 30px; min-height: 220px; display:flex; align-items:center; justify-content:center;}
+.ripple { position: relative; width: 200px; height: 200px; }
+.ring { position:absolute; inset:0; border-radius: 50%; background: rgba(255,255,255,0.10); }
+.ring.r2 { inset: 24px; background: rgba(255,255,255,0.14); }
+.ring.r3 { inset: 48px; background: rgba(255,255,255,0.20); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25); }
+</style></head>
+<body>
+  <div class="ripple">
+    <div class="ring"></div>
+    <div class="ring r2"></div>
+    <div class="ring r3"></div>
+  </div>
+</body></html>

@@ -1,0 +1,243 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { background: var(--paper); padding: 22px; font-family: var(--font-body); }
+  .grid {
+    display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px;
+  }
+  .cell { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .tile {
+    width: 88px; height: 88px;
+    border-radius: var(--r-md);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: var(--shadow-1);
+    border: 1px solid var(--border-subtle);
+  }
+  .tile svg { width: 44px; height: 44px; }
+
+  /* contextual backgrounds — same swatches the icons live on in the app */
+  .bg-water-tint { background: var(--bg-tint-water); }
+  .bg-water-deep { background: linear-gradient(180deg, #0E5A82 0%, #1C8EBF 100%); border: 0; box-shadow: var(--shadow-water);}
+  .bg-magenta-tint { background: var(--bg-tint-magenta); }
+  .bg-magenta { background: var(--grad-magenta); border: 0; box-shadow: var(--shadow-magenta);}
+  .bg-paper { background: var(--paper); }
+
+  .lbl { font-family: var(--font-mono); font-size: 11px; color: var(--fg-2); text-align: center; }
+
+  .section-title {
+    font-family: var(--font-display); font-weight: 700; font-size: 14px;
+    color: var(--fg-1); margin: 0 0 10px 2px; letter-spacing: 0.02em;
+  }
+  .section { margin-bottom: 22px; }
+  .meta {
+    font-family: var(--font-mono); font-size: 10.5px; color: var(--fg-3);
+    margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border-subtle);
+  }
+</style>
+</head>
+<body>
+
+<div class="section">
+  <div class="section-title">Brand marks — custom, original to this system</div>
+  <div class="grid">
+    <!-- 1. DROP — primary brand glyph -->
+    <div class="cell">
+      <div class="tile bg-water-tint">
+        <svg viewBox="0 0 48 48" fill="none">
+          <path d="M24 6 C 16 18, 10 26, 10 32 a14 14 0 0 0 28 0 C 38 26, 32 18, 24 6 Z"
+                fill="url(#dropGrad)" />
+          <path d="M18 30 a6 6 0 0 0 6 6" stroke="#fff" stroke-width="2.2" stroke-linecap="round" fill="none" opacity="0.85"/>
+          <defs>
+            <linearGradient id="dropGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#4FB3DD"/>
+              <stop offset="1" stop-color="#0E5A82"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="lbl">drop / brand</div>
+    </div>
+
+    <!-- 2. GLASS — drink action -->
+    <div class="cell">
+      <div class="tile bg-water-deep">
+        <svg viewBox="0 0 48 48" fill="none">
+          <path d="M14 10 H34 L31.5 38 a3 3 0 0 1 -3 2.7 H19.5 a3 3 0 0 1 -3 -2.7 Z"
+                fill="rgba(255,255,255,0.18)" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/>
+          <!-- water level -->
+          <path d="M15.6 22 H32.4 L30.7 36 a2 2 0 0 1 -2 1.8 H19.3 a2 2 0 0 1 -2 -1.8 Z"
+                fill="#4FB3DD"/>
+          <!-- highlight -->
+          <path d="M17.5 13 v 5" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+        </svg>
+      </div>
+      <div class="lbl">glass / drink</div>
+    </div>
+
+    <!-- 3. BOTTLE — daily total -->
+    <div class="cell">
+      <div class="tile bg-water-tint">
+        <svg viewBox="0 0 48 48" fill="none">
+          <!-- cap -->
+          <rect x="20" y="6" width="8" height="5" rx="1.4" fill="#0E5A82"/>
+          <!-- neck -->
+          <rect x="21" y="11" width="6" height="4" fill="#1C8EBF"/>
+          <!-- body -->
+          <path d="M16 16 c0 -0.6 0.5 -1 1 -1 h14 c0.5 0 1 0.4 1 1 v3 c0 1.5 1.5 2.5 1.5 5 V38 a4 4 0 0 1 -4 4 H17.5 a4 4 0 0 1 -4 -4 V24 c0 -2.5 1.5 -3.5 1.5 -5 Z"
+                fill="#fff" stroke="#1C8EBF" stroke-width="2.4" stroke-linejoin="round"/>
+          <!-- water fill -->
+          <path d="M14.5 28 V38 a4 4 0 0 0 4 4 H29.5 a4 4 0 0 0 4 -4 V28 Z"
+                fill="url(#bottleGrad)"/>
+          <defs>
+            <linearGradient id="bottleGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#4FB3DD"/>
+              <stop offset="1" stop-color="#1C8EBF"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="lbl">bottle / total</div>
+    </div>
+
+    <!-- 4. RIPPLE — reminder, hydration moment -->
+    <div class="cell">
+      <div class="tile bg-water-tint">
+        <svg viewBox="0 0 48 48" fill="none">
+          <circle cx="24" cy="24" r="4" fill="#1C8EBF"/>
+          <circle cx="24" cy="24" r="9" stroke="#1C8EBF" stroke-width="2" opacity="0.55"/>
+          <circle cx="24" cy="24" r="14" stroke="#1C8EBF" stroke-width="2" opacity="0.30"/>
+          <circle cx="24" cy="24" r="19" stroke="#1C8EBF" stroke-width="2" opacity="0.15"/>
+        </svg>
+      </div>
+      <div class="lbl">ripple</div>
+    </div>
+
+    <!-- 5. TROPHY — achievement / streak -->
+    <div class="cell">
+      <div class="tile bg-magenta">
+        <svg viewBox="0 0 48 48" fill="none">
+          <!-- handles -->
+          <path d="M14 12 H10 a3 3 0 0 0 -3 3 v3 a6 6 0 0 0 6 6 h2"
+                stroke="#fff" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+          <path d="M34 12 H38 a3 3 0 0 1 3 3 v3 a6 6 0 0 1 -6 6 h-2"
+                stroke="#fff" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+          <!-- cup -->
+          <path d="M14 8 H34 V20 a10 10 0 0 1 -20 0 Z" fill="#fff"/>
+          <!-- water drop inside cup, anchor to brand -->
+          <path d="M24 13 c -2 3 -3.5 5 -3.5 6.5 a3.5 3.5 0 0 0 7 0 C 27.5 18 26 16 24 13 Z" fill="#A22C83"/>
+          <!-- stem & base -->
+          <rect x="22" y="30" width="4" height="6" fill="#fff"/>
+          <rect x="16" y="36" width="16" height="3" rx="1" fill="#fff"/>
+        </svg>
+      </div>
+      <div class="lbl">trophy</div>
+    </div>
+
+    <!-- 6. STREAK / FLAME — keep it up -->
+    <div class="cell">
+      <div class="tile bg-magenta-tint">
+        <svg viewBox="0 0 48 48" fill="none">
+          <path d="M24 6 c -1 5 -7 7 -7 14 a11 11 0 0 0 22 0 c 0 -3 -2 -5 -3.5 -6 c -0.6 1.6 -1.6 2.4 -2.6 2.4 c 0 -3.5 -2.5 -7 -8.9 -10.4 Z"
+                fill="url(#flameGrad)"/>
+          <path d="M24 22 c -1 2 -3 3 -3 6 a4.5 4.5 0 0 0 9 0 c 0 -2.5 -2 -3.5 -3 -5 c -0.5 1 -1.4 1.5 -2 1 c -0.4 -0.4 -0.7 -1.2 -1 -2 Z"
+                fill="#fff" opacity="0.85"/>
+          <defs>
+            <linearGradient id="flameGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#B83A95"/>
+              <stop offset="1" stop-color="#902178"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="lbl">streak</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">UI utility — flat, 2px stroke, neutral</div>
+  <div class="grid">
+
+    <!-- 7. BELL -->
+    <div class="cell">
+      <div class="tile bg-paper">
+        <svg viewBox="0 0 48 48" fill="none" stroke="#A22C83" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 18 a10 10 0 0 1 20 0 c 0 10 4 12 4 12 H10 s 4 -2 4 -12"/>
+          <path d="M21 36 h6 a3 3 0 0 1 -6 0 z" fill="#A22C83" stroke="none"/>
+        </svg>
+      </div>
+      <div class="lbl">bell / remind</div>
+    </div>
+
+    <!-- 8. CLOCK -->
+    <div class="cell">
+      <div class="tile bg-paper">
+        <svg viewBox="0 0 48 48" fill="none" stroke="#1C8EBF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="24" cy="25" r="15"/>
+          <path d="M24 17 v8 l5 3"/>
+          <path d="M19 6 l -4 3" />
+          <path d="M29 6 l 4 3" />
+        </svg>
+      </div>
+      <div class="lbl">clock / interval</div>
+    </div>
+
+    <!-- 9. STATS / WAVE -->
+    <div class="cell">
+      <div class="tile bg-paper">
+        <svg viewBox="0 0 48 48" fill="none" stroke="#1C8EBF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 36 h36"/>
+          <path d="M9 28 q 5 -8 10 0 t 10 0 t 10 0" />
+          <path d="M9 20 q 5 -6 10 0 t 10 0 t 10 0" opacity="0.5"/>
+        </svg>
+      </div>
+      <div class="lbl">stats / wave</div>
+    </div>
+
+    <!-- 10. SETTINGS / GEAR-DROP — gear with drop center -->
+    <div class="cell">
+      <div class="tile bg-paper">
+        <svg viewBox="0 0 48 48" fill="none">
+          <g stroke="#A22C83" stroke-width="2.4" stroke-linejoin="round">
+            <path d="M24 6 l 3 3 h 4 l 1 4 l 4 1 v 4 l 3 3 l -3 3 v 4 l -4 1 l -1 4 h -4 l -3 3 l -3 -3 h -4 l -1 -4 l -4 -1 v -4 l -3 -3 l 3 -3 v -4 l 4 -1 l 1 -4 h 4 z" fill="#fff"/>
+          </g>
+          <path d="M24 18 c -1.5 2.5 -3 4 -3 5.5 a3 3 0 0 0 6 0 C 27 22 25.5 20.5 24 18 Z" fill="#A22C83"/>
+        </svg>
+      </div>
+      <div class="lbl">settings</div>
+    </div>
+
+    <!-- 11. SHARE -->
+    <div class="cell">
+      <div class="tile bg-paper">
+        <svg viewBox="0 0 48 48" fill="none" stroke="#A22C83" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="36" cy="12" r="4"/>
+          <circle cx="12" cy="24" r="4"/>
+          <circle cx="36" cy="36" r="4"/>
+          <path d="M16 22 l 16 -8"/>
+          <path d="M16 26 l 16 8"/>
+        </svg>
+      </div>
+      <div class="lbl">share</div>
+    </div>
+
+    <!-- 12. GALLERY / SNAPSHOT — replacing the old gallery glyph -->
+    <div class="cell">
+      <div class="tile bg-paper">
+        <svg viewBox="0 0 48 48" fill="none" stroke="#1C8EBF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="8" y="12" width="32" height="26" rx="3"/>
+          <circle cx="17" cy="21" r="2.6" fill="#1C8EBF" stroke="none"/>
+          <path d="M10 36 l 9 -10 l 6 6 l 5 -5 l 8 9"/>
+        </svg>
+      </div>
+      <div class="lbl">gallery</div>
+    </div>
+  </div>
+</div>
+
+<div class="meta">
+  Original Android PNGs (drink, trophy, gallery, share) referenced for shape only —
+  these icons are redrawn from scratch in SVG, sharing the system's stroke + fill rhythm.
+  Brand glyphs use water gradient or magenta fill; UI utilities use flat 2.4px stroke.
+</div>
+
+</body></html>

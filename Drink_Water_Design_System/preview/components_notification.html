@@ -1,0 +1,169 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body {
+    background: linear-gradient(160deg, #1f2a30 0%, #0e1a20 100%);
+    padding: 28px;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    min-height: 100vh;
+    box-sizing: border-box;
+    font-family: var(--font-body);
+  }
+  .platform-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    align-self: flex-start;
+    margin-left: 4px;
+  }
+  .stack { width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 8px; }
+
+  /* ────────────────────────────────────────
+     ANDROID — Material You notification
+     ──────────────────────────────────────── */
+  .android {
+    background: #f4fbf8;
+    border-radius: 28px;
+    padding: 14px 16px 12px;
+    color: #171d1b;
+    font-family: 'Roboto', system-ui, -apple-system, sans-serif;
+  }
+  .a-head {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; color: #49454f; letter-spacing: 0.02em;
+    margin-bottom: 8px;
+  }
+  .a-icon {
+    width: 18px; height: 18px; border-radius: 4px;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+  .a-app { font-weight: 500; color: #171d1b; }
+  .a-dot { width: 3px; height: 3px; border-radius: 50%; background: #79747e; }
+  .a-time { color: #49454f; }
+  .a-chevron { margin-left: auto; color: #79747e; font-size: 18px; line-height: 1; }
+  .a-title {
+    font-size: 14px; font-weight: 500; line-height: 20px;
+    color: #171d1b; margin: 0;
+  }
+  .a-body {
+    font-size: 14px; line-height: 20px; color: #49454f;
+    margin: 2px 0 0;
+  }
+  .a-actions {
+    display: flex; gap: 4px; margin-top: 12px;
+    margin-left: -8px;
+  }
+  .a-btn {
+    font-family: 'Roboto', system-ui, sans-serif;
+    font-size: 14px; font-weight: 500; letter-spacing: 0.01em;
+    color: #006a60;
+    background: transparent;
+    border: 0;
+    padding: 8px 12px;
+    border-radius: 100px;
+    cursor: pointer;
+  }
+  .a-btn.primary { color: var(--brand-magenta); }
+
+  /* ────────────────────────────────────────
+     iOS — Notification banner
+     ──────────────────────────────────────── */
+  .ios {
+    background: rgba(245, 245, 247, 0.82);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border-radius: 18px;
+    padding: 12px 14px;
+    color: #000;
+    font-family: -apple-system, 'SF Pro Text', 'SF Pro', system-ui, sans-serif;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18), 0 1px 0 rgba(255,255,255,0.4) inset;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .i-icon {
+    width: 38px; height: 38px;
+    border-radius: 9px;
+    object-fit: contain;
+    background: #fff;
+    padding: 4px;
+    box-sizing: border-box;
+    box-shadow: 0 0 0 0.5px rgba(0,0,0,0.08);
+    flex-shrink: 0;
+  }
+  .i-body { flex: 1; min-width: 0; }
+  .i-row {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 8px;
+  }
+  .i-app {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: -0.08px;
+    color: #000;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .i-time {
+    font-size: 13px;
+    color: rgba(60, 60, 67, 0.6);
+  }
+  .i-title {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 20px;
+    margin: 1px 0 0;
+    color: #000;
+    letter-spacing: -0.24px;
+  }
+  .i-sub {
+    font-size: 15px;
+    line-height: 20px;
+    margin: 0;
+    color: #000;
+    letter-spacing: -0.24px;
+  }
+</style></head>
+<body>
+
+<div class="stack">
+  <div class="platform-label">Android · Material You</div>
+  <div class="android">
+    <div class="a-head">
+      <img class="a-icon" src="../assets/ic_app_web.png" alt="">
+      <span class="a-app">Drink Water</span>
+      <span class="a-dot"></span>
+      <span class="a-time">now</span>
+      <span class="a-chevron">⌄</span>
+    </div>
+    <p class="a-title">Time to drink water</p>
+    <p class="a-body">You're at 970&nbsp;mL of your 2&nbsp;L goal. It's your turn to hydrate.</p>
+    <div class="a-actions">
+      <button class="a-btn">Skip</button>
+      <button class="a-btn primary">Drink</button>
+    </div>
+  </div>
+</div>
+
+<div class="stack">
+  <div class="platform-label">iOS · Banner</div>
+  <div class="ios">
+    <img class="i-icon" src="../assets/ic_app_web.png" alt="">
+    <div class="i-body">
+      <div class="i-row">
+        <span class="i-app">Drink Water</span>
+        <span class="i-time">now</span>
+      </div>
+      <p class="i-title">Time to drink water</p>
+      <p class="i-sub">You're at 970 mL of your 2 L goal.</p>
+    </div>
+  </div>
+</div>
+
+</body></html>

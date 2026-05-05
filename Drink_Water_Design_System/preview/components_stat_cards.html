@@ -1,0 +1,27 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../colors_and_type.css">
+<style>body { background: var(--paper-warm); padding: 22px; }
+.row { display:grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.card {
+  background: var(--paper); border-radius: var(--r-lg);
+  padding: 16px; box-shadow: var(--shadow-2);
+}
+.card.tinted { background: var(--bg-tint-water); }
+.card.magenta { background: var(--grad-magenta); color:#fff; }
+.eyebrow { font-family: var(--font-body); font-size: 12px; font-weight:600; opacity:.85; margin-bottom: 4px;}
+.big { font-family: var(--font-rounded); font-weight: 800; font-size: 36px; line-height: 1.1; }
+.unit { font-family: var(--font-body); font-size: 14px; opacity: .8; margin-top: 4px; }
+</style></head>
+<body>
+  <div class="row">
+    <div class="card">
+      <div class="eyebrow" style="color:var(--brand-magenta);">Our Goal</div>
+      <div class="big" style="color:var(--brand-magenta);">2192.39</div>
+      <div class="unit" style="color:var(--fg-2);">milliliters</div>
+    </div>
+    <div class="card magenta">
+      <div class="eyebrow">Remember each</div>
+      <div class="big">45<span style="font-size:18px;font-weight:700;margin-left:6px;">min</span></div>
+      <div class="unit">tap to change</div>
+    </div>
+  </div>
+</body></html>

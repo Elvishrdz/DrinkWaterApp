@@ -1,0 +1,25 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../colors_and_type.css">
+<style>body { background: var(--paper); padding: 24px; }
+.record {
+  background: var(--paper); border-radius: var(--r-md);
+  box-shadow: var(--shadow-1); border-left: 6px solid var(--brand-water);
+  display:flex; align-items:center; padding: 12px 14px; gap: 12px;
+  margin-bottom: 10px;
+}
+.time { font-family: var(--font-mono); font-size: 13px; color: var(--brand-magenta); font-weight:600; min-width: 110px; }
+.amount { font-family: var(--font-rounded); font-weight: 700; font-size: 18px; color: var(--brand-magenta); flex:1; text-align:center; }
+.dot { width: 32px; height: 32px; border-radius: 50%; background: var(--brand-magenta); display:flex; align-items:center; justify-content:center; }
+.dot svg { width: 16px; height: 16px; stroke: #fff; fill:none; stroke-width:2; }
+</style></head>
+<body>
+  <div class="record">
+    <div class="time">08:34 a.m.</div>
+    <div class="amount">+400 mL</div>
+    <div class="dot"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+  <div class="record">
+    <div class="time">09:02 a.m.</div>
+    <div class="amount">+100 mL</div>
+    <div class="dot"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+</body></html>

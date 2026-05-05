@@ -1,0 +1,207 @@
+/* ============================================================
+   Drink Water Design System — Tokens
+   Modernized palette derived from the original Android app:
+   teal/water-blue + magenta accent, with refined neutrals.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  /* --- BRAND COLORS (refined from original) --- */
+  --brand-teal:        #008577;  /* original colorPrimary */
+  --brand-teal-dark:   #00574B;  /* original colorPrimaryDark */
+  --brand-teal-soft:   #2BA89A;  /* lighter modern teal */
+  --brand-water:       #1C8EBF;  /* hero water blue */
+  --brand-water-light: #4FB3DD;  /* highlights */
+  --brand-water-deep:  #0E5A82;  /* deep water */
+  --brand-magenta:     #A22C83;  /* original purple */
+  --brand-magenta-dark:#902178;  /* original dark_purple */
+  --brand-magenta-pop: #D81B60;  /* original colorAccent — call to action pink */
+
+  /* --- WATER GRADIENTS --- */
+  --grad-water-hero:   linear-gradient(180deg, #4FB3DD 0%, #1C8EBF 45%, #0E5A82 100%);
+  --grad-teal-soft:    linear-gradient(180deg, #2BA89A 0%, #008577 100%);
+  --grad-magenta:      linear-gradient(180deg, #B83A95 0%, #902178 100%);
+  --grad-sky-clear:    linear-gradient(180deg, #DCEEF6 0%, #F5FAFC 100%);
+  --grad-glass-shine:  linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 60%);
+
+  /* --- NEUTRALS --- */
+  --ink-900: #0E1A20;   /* primary text on light */
+  --ink-700: #1F3640;
+  --ink-500: #4F6772;
+  --ink-400: #6B8290;
+  --ink-300: #94A8B4;
+  --ink-200: #C4D2DA;
+  --ink-100: #E2EBF0;
+  --ink-50:  #F2F6F9;
+  --paper:   #FFFFFF;
+  --paper-warm: #FBFCFD;
+
+  /* --- SEMANTIC --- */
+  --success: #00A051;
+  --warning: #F4A622;
+  --danger:  #D14343;
+  --info:    var(--brand-water);
+
+  /* --- SURFACES (LIGHT) --- */
+  --bg-app:        var(--ink-50);
+  --bg-surface:    var(--paper);
+  --bg-elevated:   var(--paper);
+  --bg-tint-water: #EAF4F9;   /* tinted card */
+  --bg-tint-magenta: #FBEFF6;
+  --border-subtle: rgba(14, 26, 32, 0.08);
+  --border-strong: rgba(14, 26, 32, 0.16);
+
+  /* --- TEXT (semantic) --- */
+  --fg-1: var(--ink-900);   /* primary */
+  --fg-2: var(--ink-500);   /* secondary */
+  --fg-3: var(--ink-400);   /* tertiary / hint */
+  --fg-on-water: #FFFFFF;
+  --fg-on-magenta: #FFFFFF;
+  --fg-link: var(--brand-water);
+
+  /* --- TYPE FAMILIES --- */
+  --font-display: "Plus Jakarta Sans", "SF Pro Display", system-ui, sans-serif;
+  --font-body:    "Plus Jakarta Sans", "SF Pro Text", system-ui, sans-serif;
+  --font-rounded: "Nunito", "SF Pro Rounded", system-ui, sans-serif; /* friendly, used for big numbers/CTAs */
+  --font-mono:    "JetBrains Mono", ui-monospace, Menlo, monospace;
+
+  /* --- TYPE SCALE (mobile-first; spec'd in px so it's portable to native) --- */
+  --fs-display:  44px;   /* hero numbers like "2192.39" */
+  --fs-h1:       28px;
+  --fs-h2:       22px;
+  --fs-h3:       18px;
+  --fs-body:     16px;
+  --fs-body-sm:  14px;
+  --fs-caption:  12px;
+  --fs-micro:    11px;
+
+  --lh-tight:  1.15;
+  --lh-snug:   1.3;
+  --lh-normal: 1.45;
+  --lh-loose:  1.6;
+
+  --tracking-tight:  -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide:   0.06em;
+  --tracking-allcaps: 0.10em;
+
+  /* --- SPACING (4pt grid) --- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-7: 32px;
+  --sp-8: 40px;
+  --sp-9: 56px;
+  --sp-10: 72px;
+
+  /* --- RADII --- */
+  --r-xs: 6px;
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+  --r-pill: 999px;
+
+  /* --- ELEVATION (shadow system, cool-tinted) --- */
+  --shadow-1: 0 1px 2px rgba(14, 26, 32, 0.06), 0 1px 3px rgba(14, 26, 32, 0.04);
+  --shadow-2: 0 2px 6px rgba(14, 26, 32, 0.08), 0 6px 16px rgba(14, 26, 32, 0.06);
+  --shadow-3: 0 8px 24px rgba(14, 26, 32, 0.10), 0 16px 48px rgba(14, 26, 32, 0.08);
+  --shadow-water: 0 10px 30px rgba(28, 142, 191, 0.30);
+  --shadow-magenta: 0 10px 30px rgba(162, 44, 131, 0.30);
+  --shadow-inset: inset 0 1px 2px rgba(14, 26, 32, 0.06);
+
+  /* --- MOTION --- */
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);  /* used for drinkbutton press */
+  --dur-fast: 120ms;
+  --dur-base: 220ms;
+  --dur-slow: 380ms;
+}
+
+/* ============================================================
+   SEMANTIC TYPOGRAPHY UTILITIES
+   ============================================================ */
+.t-display, h1.display {
+  font-family: var(--font-rounded);
+  font-weight: 800;
+  font-size: var(--fs-display);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--fg-1);
+}
+.t-h1, h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-h1);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tracking-tight);
+  color: var(--fg-1);
+}
+.t-h2, h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-h2);
+  line-height: var(--lh-snug);
+  color: var(--fg-1);
+}
+.t-h3, h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--fs-h3);
+  line-height: var(--lh-snug);
+  color: var(--fg-1);
+}
+.t-body, p {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: var(--fs-body);
+  line-height: var(--lh-normal);
+  color: var(--fg-1);
+}
+.t-body-sm {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: var(--fs-body-sm);
+  line-height: var(--lh-normal);
+  color: var(--fg-2);
+}
+.t-caption {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: var(--fs-caption);
+  line-height: var(--lh-normal);
+  color: var(--fg-2);
+}
+.t-overline {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: var(--fs-micro);
+  line-height: var(--lh-normal);
+  letter-spacing: var(--tracking-allcaps);
+  text-transform: uppercase;
+  color: var(--fg-2);
+}
+.t-button {
+  font-family: var(--font-rounded);
+  font-weight: 700;
+  font-size: var(--fs-body-sm);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+.t-numeric {
+  font-family: var(--font-rounded);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.t-mono {
+  font-family: var(--font-mono);
+  font-size: var(--fs-body-sm);
+}
+
+/* Reset baseline */
+* { box-sizing: border-box; }
+body { margin: 0; font-family: var(--font-body); color: var(--fg-1); -webkit-font-smoothing: antialiased; }

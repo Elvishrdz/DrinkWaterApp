@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Drink Water — Mobile UI Kit (Print)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link rel="stylesheet" href="../../colors_and_type.css"/>
+<link rel="stylesheet" href="components.css"/>
+<link rel="stylesheet" href="screens.css"/>
+<style>
+  html, body { background: #fff; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: var(--font-body, system-ui, sans-serif); color: var(--ink-900, #0e1a20); }
+
+  .page {
+    width: 100%;
+    min-height: 100vh;
+    box-sizing: border-box;
+    padding: 28px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 14px;
+    background: var(--ink-50, #f5f8fa);
+    break-after: page;
+    page-break-after: always;
+  }
+  .page:last-child { break-after: auto; page-break-after: auto; }
+
+  .page-head {
+    width: 100%;
+    max-width: 720px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .page-title {
+    font-family: var(--font-rounded, system-ui);
+    font-weight: 800;
+    font-size: 22px;
+    color: var(--ink-900, #0e1a20);
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  .page-meta {
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--fg-2, #5a7480);
+  }
+  .page-sub {
+    width: 100%;
+    max-width: 720px;
+    font-size: 13px;
+    color: var(--fg-2, #5a7480);
+    margin: -6px 0 4px;
+    line-height: 1.5;
+  }
+
+  .frame-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .sheet-overlay {
+    position: absolute; inset: 0; background: rgba(14,26,32,0.55);
+    display: flex; align-items: flex-end; z-index: 10;
+  }
+  .sheet-overlay > div { width: 100%; height: 80%; }
+
+  .tab-host { width: 100%; height: 100%; display: flex; flex-direction: column; }
+  .tab-host > .dw-screen { flex: 1; min-height: 0; }
+
+  /* Cover page */
+  .cover {
+    background: linear-gradient(160deg, var(--brand-blue-900, #0E5A82) 0%, var(--brand-blue-500, #1C8EBF) 65%, var(--brand-magenta, #A22C83) 130%);
+    color: #fff;
+    justify-content: center;
+    gap: 28px;
+    padding: 64px;
+  }
+  .cover-eyebrow {
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    opacity: 0.78;
+  }
+  .cover-title {
+    font-family: var(--font-rounded, system-ui);
+    font-weight: 800;
+    font-size: 72px;
+    line-height: 0.98;
+    letter-spacing: -0.025em;
+    margin: 0;
+    text-align: center;
+    max-width: 14ch;
+  }
+  .cover-sub {
+    font-size: 18px;
+    line-height: 1.5;
+    max-width: 56ch;
+    text-align: center;
+    opacity: 0.92;
+  }
+  .cover-foot {
+    margin-top: 24px;
+    display: flex;
+    gap: 32px;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    opacity: 0.85;
+  }
+  .cover-foot span { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+  .cover-foot b { font-family: var(--font-rounded, system-ui); font-weight: 700; font-size: 22px; letter-spacing: 0; text-transform: none; }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  @media print {
+    html, body { background: #fff; }
+    .page {
+      min-height: 100vh;
+      height: 100vh;
+      page-break-after: always;
+      break-after: page;
+    }
+    .page:last-child { page-break-after: auto; break-after: auto; }
+    .frame-wrap { transform-origin: center center; }
+  }
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="android-frame.jsx"></script>
+<script type="text/babel" src="Components.jsx"></script>
+<script type="text/babel" src="Screens.jsx"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState } = React;
+
+const initialLog = [
+  { time: "08:42 a.m.", amount: 250 },
+  { time: "10:15 a.m.", amount: 200 },
+  { time: "12:08 p.m.", amount: 330 },
+  { time: "01:40 p.m.", amount: 200 },
+];
+
+const weekData = [
+  { day: "M", amount: 2200 },
+  { day: "T", amount: 1850 },
+  { day: "W", amount: 2400 },
+  { day: "T", amount: 2100 },
+  { day: "F", amount: 1700 },
+  { day: "S", amount: 2300 },
+  { day: "S", amount: 1620, today: true },
+];
+
+const goal = 2200;
+const current = initialLog.reduce((s, x) => s + x.amount, 0);
+
+const screens = [
+  { id: "splash",   label: "Splash",            sub: "App-launch state with the Drink Water mark over a water-blue field." },
+  { id: "welcome",  label: "Welcome",           sub: "Step 1 of onboarding — friendly intro before we ask for any data." },
+  { id: "weight",   label: "Weight",            sub: "Step 2 of onboarding — collects body weight to calculate the daily goal." },
+  { id: "ready",    label: "Ready",             sub: "Step 3 of onboarding — confirms the calculated goal and reminder cadence." },
+  { id: "today",    label: "Today + Tabs",      sub: "Home screen — drink CTA, ring progress, today's log, with bottom tab bar." },
+  { id: "stats",    label: "Stats screen",      sub: "Weekly view — bar chart of daily intake, averages, streak, and best day." },
+  { id: "settings", label: "Settings screen",   sub: "Goal, reminder interval, quiet hours, units, notifications toggle." },
+  { id: "sheet",    label: "Add drink sheet",   sub: "Bottom sheet over the home screen for choosing a custom drink amount." },
+  { id: "notif",    label: "Push notification", sub: "System reminder with Skip / Drink quick actions on the lock or home surface." },
+];
+
+function TabHost({ activeTab }) {
+  let inner;
+  if (activeTab === "today") inner = (
+    <TodayScreen
+      current={current} goal={goal} log={initialLog}
+      onAdd={() => {}} onCustom={() => {}} onSeeAll={() => {}}
+    />
+  );
+  else if (activeTab === "stats") inner = (
+    <StatsScreen days={weekData} weekly={{ goal: 2200 }} avg={2024} streak={4} best={2680}/>
+  );
+  else inner = (
+    <SettingsScreen
+      goal={goal} interval={45} startTime="6:05 a.m." endTime="11:55 p.m."
+      units="Milliliters · kg" notif={true} setNotif={() => {}}
+      onEdit={() => {}}
+    />
+  );
+  return (
+    <div className="tab-host">
+      {inner}
+      <TabBar active={activeTab} onChange={() => {}}/>
+    </div>
+  );
+}
+
+function ScreenById({ id }) {
+  if (id === "splash")   return <SplashScreen/>;
+  if (id === "welcome")  return <WelcomeStep onNext={() => {}}/>;
+  if (id === "weight")   return <WeightStep weight="150" setWeight={() => {}} unit="lb" setUnit={() => {}} onBack={() => {}} onNext={() => {}}/>;
+  if (id === "ready")    return <ReadyStep goalMl={2200} onStart={() => {}} onBack={() => {}}/>;
+  if (id === "stats")    return <TabHost activeTab="stats"/>;
+  if (id === "settings") return <TabHost activeTab="settings"/>;
+  if (id === "sheet") return (
+    <div style={{ position: "relative", width: "100%", height: "100%" }}>
+      <TabHost activeTab="today"/>
+      <div className="sheet-overlay">
+        <div><AddDrinkSheet onClose={() => {}} onAdd={() => {}}/></div>
+      </div>
+    </div>
+  );
+  if (id === "notif")    return <NotificationDemo/>;
+  return <TabHost activeTab="today"/>;
+}
+
+function PrintApp() {
+  return (
+    <>
+      {/* Cover page */}
+      <section className="page cover">
+        <div className="cover-eyebrow">Mobile UI Kit · 2026</div>
+        <h1 className="cover-title">Drink Water</h1>
+        <p className="cover-sub">A modernized recreation of the Drink Water Android hydration tracker — onboarding, daily home, stats, settings, and reminders, refreshed in a humanist sans with a magenta &amp; water-blue palette.</p>
+        <div className="cover-foot">
+          <span><b>9</b>Screens</span>
+          <span><b>3</b>Onboarding steps</span>
+          <span><b>1</b>Drink sheet</span>
+          <span><b>1</b>Reminder</span>
+        </div>
+      </section>
+
+      {screens.map((s, i) => (
+        <section key={s.id} className="page">
+          <div className="page-head">
+            <h2 className="page-title">{s.label}</h2>
+            <div className="page-meta">{String(i + 1).padStart(2, "0")} / {String(screens.length).padStart(2, "0")}</div>
+          </div>
+          <p className="page-sub">{s.sub}</p>
+          <div className="frame-wrap">
+            <AndroidDevice width={390} height={780}>
+              <ScreenById id={s.id}/>
+            </AndroidDevice>
+          </div>
+        </section>
+      ))}
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<PrintApp/>);
+
+// Auto-print after fonts + JSX render are ready
+(async () => {
+  try { await document.fonts.ready; } catch (e) {}
+  // give Babel + React time to mount everything
+  await new Promise(r => setTimeout(r, 800));
+  window.__readyToPrint = true;
+  window.print();
+})();
+</script>
+</body>
+</html>
+</content>
