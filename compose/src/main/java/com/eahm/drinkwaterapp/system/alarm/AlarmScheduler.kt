@@ -179,13 +179,26 @@ object AlarmScheduler {
         )
 
         val triggerAtMillis = prefs.getLong(keyTriggerAtMillis(id), -1)
+        val wallClockMs = prefs.getLong(keyWallClockMs(id), -1L)
+
+        // Prefer wall-clock ms: elapsedRealtime resets on reboot so triggerAtMillis is stale after a reboot.
+        val alarmTriggerAt = if (wallClockMs > 0L) {
+            val calendar = Calendar.getInstance().apply { timeInMillis = wallClockMs }
+            AlarmTime(
+                hour = calendar.get(Calendar.HOUR_OF_DAY),
+                minute = calendar.get(Calendar.MINUTE),
+                second = calendar.get(Calendar.SECOND),
+            )
+        } else {
+            triggerAtMillis.asAlarmTime
+        }
 
         return AlarmStorageInfo(
             alarmId = id,
             alarmTriggerTimeMillis = triggerTimeMillis,
             alarmTriggerTime = triggerTime,
             alarmTriggerAtMillis = triggerAtMillis,
-            alarmTriggerAt = triggerAtMillis.asAlarmTime,
+            alarmTriggerAt = alarmTriggerAt,
         )
     }
 
@@ -238,6 +251,7 @@ object AlarmScheduler {
             putStringSet(KEY_ACTIVE_ALARMS, ids)
                 .remove(keyTriggerTimeMillis(alarmId))
                 .remove(keyTriggerAtMillis(alarmId))
+                .remove(keyWallClockMs(alarmId))
         }
     }
 
@@ -246,6 +260,7 @@ object AlarmScheduler {
 
     fun keyTriggerTimeMillis(alarmId: Int) = "alarm_trigger_time_ms_$alarmId"
     fun keyTriggerAtMillis(alarmId: Int) = "alarm_trigger_at_$alarmId"
+    fun keyWallClockMs(alarmId: Int) = "alarm_wall_clock_ms_$alarmId"
 }
 
 data class AlarmStorageInfo(

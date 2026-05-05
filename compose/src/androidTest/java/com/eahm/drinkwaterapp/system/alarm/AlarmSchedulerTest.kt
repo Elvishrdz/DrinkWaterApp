@@ -10,6 +10,7 @@ import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler.ALARM_PREFS_NAME
 import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler.KEY_ACTIVE_ALARMS
 import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler.keyTriggerAtMillis
 import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler.keyTriggerTimeMillis
+import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler.keyWallClockMs
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -186,5 +187,57 @@ class AlarmSchedulerTest {
         AlarmScheduler.cancelAlarm(context, ALARM_ID)
 
         assertNull(AlarmScheduler.getTimeUntilNextTrigger(context, ALARM_ID))
+    }
+
+    // ── wall-clock storage (boot-restore) ──────────────────────────────────────
+
+    /**
+     * After a reboot, elapsedRealtime resets to 0 so the stored triggerAt value is meaningless.
+     * AlarmScheduler must also persist the wall-clock Unix timestamp so getAlarmStorageInfo can
+     * reconstruct the correct fire time even after a reboot.
+     */
+    @Test
+    fun scheduleAlarm_savesWallClockMsWithinExpectedRange() {
+        Assume.assumeTrue("Requires SCHEDULE_EXACT_ALARM permission", canScheduleExactAlarms())
+
+        val before = System.currentTimeMillis()
+        AlarmScheduler.scheduleAlarm(context, ALARM_ID, INTERVAL_MS)
+        val after = System.currentTimeMillis()
+
+        val wallClockMs = context.getSharedPreferences(ALARM_PREFS_NAME, Context.MODE_PRIVATE)
+            .getLong(keyWallClockMs(ALARM_ID), -1L)
+
+        assertTrue("wallClockMs should be >= before + interval", wallClockMs >= before + INTERVAL_MS)
+        assertTrue("wallClockMs should be <= after + interval",  wallClockMs <= after  + INTERVAL_MS)
+    }
+
+    @Test
+    fun cancelAlarm_removesWallClockMsFromStorage() {
+        Assume.assumeTrue("Requires SCHEDULE_EXACT_ALARM permission", canScheduleExactAlarms())
+
+        AlarmScheduler.scheduleAlarm(context, ALARM_ID, INTERVAL_MS)
+        AlarmScheduler.cancelAlarm(context, ALARM_ID)
+
+        val wallClockMs = context.getSharedPreferences(ALARM_PREFS_NAME, Context.MODE_PRIVATE)
+            .getLong(keyWallClockMs(ALARM_ID), -1L)
+        assertEquals(-1L, wallClockMs)
+    }
+
+    @Test
+    fun getAlarmStorageInfo_alarmTriggerAt_reflectsCorrectWallClockHour() {
+        Assume.assumeTrue("Requires SCHEDULE_EXACT_ALARM permission", canScheduleExactAlarms())
+
+        AlarmScheduler.scheduleAlarm(context, ALARM_ID, INTERVAL_MS)
+
+        val info = AlarmScheduler.getAlarmStorageInfo(context, ALARM_ID)
+        assertNotNull(info)
+
+        // The stored wall-clock ms must be ~1 minute from now, so the AlarmTime hour
+        // must match what Calendar would compute from (currentTimeMs + INTERVAL_MS).
+        val expectedCalendar = java.util.Calendar.getInstance().apply {
+            timeInMillis = System.currentTimeMillis() + INTERVAL_MS
+        }
+        assertEquals(expectedCalendar.get(java.util.Calendar.HOUR_OF_DAY), info!!.alarmTriggerAt.hour)
+        assertEquals(expectedCalendar.get(java.util.Calendar.MINUTE),       info.alarmTriggerAt.minute)
     }
 }
