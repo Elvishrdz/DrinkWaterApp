@@ -29,6 +29,7 @@ class AlarmReceiver : BroadcastReceiver() {
             Intent.ACTION_LOCKED_BOOT_COMPLETED,
             Intent.ACTION_MY_PACKAGE_REPLACED,
                 -> {
+                // this is called multiple times depending on the action
                 restoreAlarms()
             }
 
@@ -66,7 +67,7 @@ class AlarmReceiver : BroadcastReceiver() {
         }
     }
 
-    private fun restoreAlarms() {
+    private suspend fun restoreAlarms() {
         val koin = GlobalContext.get()
         val drinkAlarmManager = koin.get<DrinkAlarmManager>()
         drinkAlarmManager.restoreAlarms()

@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 
 internal class AlarmsViewModel(
@@ -48,7 +49,13 @@ internal class AlarmsViewModel(
         }
     }
 
-    private fun onResumeCalled() = drinkAlarmManager.onResume()
+    private fun onResumeCalled() {
+        viewModelScope.launch {
+            drinkAlarmManager.onResume()
+            _events.send(AlarmsEvent.OnResumeCalled)
+        }
+    }
+
     private fun updateState() = drinkAlarmManager.refresh()
     private fun openAppPermissionSettings() = application.openSystemAppSettings()
     private fun onStopAlarm() = drinkAlarmManager.stopAlarms()

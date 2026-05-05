@@ -13,8 +13,12 @@ import com.eahm.drinkwaterapp.core.data.systemnotifications.handleNotificationIn
 import com.eahm.drinkwaterapp.core.data.systemnotifications.handleNotificationIntentOnNewIntent
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.feature.home.HomeScreen
+import org.koin.core.context.GlobalContext
 
 class MainActivity : ComponentActivity() {
+
+    val viewModel = GlobalContext.get().get<MainViewModel>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
@@ -39,5 +43,10 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         handleNotificationIntentOnNewIntent(intent)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.onResume()
     }
 }

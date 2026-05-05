@@ -18,11 +18,12 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,9 +36,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.eahm.drinkwaterapp.core.data.drinkalarm.AlarmTime
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwTertiaryButton
@@ -53,22 +51,10 @@ import com.eahm.drinkwaterapp.system.alarm.AlarmStorageInfo
 @Composable
 internal fun AlarmsScreen(
     state: AlarmsState,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     onAction: (AlarmsAction) -> Unit,
     onBackClicked: () -> Unit,
 ) {
-    val lifecycle = LocalLifecycleOwner.current
-    val lifecycleState by lifecycle.lifecycle.currentStateFlow.collectAsStateWithLifecycle()
-
-    LaunchedEffect(lifecycleState) {
-        when (lifecycleState) {
-            Lifecycle.State.INITIALIZED -> {}
-            Lifecycle.State.CREATED -> {}
-            Lifecycle.State.STARTED -> {}
-            Lifecycle.State.RESUMED -> onAction(AlarmsAction.OnResumeCalled)
-            Lifecycle.State.DESTROYED -> {}
-        }
-    }
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -78,6 +64,7 @@ internal fun AlarmsScreen(
                 },
             )
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->
         Box(
             modifier = Modifier
@@ -165,6 +152,11 @@ private fun DataContent(state: AlarmsState.Data, onAction: (AlarmsAction) -> Uni
                 Text("Alarm trigger at (millis): ${it.alarmTriggerAtMillis}")
             }
         }
+
+        DwPrimaryButton(
+            text = "Call on resume now",
+            onClick = { onAction(AlarmsAction.OnResumeCalled) },
+        )
     }
 }
 

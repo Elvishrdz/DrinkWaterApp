@@ -1,5 +1,6 @@
 package com.eahm.drinkwaterapp.di
 
+import com.eahm.drinkwaterapp.MainViewModel
 import com.eahm.drinkwaterapp.feature.dev.DevViewModel
 import com.eahm.drinkwaterapp.feature.dev.alarmcalculator.AlarmCalculatorViewModel
 import com.eahm.drinkwaterapp.feature.dev.alarms.AlarmsViewModel
@@ -11,6 +12,7 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 internal val featureModule = module {
+    viewModelOf(::MainViewModel)
 
     viewModelOf(::DrinkViewModel)
     viewModelOf(::StatsViewModel)

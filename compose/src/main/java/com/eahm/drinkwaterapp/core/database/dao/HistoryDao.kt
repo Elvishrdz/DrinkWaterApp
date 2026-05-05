@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.database.entity.Status
 import kotlinx.coroutines.flow.Flow
@@ -15,8 +16,14 @@ interface HistoryDao {
     @Insert
     fun insertAll(vararg records: HistoryEntity)
 
+    @Update
+    fun update(record: HistoryEntity)
+
     @Delete
     fun delete(record: HistoryEntity)
+
+    @Query("SELECT * FROM HistoryEntity ORDER BY timestamp ASC LIMIT 1")
+    fun getEarliestRecord(): Flow<HistoryEntity?>
 
     @Query("SELECT * FROM HistoryEntity")
     fun getAll(): Flow<List<HistoryEntity>>

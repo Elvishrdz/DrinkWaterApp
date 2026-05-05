@@ -78,6 +78,17 @@ object AlarmScheduler {
         saveAlarmToStorage(context, alarmId, triggerInTimeFromNowMillis, triggerAt)
     }
 
+    fun callBroadcastReceiver(context: Context, alarmId: Int) {
+        val intent = Intent(context, AlarmReceiver::class.java).apply {
+            setPackage(context.packageName)
+            action = AlarmReceiver.ALARM_ACTION
+            putExtra("alarm_id", alarmId)
+            putExtra("interval_ms", 0)
+        }
+        context.sendBroadcast(intent)
+    }
+
+
     fun cancelAlarm(context: Context, alarmId: Int) {
         val alarmManager = context.getSystemService(AlarmManager::class.java)
         val pendingIntent = PendingIntent.getBroadcast(
@@ -93,6 +104,7 @@ object AlarmScheduler {
         removeAlarmFromStorage(context, alarmId)
     }
 
+    // TODO: verify this is working
     fun isAlarmActive(context: Context, alarmId: Int): Boolean {
         val pendingIntent = PendingIntent.getBroadcast(
             context,
@@ -100,7 +112,14 @@ object AlarmScheduler {
             Intent(AlarmReceiver.ALARM_ACTION).setPackage(context.packageName),
             PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
         )
-        return pendingIntent != null
+
+        val alarmExists = pendingIntent != null
+
+        if (!alarmExists) {
+            removeAlarmFromStorage(context, alarmId)
+        }
+
+        return alarmExists
     }
 
     fun getTimeUntilNextTrigger(context: Context, alarmId: Int): Long? {
