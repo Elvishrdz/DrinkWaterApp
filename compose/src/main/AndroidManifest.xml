@@ -43,6 +43,15 @@
             </intent-filter>
         </receiver>
 
+        <!-- only android system should trigger this intent, not other apps (exported = false) -->
+        <receiver
+            android:name=".system.broadcast.BootCompletedReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".core.data.goalreachedwidget.GoalReachedWidget"
             android:enabled="true"
