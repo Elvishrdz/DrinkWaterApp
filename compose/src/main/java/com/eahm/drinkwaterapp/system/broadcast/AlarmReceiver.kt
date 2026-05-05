@@ -29,18 +29,19 @@ class AlarmReceiver : BroadcastReceiver() {
             Intent.ACTION_LOCKED_BOOT_COMPLETED,
             Intent.ACTION_MY_PACKAGE_REPLACED,
                 -> {
+                // TODO: test restoring alarms after reboot or app update from play store
                 // this is called multiple times depending on the action
-                restoreDrinkAlarm()
+                //restoreDrinkAlarm(source = intent.action.toString())
             }
 
             ALARM_ACTION -> {
                 val koin = GlobalContext.get()
                 val drinkAlarmManager = koin.get<DrinkAlarmManager>()
 
-                // TODO: get correct alarm id
-                drinkAlarmManager.onAlarmReceived(code)
-
                 NotificationService.showDrinkNotification(context)
+
+                // schedule next interval
+                drinkAlarmManager.onAlarmReceived(code)
             }
 
             Drink.action -> {
@@ -67,10 +68,10 @@ class AlarmReceiver : BroadcastReceiver() {
         }
     }
 
-    private suspend fun restoreDrinkAlarm() {
+    private suspend fun restoreDrinkAlarm(source: String = "unknown") {
         val koin = GlobalContext.get()
         val drinkAlarmManager = koin.get<DrinkAlarmManager>()
-        drinkAlarmManager.restoreAlarm()
+        drinkAlarmManager.restoreAlarm(source)
     }
 
     private suspend fun registerDrink() = withContext(Dispatchers.IO) {

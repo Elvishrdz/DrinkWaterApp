@@ -115,10 +115,6 @@ object AlarmScheduler {
 
         val alarmExists = pendingIntent != null
 
-        if (!alarmExists) {
-            removeAlarmFromStorage(context, alarmId)
-        }
-
         return alarmExists
     }
 

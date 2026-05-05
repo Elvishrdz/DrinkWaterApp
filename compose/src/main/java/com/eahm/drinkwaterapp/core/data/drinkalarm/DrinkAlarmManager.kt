@@ -8,6 +8,7 @@ import com.eahm.drinkwaterapp.core.data.datastore.ActiveTime
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.WhatToDoNow
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.decideWhatToDoNow
+import com.eahm.drinkwaterapp.core.data.drinkalarm.simulator.simulateNextIntervalCalculation
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStatsObserver
 import com.eahm.drinkwaterapp.core.data.systemnotifications.extension.canShowNotifications
 import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler
@@ -147,30 +148,16 @@ class DrinkAlarmManager(
         return AlarmScheduler.getTimeUntilNextTrigger(application, DRINK_ALARM_ID).toString()
     }
 
-    fun onResume() {
-        if (application.canShowNotifications) {
-            // if we can show notifications, then we just need the alarm
-        } else {
-            // we need the notification permission otherwise users will receive the app reminder
-            // display in the app this information to the user.
-        }
-
-        if (isAlarmActive) {
-            // all good, waiting for the next reminder
-        } else {
-            // we need to restore the alarm to trigger the reminder
-        }
-
+    suspend fun onResume() {
         update()
 
-        if (isAlarmActive) return
-
-        testScheduleAlarm()
+        askWhatToDo("onResume")
     }
 
     private val testInterval = 7.seconds.inWholeMilliseconds
 
     fun testScheduleAlarm(configuration: AlarmConfiguration = AlarmConfiguration()) {
+        return
         AlarmScheduler.scheduleAlarm(
             context = application,
             alarmId = DRINK_ALARM_ID,
@@ -180,92 +167,78 @@ class DrinkAlarmManager(
         update()
     }
 
-    @OptIn(ExperimentalTime::class)
-    suspend fun restoreAlarm(source: String = "unknown") {
-        Log.i("DRINK_ALARM_MANAGER", "restoreAlarms: Source: $source")
+    suspend fun askWhatToDo(source: String = "unknown") {
+        Log.i("DRINK_ALARM_MANAGER", "what to do? source: $source")
 
-        when (whatShouldIDoNow()) {
-            WhatToDoNow.DoNothing -> TODO()
-            WhatToDoNow.RemindNow -> TODO()
-            WhatToDoNow.RescheduleInterval -> TODO()
-            WhatToDoNow.ScheduleForActiveStart -> TODO()
-            WhatToDoNow.ScheduleNextInterval -> TODO()
-        }
-
-        val alarmStorageInfos = AlarmScheduler.getAlarmStorageInfos(application)
-
-        alarmStorageInfos.forEach {
-            // TODO: if alarm is in the past, call right away
-            val now = Clock.System.now()
-            val currentTime = now.toLocalDateTime(TimeZone.currentSystemDefault())
-            val alarmTime = LocalDateTime(
-                year = currentTime.year,
-                month = currentTime.month,
-                day = currentTime.day,
-                hour = it.alarmTriggerAt.hour,
-                minute = it.alarmTriggerAt.minute,
-                second = it.alarmTriggerAt.second,
-            )
-
-            val isInThePast = alarmTime < currentTime
-
-            if (isInThePast) {
-                // if alarm is in the past, trigger alarm now.
-                AlarmScheduler.callBroadcastReceiver(application, DRINK_ALARM_ID)
-//                val currentInstant = currentTime.toInstant(TimeZone.currentSystemDefault())
-//                val newInstant = currentInstant.plus(testInterval.milliseconds)
-//                val newLocalDateTime = newInstant.toLocalDateTime(TimeZone.currentSystemDefault())
-//                val totalSeconds = (newLocalDateTime.hour * 3600) +
-//                        (newLocalDateTime.minute * 60) +
-//                        newLocalDateTime.second
-//
-//                AlarmTime.createWithSeconds(seconds = totalSeconds)
-
-            } else {
-                // use same time
-                val time = it.alarmTriggerAt
-
-                val alarmTime2 = LocalDateTime(
-                    year = currentTime.year,
-                    month = currentTime.month,
-                    day = currentTime.day,
-                    hour = time.hour,
-                    minute = time.minute,
-                    second = time.second,
+        when (val data = whatShouldIDoNow()) {
+            WhatToDoNow.InvalidActiveHours -> {
+                Log.i(
+                    "DRINK_ALARM_MANAGER",
+                    "what to do? we have invalid active hours"
                 )
+            }
 
-                if (alarmTime2 < currentTime) {
-                    throw Exception("Time is still in the past: $alarmTime2 ---- $currentTime")
-                }
+            WhatToDoNow.DoNothing -> {
+                Log.i("DRINK_ALARM_MANAGER", "what to do? do nothing")
+            }
+
+            WhatToDoNow.RemindNow -> {
+                Log.i("DRINK_ALARM_MANAGER", "what to do? remind now")
+
+                // trigger broadcast now
+            }
+
+            is WhatToDoNow.RescheduleInterval -> {
+                Log.i("DRINK_ALARM_MANAGER", "what to do? reschedule to interval: $data")
 
                 AlarmScheduler.scheduleAlarm(
                     context = application,
-                    alarmId = it.alarmId,
-                    hour = time.hour,
-                    minute = time.minute,
-                    second = time.second,
+                    alarmId = DRINK_ALARM_ID,
+                    hour = data.correct.hour,
+                    minute = data.correct.minute,
+                    second = data.correct.second,
                 )
+
+                val alarmStorageInfo =
+                    AlarmScheduler.getAlarmStorageInfo(application, DRINK_ALARM_ID)
+
+                Log.i("DRINK_ALARM_MANAGER", "we have this stored: $alarmStorageInfo")
+
+                update()
             }
         }
+    }
 
+    @OptIn(ExperimentalTime::class)
+    suspend fun restoreAlarm(source: String = "unknown") {
+        Log.i("DRINK_ALARM_MANAGER", "restoreAlarms: Source: $source")
+        askWhatToDo("restoreAlarm")
         update()
     }
 
     @OptIn(ExperimentalTime::class)
     private suspend fun whatShouldIDoNow(): WhatToDoNow {
-        val dateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-        val startTime = prefsStorage.getStartTime().firstOrNull()?.toLocalDateTime() ?: dateTime
-        val endTime = prefsStorage.getEndTime().firstOrNull()?.toLocalDateTime() ?: dateTime
+        val currentDeviceDateTime =
+            Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 
+        val startTime = prefsStorage.getStartTime().firstOrNull()?.toLocalDateTime()
+            ?: currentDeviceDateTime
+        val endTime = prefsStorage.getEndTime().firstOrNull()?.toLocalDateTime()
+            ?: currentDeviceDateTime
+
+        val alarmActive = AlarmScheduler.isAlarmActive(application, DRINK_ALARM_ID)
+
+        // cached value, alarm info can exist if the alarm was not triggered
+        // for example when installing an update or restarting the phone with a different time
         val alarmInfo = AlarmScheduler.getAlarmStorageInfo(application, DRINK_ALARM_ID)
-        val storedTrigger = alarmInfo?.alarmTriggerAt?.toLocalDateTime()
+        val storedAlarmTriggerAt = alarmInfo?.alarmTriggerAt?.toLocalDateTime()
 
         return decideWhatToDoNow(
-            now = dateTime,
+            now = currentDeviceDateTime,
             startTime = startTime,
             endTime = endTime,
-            alarmActive = isAlarmActive,
-            storedTrigger = storedTrigger,
+            hasActiveAlarm = alarmActive,
+            alarmAlarmTriggersAt = storedAlarmTriggerAt,
         )
     }
 
@@ -309,8 +282,35 @@ class DrinkAlarmManager(
 
     fun refresh() = update()
 
-    fun onAlarmReceived(alarmId: Int) {
-        testScheduleAlarm()
+    @OptIn(ExperimentalTime::class)
+    suspend fun onAlarmReceived(alarmId: Int) {
+        // always schedule next alarm when previous is received
+        val currentDeviceDateTime =
+            Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+
+        val startTime = prefsStorage.getStartTime().firstOrNull()?.toLocalDateTime()
+            ?: currentDeviceDateTime
+        val endTime = prefsStorage.getEndTime().firstOrNull()?.toLocalDateTime()
+            ?: currentDeviceDateTime
+
+        val nextInterval = simulateNextIntervalCalculation(
+            now = currentDeviceDateTime,
+            startTime = startTime,
+            endTime = endTime,
+        )
+
+        AlarmScheduler.scheduleAlarm(
+            context = application,
+            alarmId = DRINK_ALARM_ID,
+            hour = nextInterval.hour,
+            minute = nextInterval.minute,
+            second = nextInterval.second,
+        )
+
+        val alarmStorageInfo =
+            AlarmScheduler.getAlarmStorageInfo(application, DRINK_ALARM_ID)
+
+        Log.i("DRINK_ALARM_MANAGER", "alarm received, next alarm at: $alarmStorageInfo")
 
         update()
     }

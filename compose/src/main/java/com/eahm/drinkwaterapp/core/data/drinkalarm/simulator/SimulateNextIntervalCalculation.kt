@@ -6,16 +6,18 @@ import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
+/**
+ * return an interval between:
+ * a) startTime
+ * b) 10:00
+ * c) 15:00
+ * d) endTime
+ * */
 fun simulateNextIntervalCalculation(
     now: LocalDateTime,
     startTime: LocalDateTime,
     endTime: LocalDateTime,
 ): LocalDateTime {
-    // set intervals at
-    // a) startTime
-    // b) 10:00
-    // c) 12:00
-    // d) endTime
     val simulatedOptionB = getSimulatedOptionB(now)
     val simulatedOptionC = getSimulatedOptionC(now)
 
@@ -49,8 +51,8 @@ fun getSimulatedOptionC(now: LocalDateTime): LocalDateTime {
         year = now.year,
         month = now.month,
         day = now.day,
-        hour = 12,
-        minute = 0,
+        hour = 14,
+        minute = 23,
     )
 }
 
