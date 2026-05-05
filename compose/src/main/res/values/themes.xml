@@ -2,4 +2,11 @@
 <resources>
 
     <style name="Theme.DrinkWaterApp" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.DrinkWaterApp.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/blue_water</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/app_logo</item>
+        <item name="windowSplashScreenIconBackgroundColor">@color/blue_water</item>
+        <item name="postSplashScreenTheme">@style/Theme.DrinkWaterApp</item>
+    </style>
 </resources>

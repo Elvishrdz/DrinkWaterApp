@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.app.ActivityCompat
 import androidx.core.net.toUri
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.eahm.drinkwaterapp.core.data.systemnotifications.handleNotificationIntentOnCreate
 import com.eahm.drinkwaterapp.core.data.systemnotifications.handleNotificationIntentOnNewIntent
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -15,6 +16,7 @@ import com.eahm.drinkwaterapp.feature.home.HomeScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         handleNotificationIntentOnCreate(intent)
