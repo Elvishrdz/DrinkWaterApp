@@ -45,9 +45,9 @@ object NotificationService {
 
         DrinkNotification.showNotification(
             context = context,
-            title = awesomeTexts.getTitle(1, context),
-            text = awesomeTexts.getText(1, context),
-            bigText = awesomeTexts.getBigText(1, context),
+            title = awesomeTexts.getTitle(2, context),
+            text = awesomeTexts.getText(3, context),
+            bigText = awesomeTexts.getBigText(4, context),
         )
     }
 

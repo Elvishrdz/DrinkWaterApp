@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.SystemClock
 import android.provider.Settings
 import androidx.core.content.edit
+import com.eahm.drinkwaterapp.core.data.drinkalarm.AlarmTime
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DayTime
 import com.eahm.drinkwaterapp.core.data.drinkalarm.createWithSeconds
 import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler.scheduleAlarm
@@ -23,12 +24,12 @@ object AlarmScheduler {
      * If that time has already passed today, the alarm is scheduled for the same time tomorrow.
      * Delegates to [scheduleAlarm] with a computed delay so storage and registration are shared.
      */
-    fun scheduleAlarm(context: Context, alarmId: Int, hour: Int, minute: Int) {
+    fun scheduleAlarm(context: Context, alarmId: Int, hour: Int, minute: Int, second: Int) {
         val now = Calendar.getInstance()
         val target = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, hour)
             set(Calendar.MINUTE, minute)
-            set(Calendar.SECOND, 0)
+            set(Calendar.SECOND, second)
             set(Calendar.MILLISECOND, 0)
         }
         if (!target.after(now)) {
@@ -158,7 +159,7 @@ object AlarmScheduler {
 
         val triggerTimeMillis = prefs.getLong(keyTriggerTimeMillis(id), -1)
 
-        val triggerTime = DayTime.createWithSeconds(
+        val triggerTime = AlarmTime.createWithSeconds(
             seconds = triggerTimeMillis.milliseconds.inWholeSeconds.toInt(),
         )
 
@@ -169,7 +170,7 @@ object AlarmScheduler {
             alarmTriggerTimeMillis = triggerTimeMillis,
             alarmTriggerTime = triggerTime,
             alarmTriggerAtMillis = triggerAtMillis,
-            alarmTriggerAt = triggerAtMillis.asDayTime,
+            alarmTriggerAt = triggerAtMillis.asAlarmTime,
         )
     }
 
@@ -192,6 +193,25 @@ object AlarmScheduler {
             )
         }
 
+    // triggerAtMillis is an elapsedRealtime value, not a Unix timestamp.
+    // Offset it to wall-clock time, then extract hour and minute.
+    val Long.asAlarmTime
+        get() = if (this <= 0) {
+            AlarmTime(0, 0, 0)
+        } else {
+            val wallClockMs = System.currentTimeMillis() +
+                    (this - SystemClock.elapsedRealtime())
+
+            val calendar = Calendar.getInstance().apply {
+                timeInMillis = wallClockMs
+            }
+
+            AlarmTime(
+                hour = calendar.get(Calendar.HOUR_OF_DAY),
+                minute = calendar.get(Calendar.MINUTE),
+                second = calendar.get(Calendar.SECOND),
+            )
+        }
 
     private fun removeAlarmFromStorage(context: Context, alarmId: Int) {
         val prefs = context.getSharedPreferences(ALARM_PREFS_NAME, Context.MODE_PRIVATE)
@@ -216,7 +236,7 @@ object AlarmScheduler {
 data class AlarmStorageInfo(
     val alarmId: Int,
     val alarmTriggerTimeMillis: Long,
-    val alarmTriggerTime: DayTime,
+    val alarmTriggerTime: AlarmTime,
     val alarmTriggerAtMillis: Long,
-    val alarmTriggerAt: DayTime,
+    val alarmTriggerAt: AlarmTime,
 )

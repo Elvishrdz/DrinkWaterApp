@@ -1,7 +1,5 @@
 package com.eahm.drinkwaterapp.core.data.drinkalarm
 
-import androidx.compose.ui.util.fastRoundToInt
-
 data class DayTime(
     val hour: Int,
     val minute: Int,
@@ -23,14 +21,11 @@ fun DayTime.Companion.create(minutes: Int): DayTime {
 }
 
 fun DayTime.Companion.createWithSeconds(seconds: Int): DayTime {
-    val totalMinutes = seconds.toFloat() / 60
-    val roundedTotalMinutes = totalMinutes.fastRoundToInt()
-    val hours = ((roundedTotalMinutes / 60) % 24).coerceAtMost(23)
-    val minutes = (roundedTotalMinutes % 60).coerceAtMost(59)
+    val results = createTimeWithSeconds(seconds)
 
     return DayTime(
-        hour = hours,
-        minute = minutes,
+        hour = results.hours,
+        minute = results.minutes,
     )
 }
 

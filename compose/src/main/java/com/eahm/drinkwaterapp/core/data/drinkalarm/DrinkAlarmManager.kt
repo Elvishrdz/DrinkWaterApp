@@ -2,11 +2,11 @@ package com.eahm.drinkwaterapp.core.data.drinkalarm
 
 import android.app.Application
 import android.content.Context
+import androidx.compose.ui.util.fastRoundToInt
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStatsObserver
 import com.eahm.drinkwaterapp.core.data.systemnotifications.extension.canShowNotifications
 import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler
-import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler.asDayTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
@@ -180,6 +180,8 @@ class DrinkAlarmManager(
 
     @OptIn(ExperimentalTime::class)
     fun restoreAlarms() {
+        if (isAlarmActive) return
+
         val alarmStorageInfos = AlarmScheduler.getAlarmStorageInfos(application)
 
         alarmStorageInfos.forEach {
@@ -192,16 +194,20 @@ class DrinkAlarmManager(
                 day = currentTime.day,
                 hour = it.alarmTriggerAt.hour,
                 minute = it.alarmTriggerAt.minute,
+                second = it.alarmTriggerAt.second,
             )
 
             val isInThePast = alarmTime < currentTime
 
             val time = if (isInThePast) {
-                // TODO: to the current time add a new interval value, sum at millis level
                 val currentInstant = currentTime.toInstant(TimeZone.currentSystemDefault())
-                val newTime = currentInstant.plus(testInterval.milliseconds)
-                val triggerAt = newTime.toEpochMilliseconds()
-                triggerAt.asDayTime
+                val newInstant = currentInstant.plus(testInterval.milliseconds)
+                val newLocalDateTime = newInstant.toLocalDateTime(TimeZone.currentSystemDefault())
+                val totalSeconds = (newLocalDateTime.hour * 3600) +
+                        (newLocalDateTime.minute * 60) +
+                        newLocalDateTime.second
+
+                AlarmTime.createWithSeconds(seconds = totalSeconds)
 
             } else {
                 // use same time
@@ -214,6 +220,7 @@ class DrinkAlarmManager(
                 day = currentTime.day,
                 hour = time.hour,
                 minute = time.minute,
+                second = time.second,
             )
 
             if (alarmTime2 < currentTime) {
@@ -225,6 +232,7 @@ class DrinkAlarmManager(
                 alarmId = it.alarmId,
                 hour = time.hour,
                 minute = time.minute,
+                second = time.second,
             )
         }
 
@@ -256,3 +264,44 @@ class DrinkAlarmManager(
         private const val DRINK_ALARM_ID = 127
     }
 }
+
+data class AlarmTime(
+    val hour: Int,
+    val minute: Int,
+    val second: Int,
+) {
+    companion object
+}
+
+fun AlarmTime.Companion.createWithSeconds(seconds: Int): AlarmTime {
+    val results = createTimeWithSeconds(seconds)
+
+    return AlarmTime(
+        hour = results.hours,
+        minute = results.minutes,
+        second = results.seconds,
+    )
+}
+
+fun createTimeWithSeconds(seconds: Int): TimeResult {
+    val totalMinutes = seconds.toFloat() / 60
+    val roundedTotalMinutes = totalMinutes.fastRoundToInt()
+    val hours = ((roundedTotalMinutes / 60) % 24).coerceAtMost(23)
+    val minutes = (roundedTotalMinutes % 60).coerceAtMost(59)
+    val roundedSeconds = roundedTotalMinutes * 60
+    val millis = roundedSeconds * 1000L
+
+    return TimeResult(
+        hours = hours,
+        minutes = minutes,
+        seconds = roundedSeconds,
+        millis = millis,
+    )
+}
+
+data class TimeResult(
+    val hours: Int,
+    val minutes: Int,
+    val seconds: Int,
+    val millis: Long,
+)
