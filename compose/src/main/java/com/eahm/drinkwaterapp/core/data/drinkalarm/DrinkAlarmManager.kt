@@ -17,6 +17,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
@@ -33,6 +35,8 @@ class DrinkAlarmManager(
     private val _state = MutableStateFlow(getState())
 
     val state: StateFlow<DrinkAlarmState> = _state
+
+    private val restoreAlarmMutex = Mutex()
 
     init {
         update()
@@ -124,10 +128,12 @@ class DrinkAlarmManager(
 
     @OptIn(ExperimentalTime::class)
     suspend fun restoreAlarm(source: String = "unknown") {
-        Log.i("DRINK_ALARM_MANAGER", "restoreAlarms: Source: $source")
-
-        askWhatToDo(source)
-        update()
+        Log.i("DRINK_ALARM_MANAGER", "restoreAlarms: Source: $source - waiting for lock")
+        restoreAlarmMutex.withLock {
+            Log.i("DRINK_ALARM_MANAGER", "restoreAlarms: Source: $source - lock acquired")
+            askWhatToDo(source)
+            update()
+        }
     }
 
     fun setInterval(hour: Int, minute: Int) {
