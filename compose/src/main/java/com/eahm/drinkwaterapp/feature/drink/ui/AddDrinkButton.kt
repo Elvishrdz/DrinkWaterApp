@@ -137,7 +137,7 @@ internal fun AddDrinkButton(
                             onDelete(preset)
                             scope.launch {
                                 val result = snackbarHostState.showSnackbar(
-                                    message = "Preset removed",
+                                    message = "Suggestion removed",
                                     actionLabel = "Undo",
                                     duration = SnackbarDuration.Short,
                                 )
@@ -196,7 +196,7 @@ fun Header(
         Text(
             modifier = Modifier
                 .weight(1f),
-            text = "Drink Presets",
+            text = "Drink Suggestions",
             style = MaterialTheme.typography.titleLarge,
         )
 
