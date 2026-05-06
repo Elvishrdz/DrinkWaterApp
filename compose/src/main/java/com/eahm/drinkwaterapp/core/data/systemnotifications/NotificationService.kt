@@ -19,8 +19,8 @@ import androidx.core.app.NotificationManagerCompat
 import com.eahm.drinkwaterapp.MainActivity
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.data.systemnotifications.channel.DrinkNotificationChannel
-import com.eahm.drinkwaterapp.core.data.systemnotifications.extension.canShowNotifications
 import com.eahm.drinkwaterapp.core.data.systemnotifications.notification.DrinkNotification
+import com.eahm.drinkwaterapp.core.domain.extension.canShowNotifications
 import com.eahm.drinkwaterapp.ui.awesometexts.AwesomeTextsClass
 import kotlin.random.Random
 import kotlin.time.Clock

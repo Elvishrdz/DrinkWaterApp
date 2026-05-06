@@ -13,12 +13,12 @@ import androidx.core.net.toUri
 import com.eahm.drinkwaterapp.MainActivity
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.data.systemnotifications.channel.DrinkNotificationChannel
-import com.eahm.drinkwaterapp.core.data.systemnotifications.extension.canShowNotifications
 import com.eahm.drinkwaterapp.core.data.systemnotifications.model.Drink
 import com.eahm.drinkwaterapp.core.data.systemnotifications.model.NotificationClicked
 import com.eahm.drinkwaterapp.core.data.systemnotifications.model.NotificationConfig
 import com.eahm.drinkwaterapp.core.data.systemnotifications.model.NotificationRemoved
 import com.eahm.drinkwaterapp.core.data.systemnotifications.model.SkipDrink
+import com.eahm.drinkwaterapp.core.domain.extension.canShowNotifications
 import com.eahm.drinkwaterapp.system.broadcast.AlarmReceiver
 import kotlin.random.Random
 

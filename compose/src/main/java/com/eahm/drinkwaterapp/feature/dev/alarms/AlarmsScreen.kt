@@ -1,9 +1,11 @@
 package com.eahm.drinkwaterapp.feature.dev.alarms
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.SystemClock
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -89,6 +91,24 @@ private fun DataContent(state: AlarmsState.Data, onAction: (AlarmsAction) -> Uni
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
+        state.canScheduleExactAlarms.let {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = "Can schedule exact alarms: $it",
+                    color = if (it) MaterialTheme.colorScheme.onBackground
+                    else MaterialTheme.colorScheme.error,
+                    fontWeight = if (it) FontWeight.Normal
+                    else FontWeight.Bold,
+                )
+
+                if (!it) {
+                    RequestScheduleExactAlarmsAuthorizationButton()
+                }
+            }
+        }
+
         state.hasNotificationPermissions.let {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -158,6 +178,25 @@ private fun DataContent(state: AlarmsState.Data, onAction: (AlarmsAction) -> Uni
             onClick = { onAction(AlarmsAction.OnResumeCalled) },
         )
     }
+}
+
+@Composable
+private fun RequestScheduleExactAlarmsAuthorizationButton() {
+    // TODO: onResume check scheduleExactAlarms state again
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return
+
+    val context = LocalContext.current
+
+    DwTertiaryButton(
+        text = "Grant authorization in app settings",
+        onClick = {
+            val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+
+            context.startActivity(intent)
+        },
+    )
 }
 
 @Composable
@@ -260,6 +299,7 @@ private fun AlarmCountdownContent(
 private fun ActiveAlarmPreview() {
     AlarmsScreen(
         state = AlarmsState.Data(
+            canScheduleExactAlarms = false,
             hasNotificationPermissions = true,
             isAlarmActive = true,
             alarmStorageInfo = AlarmStorageInfo(
@@ -280,6 +320,7 @@ private fun ActiveAlarmPreview() {
 private fun NoActiveAlarmPreview() {
     AlarmsScreen(
         state = AlarmsState.Data(
+            canScheduleExactAlarms = false,
             hasNotificationPermissions = false,
             isAlarmActive = false,
             alarmStorageInfo = null,

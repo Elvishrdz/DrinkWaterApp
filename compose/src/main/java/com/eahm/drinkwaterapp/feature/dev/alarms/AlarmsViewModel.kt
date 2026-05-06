@@ -24,6 +24,7 @@ internal class AlarmsViewModel(
 
     val state = drinkAlarmManager.state.map {
         AlarmsState.Data(
+            canScheduleExactAlarms = it.canScheduleExactAlarms,
             hasNotificationPermissions = it.hasNotificationPermissions,
             isAlarmActive = it.isAlarmActive,
             alarmStorageInfo = it.alarmStorageInfo,

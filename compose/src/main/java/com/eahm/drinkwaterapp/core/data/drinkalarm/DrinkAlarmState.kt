@@ -7,6 +7,7 @@ data class DrinkAlarmState(
     val active: Boolean,
     val interval: AlarmInterval,
     val nextInterval: AlarmInterval?,
+    val canScheduleExactAlarms: Boolean,
     val hasNotificationPermissions: Boolean,
     val isAlarmActive: Boolean,
     val alarmStorageInfo: AlarmStorageInfo?,

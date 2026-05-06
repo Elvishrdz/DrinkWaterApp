@@ -4,9 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.SystemClock
-import android.provider.Settings
 import androidx.core.content.edit
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DayTime
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmTime
@@ -17,7 +15,6 @@ import java.util.Calendar
 import kotlin.time.Duration.Companion.milliseconds
 
 object AlarmScheduler {
-
 
     /**
      * Schedules an alarm to fire at the next occurrence of [hour]:[minute] in local time.
@@ -46,15 +43,6 @@ object AlarmScheduler {
      * */
     fun scheduleAlarm(context: Context, alarmId: Int, triggerInTimeFromNowMillis: Long) {
         val alarmManager = context.getSystemService(AlarmManager::class.java)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (!alarmManager.canScheduleExactAlarms()) {
-                val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(intent)
-                return
-            }
-        }
 
         val triggerAt = SystemClock.elapsedRealtime() + triggerInTimeFromNowMillis
 

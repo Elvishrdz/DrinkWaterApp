@@ -9,7 +9,8 @@ import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.data.drinkalarm.simulator.simulateNextIntervalCalculation
 import com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.WhatToDoNow
 import com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.decideWhatToDoNow
-import com.eahm.drinkwaterapp.core.data.systemnotifications.extension.canShowNotifications
+import com.eahm.drinkwaterapp.core.domain.extension.canScheduleExactAlarms
+import com.eahm.drinkwaterapp.core.domain.extension.canShowNotifications
 import com.eahm.drinkwaterapp.core.domain.extension.toLocalDateTime
 import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -154,6 +155,7 @@ class DrinkAlarmManager(
             active = AlarmScheduler.isAlarmActive(application, DRINK_ALARM_ID),
             interval = AlarmIntervals.getInterval(application),
             nextInterval = AlarmIntervals.getNextInterval(application),
+            canScheduleExactAlarms = application.canScheduleExactAlarms,
             hasNotificationPermissions = application.canShowNotifications,
             isAlarmActive = isAlarmActive,
             alarmStorageInfo = alarmStorageInfo,
