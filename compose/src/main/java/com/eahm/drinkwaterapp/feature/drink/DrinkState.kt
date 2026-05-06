@@ -15,6 +15,7 @@ internal sealed interface DrinkState {
         val quickDrinkPresets: List<DrinkPreset>,
         val allDrinkPresets: List<DrinkPreset>,
         val todayLogs: List<DrinkLogEntry>,
+        val alarmTriggerAtMs: Long?,
     ) : DrinkState
 }
 

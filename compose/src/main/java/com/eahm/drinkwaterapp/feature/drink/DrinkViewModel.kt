@@ -140,7 +140,8 @@ internal class DrinkViewModel(
         extras,
         history,
         drinkStatsObserver.drinkStats,
-    ) { extras, history, drinkStats ->
+        drinkAlarmManager.state,
+    ) { extras, history, drinkStats, alarmState ->
         if (history == null || extras == null) {
             DrinkState.Loading
         } else {
@@ -151,6 +152,7 @@ internal class DrinkViewModel(
                 allDrinkPresets = extras.allDrinkPresets,
                 todayLogs = history.todayLogs,
                 drinkStats = drinkStats,
+                alarmTriggerAtMs = alarmState.alarmStorageInfo?.alarmTriggerAtMillis,
             )
         }
 

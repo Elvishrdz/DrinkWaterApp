@@ -1,5 +1,15 @@
 package com.eahm.drinkwaterapp.feature.drink
 
+import android.os.SystemClock
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,9 +29,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
@@ -48,6 +65,8 @@ import com.eahm.drinkwaterapp.feature.drink.ui.QuickAddRow
 import com.eahm.drinkwaterapp.feature.drink.ui.TodayLogSection
 import com.eahm.drinkwaterapp.feature.drink.ui.previewLogEntries
 import com.eahm.drinkwaterapp.ui.inputfield.toDigitString
+import kotlinx.coroutines.delay
+import kotlin.random.Random
 
 @Composable
 internal fun DrinkScreen(
@@ -94,8 +113,9 @@ internal fun DrinkScreen(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                RemainingPill(
+                RotatingInfoPill(
                     remaining = state.drinkStats?.remainingAmount ?: 0f,
+                    alarmTriggerAtMs = state.alarmTriggerAtMs,
                 )
             }
 
@@ -194,46 +214,145 @@ private fun StreakBadge(streak: Int) {
     }
 }
 
+private enum class PillMessage { Remaining, NextAlarm }
+
 @Composable
-private fun RemainingPill(remaining: Float) {
+private fun RotatingInfoPill(
+    remaining: Float,
+    alarmTriggerAtMs: Long?,
+    modifier: Modifier = Modifier,
+) {
+    val alarmRemainingMs by produceState(
+        initialValue = alarmTriggerAtMs?.let {
+            (it - SystemClock.elapsedRealtime()).coerceAtLeast(0L)
+        },
+        key1 = alarmTriggerAtMs,
+    ) {
+        if (alarmTriggerAtMs == null) {
+            value = null
+            return@produceState
+        }
+        while (true) {
+            val rem = (alarmTriggerAtMs - SystemClock.elapsedRealtime()).coerceAtLeast(0L)
+            value = rem
+            if (rem == 0L) break
+            delay(1_000L)
+        }
+    }
+
+    val hasAlarm = alarmRemainingMs != null && alarmRemainingMs!! > 0L
+    val messages = remember(hasAlarm) {
+        if (hasAlarm) listOf(PillMessage.NextAlarm, PillMessage.Remaining)
+        else listOf(PillMessage.Remaining)
+    }
+
+    var currentIndex by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(messages.size) {
+        if (currentIndex >= messages.size) currentIndex = 0
+        while (messages.size > 1) {
+            val random = Random(10).nextLong(5, 15) * 1000L
+            delay(random)
+            currentIndex = (currentIndex + 1) % messages.size
+        }
+    }
+
+    val currentMessage = messages[currentIndex.coerceAtMost(messages.lastIndex)]
+
     Box(
-        modifier = Modifier
+        modifier = modifier
             .clip(RoundedCornerShape(999.dp))
             .background(DwTintWater)
+            .animateContentSize(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessMediumLow,
+                )
+            )
             .padding(horizontal = 14.dp, vertical = 8.dp)
     ) {
-        if (remaining > 0) {
-            Text(
-                text = buildAnnotatedString {
-                    append("You're ")
-                    withStyle(
-                        SpanStyle(
-                            fontWeight = FontWeight.Bold,
-                            color = DwWater
+        AnimatedContent(
+            targetState = currentMessage,
+            transitionSpec = { fadeIn(tween(250)) togetherWith fadeOut(tween(150)) },
+            label = "pill_message",
+        ) { message ->
+            val scale = remember { Animatable(1f) }
+            LaunchedEffect(Unit) {
+                scale.animateTo(1.08f, tween(80))
+                scale.animateTo(1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy))
+            }
+
+            when (message) {
+                PillMessage.Remaining -> {
+                    if (remaining > 0) {
+                        Text(
+                            text = buildAnnotatedString {
+                                append("You're ")
+                                withStyle(
+                                    SpanStyle(
+                                        fontWeight = FontWeight.Bold,
+                                        color = DwWater
+                                    )
+                                ) {
+                                    append("${remaining.toDigitString()} mL")
+                                }
+                                append(" away from today's goal")
+                            },
+                            fontFamily = PlusJakartaSans,
+                            fontSize = 13.sp,
+                            color = DwInk400,
+                            lineHeight = (13 * 1.45).sp,
+                            modifier = Modifier.scale(scale.value),
                         )
-                    ) {
-                        append("${remaining.toDigitString()} mL")
+                    } else {
+                        Text(
+                            text = buildAnnotatedString {
+                                withStyle(
+                                    SpanStyle(
+                                        fontWeight = FontWeight.Bold,
+                                        color = DwWater
+                                    )
+                                ) {
+                                    append("Goal reached")
+                                }
+                                append(" — keep sipping to stay ahead")
+                            },
+                            fontFamily = PlusJakartaSans,
+                            fontSize = 13.sp,
+                            color = DwInk400,
+                            modifier = Modifier.scale(scale.value),
+                        )
                     }
-                    append(" away from today's goal")
-                },
-                fontFamily = PlusJakartaSans,
-                fontSize = 13.sp,
-                color = DwInk400,
-                lineHeight = (13 * 1.45).sp
-            )
-        } else {
-            Text(
-                text = buildAnnotatedString {
-                    withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = DwWater)) {
-                        append("Goal reached")
-                    }
-                    append(" — keep sipping to stay ahead")
-                },
-                fontFamily = PlusJakartaSans,
-                fontSize = 13.sp,
-                color = DwInk400
-            )
+                }
+
+                PillMessage.NextAlarm -> {
+                    val ms = alarmRemainingMs ?: 0L
+                    Text(
+                        text = buildAnnotatedString {
+                            append("Next alarm in ")
+                            withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = DwWater)) {
+                                append(formatAlarmCountdown(ms))
+                            }
+                        },
+                        fontFamily = PlusJakartaSans,
+                        fontSize = 13.sp,
+                        color = DwInk400,
+                        modifier = Modifier.scale(scale.value),
+                    )
+                }
+            }
         }
+    }
+}
+
+private fun formatAlarmCountdown(ms: Long): String {
+    val hours = ms / (1000L * 60 * 60)
+    val minutes = (ms / (1000L * 60)) % 60
+    val seconds = (ms / 1000L) % 60
+    return when {
+        hours > 0L -> "${hours}h ${minutes}m ${seconds}s"
+        minutes > 0L -> "${minutes}m ${seconds}s"
+        else -> "${seconds}s"
     }
 }
 
@@ -302,4 +421,5 @@ private val stateMock = DrinkState.Data(
     quickDrinkPresets = drinkPresetsMock.take(3),
     allDrinkPresets = drinkPresetsMock,
     todayLogs = previewLogEntries.take(4),
+    alarmTriggerAtMs = null,
 )
