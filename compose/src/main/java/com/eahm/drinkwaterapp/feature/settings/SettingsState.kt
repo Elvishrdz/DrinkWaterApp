@@ -13,6 +13,7 @@ data class SettingsState(
     val startTime: ActiveTime?,
     val endTime: ActiveTime?,
     val timeRangeError: TimeRangeError? = null,
+    val goalReachedCelebrationsEnabled: Boolean,
 )
 
 enum class WaterUnit(val label: String) {

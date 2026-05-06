@@ -1,5 +1,7 @@
 package com.eahm.drinkwaterapp.feature.settings
 
+import android.app.Application
+import android.provider.Settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.core.data.datastore.ActiveTime
@@ -19,6 +21,7 @@ data class ActiveTimes(
 )
 
 internal class SettingsViewModel(
+    val application: Application,
     val prefsStorage: PrefsStorage,
 ) : ViewModel() {
 
@@ -33,8 +36,17 @@ internal class SettingsViewModel(
         initialValue = null,
     )
 
+    private val canDrawOverlay get() = Settings.canDrawOverlays(application)
+
     private val _state =
-        MutableStateFlow(SettingsState(username = null, startTime = null, endTime = null))
+        MutableStateFlow(
+            SettingsState(
+                username = null,
+                startTime = null,
+                endTime = null,
+                goalReachedCelebrationsEnabled = canDrawOverlay,
+            )
+        )
 
     val state = combine(
         prefsStorage.getUsername(),
@@ -110,6 +122,10 @@ internal class SettingsViewModel(
             _state.update { it.copy(timeRangeError = null) }
             prefsStorage.setEndTime(newEnd)
         }
+    }
+
+    fun onDrawOverlayPermissionResult() {
+        _state.update { it.copy(goalReachedCelebrationsEnabled = canDrawOverlay) }
     }
 
     /**

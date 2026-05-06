@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwSecondaryButton
@@ -129,11 +130,27 @@ internal fun SettingsScreen(
         }
     }
 
+    // ── Draw-overlay permission ───────────────────────────────────────────────
+    var showOverlayInstructionsDialog by rememberSaveable { mutableStateOf(false) }
+
+    val drawOverlayLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+    ) {
+        viewModel.onDrawOverlayPermissionResult()
+    }
+
+    fun handleDrawOverlayToggle() {
+        showOverlayInstructionsDialog = true
+    }
+
     // ── Share & Rate ──────────────────────────────────────────────────────────
     fun handleShare() {
         val shareIntent = Intent.createChooser(
             Intent(Intent.ACTION_SEND).apply {
-                putExtra(Intent.EXTRA_TEXT, "Stay hydrated! I use DrinkWater to track my daily water intake. Check it out!")
+                putExtra(
+                    Intent.EXTRA_TEXT,
+                    "Stay hydrated! I use DrinkWater to track my daily water intake. Check it out!"
+                )
                 type = "text/plain"
             },
             null,
@@ -158,6 +175,7 @@ internal fun SettingsScreen(
         onEndTimeChanged = viewModel::onEndTimeChanged,
         onShareTap = ::handleShare,
         onRateTap = ::handleRate,
+        onGoalCelebrationsToggled = { handleDrawOverlayToggle() },
         modifier = modifier,
     )
 
@@ -170,6 +188,21 @@ internal fun SettingsScreen(
                 val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
                     .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
                 context.startActivity(intent)
+            },
+        )
+    }
+
+    // ── Draw-overlay instructions dialog ─────────────────────────────────────
+    if (showOverlayInstructionsDialog) {
+        DrawOverlayInstructionsDialog(
+            onDismiss = { showOverlayInstructionsDialog = false },
+            onGoToSettings = {
+                showOverlayInstructionsDialog = false
+                val intent = Intent(
+                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    "package:${context.packageName}".toUri(),
+                )
+                drawOverlayLauncher.launch(intent)
             },
         )
     }
@@ -189,6 +222,7 @@ internal fun SettingsContent(
     onEndTimeChanged: (TimeSelected) -> Unit,
     onShareTap: () -> Unit,
     onRateTap: () -> Unit,
+    onGoalCelebrationsToggled: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     // Window duration used to cap the reminder interval
@@ -305,6 +339,29 @@ internal fun SettingsContent(
         }
 
         item {
+            SettingsSection(title = "OVERLAYS") {
+                SettingRow(
+                    icon = DwIcons.Bell,
+                    iconBg = DwTintMagenta,
+                    iconTint = DwMagenta,
+                    label = "Goal reached celebrations",
+                ) {
+                    Switch(
+                        checked = state.goalReachedCelebrationsEnabled,
+                        onCheckedChange = onGoalCelebrationsToggled,
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = DwPaper,
+                            checkedTrackColor = DwMagenta,
+                            uncheckedThumbColor = DwPaper,
+                            uncheckedTrackColor = DwInk200,
+                            uncheckedBorderColor = DwInk200,
+                        ),
+                    )
+                }
+            }
+        }
+
+        item {
             SettingsSection(title = "ABOUT") {
                 SettingRow(
                     icon = DwIcons.Share,
@@ -389,6 +446,78 @@ private fun NotificationPermissionDeniedDialog(
             Spacer(Modifier.height(24.dp))
             DwPrimaryButton(
                 text = "Open Settings",
+                onClick = onGoToSettings,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(Modifier.height(8.dp))
+            DwSecondaryButton(
+                text = "Not now",
+                onClick = onDismiss,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+}
+
+// ── Draw-overlay instructions dialog ─────────────────────────────────────────
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DrawOverlayInstructionsDialog(
+    onDismiss: () -> Unit,
+    onGoToSettings: () -> Unit,
+) {
+    val context = LocalContext.current
+
+    val title = if (!Settings.canDrawOverlays(context)) {
+        "Allow display over other apps"
+    } else {
+        "Disable display over other apps"
+    }
+
+    val instructions = if (!Settings.canDrawOverlays(context)) {
+        """
+To show goal reached celebration, we need permission to display over other apps.
+            
+1. Find the app in the list of apps when continuing to the settings.
+2. Finalize by enabling "Allow display over other apps".
+            Then press back and return to the app.
+        """
+    } else {
+        """
+To disable the goal reached celebration, you need to remove the permission explicitly.
+
+1. Find the app in the list of apps when continuing to the settings.
+2. Disable "Allow display over other apps".
+Then press back and return to the app.
+        """
+    }
+
+    BasicAlertDialog(onDismissRequest = onDismiss) {
+        Column(
+            modifier = Modifier
+                .clip(RoundedCornerShape(20.dp))
+                .background(DwPaper)
+                .padding(24.dp),
+        ) {
+            Text(
+                text = title,
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                color = DwInk900,
+            )
+            Spacer(Modifier.height(10.dp))
+            Text(
+                text = instructions,
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp,
+                color = DwInk500,
+            )
+            Spacer(Modifier.height(24.dp))
+            DwPrimaryButton(
+                text = "Continue to Settings",
                 onClick = onGoToSettings,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -488,7 +617,11 @@ private fun ProfileCard(
             )
             Spacer(modifier = Modifier.height(1.dp))
             Text(
-                text = "${state.weightKg.toInt()} ${state.weightUnit.label} · daily goal ${formatGoal(state.dailyGoalMl)}",
+                text = "${state.weightKg.toInt()} ${state.weightUnit.label} · daily goal ${
+                    formatGoal(
+                        state.dailyGoalMl
+                    )
+                }",
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Normal,
                 fontSize = 12.sp,
@@ -640,6 +773,7 @@ private fun SettingsScreenPreview() {
             onEndTimeChanged = {},
             onShareTap = {},
             onRateTap = {},
+            onGoalCelebrationsToggled = {},
         )
     }
 }
@@ -648,4 +782,5 @@ private val settingsStateMock = SettingsState(
     username = null,
     startTime = null,
     endTime = null,
+    goalReachedCelebrationsEnabled = false,
 )
