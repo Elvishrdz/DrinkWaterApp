@@ -9,6 +9,7 @@ import com.eahm.drinkwaterapp.core.data.confetti.ConfettiController
 import com.eahm.drinkwaterapp.core.data.datastore.DrinkPreset
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStatsObserver
 import com.eahm.drinkwaterapp.core.data.goalreachedwidget.GoalReachedWidget
 import com.eahm.drinkwaterapp.core.database.AppDatabase
@@ -169,7 +170,7 @@ internal class DrinkViewModel(
 
                 dao.insertAll(record)
 
-                drinkAlarmManager.setupAlarm(application)
+                drinkAlarmManager.setupAlarm(AlarmSource.DrinkButton)
             }
         }
     }

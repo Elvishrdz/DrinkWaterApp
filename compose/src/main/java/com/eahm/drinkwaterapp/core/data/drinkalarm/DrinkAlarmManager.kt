@@ -1,10 +1,11 @@
 package com.eahm.drinkwaterapp.core.data.drinkalarm
 
 import android.app.Application
-import android.content.Context
 import android.util.Log
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmConfiguration
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSchedule
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.data.drinkalarm.simulator.simulateNextIntervalCalculation
 import com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.WhatToDoNow
 import com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.decideWhatToDoNow
@@ -37,26 +38,7 @@ class DrinkAlarmManager(
     }
 
     @OptIn(ExperimentalTime::class)
-    suspend fun setupAlarm(context: Context) {
-
-    }
-
-    fun setupTestAlarm(configuration: AlarmConfiguration = AlarmConfiguration()) {
-        // schedule alarm using the testInterval for testing purposes
-        // not checking the alarm calculations.
-        return
-        AlarmScheduler.scheduleAlarm(
-            context = application,
-            alarmId = DRINK_ALARM_ID,
-            triggerInTimeFromNowMillis = testInterval,
-        )
-
-        update()
-    }
-
-    @OptIn(ExperimentalTime::class)
-    suspend fun onAlarmReceived(alarmId: Int) {
-        // always schedule next alarm when previous is received
+    suspend fun setupAlarm(source: AlarmSource) {
         val currentDeviceDateTime =
             Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 
@@ -71,20 +53,66 @@ class DrinkAlarmManager(
             endTime = endTime,
         )
 
-        AlarmScheduler.scheduleAlarm(
-            context = application,
-            alarmId = DRINK_ALARM_ID,
-            hour = nextInterval.hour,
-            minute = nextInterval.minute,
-            second = nextInterval.second,
+        val configuration = AlarmConfiguration(
+            source = source,
+            schedule = AlarmSchedule.AtExactTime(
+                hour = nextInterval.hour,
+                minute = nextInterval.minute,
+                second = nextInterval.second,
+            ),
         )
 
-        val alarmStorageInfo =
-            AlarmScheduler.getAlarmStorageInfo(application, DRINK_ALARM_ID)
+        scheduleDrinkAlarm(configuration)
+    }
 
-        Log.i("DRINK_ALARM_MANAGER", "alarm received, next alarm at: $alarmStorageInfo")
+    fun setupTestAlarm(source: AlarmSource) {
+        val configuration = AlarmConfiguration(
+            source = source,
+            schedule = AlarmSchedule.AfterGivenTime(
+                milliseconds = testInterval,
+            ),
+        )
+
+        scheduleDrinkAlarm(configuration)
 
         update()
+    }
+
+    @OptIn(ExperimentalTime::class)
+    private fun scheduleDrinkAlarm(configuration: AlarmConfiguration) {
+        val alarmId = DRINK_ALARM_ID
+
+        when (val data = configuration.schedule) {
+            is AlarmSchedule.AtExactTime -> {
+                AlarmScheduler.scheduleAlarm(
+                    context = application,
+                    alarmId = alarmId,
+                    hour = data.hour,
+                    minute = data.minute,
+                    second = data.second,
+                )
+            }
+
+            is AlarmSchedule.AfterGivenTime -> {
+                AlarmScheduler.scheduleAlarm(
+                    context = application,
+                    alarmId = alarmId,
+                    triggerInTimeFromNowMillis = testInterval,
+                )
+            }
+        }
+
+        update()
+    }
+
+    @OptIn(ExperimentalTime::class)
+    suspend fun onAlarmReceived(source: AlarmSource) {
+        // always schedule next alarm when previous is received
+        setupAlarm(source)
+
+        val alarmStorageInfo = AlarmScheduler.getAlarmStorageInfo(application, DRINK_ALARM_ID)
+
+        Log.i("DRINK_ALARM_MANAGER", "alarm received, next alarm at: $alarmStorageInfo")
     }
 
     suspend fun onResume() {

@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationManagerCompat
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.data.systemnotifications.NotificationService
 import com.eahm.drinkwaterapp.core.data.systemnotifications.model.Drink
 import com.eahm.drinkwaterapp.core.data.systemnotifications.model.NotificationRemoved
@@ -14,12 +15,17 @@ import com.eahm.drinkwaterapp.core.data.systemnotifications.notification.DrinkNo
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.database.entity.Status
-import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.koin.core.context.GlobalContext
 
 class AlarmReceiver : BroadcastReceiver() {
+
+    private val drinkAlarmManager
+        get() = let {
+            val koin = GlobalContext.get()
+            koin.get<DrinkAlarmManager>()
+        }
 
     override fun onReceive(context: Context, intent: Intent) = goAsync { _ ->
         val code = intent.getIntExtra(EXTRA_CODE, -1)
@@ -31,80 +37,57 @@ class AlarmReceiver : BroadcastReceiver() {
                 -> {
                 println("DrinkWaterApp: restore alarms with received intent: ${intent.action}")
                 // this is called multiple times depending on the intent action
-                restoreDrinkAlarm(source = intent.action.toString())
+                drinkAlarmManager.restoreAlarm(source = intent.action.toString())
             }
 
             ALARM_ACTION -> {
-                val koin = GlobalContext.get()
-                val drinkAlarmManager = koin.get<DrinkAlarmManager>()
+                drinkAlarmManager.onAlarmReceived(AlarmSource.DrinkAlarmReceived)
 
                 NotificationService.showDrinkNotification(context)
 
-                drinkAlarmManager.onAlarmReceived(code)
             }
 
             Drink.action -> {
                 if (code == Drink.code) {
                     registerDrink()
-                    scheduleNextAlarm(context)
+                    drinkAlarmManager.setupAlarm(AlarmSource.NotificationDrinkButton)
                     removeNotificationFromSystem(context, intent)
                 }
             }
 
             SkipDrink.action -> {
                 if (code == SkipDrink.code) {
-                    scheduleNextAlarm(context)
+                    drinkAlarmManager.setupAlarm(AlarmSource.NotificationSkipButton)
                     removeNotificationFromSystem(context, intent)
                 }
             }
 
             NotificationRemoved.action -> {
                 if (code == NotificationRemoved.code) {
-                    scheduleNextAlarm(context)
+                    drinkAlarmManager.setupAlarm(AlarmSource.NotificationRemoved)
                     removeNotificationFromSystem(context, intent)
                 }
             }
         }
     }
 
-    private suspend fun restoreDrinkAlarm(source: String = "unknown") {
-        val koin = GlobalContext.get()
-        val drinkAlarmManager = koin.get<DrinkAlarmManager>()
-        drinkAlarmManager.restoreAlarm(source)
-    }
-
     private suspend fun registerDrink() = withContext(Dispatchers.IO) {
         val koin = GlobalContext.get()
         val database = koin.get<AppDatabase>()
         val dao = database.getHistoryDao()
+
+        // TODO: get notification setup amount from shared prefs
         val record = HistoryEntity(
-            amount = 300f,
+            amount = 150f,
             status = Status.FROM_NOTIFICATION,
         )
 
         dao.insertAll(record)
     }
 
-    private suspend fun scheduleNextAlarm(context: Context) {
-        val koin = GlobalContext.get()
-        val drinkAlarmManager = koin.get<DrinkAlarmManager>()
-        drinkAlarmManager.setupAlarm(context)
-    }
-
     private fun removeNotificationFromSystem(context: Context, intent: Intent) {
         val notificationId = intent.getIntExtra(EXTRA_NOTIFICATION_ID, -1)
         NotificationManagerCompat.from(context).cancel(notificationId)
-    }
-
-    fun restoreAlarmsFromStorage(context: Context) {
-        val prefs = context.getSharedPreferences("alarms", Context.MODE_PRIVATE)
-        val alarmIds = prefs.getStringSet("active_alarms", emptySet()) ?: return
-
-        alarmIds.forEach { idStr ->
-            val id = idStr.toIntOrNull() ?: return@forEach
-            val intervalMs = prefs.getLong("alarm_interval_$id", 60_000L)
-            AlarmScheduler.scheduleAlarm(context, id, intervalMs)
-        }
     }
 
     companion object {

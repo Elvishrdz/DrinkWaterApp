@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.domain.extension.openSystemAppSettings
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -55,5 +56,5 @@ internal class AlarmsViewModel(
     private fun updateState() = drinkAlarmManager.update()
     private fun openAppPermissionSettings() = application.openSystemAppSettings()
     private fun onStopAlarm() = drinkAlarmManager.stopAlarm()
-    private fun setupAlarm() = drinkAlarmManager.setupTestAlarm()
+    private fun setupAlarm() = drinkAlarmManager.setupTestAlarm(AlarmSource.AlarmsDevMenu)
 }
