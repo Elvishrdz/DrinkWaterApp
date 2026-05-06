@@ -51,8 +51,8 @@ fun getSimulatedOptionC(now: LocalDateTime): LocalDateTime {
         year = now.year,
         month = now.month,
         day = now.day,
-        hour = 14,
-        minute = 23,
+        hour = 15,
+        minute = 0,
     )
 }
 

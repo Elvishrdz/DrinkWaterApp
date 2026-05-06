@@ -1,6 +1,7 @@
 package com.eahm.drinkwaterapp.core.data.drinkalarm
 
 import android.app.Application
+import android.content.Intent
 import android.util.Log
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmConfiguration
@@ -13,6 +14,7 @@ import com.eahm.drinkwaterapp.core.domain.extension.canScheduleExactAlarms
 import com.eahm.drinkwaterapp.core.domain.extension.canShowNotifications
 import com.eahm.drinkwaterapp.core.domain.extension.toLocalDateTime
 import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler
+import com.eahm.drinkwaterapp.system.broadcast.AlarmReceiver
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
@@ -29,12 +31,11 @@ class DrinkAlarmManager(
     private val application: Application,
     private val prefsStorage: PrefsStorage,
 ) {
-    private val isAlarmActive
-        get() = AlarmScheduler.isAlarmActive(application, DRINK_ALARM_ID)
-
     private val _state = MutableStateFlow(getState())
 
     val state: StateFlow<DrinkAlarmState> = _state
+
+    private val isAlarmActive get() = AlarmScheduler.isAlarmActive(application, DRINK_ALARM_ID)
 
     private val restoreAlarmMutex = Mutex()
 
@@ -190,7 +191,10 @@ class DrinkAlarmManager(
             WhatToDoNow.RemindNow -> {
                 Log.i("DRINK_ALARM_MANAGER", "what to do? remind now")
 
-                // trigger broadcast now
+                val intent = Intent(AlarmReceiver.ALARM_ACTION).apply {
+                    setPackage(application.packageName)
+                }
+                application.sendBroadcast(intent)
             }
 
             is WhatToDoNow.RescheduleInterval -> {
@@ -213,7 +217,6 @@ class DrinkAlarmManager(
             }
         }
     }
-
 
     @OptIn(ExperimentalTime::class)
     private suspend fun whatShouldIDoNow(): WhatToDoNow {
