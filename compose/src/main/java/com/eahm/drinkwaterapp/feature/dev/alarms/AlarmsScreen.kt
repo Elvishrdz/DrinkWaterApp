@@ -151,6 +151,11 @@ private fun DataContent(state: AlarmsState.Data, onAction: (AlarmsAction) -> Uni
             }
         }
 
+        Text(
+            text = "In active hours: ${state.inActiveHours}",
+            color = MaterialTheme.colorScheme.onBackground,
+        )
+
         Spacer(Modifier.height(16.dp))
 
         state.alarmStorageInfo?.let {
@@ -309,6 +314,7 @@ private fun ActiveAlarmPreview() {
                 alarmTriggerAtMillis = SystemClock.elapsedRealtime() + 3_661_000L,
                 alarmTriggerAt = AlarmTime(15, 30, 1),
             ),
+            inActiveHours = false,
         ),
         onAction = {},
         onBackClicked = {},
@@ -324,6 +330,7 @@ private fun NoActiveAlarmPreview() {
             hasNotificationPermissions = false,
             isAlarmActive = false,
             alarmStorageInfo = null,
+            inActiveHours = false,
         ),
         onAction = {},
         onBackClicked = {},

@@ -5,6 +5,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ProcessLifecycleOwner
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,6 +18,8 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -28,7 +33,6 @@ val dateTimeObserverModule = module {
     singleOf(::DateTimeObserver)
 }
 
-// TODO: make it lifecycle aware to not keep it alive when app is in background
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
 class DateTimeObserver(
     val application: Application,
@@ -43,28 +47,43 @@ class DateTimeObserver(
 
     // Emits the current LocalDateTime and re-emits whenever the calendar date changes
     // (midnight rollover, manual date/time edit, or timezone switch).
+    // The BroadcastReceiver is only registered while the app is foregrounded (>= STARTED),
+    // so it is automatically unregistered in the background — no battery wasted.
+    // When the app returns to the foreground the flow restarts and emits the current date;
     // distinctUntilChangedBy ensures only a real day boundary triggers downstream work.
-    val currentDay: StateFlow<LocalDateTime> = callbackFlow {
+    val currentDateTime: StateFlow<LocalDateTime> = ProcessLifecycleOwner.get()
+        .lifecycle
+        .currentStateFlow
+        .flatMapLatest { state ->
+            if (state.isAtLeast(Lifecycle.State.STARTED)) {
+                callbackFlow {
+                    trySend(getCurrentDateTime())
 
-        // initial
-        trySend(getCurrentDateTime())
+                    val receiver = object : BroadcastReceiver() {
+                        override fun onReceive(context: Context, intent: Intent) {
+                            trySend(getCurrentDateTime())
+                        }
+                    }
 
-        val receiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                trySend(getCurrentDateTime())
+                    val filter = IntentFilter().apply {
+                        addAction(Intent.ACTION_DATE_CHANGED)
+                        addAction(Intent.ACTION_TIME_CHANGED)
+                        addAction(Intent.ACTION_TIMEZONE_CHANGED)
+                    }
+
+                    ContextCompat.registerReceiver(
+                        application,
+                        receiver,
+                        filter,
+                        ContextCompat.RECEIVER_NOT_EXPORTED
+                    )
+
+                    awaitClose { application.unregisterReceiver(receiver) }
+                }
+            } else {
+                emptyFlow()
             }
         }
-
-        val filter = IntentFilter().apply {
-            addAction(Intent.ACTION_DATE_CHANGED)
-            addAction(Intent.ACTION_TIME_CHANGED)
-            addAction(Intent.ACTION_TIMEZONE_CHANGED)
-        }
-
-        application.registerReceiver(receiver, filter)
-
-        awaitClose { application.unregisterReceiver(receiver) }
-    }
         .distinctUntilChangedBy { it.date }
         .stateIn(
             scope = scope,

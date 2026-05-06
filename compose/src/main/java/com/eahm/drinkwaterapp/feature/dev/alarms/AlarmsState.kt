@@ -11,6 +11,7 @@ internal sealed interface AlarmsState {
         val hasNotificationPermissions: Boolean,
         val isAlarmActive: Boolean,
         val alarmStorageInfo: AlarmStorageInfo?,
+        val inActiveHours: Boolean,
     ) : AlarmsState
 }
 

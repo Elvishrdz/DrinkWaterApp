@@ -49,11 +49,11 @@ internal class DrinkViewModel(
 
     private val dao = database.getHistoryDao()
 
-    private val historyDate = MutableStateFlow(dateTimeObserver.currentDay.value)
+    private val historyDate = MutableStateFlow(dateTimeObserver.currentDateTime.value)
 
     init {
         viewModelScope.launch {
-            dateTimeObserver.currentDay.collect { historyDate.value = it }
+            dateTimeObserver.currentDateTime.collect { historyDate.value = it }
         }
 
         viewModelScope.launch {

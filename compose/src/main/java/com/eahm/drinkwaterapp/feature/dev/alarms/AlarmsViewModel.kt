@@ -6,10 +6,11 @@ import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.domain.extension.openSystemAppSettings
+import com.eahm.drinkwaterapp.feature.drink.ActiveHoursObserver
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -17,17 +18,22 @@ import kotlinx.coroutines.launch
 internal class AlarmsViewModel(
     private val application: Application,
     private val drinkAlarmManager: DrinkAlarmManager,
+    activeHoursObserver: ActiveHoursObserver,
 ) : ViewModel() {
 
     private val _events = Channel<AlarmsEvent>(Channel.BUFFERED)
     val events: Flow<AlarmsEvent> = _events.receiveAsFlow()
 
-    val state = drinkAlarmManager.state.map {
+    val state = combine(
+        drinkAlarmManager.state,
+        activeHoursObserver.inActiveHours,
+    ) { drinkAlarmState, inActiveHours ->
         AlarmsState.Data(
-            canScheduleExactAlarms = it.canScheduleExactAlarms,
-            hasNotificationPermissions = it.hasNotificationPermissions,
-            isAlarmActive = it.isAlarmActive,
-            alarmStorageInfo = it.alarmStorageInfo,
+            canScheduleExactAlarms = drinkAlarmState.canScheduleExactAlarms,
+            hasNotificationPermissions = drinkAlarmState.hasNotificationPermissions,
+            isAlarmActive = drinkAlarmState.isAlarmActive,
+            alarmStorageInfo = drinkAlarmState.alarmStorageInfo,
+            inActiveHours = inActiveHours,
         )
     }
         .stateIn(

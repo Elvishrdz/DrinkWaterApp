@@ -30,7 +30,7 @@ class DrinkStatsObserver(
     private val dao = database.getHistoryDao()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val currentDrinkAmount = dateTimeObserver.currentDay
+    private val currentDrinkAmount = dateTimeObserver.currentDateTime
         .flatMapLatest { day ->
             dao.getTotalDrinkAmount(start = day.toStartOfDayTime, end = day.toEndOfDayTime)
         }
