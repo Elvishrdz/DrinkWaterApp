@@ -36,7 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
-import com.eahm.drinkwaterapp.core.data.drinkalarm.AlarmTime
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmTime
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwTertiaryButton
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500

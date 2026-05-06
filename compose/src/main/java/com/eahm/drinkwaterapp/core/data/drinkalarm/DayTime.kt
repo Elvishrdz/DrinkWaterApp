@@ -1,5 +1,7 @@
 package com.eahm.drinkwaterapp.core.data.drinkalarm
 
+import com.eahm.drinkwaterapp.core.domain.extension.createTimeResultFromSeconds
+
 data class DayTime(
     val hour: Int,
     val minute: Int,
@@ -21,7 +23,7 @@ fun DayTime.Companion.create(minutes: Int): DayTime {
 }
 
 fun DayTime.Companion.createWithSeconds(seconds: Int): DayTime {
-    val results = createTimeWithSeconds(seconds)
+    val results = seconds.createTimeResultFromSeconds()
 
     return DayTime(
         hour = results.hours,

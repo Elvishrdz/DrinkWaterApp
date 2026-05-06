@@ -1,4 +1,4 @@
-package com.eahm.drinkwaterapp.core.data.drinkalarm.data
+package com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo
 
 import com.eahm.drinkwaterapp.core.data.drinkalarm.simulator.simulateNextIntervalCalculation
 import kotlinx.datetime.LocalDateTime

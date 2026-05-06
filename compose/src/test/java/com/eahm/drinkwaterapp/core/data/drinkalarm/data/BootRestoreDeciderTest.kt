@@ -1,15 +1,16 @@
 package com.eahm.drinkwaterapp.core.data.drinkalarm.data
 
+import com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.WhatToDoNow
+import com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.decideWhatToDoNow
 import kotlinx.datetime.LocalDateTime
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Test
 
 /**
- * Unit tests for [decideWhatToDoNow] covering boot-restore scenarios.
+ * Unit tests for [com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.decideWhatToDoNow] covering boot-restore scenarios.
  *
  * After a device reboot, AlarmManager clears all pending alarms, so [hasActiveAlarm] is always
- * false. These tests verify that [decideWhatToDoNow] returns the correct action to re-register
+ * false. These tests verify that [com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.decideWhatToDoNow] returns the correct action to re-register
  * or trigger alarms when called from the BOOT_COMPLETED BroadcastReceiver.
  *
  * Active window used throughout: 07:00 – 22:00 on 2026-05-05.

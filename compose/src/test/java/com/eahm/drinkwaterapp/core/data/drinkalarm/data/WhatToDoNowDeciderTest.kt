@@ -1,11 +1,13 @@
 package com.eahm.drinkwaterapp.core.data.drinkalarm.data
 
+import com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.WhatToDoNow
+import com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.decideWhatToDoNow
 import kotlinx.datetime.LocalDateTime
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 /**
- * Unit tests for [decideWhatToDoNow].
+ * Unit tests for [com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.decideWhatToDoNow].
  *
  * Active window used in all tests: 07:00 – 22:00.
  * "Current time" is fixed at specific hours to place it clearly inside or outside that window.

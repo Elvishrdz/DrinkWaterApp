@@ -25,17 +25,13 @@ class AlarmReceiver : BroadcastReceiver() {
         val code = intent.getIntExtra(EXTRA_CODE, -1)
 
         when (intent.action) {
-            // called after the user has finished booting but while still in the "locked" state, perfect to installing alarms.
-            Intent.ACTION_LOCKED_BOOT_COMPLETED -> {
-                //TODO: test if using not async broadcast triggers this println
-                println("DrinkWaterApp: device just booted up!")
-                // TODO: test restoring alarms after reboot or app update from play store
-                // this is called multiple times depending on the action
-                //restoreDrinkAlarm(source = intent.action.toString())
-            }
-
-            Intent.ACTION_MY_PACKAGE_REPLACED -> {
-                println("DrinkWaterApp: app updated!")
+            Intent.ACTION_MY_PACKAGE_REPLACED,
+            Intent.ACTION_BOOT_COMPLETED,
+            Intent.ACTION_LOCKED_BOOT_COMPLETED,
+                -> {
+                println("DrinkWaterApp: restore alarms with received intent: ${intent.action}")
+                // this is called multiple times depending on the intent action
+                restoreDrinkAlarm(source = intent.action.toString())
             }
 
             ALARM_ACTION -> {
@@ -44,7 +40,6 @@ class AlarmReceiver : BroadcastReceiver() {
 
                 NotificationService.showDrinkNotification(context)
 
-                // schedule next interval
                 drinkAlarmManager.onAlarmReceived(code)
             }
 

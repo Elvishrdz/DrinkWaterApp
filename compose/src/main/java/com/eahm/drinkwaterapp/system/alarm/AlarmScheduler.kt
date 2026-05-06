@@ -8,9 +8,9 @@ import android.os.Build
 import android.os.SystemClock
 import android.provider.Settings
 import androidx.core.content.edit
-import com.eahm.drinkwaterapp.core.data.drinkalarm.AlarmTime
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DayTime
-import com.eahm.drinkwaterapp.core.data.drinkalarm.createWithSeconds
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmTime
+import com.eahm.drinkwaterapp.core.domain.extension.createWithSeconds
 import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler.scheduleAlarm
 import com.eahm.drinkwaterapp.system.broadcast.AlarmReceiver
 import java.util.Calendar
