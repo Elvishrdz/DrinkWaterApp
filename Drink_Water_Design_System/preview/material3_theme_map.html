@@ -1,0 +1,1064 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Drink Water — Material 3 Theme Map</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link rel="stylesheet" href="../colors_and_type.css"/>
+<style>
+  body {
+    background: var(--ink-50);
+    padding: 32px 24px 64px 24px;
+    min-height: 100vh;
+  }
+  .page {
+    max-width: 1280px; margin: 0 auto;
+    display: flex; flex-direction: column; gap: 32px;
+  }
+  .page-head {
+    display: flex; flex-direction: column; gap: 8px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .page-head h1 {
+    font-family: var(--font-display); font-weight: 800; font-size: 36px;
+    margin: 0; letter-spacing: -0.02em; color: var(--fg-1);
+  }
+  .page-head p { font-size: 14px; color: var(--fg-2); margin: 0; max-width: 720px; line-height: 1.55; }
+  .page-head .pill-row { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+  .lang-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 999px;
+    background: var(--bg-tint-water); color: var(--brand-water-deep);
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .lang-pill.android { background: #E6F4EA; color: #1B5E20; }
+  .lang-pill.kotlin { background: #F2EFFE; color: #5A2EBE; }
+
+  .section {
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .section-head {
+    display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+  }
+  .section-head h2 {
+    font-family: var(--font-display); font-weight: 700; font-size: 20px;
+    margin: 0; color: var(--fg-1);
+  }
+  .section-head .meta {
+    font-family: var(--font-mono); font-size: 11px; color: var(--fg-2);
+    letter-spacing: 0.04em;
+  }
+  .section-head .compose-key {
+    font-family: var(--font-mono); font-size: 11px; color: var(--brand-magenta);
+    background: var(--bg-tint-magenta); padding: 3px 8px; border-radius: 6px;
+  }
+
+  .card {
+    background: var(--paper); border: 1px solid var(--border-subtle);
+    border-radius: var(--r-md);
+    padding: 20px;
+  }
+  .card.dense { padding: 16px; }
+
+  /* ---------- COLOR ROW ---------- */
+  .color-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px;
+  }
+  .swatch {
+    border-radius: var(--r-sm); overflow: hidden;
+    border: 1px solid var(--border-subtle);
+    display: flex; flex-direction: column;
+    background: var(--paper);
+  }
+  .swatch-bar {
+    height: 64px;
+    display: flex; align-items: flex-end; padding: 8px;
+    color: #fff;
+    font-family: var(--font-mono); font-size: 10px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.25);
+  }
+  .swatch-bar.is-light { color: var(--fg-1); text-shadow: none; }
+  .swatch-meta {
+    padding: 8px 10px;
+    display: flex; flex-direction: column; gap: 2px;
+    border-top: 1px solid var(--border-subtle);
+    background: var(--paper);
+  }
+  .swatch-name {
+    font-family: var(--font-display); font-weight: 700; font-size: 12px;
+    color: var(--fg-1);
+  }
+  .swatch-role {
+    font-family: var(--font-mono); font-size: 10px; color: var(--brand-magenta);
+    letter-spacing: 0.04em;
+  }
+  .swatch-hex {
+    font-family: var(--font-mono); font-size: 10px; color: var(--fg-2);
+  }
+
+  /* ---------- TYPE ---------- */
+  .type-list { display: flex; flex-direction: column; gap: 14px; }
+  .type-row {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 24px; align-items: baseline;
+    padding: 14px 16px;
+    background: var(--paper);
+    border: 1px solid var(--border-subtle); border-radius: var(--r-sm);
+  }
+  .type-sample-name { color: var(--fg-1); }
+  .type-spec {
+    font-family: var(--font-mono); font-size: 11px; color: var(--fg-2);
+    line-height: 1.55; display: flex; flex-direction: column; gap: 2px;
+    text-align: right;
+  }
+  .type-spec .compose {
+    color: var(--brand-magenta); font-weight: 600;
+  }
+
+  /* ---------- SHAPE ---------- */
+  .shape-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px;
+  }
+  .shape-card {
+    background: var(--paper);
+    border: 1px solid var(--border-subtle); border-radius: var(--r-sm);
+    padding: 14px; display: flex; flex-direction: column; gap: 10px; align-items: center;
+  }
+  .shape-block {
+    width: 88px; height: 88px;
+    background: var(--grad-water-hero);
+    box-shadow: var(--shadow-water);
+  }
+  .shape-name {
+    font-family: var(--font-display); font-weight: 700; font-size: 13px; color: var(--fg-1);
+  }
+  .shape-spec {
+    font-family: var(--font-mono); font-size: 10px; color: var(--fg-2); text-align: center;
+    line-height: 1.5;
+  }
+  .shape-spec .compose { color: var(--brand-magenta); font-weight: 600; }
+
+  /* ---------- SPACING ---------- */
+  .spacing-rows { display: flex; flex-direction: column; gap: 8px; }
+  .spacing-row {
+    display: grid; grid-template-columns: 80px 1fr 200px;
+    align-items: center; gap: 16px;
+    padding: 8px 14px; background: var(--paper);
+    border: 1px solid var(--border-subtle); border-radius: var(--r-xs);
+  }
+  .sp-name {
+    font-family: var(--font-mono); font-size: 11px; color: var(--brand-magenta); font-weight: 600;
+  }
+  .sp-bar {
+    height: 14px; background: var(--brand-water); border-radius: 4px;
+  }
+  .sp-spec {
+    font-family: var(--font-mono); font-size: 11px; color: var(--fg-2);
+    text-align: right;
+  }
+
+  /* ---------- ELEVATION ---------- */
+  .elev-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px; padding: 24px;
+    background: var(--paper-warm); border: 1px solid var(--border-subtle); border-radius: var(--r-sm);
+  }
+  .elev-card {
+    background: var(--paper);
+    height: 110px; border-radius: var(--r-sm);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 4px; padding: 10px;
+  }
+  .elev-card.e0 { box-shadow: none; border: 1px solid var(--border-subtle); }
+  .elev-card.e1 { box-shadow: var(--shadow-1); }
+  .elev-card.e2 { box-shadow: var(--shadow-2); }
+  .elev-card.e3 { box-shadow: var(--shadow-3); }
+  .elev-card.water { box-shadow: var(--shadow-water); background: var(--grad-water-hero); color: #fff; }
+  .elev-card.magenta { box-shadow: var(--shadow-magenta); background: var(--grad-magenta); color: #fff; }
+  .elev-name { font-family: var(--font-display); font-weight: 700; font-size: 12px; }
+  .elev-dp { font-family: var(--font-mono); font-size: 10px; opacity: 0.85; }
+
+  /* ---------- KOTLIN CODE ---------- */
+  .code {
+    background: #0E1A20;
+    color: #E2EBF0;
+    border-radius: var(--r-sm);
+    padding: 18px 20px;
+    font-family: var(--font-mono); font-size: 12px; line-height: 1.65;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .code .k { color: #C792EA; }     /* keywords */
+  .code .s { color: #A5D6A7; }     /* strings */
+  .code .c { color: #6B8290; font-style: italic; } /* comments */
+  .code .t { color: #FFCB6B; }     /* types */
+  .code .n { color: #82AAFF; }     /* numbers */
+  .code .p { color: #FF8A65; }     /* property name */
+
+  .file-tabs {
+    display: flex; gap: 2px;
+    border-bottom: 1px solid var(--border-subtle);
+    margin-bottom: -1px;
+  }
+  .file-tab {
+    padding: 8px 14px;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+    background: transparent; border: 1px solid transparent;
+    border-radius: var(--r-xs) var(--r-xs) 0 0;
+    color: var(--fg-2); cursor: pointer;
+  }
+  .file-tab.active {
+    background: #0E1A20; color: #fff;
+    border-color: #0E1A20;
+  }
+  .code-pane { display: none; }
+  .code-pane.active { display: block; }
+
+  /* ---------- preview phone ---------- */
+  .preview-row {
+    display: grid; grid-template-columns: 1fr 320px; gap: 24px;
+  }
+  @media (max-width: 980px) { .preview-row { grid-template-columns: 1fr; } }
+  .phone {
+    width: 280px; height: 580px; margin: 0 auto;
+    background: #1F3640; border-radius: 36px;
+    padding: 12px; box-shadow: var(--shadow-3);
+  }
+  .phone-screen {
+    width: 100%; height: 100%; background: var(--paper);
+    border-radius: 26px; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .phone-statusbar {
+    padding: 12px 18px 6px; display: flex; justify-content: space-between;
+    font-family: var(--font-mono); font-size: 10px; color: var(--fg-1);
+  }
+  .phone-topbar {
+    padding: 0 16px 12px;
+  }
+  .phone-topbar h3 {
+    font-family: var(--font-display); font-weight: 700; font-size: 22px;
+    color: var(--fg-1); margin: 0;
+  }
+  .phone-content {
+    flex: 1; padding: 12px 16px; display: flex; flex-direction: column; gap: 10px;
+    overflow: auto;
+  }
+  .m3-card {
+    background: var(--bg-tint-water); border-radius: 12px; padding: 12px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .m3-card .m3-card-overline {
+    font-family: var(--font-body); font-weight: 700; font-size: 11px;
+    color: var(--brand-water-deep); letter-spacing: 0.10em; text-transform: uppercase;
+  }
+  .m3-card .m3-card-headline {
+    font-family: var(--font-rounded); font-weight: 800; font-size: 28px; color: var(--fg-1);
+    line-height: 1.1;
+  }
+  .m3-card .m3-card-body {
+    font-family: var(--font-body); font-size: 13px; color: var(--fg-2);
+  }
+  .m3-fab {
+    position: absolute; bottom: 76px; right: 16px;
+    width: 56px; height: 56px; border-radius: 16px;
+    background: var(--grad-magenta); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: var(--shadow-magenta);
+    font-family: var(--font-rounded); font-size: 28px; font-weight: 800;
+  }
+  .m3-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+  .m3-btn {
+    padding: 10px 18px; border-radius: 999px;
+    font-family: var(--font-rounded); font-weight: 700; font-size: 13px;
+    letter-spacing: 0.04em;
+    border: 0; cursor: pointer;
+  }
+  .m3-btn.filled { background: var(--brand-water); color: #fff; }
+  .m3-btn.tonal  { background: var(--bg-tint-water); color: var(--brand-water-deep); }
+  .m3-btn.outlined { background: transparent; color: var(--brand-water); border: 1.5px solid var(--brand-water); }
+  .m3-btn.text { background: transparent; color: var(--brand-water); padding-left: 8px; padding-right: 8px; }
+  .m3-chip {
+    padding: 6px 12px; border-radius: 8px;
+    background: var(--bg-tint-magenta); color: var(--brand-magenta);
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+  }
+  .preview-meta {
+    font-family: var(--font-mono); font-size: 11px; color: var(--fg-2);
+    text-align: center; margin-top: 8px;
+  }
+
+  /* mapping legend */
+  .legend {
+    display: flex; gap: 14px; flex-wrap: wrap;
+    padding: 14px 16px;
+    background: var(--bg-tint-water);
+    border-radius: var(--r-sm); border: 1px solid var(--border-subtle);
+  }
+  .legend-item {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono); font-size: 11px; color: var(--fg-1);
+  }
+  .legend-dot {
+    width: 12px; height: 12px; border-radius: 4px; background: var(--brand-magenta);
+  }
+  .legend-dot.css { background: var(--brand-water); }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="page-head">
+  <h1>Drink Water → Material 3 Theme Map</h1>
+  <p>This page maps every token from <code>colors_and_type.css</code> onto Material 3's <code>ColorScheme</code>, <code>Typography</code>, and <code>Shapes</code> APIs. Each visual sample is labeled with both the CSS variable and the Compose property it maps to, so you can copy the Kotlin code at the bottom directly into your <code>Theme.kt</code>.</p>
+  <div class="pill-row">
+    <span class="lang-pill android">Jetpack Compose</span>
+    <span class="lang-pill kotlin">Material 3</span>
+    <span class="lang-pill">androidx.compose.material3:1.2+</span>
+  </div>
+  <div class="legend" style="margin-top: 12px;">
+    <div class="legend-item"><span class="legend-dot css"></span>CSS token</div>
+    <div class="legend-item"><span class="legend-dot"></span>Compose / M3 binding</div>
+  </div>
+</header>
+
+<!-- ============================================================
+     1. COLOR SCHEME
+     ============================================================ -->
+<section class="section">
+  <div class="section-head">
+    <h2>1. ColorScheme</h2>
+    <span class="meta">15 roles · light + dark</span>
+    <span class="compose-key">MaterialTheme.colorScheme</span>
+  </div>
+
+  <div class="card">
+    <div style="font-family: var(--font-display); font-weight: 700; font-size: 14px; margin-bottom: 12px; color: var(--fg-1);">
+      Primary · Secondary · Tertiary
+    </div>
+    <div class="color-grid">
+
+      <div class="swatch">
+        <div class="swatch-bar" style="background: #1C8EBF;">#1C8EBF</div>
+        <div class="swatch-meta">
+          <div class="swatch-name">Primary</div>
+          <div class="swatch-role">primary  ←  --brand-water</div>
+          <div class="swatch-hex">on container · #FFFFFF</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-bar" style="background: #EAF4F9;" >
+          <span style="color: var(--fg-1); text-shadow: none;">#EAF4F9</span>
+        </div>
+        <div class="swatch-meta">
+          <div class="swatch-name">Primary Container</div>
+          <div class="swatch-role">primaryContainer  ←  --bg-tint-water</div>
+          <div class="swatch-hex">onPrimaryContainer · #0E5A82</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-bar" style="background: #A22C83;">#A22C83</div>
+        <div class="swatch-meta">
+          <div class="swatch-name">Secondary</div>
+          <div class="swatch-role">secondary  ←  --brand-magenta</div>
+          <div class="swatch-hex">onSecondary · #FFFFFF</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-bar" style="background: #FBEFF6;" class="swatch-bar is-light">
+          <span style="color: var(--fg-1); text-shadow: none;">#FBEFF6</span>
+        </div>
+        <div class="swatch-meta">
+          <div class="swatch-name">Secondary Container</div>
+          <div class="swatch-role">secondaryContainer  ←  --bg-tint-magenta</div>
+          <div class="swatch-hex">onSecondaryContainer · #902178</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-bar" style="background: #008577;">#008577</div>
+        <div class="swatch-meta">
+          <div class="swatch-name">Tertiary</div>
+          <div class="swatch-role">tertiary  ←  --brand-teal</div>
+          <div class="swatch-hex">onTertiary · #FFFFFF</div>
+        </div>
+      </div>
+
+      <div class="swatch">
+        <div class="swatch-bar" style="background: #D81B60;">#D81B60</div>
+        <div class="swatch-meta">
+          <div class="swatch-name">Accent (extended)</div>
+          <div class="swatch-role">extendedColor.accentPop ← --brand-magenta-pop</div>
+          <div class="swatch-hex">use for FAB / call-to-action</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="font-family: var(--font-display); font-weight: 700; font-size: 14px; margin-bottom: 12px; color: var(--fg-1);">
+      Surfaces & background
+    </div>
+    <div class="color-grid">
+      <div class="swatch">
+        <div class="swatch-bar is-light" style="background: #F2F6F9;">#F2F6F9</div>
+        <div class="swatch-meta">
+          <div class="swatch-name">Background</div>
+          <div class="swatch-role">background  ←  --ink-50</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-bar is-light" style="background: #FFFFFF; border-bottom: 1px solid var(--border-subtle);">#FFFFFF</div>
+        <div class="swatch-meta">
+          <div class="swatch-name">Surface</div>
+          <div class="swatch-role">surface  ←  --paper</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-bar is-light" style="background: #FBFCFD;">#FBFCFD</div>
+        <div class="swatch-meta">
+          <div class="swatch-name">Surface (variant)</div>
+          <div class="swatch-role">surfaceVariant ← --paper-warm</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-bar is-light" style="background: #E2EBF0;">#E2EBF0</div>
+        <div class="swatch-meta">
+          <div class="swatch-name">Outline</div>
+          <div class="swatch-role">outline ← --ink-100</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-bar" style="background: #0E1A20;">#0E1A20</div>
+        <div class="swatch-meta">
+          <div class="swatch-name">On Surface</div>
+          <div class="swatch-role">onSurface ← --ink-900 (--fg-1)</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-bar" style="background: #4F6772;">#4F6772</div>
+        <div class="swatch-meta">
+          <div class="swatch-name">On Surface (variant)</div>
+          <div class="swatch-role">onSurfaceVariant ← --ink-500 (--fg-2)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="font-family: var(--font-display); font-weight: 700; font-size: 14px; margin-bottom: 12px; color: var(--fg-1);">
+      Semantic / status
+    </div>
+    <div class="color-grid">
+      <div class="swatch">
+        <div class="swatch-bar" style="background: #D14343;">#D14343</div>
+        <div class="swatch-meta">
+          <div class="swatch-name">Error</div>
+          <div class="swatch-role">error ← --danger</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-bar" style="background: #00A051;">#00A051</div>
+        <div class="swatch-meta">
+          <div class="swatch-name">Success (extended)</div>
+          <div class="swatch-role">extendedColor.success ← --success</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-bar" style="background: #F4A622;">#F4A622</div>
+        <div class="swatch-meta">
+          <div class="swatch-name">Warning (extended)</div>
+          <div class="swatch-role">extendedColor.warning ← --warning</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-bar" style="background: #1C8EBF;">#1C8EBF</div>
+        <div class="swatch-meta">
+          <div class="swatch-name">Info (extended)</div>
+          <div class="swatch-role">extendedColor.info ← --info</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     2. TYPOGRAPHY
+     ============================================================ -->
+<section class="section">
+  <div class="section-head">
+    <h2>2. Typography</h2>
+    <span class="meta">M3 type scale · 13 styles</span>
+    <span class="compose-key">MaterialTheme.typography</span>
+  </div>
+
+  <div class="card dense">
+    <div class="type-list">
+
+      <div class="type-row">
+        <div style="font-family: var(--font-rounded); font-weight: 800; font-size: 44px; line-height: 1.15; letter-spacing: -0.02em;">2,192 mL</div>
+        <div class="type-spec">
+          <div class="compose">displayLarge</div>
+          <div>Nunito · 800 · 44 / 50</div>
+          <div>tracking -0.02em</div>
+          <div>← --fs-display</div>
+        </div>
+      </div>
+
+      <div class="type-row">
+        <div style="font-family: var(--font-rounded); font-weight: 800; font-size: 36px;">Display Medium</div>
+        <div class="type-spec">
+          <div class="compose">displayMedium</div>
+          <div>Nunito · 800 · 36 / 44</div>
+        </div>
+      </div>
+
+      <div class="type-row">
+        <div style="font-family: var(--font-display); font-weight: 700; font-size: 28px; letter-spacing: -0.02em;">Drink Water</div>
+        <div class="type-spec">
+          <div class="compose">headlineLarge</div>
+          <div>Plus Jakarta Sans · 700 · 28 / 36</div>
+          <div>← --fs-h1</div>
+        </div>
+      </div>
+
+      <div class="type-row">
+        <div style="font-family: var(--font-display); font-weight: 700; font-size: 22px;">Stats this week</div>
+        <div class="type-spec">
+          <div class="compose">headlineMedium</div>
+          <div>Plus Jakarta Sans · 700 · 22 / 28</div>
+          <div>← --fs-h2</div>
+        </div>
+      </div>
+
+      <div class="type-row">
+        <div style="font-family: var(--font-display); font-weight: 600; font-size: 18px;">Section title</div>
+        <div class="type-spec">
+          <div class="compose">titleLarge</div>
+          <div>Plus Jakarta Sans · 600 · 18 / 24</div>
+          <div>← --fs-h3</div>
+        </div>
+      </div>
+
+      <div class="type-row">
+        <div style="font-family: var(--font-display); font-weight: 600; font-size: 16px;">List item / card title</div>
+        <div class="type-spec">
+          <div class="compose">titleMedium</div>
+          <div>Plus Jakarta Sans · 600 · 16 / 22</div>
+        </div>
+      </div>
+
+      <div class="type-row">
+        <div style="font-family: var(--font-body); font-weight: 400; font-size: 16px;">Stay hydrated. We'll remind you every hour to take a sip.</div>
+        <div class="type-spec">
+          <div class="compose">bodyLarge</div>
+          <div>Plus Jakarta Sans · 400 · 16 / 23</div>
+          <div>← --fs-body</div>
+        </div>
+      </div>
+
+      <div class="type-row">
+        <div style="font-family: var(--font-body); font-weight: 400; font-size: 14px; color: var(--fg-2);">Recommended daily goal based on your weight.</div>
+        <div class="type-spec">
+          <div class="compose">bodyMedium</div>
+          <div>Plus Jakarta Sans · 400 · 14 / 20</div>
+          <div>← --fs-body-sm</div>
+        </div>
+      </div>
+
+      <div class="type-row">
+        <div style="font-family: var(--font-rounded); font-weight: 700; font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase;">Add Drink</div>
+        <div class="type-spec">
+          <div class="compose">labelLarge</div>
+          <div>Nunito · 700 · 14 · UPPER</div>
+          <div>tracking 0.06em · ← --t-button</div>
+        </div>
+      </div>
+
+      <div class="type-row">
+        <div style="font-family: var(--font-mono); font-size: 12px; color: var(--fg-2);">07:12 a.m. · 250 mL</div>
+        <div class="type-spec">
+          <div class="compose">labelMedium</div>
+          <div>JetBrains Mono · 500 · 12</div>
+          <div>← --t-mono</div>
+        </div>
+      </div>
+
+      <div class="type-row">
+        <div style="font-family: var(--font-body); font-weight: 700; font-size: 11px; letter-spacing: 0.10em; text-transform: uppercase; color: var(--fg-2);">Today, May 5</div>
+        <div class="type-spec">
+          <div class="compose">labelSmall</div>
+          <div>Plus Jakarta Sans · 700 · 11 · UPPER</div>
+          <div>tracking 0.10em · ← --t-overline</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     3. SHAPES
+     ============================================================ -->
+<section class="section">
+  <div class="section-head">
+    <h2>3. Shapes</h2>
+    <span class="meta">5 corner sizes + pill</span>
+    <span class="compose-key">MaterialTheme.shapes</span>
+  </div>
+
+  <div class="card">
+    <div class="shape-grid">
+      <div class="shape-card">
+        <div class="shape-block" style="border-radius: 6px;"></div>
+        <div class="shape-name">Extra Small</div>
+        <div class="shape-spec"><span class="compose">extraSmall</span><br/>RoundedCorner(6.dp)<br/>← --r-xs</div>
+      </div>
+      <div class="shape-card">
+        <div class="shape-block" style="border-radius: 10px;"></div>
+        <div class="shape-name">Small</div>
+        <div class="shape-spec"><span class="compose">small</span><br/>RoundedCorner(10.dp)<br/>← --r-sm</div>
+      </div>
+      <div class="shape-card">
+        <div class="shape-block" style="border-radius: 14px;"></div>
+        <div class="shape-name">Medium</div>
+        <div class="shape-spec"><span class="compose">medium</span><br/>RoundedCorner(14.dp)<br/>← --r-md</div>
+      </div>
+      <div class="shape-card">
+        <div class="shape-block" style="border-radius: 20px;"></div>
+        <div class="shape-name">Large</div>
+        <div class="shape-spec"><span class="compose">large</span><br/>RoundedCorner(20.dp)<br/>← --r-lg</div>
+      </div>
+      <div class="shape-card">
+        <div class="shape-block" style="border-radius: 28px;"></div>
+        <div class="shape-name">Extra Large</div>
+        <div class="shape-spec"><span class="compose">extraLarge</span><br/>RoundedCorner(28.dp)<br/>← --r-xl</div>
+      </div>
+      <div class="shape-card">
+        <div class="shape-block" style="border-radius: 999px;"></div>
+        <div class="shape-name">Pill</div>
+        <div class="shape-spec"><span class="compose">CircleShape</span><br/>used for chips/buttons<br/>← --r-pill</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     4. SPACING
+     ============================================================ -->
+<section class="section">
+  <div class="section-head">
+    <h2>4. Spacing scale</h2>
+    <span class="meta">4-pt grid · 10 steps</span>
+    <span class="compose-key">object Spacing { val xs = 4.dp ... }</span>
+  </div>
+
+  <div class="card dense">
+    <div class="spacing-rows">
+      <div class="spacing-row"><div class="sp-name">xs   (sp-1)</div><div class="sp-bar" style="width: 4px;"></div><div class="sp-spec">4.dp</div></div>
+      <div class="spacing-row"><div class="sp-name">sm   (sp-2)</div><div class="sp-bar" style="width: 8px;"></div><div class="sp-spec">8.dp</div></div>
+      <div class="spacing-row"><div class="sp-name">md   (sp-3)</div><div class="sp-bar" style="width: 12px;"></div><div class="sp-spec">12.dp</div></div>
+      <div class="spacing-row"><div class="sp-name">base (sp-4)</div><div class="sp-bar" style="width: 16px;"></div><div class="sp-spec">16.dp · default padding</div></div>
+      <div class="spacing-row"><div class="sp-name">lg   (sp-5)</div><div class="sp-bar" style="width: 20px;"></div><div class="sp-spec">20.dp</div></div>
+      <div class="spacing-row"><div class="sp-name">xl   (sp-6)</div><div class="sp-bar" style="width: 24px;"></div><div class="sp-spec">24.dp · card gap</div></div>
+      <div class="spacing-row"><div class="sp-name">2xl  (sp-7)</div><div class="sp-bar" style="width: 32px;"></div><div class="sp-spec">32.dp</div></div>
+      <div class="spacing-row"><div class="sp-name">3xl  (sp-8)</div><div class="sp-bar" style="width: 40px;"></div><div class="sp-spec">40.dp</div></div>
+      <div class="spacing-row"><div class="sp-name">4xl  (sp-9)</div><div class="sp-bar" style="width: 56px;"></div><div class="sp-spec">56.dp · FAB size</div></div>
+      <div class="spacing-row"><div class="sp-name">5xl  (sp-10)</div><div class="sp-bar" style="width: 72px;"></div><div class="sp-spec">72.dp</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     5. ELEVATION
+     ============================================================ -->
+<section class="section">
+  <div class="section-head">
+    <h2>5. Elevation</h2>
+    <span class="meta">tonal + brand-tinted</span>
+    <span class="compose-key">CardDefaults.elevatedCardElevation()</span>
+  </div>
+
+  <div class="elev-grid">
+    <div class="elev-card e0"><div class="elev-name">level0</div><div class="elev-dp">0.dp</div></div>
+    <div class="elev-card e1"><div class="elev-name">level1</div><div class="elev-dp">1.dp · --shadow-1</div></div>
+    <div class="elev-card e2"><div class="elev-name">level2</div><div class="elev-dp">3.dp · --shadow-2</div></div>
+    <div class="elev-card e3"><div class="elev-name">level3</div><div class="elev-dp">6.dp · --shadow-3</div></div>
+    <div class="elev-card water"><div class="elev-name">water glow</div><div class="elev-dp">brand · --shadow-water</div></div>
+    <div class="elev-card magenta"><div class="elev-name">magenta glow</div><div class="elev-dp">brand · --shadow-magenta</div></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     6. PREVIEW + KOTLIN
+     ============================================================ -->
+<section class="section">
+  <div class="section-head">
+    <h2>6. Putting it together</h2>
+    <span class="meta">M3 components rendered with the theme</span>
+  </div>
+
+  <div class="preview-row">
+    <div class="card" style="position: relative;">
+      <div class="phone" style="position: relative;">
+        <div class="phone-screen">
+          <div class="phone-statusbar">
+            <span>9:30</span>
+            <span>● ▲ ▮▮▯</span>
+          </div>
+          <div class="phone-topbar">
+            <h3>Today</h3>
+          </div>
+          <div class="phone-content">
+            <div class="m3-card">
+              <div class="m3-card-overline">Today, May 5</div>
+              <div class="m3-card-headline">2,192 mL</div>
+              <div class="m3-card-body">8 drinks · 99% of goal</div>
+            </div>
+            <div class="m3-buttons">
+              <button class="m3-btn filled">Add 250 mL</button>
+              <button class="m3-btn tonal">Custom</button>
+            </div>
+            <div class="m3-buttons">
+              <button class="m3-btn outlined">Edit goal</button>
+              <button class="m3-btn text">View stats</button>
+            </div>
+            <div style="display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap;">
+              <span class="m3-chip">07:12 a.m. · 250</span>
+              <span class="m3-chip">10:05 a.m. · 330</span>
+              <span class="m3-chip">01:22 p.m. · 200</span>
+            </div>
+          </div>
+        </div>
+        <div class="m3-fab">+</div>
+      </div>
+      <div class="preview-meta">A composable preview using the theme above</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="font-family: var(--font-display); font-weight: 700; font-size: 14px; color: var(--fg-1);">Component → Theme bindings</div>
+      <div class="card dense" style="font-family: var(--font-mono); font-size: 11px; line-height: 1.7; color: var(--fg-2);">
+        <div><b style="color: var(--fg-1);">Card surface</b> · surface + outline</div>
+        <div><b style="color: var(--fg-1);">Headline 2,192 mL</b> · displayLarge</div>
+        <div><b style="color: var(--fg-1);">Overline "Today, May 5"</b> · labelSmall</div>
+        <div><b style="color: var(--fg-1);">Body "8 drinks…"</b> · bodyMedium</div>
+        <div><b style="color: var(--fg-1);">Filled button</b> · primary / onPrimary</div>
+        <div><b style="color: var(--fg-1);">Tonal button</b> · primaryContainer</div>
+        <div><b style="color: var(--fg-1);">Outlined button</b> · outline + primary</div>
+        <div><b style="color: var(--fg-1);">FAB +</b> · secondary (extendedColor.accentPop)</div>
+        <div><b style="color: var(--fg-1);">Chips</b> · secondaryContainer</div>
+        <div><b style="color: var(--fg-1);">Card radius</b> · shapes.medium</div>
+        <div><b style="color: var(--fg-1);">Button radius</b> · CircleShape (pill)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     7. KOTLIN CODE
+     ============================================================ -->
+<section class="section">
+  <div class="section-head">
+    <h2>7. Kotlin / Compose code</h2>
+    <span class="meta">drop into ui/theme/</span>
+  </div>
+
+  <div class="file-tabs">
+    <button class="file-tab active" data-tab="color">Color.kt</button>
+    <button class="file-tab" data-tab="type">Type.kt</button>
+    <button class="file-tab" data-tab="shape">Shape.kt</button>
+    <button class="file-tab" data-tab="theme">Theme.kt</button>
+    <button class="file-tab" data-tab="ext">Extended.kt</button>
+  </div>
+
+  <div class="code code-pane active" data-pane="color"><span class="c">// Color.kt — raw palette from colors_and_type.css</span>
+<span class="k">package</span> com.drinkwater.ui.theme
+
+<span class="k">import</span> androidx.compose.ui.graphics.Color
+
+<span class="c">// Brand</span>
+<span class="k">val</span> <span class="p">BrandWater</span>      = Color(<span class="n">0xFF1C8EBF</span>)  <span class="c">// --brand-water</span>
+<span class="k">val</span> <span class="p">BrandWaterLight</span> = Color(<span class="n">0xFF4FB3DD</span>)
+<span class="k">val</span> <span class="p">BrandWaterDeep</span>  = Color(<span class="n">0xFF0E5A82</span>)
+<span class="k">val</span> <span class="p">BrandMagenta</span>    = Color(<span class="n">0xFFA22C83</span>)  <span class="c">// --brand-magenta</span>
+<span class="k">val</span> <span class="p">BrandMagentaDark</span>= Color(<span class="n">0xFF902178</span>)
+<span class="k">val</span> <span class="p">BrandMagentaPop</span> = Color(<span class="n">0xFFD81B60</span>)  <span class="c">// CTA / FAB</span>
+<span class="k">val</span> <span class="p">BrandTeal</span>       = Color(<span class="n">0xFF008577</span>)
+<span class="k">val</span> <span class="p">BrandTealDark</span>   = Color(<span class="n">0xFF00574B</span>)
+<span class="k">val</span> <span class="p">BrandTealSoft</span>   = Color(<span class="n">0xFF2BA89A</span>)
+
+<span class="c">// Neutrals (ink scale)</span>
+<span class="k">val</span> <span class="p">Ink900</span> = Color(<span class="n">0xFF0E1A20</span>)
+<span class="k">val</span> <span class="p">Ink700</span> = Color(<span class="n">0xFF1F3640</span>)
+<span class="k">val</span> <span class="p">Ink500</span> = Color(<span class="n">0xFF4F6772</span>)
+<span class="k">val</span> <span class="p">Ink400</span> = Color(<span class="n">0xFF6B8290</span>)
+<span class="k">val</span> <span class="p">Ink300</span> = Color(<span class="n">0xFF94A8B4</span>)
+<span class="k">val</span> <span class="p">Ink200</span> = Color(<span class="n">0xFFC4D2DA</span>)
+<span class="k">val</span> <span class="p">Ink100</span> = Color(<span class="n">0xFFE2EBF0</span>)
+<span class="k">val</span> <span class="p">Ink50</span>  = Color(<span class="n">0xFFF2F6F9</span>)
+<span class="k">val</span> <span class="p">Paper</span>     = Color(<span class="n">0xFFFFFFFF</span>)
+<span class="k">val</span> <span class="p">PaperWarm</span> = Color(<span class="n">0xFFFBFCFD</span>)
+
+<span class="c">// Tints</span>
+<span class="k">val</span> <span class="p">TintWater</span>   = Color(<span class="n">0xFFEAF4F9</span>)  <span class="c">// --bg-tint-water</span>
+<span class="k">val</span> <span class="p">TintMagenta</span> = Color(<span class="n">0xFFFBEFF6</span>)
+
+<span class="c">// Semantic</span>
+<span class="k">val</span> <span class="p">Success</span> = Color(<span class="n">0xFF00A051</span>)
+<span class="k">val</span> <span class="p">Warning</span> = Color(<span class="n">0xFFF4A622</span>)
+<span class="k">val</span> <span class="p">Danger</span>  = Color(<span class="n">0xFFD14343</span>)
+
+<span class="c">// Light scheme</span>
+<span class="k">val</span> <span class="p">LightColorScheme</span> = lightColorScheme(
+    primary            = BrandWater,
+    onPrimary          = Paper,
+    primaryContainer   = TintWater,
+    onPrimaryContainer = BrandWaterDeep,
+    secondary            = BrandMagenta,
+    onSecondary          = Paper,
+    secondaryContainer   = TintMagenta,
+    onSecondaryContainer = BrandMagentaDark,
+    tertiary            = BrandTeal,
+    onTertiary          = Paper,
+    tertiaryContainer   = Color(<span class="n">0xFFE0F2EF</span>),
+    onTertiaryContainer = BrandTealDark,
+    background       = Ink50,
+    onBackground     = Ink900,
+    surface          = Paper,
+    onSurface        = Ink900,
+    surfaceVariant   = PaperWarm,
+    onSurfaceVariant = Ink500,
+    outline          = Ink100,
+    outlineVariant   = Ink200,
+    error          = Danger,
+    onError        = Paper,
+    errorContainer = Color(<span class="n">0xFFFCE6E6</span>),
+    onErrorContainer = Color(<span class="n">0xFF8A1F1F</span>),
+)
+
+<span class="c">// Dark scheme — derive by inverting the ink ramp + lifting brand</span>
+<span class="k">val</span> <span class="p">DarkColorScheme</span> = darkColorScheme(
+    primary            = BrandWaterLight,
+    onPrimary          = BrandWaterDeep,
+    primaryContainer   = BrandWaterDeep,
+    onPrimaryContainer = TintWater,
+    secondary            = Color(<span class="n">0xFFE490C8</span>),
+    onSecondary          = Color(<span class="n">0xFF4A0F3A</span>),
+    secondaryContainer   = BrandMagentaDark,
+    onSecondaryContainer = TintMagenta,
+    tertiary           = BrandTealSoft,
+    onTertiary         = BrandTealDark,
+    background       = Ink900,
+    onBackground     = Ink100,
+    surface          = Ink700,
+    onSurface        = Ink100,
+    surfaceVariant   = Color(<span class="n">0xFF2A4250</span>),
+    onSurfaceVariant = Ink300,
+    outline          = Ink500,
+    outlineVariant   = Ink700,
+    error            = Color(<span class="n">0xFFFF8A8A</span>),
+    onError          = Color(<span class="n">0xFF410E0E</span>),
+)
+</div>
+
+  <div class="code code-pane" data-pane="type"><span class="c">// Type.kt — Material 3 Typography</span>
+<span class="k">package</span> com.drinkwater.ui.theme
+
+<span class="k">import</span> androidx.compose.material3.Typography
+<span class="k">import</span> androidx.compose.ui.text.TextStyle
+<span class="k">import</span> androidx.compose.ui.text.font.Font
+<span class="k">import</span> androidx.compose.ui.text.font.FontFamily
+<span class="k">import</span> androidx.compose.ui.text.font.FontWeight
+<span class="k">import</span> androidx.compose.ui.unit.sp
+<span class="k">import</span> androidx.compose.ui.unit.em
+<span class="k">import</span> com.drinkwater.R
+
+<span class="c">// 1. Add font files to res/font/ then declare families.</span>
+<span class="k">val</span> <span class="p">PlusJakarta</span> = FontFamily(
+    Font(R.font.plus_jakarta_regular, FontWeight.Normal),
+    Font(R.font.plus_jakarta_medium,  FontWeight.Medium),
+    Font(R.font.plus_jakarta_semibold,FontWeight.SemiBold),
+    Font(R.font.plus_jakarta_bold,    FontWeight.Bold),
+)
+<span class="k">val</span> <span class="p">Nunito</span> = FontFamily(
+    Font(R.font.nunito_regular,  FontWeight.Normal),
+    Font(R.font.nunito_semibold, FontWeight.SemiBold),
+    Font(R.font.nunito_bold,     FontWeight.Bold),
+    Font(R.font.nunito_extrabold,FontWeight.ExtraBold),
+)
+<span class="k">val</span> <span class="p">JetMono</span> = FontFamily(
+    Font(R.font.jetbrains_mono_regular, FontWeight.Normal),
+    Font(R.font.jetbrains_mono_medium,  FontWeight.Medium),
+)
+
+<span class="k">val</span> <span class="p">DrinkWaterTypography</span> = Typography(
+    <span class="c">// Display — Nunito (rounded), used for hero numbers</span>
+    displayLarge  = TextStyle(fontFamily = Nunito, fontWeight = FontWeight.ExtraBold, fontSize = <span class="n">44</span>.sp, lineHeight = <span class="n">50</span>.sp, letterSpacing = (<span class="n">-0.02</span>).em),
+    displayMedium = TextStyle(fontFamily = Nunito, fontWeight = FontWeight.ExtraBold, fontSize = <span class="n">36</span>.sp, lineHeight = <span class="n">44</span>.sp),
+    displaySmall  = TextStyle(fontFamily = Nunito, fontWeight = FontWeight.Bold,      fontSize = <span class="n">28</span>.sp, lineHeight = <span class="n">36</span>.sp),
+
+    <span class="c">// Headline — Plus Jakarta Sans</span>
+    headlineLarge  = TextStyle(fontFamily = PlusJakarta, fontWeight = FontWeight.Bold, fontSize = <span class="n">28</span>.sp, lineHeight = <span class="n">36</span>.sp, letterSpacing = (<span class="n">-0.02</span>).em),
+    headlineMedium = TextStyle(fontFamily = PlusJakarta, fontWeight = FontWeight.Bold, fontSize = <span class="n">22</span>.sp, lineHeight = <span class="n">28</span>.sp),
+    headlineSmall  = TextStyle(fontFamily = PlusJakarta, fontWeight = FontWeight.Bold, fontSize = <span class="n">20</span>.sp, lineHeight = <span class="n">26</span>.sp),
+
+    <span class="c">// Title</span>
+    titleLarge  = TextStyle(fontFamily = PlusJakarta, fontWeight = FontWeight.SemiBold, fontSize = <span class="n">18</span>.sp, lineHeight = <span class="n">24</span>.sp),
+    titleMedium = TextStyle(fontFamily = PlusJakarta, fontWeight = FontWeight.SemiBold, fontSize = <span class="n">16</span>.sp, lineHeight = <span class="n">22</span>.sp),
+    titleSmall  = TextStyle(fontFamily = PlusJakarta, fontWeight = FontWeight.SemiBold, fontSize = <span class="n">14</span>.sp, lineHeight = <span class="n">20</span>.sp),
+
+    <span class="c">// Body</span>
+    bodyLarge  = TextStyle(fontFamily = PlusJakarta, fontWeight = FontWeight.Normal, fontSize = <span class="n">16</span>.sp, lineHeight = <span class="n">23</span>.sp),
+    bodyMedium = TextStyle(fontFamily = PlusJakarta, fontWeight = FontWeight.Normal, fontSize = <span class="n">14</span>.sp, lineHeight = <span class="n">20</span>.sp),
+    bodySmall  = TextStyle(fontFamily = PlusJakarta, fontWeight = FontWeight.Normal, fontSize = <span class="n">12</span>.sp, lineHeight = <span class="n">17</span>.sp),
+
+    <span class="c">// Label — Nunito for buttons (rounded), JetMono optional for timestamps</span>
+    labelLarge  = TextStyle(fontFamily = Nunito,     fontWeight = FontWeight.Bold, fontSize = <span class="n">14</span>.sp, lineHeight = <span class="n">20</span>.sp, letterSpacing = <span class="n">0.06</span>.em),
+    labelMedium = TextStyle(fontFamily = JetMono,    fontWeight = FontWeight.Medium, fontSize = <span class="n">12</span>.sp, lineHeight = <span class="n">16</span>.sp),
+    labelSmall  = TextStyle(fontFamily = PlusJakarta, fontWeight = FontWeight.Bold, fontSize = <span class="n">11</span>.sp, lineHeight = <span class="n">16</span>.sp, letterSpacing = <span class="n">0.10</span>.em),
+)
+</div>
+
+  <div class="code code-pane" data-pane="shape"><span class="c">// Shape.kt — Material 3 Shapes</span>
+<span class="k">package</span> com.drinkwater.ui.theme
+
+<span class="k">import</span> androidx.compose.foundation.shape.RoundedCornerShape
+<span class="k">import</span> androidx.compose.material3.Shapes
+<span class="k">import</span> androidx.compose.ui.unit.dp
+
+<span class="k">val</span> <span class="p">DrinkWaterShapes</span> = Shapes(
+    extraSmall = RoundedCornerShape(<span class="n">6</span>.dp),    <span class="c">// --r-xs</span>
+    small      = RoundedCornerShape(<span class="n">10</span>.dp),   <span class="c">// --r-sm</span>
+    medium     = RoundedCornerShape(<span class="n">14</span>.dp),   <span class="c">// --r-md · default for cards</span>
+    large      = RoundedCornerShape(<span class="n">20</span>.dp),   <span class="c">// --r-lg</span>
+    extraLarge = RoundedCornerShape(<span class="n">28</span>.dp),   <span class="c">// --r-xl · sheets</span>
+)
+
+<span class="c">// Pill / circle is achieved with CircleShape directly:</span>
+<span class="c">// Button(shape = CircleShape, ...)</span>
+</div>
+
+  <div class="code code-pane" data-pane="theme"><span class="c">// Theme.kt — top-level @Composable</span>
+<span class="k">package</span> com.drinkwater.ui.theme
+
+<span class="k">import</span> androidx.compose.foundation.isSystemInDarkTheme
+<span class="k">import</span> androidx.compose.material3.MaterialTheme
+<span class="k">import</span> androidx.compose.runtime.Composable
+<span class="k">import</span> androidx.compose.runtime.CompositionLocalProvider
+
+@Composable
+<span class="k">fun</span> <span class="p">DrinkWaterTheme</span>(
+    darkTheme: <span class="t">Boolean</span> = isSystemInDarkTheme(),
+    content: @Composable () -> <span class="t">Unit</span>,
+) {
+    <span class="k">val</span> colorScheme = <span class="k">if</span> (darkTheme) DarkColorScheme <span class="k">else</span> LightColorScheme
+
+    CompositionLocalProvider(
+        LocalExtendedColors provides <span class="k">if</span> (darkTheme) ExtendedColorsDark <span class="k">else</span> ExtendedColorsLight,
+        LocalSpacing       provides Spacing,
+    ) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography  = DrinkWaterTypography,
+            shapes      = DrinkWaterShapes,
+            content     = content,
+        )
+    }
+}
+</div>
+
+  <div class="code code-pane" data-pane="ext"><span class="c">// Extended.kt — tokens M3 doesn't cover natively (success/warning, brand glow shadows, spacing)</span>
+<span class="k">package</span> com.drinkwater.ui.theme
+
+<span class="k">import</span> androidx.compose.runtime.*
+<span class="k">import</span> androidx.compose.ui.graphics.Color
+<span class="k">import</span> androidx.compose.ui.unit.Dp
+<span class="k">import</span> androidx.compose.ui.unit.dp
+
+<span class="c">// --- extended colors ---</span>
+<span class="k">data class</span> <span class="t">ExtendedColors</span>(
+    <span class="k">val</span> success: Color,
+    <span class="k">val</span> warning: Color,
+    <span class="k">val</span> info: Color,
+    <span class="k">val</span> accentPop: Color,    <span class="c">// --brand-magenta-pop, FAB / CTA</span>
+    <span class="k">val</span> waterDeep: Color,
+    <span class="k">val</span> tintWater: Color,
+    <span class="k">val</span> tintMagenta: Color,
+)
+
+<span class="k">val</span> <span class="p">ExtendedColorsLight</span> = ExtendedColors(
+    success     = Success,
+    warning     = Warning,
+    info        = BrandWater,
+    accentPop   = BrandMagentaPop,
+    waterDeep   = BrandWaterDeep,
+    tintWater   = TintWater,
+    tintMagenta = TintMagenta,
+)
+<span class="k">val</span> <span class="p">ExtendedColorsDark</span> = ExtendedColors(
+    success     = Color(<span class="n">0xFF7DDFA9</span>),
+    warning     = Color(<span class="n">0xFFFFCB6B</span>),
+    info        = BrandWaterLight,
+    accentPop   = Color(<span class="n">0xFFFF85A8</span>),
+    waterDeep   = BrandWaterLight,
+    tintWater   = Color(<span class="n">0xFF143D4F</span>),
+    tintMagenta = Color(<span class="n">0xFF3D1531</span>),
+)
+
+<span class="k">val</span> <span class="p">LocalExtendedColors</span> = staticCompositionLocalOf { ExtendedColorsLight }
+
+<span class="c">// Use as: MaterialTheme.extended.success</span>
+<span class="k">val</span> MaterialTheme.extended: ExtendedColors
+    @Composable @ReadOnlyComposable
+    <span class="k">get</span>() = LocalExtendedColors.current
+
+<span class="c">// --- spacing tokens ---</span>
+<span class="k">data class</span> <span class="t">SpacingTokens</span>(
+    <span class="k">val</span> xs:   Dp = <span class="n">4</span>.dp,
+    <span class="k">val</span> sm:   Dp = <span class="n">8</span>.dp,
+    <span class="k">val</span> md:   Dp = <span class="n">12</span>.dp,
+    <span class="k">val</span> base: Dp = <span class="n">16</span>.dp,
+    <span class="k">val</span> lg:   Dp = <span class="n">20</span>.dp,
+    <span class="k">val</span> xl:   Dp = <span class="n">24</span>.dp,
+    <span class="k">val</span> xl2:  Dp = <span class="n">32</span>.dp,
+    <span class="k">val</span> xl3:  Dp = <span class="n">40</span>.dp,
+    <span class="k">val</span> xl4:  Dp = <span class="n">56</span>.dp,
+    <span class="k">val</span> xl5:  Dp = <span class="n">72</span>.dp,
+)
+
+<span class="k">val</span> <span class="p">Spacing</span> = SpacingTokens()
+<span class="k">val</span> <span class="p">LocalSpacing</span> = staticCompositionLocalOf { Spacing }
+
+<span class="k">val</span> MaterialTheme.spacing: SpacingTokens
+    @Composable @ReadOnlyComposable
+    <span class="k">get</span>() = LocalSpacing.current
+
+<span class="c">// --- usage examples ---</span>
+<span class="c">// Modifier.padding(MaterialTheme.spacing.base)</span>
+<span class="c">// Text("Goal met!", color = MaterialTheme.extended.success)</span>
+<span class="c">// FloatingActionButton(containerColor = MaterialTheme.extended.accentPop) { ... }</span>
+</div>
+</section>
+
+</div>
+
+<script>
+document.querySelectorAll('.file-tab').forEach(t => {
+  t.addEventListener('click', () => {
+    const tab = t.getAttribute('data-tab');
+    document.querySelectorAll('.file-tab').forEach(x => x.classList.toggle('active', x === t));
+    document.querySelectorAll('.code-pane').forEach(p => {
+      p.classList.toggle('active', p.getAttribute('data-pane') === tab);
+    });
+  });
+});
+</script>
+</body>
+</html>

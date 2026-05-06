@@ -1,0 +1,411 @@
+/* Drink Water — Goal Reached Celebration Overlay
+   Floating card that appears over the Home screen when daily goal is reached.
+   The visual treatment varies by day (theme rotates daily). */
+
+/* ============================================================
+   SCRIM (behind card, dims app)
+   ============================================================ */
+.dw-celebrate-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(14, 26, 32, 0.42);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: dw-scrim-in 220ms var(--ease-out) both;
+}
+@keyframes dw-scrim-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ============================================================
+   CARD — base (each theme overrides surface + accent)
+   ============================================================ */
+.dw-celebrate-card {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  border-radius: var(--r-xl);
+  background: var(--paper);
+  box-shadow: 0 24px 64px rgba(14, 26, 32, 0.32),
+              0 8px 20px rgba(14, 26, 32, 0.18);
+  overflow: hidden;
+  animation: dw-card-in 460ms var(--ease-bounce) both;
+}
+@keyframes dw-card-in {
+  from { opacity: 0; transform: scale(0.82) translateY(24px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* hero region (top of card — themed background lives here) */
+.dw-celebrate-hero {
+  position: relative;
+  padding: 28px 24px 20px 24px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: #fff;
+}
+.dw-celebrate-hero::before {
+  /* faint diagonal sheen */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--grad-glass-shine);
+  pointer-events: none;
+}
+
+/* trophy / glyph plate */
+.dw-celebrate-mark {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35),
+              0 10px 28px rgba(0, 0, 0, 0.18);
+  animation: dw-mark-pop 700ms var(--ease-bounce) 120ms both;
+}
+@keyframes dw-mark-pop {
+  0%   { transform: scale(0.4) rotate(-12deg); opacity: 0; }
+  60%  { transform: scale(1.08) rotate(4deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.dw-celebrate-mark img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25));
+}
+.dw-celebrate-mark .glyph {
+  font-family: var(--font-rounded);
+  font-weight: 800;
+  font-size: 44px;
+  color: #fff;
+  line-height: 1;
+}
+
+/* eyebrow above headline (date / streak chip) */
+.dw-celebrate-eyebrow {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 0.22);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: #fff;
+  margin-bottom: 10px;
+}
+.dw-celebrate-eyebrow .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #fff;
+}
+
+/* big headline (the cheerful daily line) */
+.dw-celebrate-headline {
+  position: relative;
+  font-family: var(--font-rounded);
+  font-weight: 800;
+  font-size: 26px;
+  line-height: 1.18;
+  letter-spacing: -0.01em;
+  color: #fff;
+  margin: 0 0 6px 0;
+  text-wrap: balance;
+}
+
+/* sub-line */
+.dw-celebrate-sub {
+  position: relative;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.92);
+  margin: 0;
+  text-wrap: pretty;
+}
+
+/* ============================================================
+   STAT STRIP (white surface, three columns)
+   ============================================================ */
+.dw-celebrate-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0;
+  padding: 18px 8px;
+  background: var(--paper);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.dw-celebrate-stat {
+  text-align: center;
+  padding: 0 6px;
+  position: relative;
+}
+.dw-celebrate-stat + .dw-celebrate-stat::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 12%;
+  bottom: 12%;
+  width: 1px;
+  background: var(--border-subtle);
+}
+.dw-celebrate-stat-value {
+  font-family: var(--font-rounded);
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--brand-magenta);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+.dw-celebrate-stat-unit {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--brand-magenta);
+  margin-left: 1px;
+}
+.dw-celebrate-stat-label {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--fg-2);
+  margin-top: 6px;
+  letter-spacing: 0.02em;
+}
+
+/* ============================================================
+   ACTIONS
+   ============================================================ */
+.dw-celebrate-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 18px 20px 18px;
+  background: var(--paper);
+}
+.dw-celebrate-actions .dw-btn {
+  width: 100%;
+  justify-content: center;
+}
+.dw-celebrate-secondary {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--font-rounded);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-2);
+  padding: 8px 0 2px 0;
+}
+.dw-celebrate-secondary:hover { color: var(--brand-magenta); }
+
+/* close (top right) */
+.dw-celebrate-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 5;
+  transition: background var(--dur-fast) var(--ease-out);
+}
+.dw-celebrate-close:hover { background: rgba(255, 255, 255, 0.36); }
+
+/* ============================================================
+   AMBIENT DECORATIONS — confetti / bubbles / sparkles
+   Theme picks one set; positions are fixed but absolute.
+   ============================================================ */
+.dw-celebrate-decor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* bubbles (water theme) */
+.dw-bubble {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+  animation: dw-bubble-rise 4s var(--ease-out) infinite;
+}
+@keyframes dw-bubble-rise {
+  0%   { transform: translateY(20px) scale(0.85); opacity: 0; }
+  20%  { opacity: 1; }
+  100% { transform: translateY(-90px) scale(1.05); opacity: 0; }
+}
+
+/* confetti (party theme) */
+.dw-confetti {
+  position: absolute;
+  width: 8px;
+  height: 12px;
+  border-radius: 2px;
+  animation: dw-confetti-fall 2.6s var(--ease-out) infinite;
+  opacity: 0.9;
+}
+@keyframes dw-confetti-fall {
+  0%   { transform: translateY(-30px) rotate(0deg); opacity: 0; }
+  15%  { opacity: 1; }
+  100% { transform: translateY(180px) rotate(360deg); opacity: 0; }
+}
+
+/* sparkles (star theme) */
+.dw-spark {
+  position: absolute;
+  width: 14px; height: 14px;
+  animation: dw-spark-twinkle 2.2s var(--ease-out) infinite;
+}
+@keyframes dw-spark-twinkle {
+  0%, 100% { transform: scale(0.6); opacity: 0.3; }
+  50%      { transform: scale(1.1); opacity: 1; }
+}
+
+/* drips (rain theme) */
+.dw-drip {
+  position: absolute;
+  width: 4px;
+  height: 14px;
+  border-radius: 0 0 50% 50% / 0 0 100% 100%;
+  background: rgba(255, 255, 255, 0.55);
+  animation: dw-drip-fall 1.8s linear infinite;
+}
+@keyframes dw-drip-fall {
+  0%   { transform: translateY(-30px); opacity: 0; }
+  20%  { opacity: 1; }
+  100% { transform: translateY(160px); opacity: 0; }
+}
+
+/* moon-glow ring (chill theme) */
+.dw-glow-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  animation: dw-glow-pulse 3.2s var(--ease-out) infinite;
+}
+@keyframes dw-glow-pulse {
+  0%, 100% { transform: scale(0.95); opacity: 0.5; }
+  50%      { transform: scale(1.08); opacity: 1; }
+}
+
+/* sun rays (sunrise theme) */
+.dw-ray {
+  position: absolute;
+  background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0));
+  width: 2px;
+  transform-origin: bottom center;
+  animation: dw-ray-shimmer 3s ease-in-out infinite;
+}
+@keyframes dw-ray-shimmer {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 0.9; }
+}
+
+/* ============================================================
+   THEMES — each replaces hero background + accents
+   T1 OCEAN (water)         deep blue gradient + bubbles
+   T2 CARNIVAL (magenta)    magenta gradient + confetti
+   T3 STARLIGHT (deep)      deep navy + sparkles
+   T4 RAIN (mid-water)      mid blue + drips
+   T5 SUNSET (warm-cool)    teal-to-magenta + rays
+   T6 MOONLIT (teal-dark)   teal dark + glow rings
+   ============================================================ */
+
+/* T1 OCEAN */
+.theme-ocean .dw-celebrate-hero {
+  background: var(--grad-water-hero);
+}
+
+/* T2 CARNIVAL */
+.theme-carnival .dw-celebrate-hero {
+  background: var(--grad-magenta);
+}
+
+/* T3 STARLIGHT */
+.theme-starlight .dw-celebrate-hero {
+  background:
+    radial-gradient(ellipse at 30% 20%, #1C8EBF 0%, transparent 60%),
+    linear-gradient(180deg, #0E2235 0%, #0B1C2C 100%);
+}
+
+/* T4 RAIN */
+.theme-rain .dw-celebrate-hero {
+  background: linear-gradient(180deg, #2BA89A 0%, #1C8EBF 60%, #0E5A82 100%);
+}
+
+/* T5 SUNSET */
+.theme-sunset .dw-celebrate-hero {
+  background: linear-gradient(160deg, #4FB3DD 0%, #1C8EBF 35%, #A22C83 100%);
+}
+
+/* T6 MOONLIT */
+.theme-moonlit .dw-celebrate-hero {
+  background:
+    radial-gradient(ellipse at 80% 15%, rgba(255,255,255,0.18) 0%, transparent 50%),
+    linear-gradient(180deg, #008577 0%, #00574B 100%);
+}
+
+/* ============================================================
+   THEME SWITCHER STRIP (lets reviewer cycle days at a glance)
+   ============================================================ */
+.dw-day-switch {
+  position: absolute;
+  bottom: -56px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  background: rgba(14, 26, 32, 0.7);
+  border-radius: var(--r-pill);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.dw-day-switch button {
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.75);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-family: var(--font-rounded);
+  font-weight: 800;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-out);
+}
+.dw-day-switch button.is-active {
+  background: var(--brand-magenta);
+  color: #fff;
+  box-shadow: var(--shadow-magenta);
+}
