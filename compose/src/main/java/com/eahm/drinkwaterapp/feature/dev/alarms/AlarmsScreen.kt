@@ -22,8 +22,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -43,10 +41,7 @@ import androidx.core.content.ContextCompat
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmTime
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwTertiaryButton
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk200
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwPaper
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 import com.eahm.drinkwaterapp.feature.dev.alarms.countdown.AlarmCountdown
 import com.eahm.drinkwaterapp.feature.dev.alarms.countdown.CountdownConfig
@@ -134,35 +129,6 @@ private fun DataContent(state: AlarmsState.Data, onAction: (AlarmsAction) -> Uni
                         onOpenSettings = { onAction(AlarmsAction.OpenAppPermissionSettings) },
                     )
                 }
-            }
-        }
-
-        state.appNotificationEnabled.let {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(7.dp),
-            ) {
-                Text(
-                    text = "Is notification enabled in the app: $it",
-                    color = if (it) MaterialTheme.colorScheme.onBackground
-                    else MaterialTheme.colorScheme.error,
-                    fontWeight = if (it) FontWeight.Normal
-                    else FontWeight.Bold,
-                )
-
-                Switch(
-                    checked = it,
-                    onCheckedChange = { state ->
-                        onAction(AlarmsAction.AppNotificationStateChanged(state))
-                    },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = DwPaper,
-                        checkedTrackColor = DwMagenta,
-                        uncheckedThumbColor = DwPaper,
-                        uncheckedTrackColor = DwInk200,
-                        uncheckedBorderColor = DwInk200,
-                    ),
-                )
             }
         }
 
@@ -342,7 +308,6 @@ private fun ActiveAlarmPreview() {
         state = AlarmsState.Data(
             canScheduleExactAlarms = false,
             hasNotificationPermissions = true,
-            appNotificationEnabled = false,
             isAlarmActive = true,
             alarmStorageInfo = AlarmStorageInfo(
                 alarmId = 127,
@@ -365,7 +330,6 @@ private fun NoActiveAlarmPreview() {
         state = AlarmsState.Data(
             canScheduleExactAlarms = false,
             hasNotificationPermissions = false,
-            appNotificationEnabled = false,
             isAlarmActive = false,
             alarmStorageInfo = null,
             inActiveHours = false,

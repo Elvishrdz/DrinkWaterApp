@@ -52,13 +52,12 @@ internal class SettingsViewModel(
         prefsStorage.getUsername(),
         prefsStorage.getGoalAmount(),
         activeTimes,
-        prefsStorage.getNotificationEnabled(),
         _state,
-    ) { username, goal, activeTimes, appNotificationEnabled, state ->
+    ) { username, goal, activeTimes, state ->
         state.copy(
             username = username,
             dailyGoalMl = goal.toInt(),
-            notificationsEnabled = appNotificationEnabled,
+            notificationsEnabled = false,
             startTime = activeTimes?.start,
             endTime = activeTimes?.end,
         )
@@ -70,7 +69,6 @@ internal class SettingsViewModel(
 
     fun onNotificationsToggled(enabled: Boolean) {
         viewModelScope.launch {
-            prefsStorage.setNotificationEnabled(enabled)
             _state.update { it.copy(notificationsEnabled = enabled) }
         }
     }

@@ -17,7 +17,6 @@ import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.database.entity.Status
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import org.koin.core.context.GlobalContext
 
@@ -51,10 +50,7 @@ class AlarmReceiver : BroadcastReceiver() {
             ALARM_ACTION -> {
                 drinkAlarmManager.onAlarmReceived(AlarmSource.DrinkAlarmReceived)
 
-                prefsStorage.getNotificationEnabled().firstOrNull()
-                    ?.takeIf { it }
-                    ?.let { NotificationService.showDrinkNotification(context) }
-
+                NotificationService.showDrinkNotification(context)
             }
 
             Drink.action -> {

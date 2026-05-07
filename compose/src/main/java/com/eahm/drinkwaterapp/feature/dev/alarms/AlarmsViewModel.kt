@@ -29,12 +29,10 @@ internal class AlarmsViewModel(
     val state = combine(
         drinkAlarmManager.state,
         activeHoursObserver.inActiveHours,
-        prefsStorage.getNotificationEnabled(),
-    ) { drinkAlarmState, inActiveHours, appNotificationEnabled ->
+    ) { drinkAlarmState, inActiveHours ->
         AlarmsState.Data(
             canScheduleExactAlarms = drinkAlarmState.canScheduleExactAlarms,
             hasNotificationPermissions = drinkAlarmState.hasNotificationPermissions,
-            appNotificationEnabled = appNotificationEnabled,
             isAlarmActive = drinkAlarmState.isAlarmActive,
             alarmStorageInfo = drinkAlarmState.alarmStorageInfo,
             inActiveHours = inActiveHours,
@@ -54,7 +52,6 @@ internal class AlarmsViewModel(
             AlarmsAction.OpenAppPermissionSettings -> openAppPermissionSettings()
             AlarmsAction.SetupAlarm -> setupAlarm()
             AlarmsAction.StopAlarm -> onStopAlarm()
-            is AlarmsAction.AppNotificationStateChanged -> notificationStateChanged(action.enabled)
         }
     }
 
@@ -69,7 +66,4 @@ internal class AlarmsViewModel(
     private fun openAppPermissionSettings() = application.openSystemAppSettings()
     private fun onStopAlarm() = drinkAlarmManager.stopAlarm()
     private fun setupAlarm() = drinkAlarmManager.setupTestAlarm(AlarmSource.AlarmsDevMenu)
-    private fun notificationStateChanged(enabled: Boolean) {
-        viewModelScope.launch { prefsStorage.setNotificationEnabled(enabled) }
-    }
 }

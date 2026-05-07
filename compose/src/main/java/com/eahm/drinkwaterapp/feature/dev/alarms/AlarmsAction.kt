@@ -7,5 +7,4 @@ internal sealed interface AlarmsAction {
     data object OpenAppPermissionSettings : AlarmsAction
     data object SetupAlarm : AlarmsAction
     data object StopAlarm : AlarmsAction
-    data class AppNotificationStateChanged(val enabled: Boolean) : AlarmsAction
 }
