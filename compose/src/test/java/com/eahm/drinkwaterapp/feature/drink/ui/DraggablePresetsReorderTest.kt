@@ -1,6 +1,6 @@
 package com.eahm.drinkwaterapp.feature.drink.ui
 
-import com.eahm.drinkwaterapp.core.data.datastore.DrinkPreset
+import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -14,9 +14,9 @@ import org.junit.Test
  */
 class DraggablePresetsReorderTest {
 
-    private val presetA = DrinkPreset(order = 1, amountMl = 100f)
-    private val presetB = DrinkPreset(order = 2, amountMl = 200f)
-    private val presetC = DrinkPreset(order = 3, amountMl = 300f)
+    private val presetA = DrinkSuggestion(order = 1, amountMl = 100f)
+    private val presetB = DrinkSuggestion(order = 2, amountMl = 200f)
+    private val presetC = DrinkSuggestion(order = 3, amountMl = 300f)
 
     // Use fixed dimensions so threshold is predictable.
     private val itemWidth = 100f

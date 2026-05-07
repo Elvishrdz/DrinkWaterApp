@@ -48,7 +48,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.eahm.drinkwaterapp.core.data.datastore.DrinkPreset
+import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStats
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -72,10 +72,10 @@ import kotlin.random.Random
 internal fun DrinkScreen(
     state: DrinkState.Data,
     onDrink: (Float) -> Unit,
-    onReorderPresets: (List<DrinkPreset>, Boolean) -> Unit,
+    onReorderPresets: (List<DrinkSuggestion>, Boolean) -> Unit,
     onCreatePreset: (Float) -> Unit,
-    onDeletePreset: (DrinkPreset) -> Unit,
-    onRestorePreset: (DrinkPreset) -> Unit,
+    onDeletePreset: (DrinkSuggestion) -> Unit,
+    onRestorePreset: (DrinkSuggestion) -> Unit,
     onNavigateToHistory: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -122,8 +122,8 @@ internal fun DrinkScreen(
             Spacer(modifier = Modifier.height(20.dp))
 
             QuickAddRow(
-                quickPresets = state.quickDrinkPresets,
-                allPresets = state.allDrinkPresets,
+                quickPresets = state.quickDrinkSuggestions,
+                allPresets = state.allDrinkSuggestions,
                 onDrink = onDrink,
                 onCreatePreset = onCreatePreset,
                 onReorder = onReorderPresets,
@@ -404,10 +404,10 @@ private fun DrinkScreenGoalReachedPreview() {
     }
 }
 
-internal val drinkPresetsMock = listOf(
-    DrinkPreset(1, 100f),
-    DrinkPreset(2, 200f),
-    DrinkPreset(3, 300f),
+internal val drinkSuggestionsMocks = listOf(
+    DrinkSuggestion(1, 100f),
+    DrinkSuggestion(2, 200f),
+    DrinkSuggestion(3, 300f),
 )
 
 private val stateMock = DrinkState.Data(
@@ -418,8 +418,8 @@ private val stateMock = DrinkState.Data(
         drinkAmount = 1500f,
         goalReached = false,
     ),
-    quickDrinkPresets = drinkPresetsMock.take(3),
-    allDrinkPresets = drinkPresetsMock,
+    quickDrinkSuggestions = drinkSuggestionsMocks.take(3),
+    allDrinkSuggestions = drinkSuggestionsMocks,
     todayLogs = previewLogEntries.take(4),
     alarmTriggerAtMs = null,
 )

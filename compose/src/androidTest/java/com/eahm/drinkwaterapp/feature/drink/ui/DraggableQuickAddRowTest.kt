@@ -7,7 +7,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTouchInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.eahm.drinkwaterapp.core.data.datastore.DrinkPreset
+import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -34,13 +34,13 @@ class DraggableQuickAddRowTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private val presetA = DrinkPreset(order = 1, amountMl = 100f)
-    private val presetB = DrinkPreset(order = 2, amountMl = 200f)
-    private val presetC = DrinkPreset(order = 3, amountMl = 300f)
+    private val presetA = DrinkSuggestion(order = 1, amountMl = 100f)
+    private val presetB = DrinkSuggestion(order = 2, amountMl = 200f)
+    private val presetC = DrinkSuggestion(order = 3, amountMl = 300f)
 
     @Test
     fun movingOneItemRightCallsOnReorderWithUpdatedList() {
-        var capturedOrder: List<DrinkPreset>? = null
+        var capturedOrder: List<DrinkSuggestion>? = null
 
         composeTestRule.setContent {
             DrinkWaterAppTheme {
@@ -73,7 +73,7 @@ class DraggableQuickAddRowTest {
     fun movingItemBackRestoresOriginalOrder() {
         // Start with A already at index 1 — simulating a prior reorder.
         val startingOrder = listOf(presetB, presetA, presetC)
-        var capturedOrder: List<DrinkPreset>? = null
+        var capturedOrder: List<DrinkSuggestion>? = null
 
         composeTestRule.setContent {
             DrinkWaterAppTheme {
@@ -104,7 +104,7 @@ class DraggableQuickAddRowTest {
 
     @Test
     fun movingTwoItemsToDifferentPositionsProducesCorrectFinalOrder() {
-        val reorderEvents = mutableListOf<List<DrinkPreset>>()
+        val reorderEvents = mutableListOf<List<DrinkSuggestion>>()
 
         composeTestRule.setContent {
             DrinkWaterAppTheme {
@@ -152,7 +152,7 @@ class DraggableQuickAddRowTest {
 
     @Test
     fun movingItemToEndAndBackRestoresOriginalOrder() {
-        var capturedOrder: List<DrinkPreset>? = null
+        var capturedOrder: List<DrinkSuggestion>? = null
 
         composeTestRule.setContent {
             DrinkWaterAppTheme {

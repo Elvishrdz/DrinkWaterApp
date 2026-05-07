@@ -6,9 +6,10 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
+import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
@@ -18,62 +19,24 @@ val prefsStorageModule = module {
     singleOf(::DataStorePrefsStorage) bind PrefsStorage::class
 }
 
-interface PrefsStorage {
-
-    fun getFirstSetupDone(): Flow<Boolean>
-    suspend fun setFirstSetupDone(value: Boolean)
-
-    fun getGoalAmount(): Flow<Float>
-    suspend fun setGoalAmount(amount: Float)
-
-    fun getUsername(): Flow<String?>
-    suspend fun setUsername(name: String)
-
-    fun getDrinkPresets(): Flow<Set<DrinkPreset>>
-    suspend fun setDrinkPresets(presets: Set<DrinkPreset>)
-
-    fun getStartTime(): Flow<ActiveTime>
-    suspend fun setStartTime(time: ActiveTime)
-
-    fun getEndTime(): Flow<ActiveTime>
-    suspend fun setEndTime(time: ActiveTime)
-
-    fun getAmountPerDrink(): Flow<Float>
-    suspend fun setAmountPerDrink(milliliters: Float)
-
-    suspend fun clear()
-}
-
-@Serializable
-data class ActiveTime(
-    val hour: Int,
-    val minute: Int,
-)
-
-@Serializable
-data class DrinkPreset(
-    val order: Int,
-    val amountMl: Float,
-)
-
 private class DataStorePrefsStorage(
     private val dataStore: DataStore<Preferences>,
 ) : PrefsStorage {
 
-    private val drinkDefaultPresets = setOf(
-        DrinkPreset(1, 50f),
-        DrinkPreset(2, 100f),
-        DrinkPreset(3, 200f),
+    private val initialDrinkSuggestions = setOf(
+        DrinkSuggestion(1, 50f),
+        DrinkSuggestion(2, 100f),
+        DrinkSuggestion(3, 200f),
 
-        DrinkPreset(4, 10f),
-        DrinkPreset(5, 150f),
-        DrinkPreset(6, 250f),
+        DrinkSuggestion(4, 10f),
+        DrinkSuggestion(5, 150f),
+        DrinkSuggestion(6, 250f),
     )
 
     private val firstSetupKey = booleanPreferencesKey("FIRST_SETUP")
     private val goalAmountKey = floatPreferencesKey("GOAL_AMOUNT")
     private val usernameKey = stringPreferencesKey("USERNAME")
-    private val drinkPresetsKey = stringPreferencesKey("DRINKS_PRESETS")
+    private val drinkSuggestionsKey = stringPreferencesKey("DRINKS_SUGGESTIONS")
     private val startTimeKey = stringPreferencesKey("START_TIME")
     private val endTimeKey = stringPreferencesKey("END_TIME")
     private val amountPerDrinkKey = floatPreferencesKey("AMOUNT_PER_DRINK")
@@ -127,22 +90,22 @@ private class DataStorePrefsStorage(
         }
     }
 
-    override fun getDrinkPresets(): Flow<Set<DrinkPreset>> {
+    override fun getDrinkSuggestions(): Flow<Set<DrinkSuggestion>> {
         return dataStore.data.map { preferences ->
-            val jsonString = preferences[drinkPresetsKey]
+            val jsonString = preferences[drinkSuggestionsKey]
             jsonString?.let {
-                runCatching { json.decodeFromString<Set<DrinkPreset>>(it) }
+                runCatching { json.decodeFromString<Set<DrinkSuggestion>>(it) }
                     .getOrNull()
-            } ?: drinkDefaultPresets
+            } ?: initialDrinkSuggestions
         }
     }
 
-    override suspend fun setDrinkPresets(presets: Set<DrinkPreset>) {
+    override suspend fun setDrinkSuggestions(suggestions: Set<DrinkSuggestion>) {
         dataStore.updateData { preferences ->
             preferences.toMutablePreferences()
                 .also {
-                    val jsonString = Json.encodeToString(presets)
-                    it[drinkPresetsKey] = jsonString
+                    val jsonString = Json.encodeToString(suggestions)
+                    it[drinkSuggestionsKey] = jsonString
                 }
         }
     }
@@ -207,7 +170,7 @@ private class DataStorePrefsStorage(
             it.remove(firstSetupKey)
             it.remove(goalAmountKey)
             it.remove(usernameKey)
-            it.remove(drinkPresetsKey)
+            it.remove(drinkSuggestionsKey)
             it.remove(startTimeKey)
             it.remove(endTimeKey)
             it.remove(amountPerDrinkKey)

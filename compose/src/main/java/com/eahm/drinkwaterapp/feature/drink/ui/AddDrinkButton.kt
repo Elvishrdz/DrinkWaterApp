@@ -49,7 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.eahm.drinkwaterapp.core.data.datastore.DrinkPreset
+import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwSecondaryButton
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
@@ -57,7 +57,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk300
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
-import com.eahm.drinkwaterapp.feature.drink.drinkPresetsMock
+import com.eahm.drinkwaterapp.feature.drink.drinkSuggestionsMocks
 import com.eahm.drinkwaterapp.ui.bottomsheet.AppBottomSheet
 import com.eahm.drinkwaterapp.ui.inputfield.AppInputField
 import com.eahm.drinkwaterapp.ui.inputfield.toDigitString
@@ -66,12 +66,12 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun AddDrinkButton(
-    presets: List<DrinkPreset>,
+    presets: List<DrinkSuggestion>,
     onDrink: (Float) -> Unit,
     onCreatePreset: (Float) -> Unit,
-    onReorder: (List<DrinkPreset>, Boolean) -> Unit,
-    onDelete: (DrinkPreset) -> Unit,
-    onRestorePreset: (DrinkPreset) -> Unit,
+    onReorder: (List<DrinkSuggestion>, Boolean) -> Unit,
+    onDelete: (DrinkSuggestion) -> Unit,
+    onRestorePreset: (DrinkSuggestion) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var showBottomSheet by rememberSaveable { mutableStateOf(false) }
@@ -346,7 +346,7 @@ private fun DeleteZone(isHovered: Boolean) {
 @Composable
 private fun AddDrinkButtonPreview() {
     AddDrinkButton(
-        presets = drinkPresetsMock,
+        presets = drinkSuggestionsMocks,
         onDrink = {},
         onCreatePreset = {},
         onReorder = { _, _ -> },

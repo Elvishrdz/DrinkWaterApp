@@ -1,6 +1,6 @@
 package com.eahm.drinkwaterapp.core.domain.extension
 
-import com.eahm.drinkwaterapp.core.data.datastore.ActiveTime
+import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime

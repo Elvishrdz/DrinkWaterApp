@@ -6,7 +6,7 @@ import android.provider.Settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.core.data.confetti.ConfettiController
-import com.eahm.drinkwaterapp.core.data.datastore.DrinkPreset
+import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
@@ -118,7 +118,7 @@ internal class DrinkViewModel(
 
     private val extras = combine(
         prefsStorage.getUsername(),
-        prefsStorage.getDrinkPresets(),
+        prefsStorage.getDrinkSuggestions(),
     ) { username, drinkPresets ->
         val allDrinkPresets = drinkPresets
             .sortedBy { it.order }
@@ -126,8 +126,8 @@ internal class DrinkViewModel(
 
         DrinkExtras(
             username = username,
-            quickDrinkPresets = allDrinkPresets.take(QUICK_DRINK_PRESETS_AMOUNT),
-            allDrinkPresets = allDrinkPresets,
+            quickDrinkSuggestions = allDrinkPresets.take(QUICK_DRINK_PRESETS_AMOUNT),
+            allDrinkSuggestions = allDrinkPresets,
         )
 
     }.stateIn(
@@ -148,8 +148,8 @@ internal class DrinkViewModel(
             DrinkState.Data(
                 username = extras.username,
                 currentStreak = 0,
-                quickDrinkPresets = extras.quickDrinkPresets,
-                allDrinkPresets = extras.allDrinkPresets,
+                quickDrinkSuggestions = extras.quickDrinkSuggestions,
+                allDrinkSuggestions = extras.allDrinkSuggestions,
                 todayLogs = history.todayLogs,
                 drinkStats = drinkStats,
                 alarmTriggerAtMs = alarmState.alarmStorageInfo?.alarmTriggerAtMillis,
@@ -179,11 +179,11 @@ internal class DrinkViewModel(
 
     fun onCreatePreset(amount: Float) {
         viewModelScope.launch {
-            prefsStorage.getDrinkPresets().firstOrNull()?.let { currentPresets ->
+            prefsStorage.getDrinkSuggestions().firstOrNull()?.let { currentPresets ->
                 val isUnique = !currentPresets.any { it.amountMl.equals(amount) }
 
                 if (isUnique) {
-                    val new = DrinkPreset(
+                    val new = DrinkSuggestion(
                         order = currentPresets.size.plus(1),
                         amountMl = amount,
                     )
@@ -194,42 +194,42 @@ internal class DrinkViewModel(
                         .sortedBy { it.order }
                         .toSet()
 
-                    prefsStorage.setDrinkPresets(updated)
+                    prefsStorage.setDrinkSuggestions(updated)
                 }
             }
         }
     }
 
-    fun onDeletePreset(preset: DrinkPreset) {
+    fun onDeletePreset(preset: DrinkSuggestion) {
         viewModelScope.launch {
-            prefsStorage.getDrinkPresets().firstOrNull()?.let { currentPresets ->
+            prefsStorage.getDrinkSuggestions().firstOrNull()?.let { currentPresets ->
                 val updated = currentPresets
                     .filter { it.amountMl != preset.amountMl }
                     .toSet()
-                prefsStorage.setDrinkPresets(updated)
+                prefsStorage.setDrinkSuggestions(updated)
             }
         }
     }
 
-    fun onRestorePreset(preset: DrinkPreset) {
+    fun onRestorePreset(preset: DrinkSuggestion) {
         viewModelScope.launch {
-            prefsStorage.getDrinkPresets().firstOrNull()?.let { currentPresets ->
+            prefsStorage.getDrinkSuggestions().firstOrNull()?.let { currentPresets ->
                 if (currentPresets.none { it.amountMl == preset.amountMl }) {
                     val updated = currentPresets.toMutableSet().apply { add(preset) }
-                    prefsStorage.setDrinkPresets(updated)
+                    prefsStorage.setDrinkSuggestions(updated)
                 }
             }
         }
     }
 
-    fun onPresetsReordered(newOrder: List<DrinkPreset>, reorderingQuickPresets: Boolean) {
+    fun onPresetsReordered(newOrder: List<DrinkSuggestion>, reorderingQuickPresets: Boolean) {
         viewModelScope.launch {
             val reordered = newOrder.mapIndexed { index, preset ->
                 preset.copy(order = index + 1)
             }.toMutableSet()
 
             if (reorderingQuickPresets) {
-                val currentPresets = prefsStorage.getDrinkPresets().firstOrNull()
+                val currentPresets = prefsStorage.getDrinkSuggestions().firstOrNull()
                     ?.toMutableSet()
 
                 val remainingPresets = currentPresets
@@ -240,7 +240,7 @@ internal class DrinkViewModel(
                 }
             }
 
-            prefsStorage.setDrinkPresets(reordered)
+            prefsStorage.setDrinkSuggestions(reordered)
         }
     }
 

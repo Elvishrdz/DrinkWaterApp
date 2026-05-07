@@ -32,7 +32,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.eahm.drinkwaterapp.core.data.datastore.DrinkPreset
+import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
 
 private const val DRAG_SCALE = 1.3f
 private const val DRAG_ELEVATION = 0f // FIXME: elevation cutout
@@ -43,7 +43,7 @@ private val horizontalSpacing = 8.dp
 private val gridSpacing = 7.dp
 
 internal data class SwapResult(
-    val presets: List<DrinkPreset>,
+    val presets: List<DrinkSuggestion>,
     val newIndex: Int,
     val newOffsetX: Float,
 )
@@ -53,7 +53,7 @@ internal data class SwapResult(
  * threshold-based swap, or null if no swap threshold was crossed.
  */
 internal fun applyHorizontalSwap(
-    list: List<DrinkPreset>,
+    list: List<DrinkSuggestion>,
     dragIndex: Int,
     dragOffsetX: Float,
     itemWidth: Float,
@@ -79,14 +79,14 @@ internal fun applyHorizontalSwap(
 
 @Composable
 fun DraggableQuickAddRow(
-    presets: List<DrinkPreset>,
+    presets: List<DrinkSuggestion>,
     onDrink: (Float) -> Unit,
-    onReorder: (List<DrinkPreset>, Boolean) -> Unit,
+    onReorder: (List<DrinkSuggestion>, Boolean) -> Unit,
     modifier: Modifier = Modifier,
     trailingContent: @Composable (Modifier) -> Unit = {},
 ) {
     var currentPresets by remember { mutableStateOf(presets) }
-    var previousPresets by remember { mutableStateOf(emptyList<DrinkPreset>()) }
+    var previousPresets by remember { mutableStateOf(emptyList<DrinkSuggestion>()) }
 
     var draggedItemIndex by remember { mutableStateOf<Int?>(null) }
     val isDraggingItem by remember { derivedStateOf { draggedItemIndex != null } }
@@ -238,17 +238,17 @@ fun DraggableQuickAddRow(
 
 @Composable
 fun DraggablePresetGrid(
-    presets: List<DrinkPreset>,
+    presets: List<DrinkSuggestion>,
     onDrink: (Float) -> Unit,
-    onReorder: (List<DrinkPreset>) -> Unit,
-    onDelete: (DrinkPreset) -> Unit = {},
+    onReorder: (List<DrinkSuggestion>) -> Unit,
+    onDelete: (DrinkSuggestion) -> Unit = {},
     onDraggingChanged: (Boolean) -> Unit = {},
     onDeleteHover: (Boolean) -> Unit = {},
     columns: Int = GRID_COLUMNS,
     modifier: Modifier = Modifier,
 ) {
     var currentPresets by remember { mutableStateOf(presets) }
-    var previousPresets by remember { mutableStateOf(emptyList<DrinkPreset>()) }
+    var previousPresets by remember { mutableStateOf(emptyList<DrinkSuggestion>()) }
 
     // Hold the state object explicitly so NestedScrollConnection can read the
     // current value without capturing a stale reference.

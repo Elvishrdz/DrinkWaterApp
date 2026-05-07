@@ -29,7 +29,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.eahm.drinkwaterapp.core.data.datastore.DrinkPreset
+import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
 import com.eahm.drinkwaterapp.core.designsystem.component.extension.outlineBorderStyle
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -37,19 +37,19 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk900
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
-import com.eahm.drinkwaterapp.feature.drink.drinkPresetsMock
+import com.eahm.drinkwaterapp.feature.drink.drinkSuggestionsMocks
 import com.eahm.drinkwaterapp.ui.inputfield.toDigitString
 import kotlinx.coroutines.launch
 
 @Composable
 fun QuickAddRow(
-    quickPresets: List<DrinkPreset>,
-    allPresets: List<DrinkPreset>,
+    quickPresets: List<DrinkSuggestion>,
+    allPresets: List<DrinkSuggestion>,
     onDrink: (Float) -> Unit,
     onCreatePreset: (Float) -> Unit,
-    onReorder: (List<DrinkPreset>, Boolean) -> Unit,
-    onDelete: (DrinkPreset) -> Unit,
-    onRestorePreset: (DrinkPreset) -> Unit,
+    onReorder: (List<DrinkSuggestion>, Boolean) -> Unit,
+    onDelete: (DrinkSuggestion) -> Unit,
+    onRestorePreset: (DrinkSuggestion) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     DraggableQuickAddRow(
@@ -160,8 +160,8 @@ fun WaterChip(
 private fun QuickAddRowPreview() {
     DrinkWaterAppTheme {
         QuickAddRow(
-            quickPresets = drinkPresetsMock.take(3),
-            allPresets = drinkPresetsMock,
+            quickPresets = drinkSuggestionsMocks.take(3),
+            allPresets = drinkSuggestionsMocks,
             onDrink = {},
             onCreatePreset = {},
             onReorder = { _, _ -> },
