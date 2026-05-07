@@ -111,6 +111,10 @@ class DrinkAlarmManager(
         update()
     }
 
+    suspend fun determineAction(source: AlarmSource) {
+        askWhatToDo(source.toString())
+    }
+
     @OptIn(ExperimentalTime::class)
     suspend fun onAlarmReceived(source: AlarmSource) {
         // always schedule next alarm when previous is received

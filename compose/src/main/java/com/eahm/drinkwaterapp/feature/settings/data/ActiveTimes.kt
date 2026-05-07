@@ -1,0 +1,8 @@
+package com.eahm.drinkwaterapp.feature.settings.data
+
+import com.eahm.drinkwaterapp.core.data.datastore.ActiveTime
+
+data class ActiveTimes(
+    val start: ActiveTime,
+    val end: ActiveTime,
+)

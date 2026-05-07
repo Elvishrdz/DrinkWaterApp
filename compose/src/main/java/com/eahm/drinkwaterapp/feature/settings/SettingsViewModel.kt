@@ -6,6 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.core.data.datastore.ActiveTime
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
+import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
+import com.eahm.drinkwaterapp.feature.settings.data.ActiveTimes
 import com.eahm.drinkwaterapp.ui.inputfield.validateText
 import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,14 +18,10 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-data class ActiveTimes(
-    val start: ActiveTime,
-    val end: ActiveTime,
-)
-
 internal class SettingsViewModel(
     val application: Application,
     val prefsStorage: PrefsStorage,
+    val drinkAlarmManager: DrinkAlarmManager,
 ) : ViewModel() {
 
     private val activeTimes = combine(
@@ -105,6 +104,7 @@ internal class SettingsViewModel(
 
             _state.update { it.copy(timeRangeError = null) }
             prefsStorage.setStartTime(newStart)
+            drinkAlarmManager.determineAction(AlarmSource.NotificationActiveHoursStartTimeChanged)
         }
     }
 
@@ -121,6 +121,7 @@ internal class SettingsViewModel(
 
             _state.update { it.copy(timeRangeError = null) }
             prefsStorage.setEndTime(newEnd)
+            drinkAlarmManager.determineAction(AlarmSource.NotificationActiveHoursStartTimeChanged)
         }
     }
 

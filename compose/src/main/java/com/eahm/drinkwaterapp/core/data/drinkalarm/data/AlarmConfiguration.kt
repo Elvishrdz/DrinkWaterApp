@@ -11,6 +11,8 @@ enum class AlarmSource {
     NotificationDrinkButton,
     NotificationSkipButton,
     NotificationRemoved,
+    NotificationActiveHoursStartTimeChanged,
+    NotificationActiveHoursEndTimeChanged,
     DrinkButtonDevMenu,
     AlarmsDevMenu,
 }
