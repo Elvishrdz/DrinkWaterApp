@@ -1,6 +1,9 @@
 package com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo
 
+import com.eahm.drinkwaterapp.core.data.drinkalarm.DayTime
+import com.eahm.drinkwaterapp.core.data.drinkalarm.calculator.calculateNextAlarmSlot
 import com.eahm.drinkwaterapp.core.data.drinkalarm.simulator.simulateNextIntervalCalculation
+import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import kotlinx.datetime.LocalDateTime
 
 /**
@@ -30,12 +33,21 @@ internal fun decideWhatToDoNow(
         return WhatToDoNow.InvalidActiveHours
     }
 
+    fun invokeNextAlarmTime() = getNextAlarmSlot(
+        currentDeviceDateTime = now,
+        startTime = startTime,
+        endTime = endTime,
+        // TODO: we need goal and raw interval. Check DrinkAlarmManager setupAlarm()
+        goalMl = 1f,
+        rawInterval = AlarmInterval(0, 0),
+    )
+
     val isInActiveTime = now in startTime..endTime
 
     val inActiveHoursDecider: () -> WhatToDoNow = {
         if (hasActiveAlarm) {
             val hasCachedAlarm = alarmAlarmTriggersAt != null
-            val nextAlarmTime = simulateNextIntervalCalculation(now, startTime, endTime)
+            val nextAlarmTime = invokeNextAlarmTime()
 
             if (hasCachedAlarm) {
                 // with a cached alarm:
@@ -75,7 +87,7 @@ internal fun decideWhatToDoNow(
         } else {
             // no alarm scheduled in the system
             val hasCachedAlarm = alarmAlarmTriggersAt != null
-            val nextAlarmTime = simulateNextIntervalCalculation(now, startTime, endTime)
+            val nextAlarmTime = invokeNextAlarmTime()
 
             if (hasCachedAlarm) {
                 // no alarm but there is a cached value: restore
@@ -107,7 +119,7 @@ internal fun decideWhatToDoNow(
     val inUnactiveHoursDecider: () -> WhatToDoNow = {
         if (hasActiveAlarm) {
             val hasCachedAlarm = alarmAlarmTriggersAt != null
-            val nextAlarmTime = simulateNextIntervalCalculation(now, startTime, endTime)
+            val nextAlarmTime = invokeNextAlarmTime()
 
             if (hasCachedAlarm) {
                 // outside active hours, and we have a cache alarm value
@@ -148,7 +160,7 @@ internal fun decideWhatToDoNow(
         } else {
             // no alarm scheduled in the system, and outside active hours
             val hasCachedAlarm = alarmAlarmTriggersAt != null
-            val nextAlarmTime = simulateNextIntervalCalculation(now, startTime, endTime)
+            val nextAlarmTime = invokeNextAlarmTime()
 
             if (hasCachedAlarm) {
                 // no alarm but there is a cached value: restore
@@ -204,3 +216,37 @@ internal fun decideWhatToDoNow(
 // 2. si no esta la alarma y el tiempo no ha pasado: programar alarma para inicio de proxima hora activa.
 // 3. si ya esta la alarma y el tiempo NO esta en el intervalo requerido: programar alarma para inicio de proxima hora activa.
 // 4. si ya esta la alarma y el tiempo esta en el intervalo requerido: no hacer nada
+
+
+fun getNextAlarmSlot(
+    currentDeviceDateTime: LocalDateTime,
+    startTime: LocalDateTime,
+    endTime: LocalDateTime,
+    goalMl: Float,
+    rawInterval: AlarmInterval,
+    testMode: Boolean = false,
+): LocalDateTime {
+    return if (testMode) {
+        simulateNextIntervalCalculation(
+            now = currentDeviceDateTime,
+            startTime = startTime,
+            endTime = endTime,
+        )
+    } else {
+
+
+        val intervalMinutes = (rawInterval.hour * 60 + rawInterval.minute).coerceAtLeast(1)
+
+
+        val startDayTime = DayTime(startTime.hour, startTime.minute)
+        val endDayTime = DayTime(endTime.hour, endTime.minute)
+
+        calculateNextAlarmSlot(
+            now = currentDeviceDateTime,
+            startTime = startDayTime,
+            endTime = endDayTime,
+            goalMl = goalMl,
+            intervalMinutes = intervalMinutes,
+        )
+    }
+}

@@ -34,6 +34,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 import com.eahm.drinkwaterapp.feature.stats.components.MiniStatsCards
 import com.eahm.drinkwaterapp.feature.stats.components.SummaryCard
 import com.eahm.drinkwaterapp.feature.stats.components.WeeklyBarChart
+import com.eahm.drinkwaterapp.ui.calendar.CalendarViewMode
 import com.eahm.drinkwaterapp.ui.calendar.DrinkCalendar
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -49,7 +50,13 @@ internal fun StatsScreen(
     StatsContent(
         state = state,
         calendarState = calendarState,
-        onPeriodSelected = viewModel::onPeriodSelected,
+        onPeriodSelected = { period ->
+            viewModel.onPeriodSelected(period)
+            // Keep calendar view mode in sync: year toggle → year calendar, else → month
+            calendarViewModel.setViewMode(
+                if (period == StatsPeriod.YEAR) CalendarViewMode.YEAR else CalendarViewMode.MONTH
+            )
+        },
         onChartPageChanged = viewModel::onChartPageChanged,
         onCalendarPrevious = calendarViewModel::navigatePrevious,
         onCalendarNext = calendarViewModel::navigateNext,
@@ -66,7 +73,7 @@ internal fun StatsContent(
     onChartPageChanged: (Int) -> Unit,
     onCalendarPrevious: () -> Unit,
     onCalendarNext: () -> Unit,
-    onCalendarViewModeToggle: (com.eahm.drinkwaterapp.ui.calendar.CalendarViewMode) -> Unit,
+    onCalendarViewModeToggle: (CalendarViewMode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val periodLabel = when (state.selectedPeriod) {

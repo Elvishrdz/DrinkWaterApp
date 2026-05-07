@@ -1,48 +1,102 @@
 package com.eahm.drinkwaterapp.feature.stats
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.eahm.drinkwaterapp.core.database.AppDatabase
+import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
+import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.Month
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
+import kotlinx.datetime.toLocalDateTime
+import kotlin.math.abs
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
-internal class StatsViewModel : ViewModel() {
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
+internal class StatsViewModel(
+    database: AppDatabase,
+) : ViewModel() {
 
-    private val _state = MutableStateFlow(buildInitialState())
-    val state: StateFlow<StatsState> = _state.asStateFlow()
+    private val historyDao = database.getHistoryDao()
+    private val goalDao = database.getDailyGoalDao()
+
+    private val today: LocalDate = Clock.System.now()
+        .toLocalDateTime(TimeZone.currentSystemDefault())
+        .date
+
+    private val _selectedPeriod = MutableStateFlow(StatsPeriod.WEEK)
+    private val _chartPage = MutableStateFlow(0)
+
+    private val todayGoalMl: StateFlow<Int> = goalDao
+        .getGoalForDate(today.toEpochDays())
+        .map { it?.goalMl?.toInt() ?: DEFAULT_GOAL_ML.toInt() }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, DEFAULT_GOAL_ML.toInt())
+
+    private val pages: StateFlow<List<PeriodPage>> = _selectedPeriod
+        .flatMapLatest { period -> loadPagesFlow(period) }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
+    val state: StateFlow<StatsState> = combine(
+        _selectedPeriod, _chartPage, pages, todayGoalMl,
+    ) { period, page, pages, dailyGoalMl ->
+        // For YEAR mode bars represent monthly totals, scale goal to match
+        val chartGoal = when (period) {
+            StatsPeriod.YEAR -> dailyGoalMl * 30
+            else -> dailyGoalMl
+        }
+        val safeIndex = page.coerceIn(0, (pages.size - 1).coerceAtLeast(0))
+        val summary = computeSummary(pages, safeIndex)
+        StatsState(
+            selectedPeriod = period,
+            chartPage = page,
+            pages = pages,
+            goalMl = chartGoal,
+            avgMl = summary.avgMl,
+            avgTrendPercent = summary.trendPercent,
+            isTrendPositive = summary.isTrendPositive,
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Lazily,
+        initialValue = StatsState(),
+    )
 
     fun onPeriodSelected(period: StatsPeriod) {
-        // Reset to page 0 (most recent) when switching period types
-        _state.update { it.copy(selectedPeriod = period, chartPage = 0) }
-        // TODO: reload pages for the selected period from the data layer
+        _selectedPeriod.value = period
+        _chartPage.value = 0
     }
 
     fun onChartPageChanged(page: Int) {
-        val pages = _state.value.pages
-        if (page !in pages.indices) return
-        val summary = computeSummary(pages, page, _state.value.goalMl)
-        _state.update {
-            it.copy(
-                chartPage = page,
-                avgMl = summary.avgMl,
-                avgTrendPercent = summary.trendPercent,
-                isTrendPositive = summary.isTrendPositive,
-            )
-        }
+        _chartPage.value = page
     }
 
-    private data class Summary(
-        val avgMl: Int,
-        val trendPercent: Int,
-        val isTrendPositive: Boolean,
-    )
+    // ── Summary ──────────────────────────────────────────────────────────────
+
+    private data class Summary(val avgMl: Int, val trendPercent: Int, val isTrendPositive: Boolean)
 
     /**
-     * Computes average intake and week-over-week trend for [pageIndex].
-     * Only counts days with amountMl > 0 (logged days).
-     * Trend compares to the next older page (pageIndex + 1).
+     * Average intake and period-over-period trend for [pageIndex].
+     * Only days/months with amountMl > 0 are counted.
+     * Trend compares against the next older page (pageIndex + 1).
      */
-    private fun computeSummary(pages: List<PeriodPage>, pageIndex: Int, goal: Int): Summary {
+    private fun computeSummary(pages: List<PeriodPage>, pageIndex: Int): Summary {
+        if (pages.isEmpty() || pageIndex !in pages.indices) {
+            return Summary(avgMl = 0, trendPercent = 0, isTrendPositive = true)
+        }
         val amounts = pages[pageIndex].entries.map { it.amountMl }.filter { it > 0 }
         val avg = if (amounts.isNotEmpty()) amounts.average().toInt() else 0
 
@@ -50,83 +104,159 @@ internal class StatsViewModel : ViewModel() {
             ?.entries?.map { it.amountMl }?.filter { it > 0 }
         val prevAvg = if (!prevAmounts.isNullOrEmpty()) prevAmounts.average().toInt() else avg
 
-        val trendPercent = if (prevAvg > 0) {
-            ((avg - prevAvg).toDouble() / prevAvg * 100).toInt()
-        } else 0
+        val trendPercent =
+            if (prevAvg > 0) ((avg - prevAvg).toDouble() / prevAvg * 100).toInt() else 0
 
         return Summary(
             avgMl = avg,
-            trendPercent = kotlin.math.abs(trendPercent),
+            trendPercent = abs(trendPercent),
             isTrendPositive = trendPercent >= 0,
         )
     }
 
-    /**
-     * Builds 8 weeks of mock data.
-     * Today = Tuesday Apr 28, 2026 → week index 0, day index 1 (Mon=0, Tue=1 …).
-     *
-     * Replace this with real data layer calls once functionality is connected.
-     */
-    private fun buildInitialState(): StatsState {
-        val goal = 2400
-        val dayLabels = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+    // ── Data loading ─────────────────────────────────────────────────────────
 
-        // Each inner list: [Mon, Tue, Wed, Thu, Fri, Sat, Sun] in mL.
-        // 0 = no data (future day or missing log).
-        val weekAmounts = listOf(
-            /* Week 0 – Apr 27 – May 3  (today = Tue, index 1) */
-            listOf(2200, 1500, 0, 0, 0, 0, 0),
-            /* Week 1 – Apr 20 – Apr 26 */
-            listOf(2300, 2200, 2550, 2100, 2400, 1900, 2600),
-            /* Week 2 – Apr 13 – Apr 19 */
-            listOf(1900, 2100, 2300, 2400, 2100, 2200, 2050),
-            /* Week 3 – Apr 6  – Apr 12 */
-            listOf(2100, 2400, 2200, 1800, 2300, 2500, 2100),
-            /* Week 4 – Mar 30 – Apr 5  */
-            listOf(2000, 2200, 1700, 2400, 2100, 2300, 1900),
-            /* Week 5 – Mar 23 – Mar 29 */
-            listOf(1800, 2100, 2400, 2000, 1900, 2200, 2100),
-            /* Week 6 – Mar 16 – Mar 22 */
-            listOf(1700, 1900, 2100, 2300, 2000, 2100, 1800),
-            /* Week 7 – Mar 9  – Mar 15 */
-            listOf(1900, 2000, 1800, 2100, 2200, 2000, 1700),
-        )
+    private fun loadPagesFlow(period: StatsPeriod): Flow<List<PeriodPage>> = when (period) {
+        StatsPeriod.WEEK -> loadWeekPages()
+        StatsPeriod.MONTH -> loadMonthPages()
+        StatsPeriod.YEAR -> loadYearPages()
+    }
 
-        val weekRanges = listOf(
-            "Apr 27 – May 3",
-            "Apr 20 – Apr 26",
-            "Apr 13 – Apr 19",
-            "Apr 6 – Apr 12",
-            "Mar 30 – Apr 5",
-            "Mar 23 – Mar 29",
-            "Mar 16 – Mar 22",
-            "Mar 9 – Mar 15",
-        )
+    /** 8 pages, most-recent first. Each page = Mon–Sun of a calendar week. */
+    private fun loadWeekPages(): Flow<List<PeriodPage>> {
+        val daysFromMonday = today.dayOfWeek.ordinal  // MONDAY=0 … SUNDAY=6
+        val thisMonday = today.minus(daysFromMonday, DateTimeUnit.DAY)
+        val rangeStart = thisMonday.minus((NUM_WEEKS - 1) * 7, DateTimeUnit.DAY)
 
-        val pages = weekAmounts.mapIndexed { weekIndex, amounts ->
-            PeriodPage(
-                rangeLabel = weekRanges[weekIndex],
-                entries = amounts.mapIndexed { dayIndex, amount ->
-                    DayEntry(
-                        shortLabel = dayLabels[dayIndex],
-                        amountMl = amount,
-                        isToday = weekIndex == 0 && dayIndex == 1, // Tue Apr 28
+        return historyDao.findByTimestamp(rangeStart.atStartOfDay(), today.atEndOfDay())
+            .map { records ->
+                val dailyTotals = records.toDailyTotals()
+                (0 until NUM_WEEKS).map { weekIndex ->
+                    val monday = thisMonday.minus(weekIndex * 7, DateTimeUnit.DAY)
+                    val sunday = monday.plus(6, DateTimeUnit.DAY)
+                    PeriodPage(
+                        rangeLabel = buildWeekRangeLabel(monday, sunday),
+                        entries = (0..6).map { dayOffset ->
+                            val date = monday.plus(dayOffset, DateTimeUnit.DAY)
+                            DayEntry(
+                                shortLabel = DAY_SHORT_LABELS[dayOffset],
+                                amountMl = (dailyTotals[date] ?: 0f).toInt(),
+                                isToday = date == today,
+                            )
+                        },
                     )
                 }
-            )
+            }
+    }
+
+    /** 6 pages, most-recent first. Each page = all days of a calendar month. */
+    private fun loadMonthPages(): Flow<List<PeriodPage>> {
+        val monthStarts = (0 until NUM_MONTHS).map { offset ->
+            var year = today.year
+            var month = today.monthNumber - offset
+            while (month <= 0) {
+                month += 12; year--
+            }
+            LocalDate(year, month, 1)
         }
+        val rangeStart = monthStarts.last()
 
-        val personalBest = weekAmounts.flatten().maxOrNull() ?: 0
-        val initialSummary = computeSummary(pages, 0, goal)
+        return historyDao.findByTimestamp(rangeStart.atStartOfDay(), today.atEndOfDay())
+            .map { records ->
+                val dailyTotals = records.toDailyTotals()
+                monthStarts.map { monthStart ->
+                    val year = monthStart.year
+                    val month = monthStart.month
+                    val daysCount = daysInMonth(year, monthStart.monthNumber)
+                    PeriodPage(
+                        rangeLabel = buildMonthLabel(month, year),
+                        entries = (1..daysCount).map { day ->
+                            val date = LocalDate(year, month, day)
+                            DayEntry(
+                                shortLabel = day.toString(),
+                                amountMl = (dailyTotals[date] ?: 0f).toInt(),
+                                isToday = date == today,
+                            )
+                        },
+                    )
+                }
+            }
+    }
 
-        return StatsState(
-            pages = pages,
-            goalMl = goal,
-            avgMl = initialSummary.avgMl,
-            avgTrendPercent = initialSummary.trendPercent,
-            isTrendPositive = initialSummary.isTrendPositive,
-            streakDays = 4,
-            personalBestMl = personalBest,
+    /** 3 pages, most-recent first. Each page = 12 months of a calendar year. */
+    private fun loadYearPages(): Flow<List<PeriodPage>> {
+        val years = (0 until NUM_YEARS).map { today.year - it }
+        val rangeStart = LocalDate(years.last(), 1, 1)
+
+        return historyDao.findByTimestamp(rangeStart.atStartOfDay(), today.atEndOfDay())
+            .map { records ->
+                val monthlyTotals = records
+                    .filter { it.amount > 0f }
+                    .groupBy { Pair(it.timestamp.year, it.timestamp.monthNumber) }
+                    .mapValues { (_, entries) -> entries.sumOf { it.amount.toDouble() }.toFloat() }
+
+                years.map { year ->
+                    PeriodPage(
+                        rangeLabel = year.toString(),
+                        entries = (1..12).map { monthNum ->
+                            DayEntry(
+                                shortLabel = MONTH_SHORT_LABELS[monthNum - 1],
+                                amountMl = (monthlyTotals[Pair(year, monthNum)] ?: 0f).toInt(),
+                                isToday = year == today.year && monthNum == today.monthNumber,
+                            )
+                        },
+                    )
+                }
+            }
+    }
+
+    // ── Helpers ──────────────────────────────────────────────────────────────
+
+    private fun List<HistoryEntity>.toDailyTotals(): Map<LocalDate, Float> =
+        filter { it.amount > 0f }
+            .groupBy { it.timestamp.date }
+            .mapValues { (_, entries) -> entries.sumOf { it.amount.toDouble() }.toFloat() }
+
+    private fun LocalDate.atStartOfDay() = LocalDateTime(year, monthNumber, dayOfMonth, 0, 0, 0, 0)
+    private fun LocalDate.atEndOfDay() =
+        LocalDateTime(year, monthNumber, dayOfMonth, 23, 59, 59, 999_999_999)
+
+    private fun buildWeekRangeLabel(monday: LocalDate, sunday: LocalDate): String {
+        val start = "${MONTH_SHORT_LABELS[monday.monthNumber - 1]} ${monday.dayOfMonth}"
+        val end = if (monday.month == sunday.month) {
+            "${sunday.dayOfMonth}"
+        } else {
+            "${MONTH_SHORT_LABELS[sunday.monthNumber - 1]} ${sunday.dayOfMonth}"
+        }
+        return "$start – $end"
+    }
+
+    private fun buildMonthLabel(month: Month, year: Int): String =
+        "${MONTH_FULL_LABELS[month.ordinal]} $year"
+
+    private fun daysInMonth(year: Int, month: Int): Int = when (month) {
+        1, 3, 5, 7, 8, 10, 12 -> 31
+        4, 6, 9, 11 -> 30
+        2 -> if (isLeapYear(year)) 29 else 28
+        else -> 30
+    }
+
+    private fun isLeapYear(year: Int): Boolean =
+        (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
+
+    companion object {
+        private const val NUM_WEEKS = 8
+        private const val NUM_MONTHS = 6
+        private const val NUM_YEARS = 3
+
+        private val DAY_SHORT_LABELS = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+        private val MONTH_SHORT_LABELS = listOf(
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+        )
+        private val MONTH_FULL_LABELS = listOf(
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December",
         )
     }
 }
