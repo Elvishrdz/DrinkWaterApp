@@ -2,6 +2,7 @@ package com.eahm.drinkwaterapp.feature.history
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,8 +10,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,9 +25,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.eahm.drinkwaterapp.core.bindings.toEntity
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk300
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk50
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk900
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.JetBrainsMono
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 import com.eahm.drinkwaterapp.core.domain.mock.Mock
@@ -52,6 +57,7 @@ fun HistoryRoot() {
                 state = data,
                 onDelete = viewModel::onDelete,
                 onDateChanged = viewModel::onDateChanged,
+                onGoToToday = viewModel::goToToday,
             )
         }
     }
@@ -62,6 +68,7 @@ internal fun HistoryScreen(
     state: HistoryState.Data,
     onDelete: (HistoryEntity) -> Unit,
     onDateChanged: (LocalDateTime) -> Unit,
+    onGoToToday: () -> Unit,
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -73,8 +80,12 @@ internal fun HistoryScreen(
                 .fillMaxSize(),
             date = state.date,
             historyRecords = state.historyRecords,
+            goalMl = state.goalMl,
+            consumedMl = state.consumedMl,
+            isToday = state.isToday,
             onDelete = onDelete,
             onDateChanged = onDateChanged,
+            onGoToToday = onGoToToday,
         )
     }
 }
@@ -83,9 +94,13 @@ internal fun HistoryScreen(
 private fun Content(
     date: LocalDateTime,
     historyRecords: List<HourGroup>,
+    goalMl: Float,
+    consumedMl: Float,
+    isToday: Boolean,
     modifier: Modifier = Modifier,
     onDelete: (HistoryEntity) -> Unit,
     onDateChanged: (LocalDateTime) -> Unit,
+    onGoToToday: () -> Unit,
 ) {
     Column(modifier = modifier) {
 
@@ -105,14 +120,39 @@ private fun Content(
                 color = DwInk900,
             )
 
-            // Date section — label + styled date picker
+            // Date section — label + picker + Today button
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                SectionLabel("SELECT DATE")
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    SectionLabel("SELECT DATE")
+                    if (!isToday) {
+                        TextButton(
+                            onClick = onGoToToday,
+                        ) {
+                            Text(
+                                text = "Today",
+                                fontFamily = PlusJakartaSans,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 13.sp,
+                                color = DwWater,
+                            )
+                        }
+                    }
+                }
                 DateTimePickerButton(
                     selectedDateTime = date,
                     onDateTimeSelected = onDateChanged,
                     label = "Select a date",
                 )
+            }
+
+            // Summary section — consumed vs goal
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                SectionLabel("SUMMARY")
+                DaySummaryRow(consumedMl = consumedMl, goalMl = goalMl)
             }
         }
 
@@ -131,6 +171,58 @@ private fun Content(
             historyRecords = historyRecords,
             onDelete = { onDelete(it.toEntity()) },
             modifier = Modifier.weight(1f),
+        )
+    }
+}
+
+@Composable
+private fun DaySummaryRow(
+    consumedMl: Float,
+    goalMl: Float,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        StatChip(
+            label = "Consumed",
+            value = "${consumedMl.toInt()} mL",
+            modifier = Modifier.weight(1f),
+        )
+        StatChip(
+            label = "Goal",
+            value = "${goalMl.toInt()} mL",
+            modifier = Modifier.weight(1f),
+        )
+    }
+}
+
+@Composable
+private fun StatChip(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .padding(vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        Text(
+            text = label,
+            fontFamily = JetBrainsMono,
+            fontWeight = FontWeight.Medium,
+            fontSize = 10.sp,
+            color = DwInk300,
+            letterSpacing = TextUnit(0.08f, TextUnitType.Em),
+        )
+        Text(
+            text = value,
+            fontFamily = PlusJakartaSans,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 20.sp,
+            color = DwInk900,
         )
     }
 }
@@ -158,8 +250,12 @@ private fun HistoryScreenPreview() {
         Content(
             date = Mock.localDateTimeMock,
             historyRecords = Mock.hourGroupMock,
+            goalMl = 2000f,
+            consumedMl = 750f,
+            isToday = false,
             onDelete = {},
             onDateChanged = {},
+            onGoToToday = {},
         )
     }
 }

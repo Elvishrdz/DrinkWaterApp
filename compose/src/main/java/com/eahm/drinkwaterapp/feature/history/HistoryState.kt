@@ -10,5 +10,8 @@ internal sealed interface HistoryState {
     data class Data(
         val date: LocalDateTime,
         val historyRecords: List<HourGroup>,
+        val goalMl: Float,
+        val consumedMl: Float,
+        val isToday: Boolean,
     ) : HistoryState
 }

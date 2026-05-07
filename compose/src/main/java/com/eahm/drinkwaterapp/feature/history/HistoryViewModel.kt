@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.core.bindings.toUI
 import com.eahm.drinkwaterapp.core.database.AppDatabase
+import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.domain.extension.toEndOfDayTime
 import com.eahm.drinkwaterapp.core.domain.extension.toStartOfDayTime
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -32,7 +34,8 @@ internal class HistoryViewModel(
     val database: AppDatabase,
 ) : ViewModel() {
 
-    private val dao = database.getHistoryDao()
+    private val historyDao = database.getHistoryDao()
+    private val goalDao = database.getDailyGoalDao()
 
     @OptIn(ExperimentalTime::class)
     private val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
@@ -42,7 +45,7 @@ internal class HistoryViewModel(
     @OptIn(ExperimentalCoroutinesApi::class)
     private val records = historyDate
         .flatMapLatest {
-            dao.findByTimestamp(
+            historyDao.findByTimestamp(
                 start = it.toStartOfDayTime,
                 end = it.toEndOfDayTime,
             )
@@ -54,10 +57,30 @@ internal class HistoryViewModel(
             initialValue = emptyList(),
         )
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val consumedMl = historyDate
+        .flatMapLatest { date ->
+            historyDao.getTotalDrinkAmount(
+                start = date.toStartOfDayTime,
+                end = date.toEndOfDayTime,
+            )
+        }
+        .flowOn(Dispatchers.IO)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val goalMl = historyDate
+        .flatMapLatest { date ->
+            goalDao.getGoalForDate(date.date.toEpochDays())
+        }
+        .map { it?.goalMl ?: DEFAULT_GOAL_ML }
+        .flowOn(Dispatchers.IO)
+
     val state = combine(
         historyDate,
-        records
-    ) { date, records ->
+        records,
+        goalMl,
+        consumedMl,
+    ) { date, records, goal, consumed ->
         val historyRecords = records
             .sortedBy { it.timestamp }
             .reversed()
@@ -83,9 +106,14 @@ internal class HistoryViewModel(
             }
             .sortedByDescending { it.hour }
 
+        val isToday = date.date == today.date
+
         HistoryState.Data(
             date = date,
             historyRecords = historyRecords,
+            goalMl = goal,
+            consumedMl = consumed,
+            isToday = isToday,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -96,12 +124,16 @@ internal class HistoryViewModel(
     fun onDelete(it: HistoryEntity) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                dao.delete(it)
+                historyDao.delete(it)
             }
         }
     }
 
     fun onDateChanged(date: LocalDateTime) {
         historyDate.update { date }
+    }
+
+    fun goToToday() {
+        historyDate.update { today }
     }
 }
