@@ -10,6 +10,8 @@ Next steps
 [] migrate to compose
 
 Fixes
+- despues de tomar agua y una alarma existe, hay que cambiar la hora de la proxima alarma, no quiero beber 10 segundos antes y 
+- aun recibir la notification.
 - use Instant instead of LocalDateTime (good for timezone conversion) for dates, then parse to localdate time if needed.
 - goal reached widget deberia estar centrado cuando aparezca y mas enfatizado, para que se vea bien con el confetti.
 - detectar cambios de hora en el telefono (receiver) y ajustarse para reprogramar alarmas.
