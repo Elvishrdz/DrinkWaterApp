@@ -9,9 +9,6 @@ interface PrefsStorage {
     fun getFirstSetupDone(): Flow<Boolean>
     suspend fun setFirstSetupDone(value: Boolean)
 
-    fun getGoalAmount(): Flow<Float>
-    suspend fun setGoalAmount(amount: Float)
-
     fun getUsername(): Flow<String?>
     suspend fun setUsername(name: String)
 

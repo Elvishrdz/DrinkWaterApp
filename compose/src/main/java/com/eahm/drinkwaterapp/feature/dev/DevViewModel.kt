@@ -7,12 +7,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.core.bindings.toUI
 import com.eahm.drinkwaterapp.core.data.confetti.ConfettiController
-import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStats
 import com.eahm.drinkwaterapp.core.data.goalreachedwidget.GoalReachedWidget
 import com.eahm.drinkwaterapp.core.database.AppDatabase
+import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
+import com.eahm.drinkwaterapp.core.database.entity.DailyGoalEntity
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.database.entity.Status
 import com.eahm.drinkwaterapp.core.domain.extension.toEndOfDayTime
@@ -27,12 +28,15 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
@@ -47,18 +51,21 @@ internal class DevViewModel(
     val application: Application,
     val drinkAlarmManager: DrinkAlarmManager,
     val database: AppDatabase,
-    val prefsStorage: PrefsStorage,
     val confettiController: ConfettiController,
 ) : ViewModel() {
 
     private val dao = database.getHistoryDao()
+    private val goalDao = database.getDailyGoalDao()
 
     @OptIn(ExperimentalTime::class)
     private val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 
+    private val todayDate: LocalDate = today.date
+
     private val historyDate = MutableStateFlow(today)
 
-    private val goalAmount = prefsStorage.getGoalAmount()
+    private val goalAmount = goalDao.getGoalForDate(todayDate.toEpochDays())
+        .map { it?.goalMl ?: DEFAULT_GOAL_ML }
 
     private val drinkAmount = dao.getTotalDrinkAmount(today.toStartOfDayTime, today.toEndOfDayTime)
 
@@ -114,9 +121,7 @@ internal class DevViewModel(
             .sortedByDescending { it.hour }
 
         val todayLogs = records
-            //  TODO: filter from current time to latest 4 records
             .filter { it.timestamp in today.toStartOfDayTime..today.toEndOfDayTime }
-            //.take(4)
             .sortedByDescending { it.timestamp }
             .map {
                 DrinkLogEntry(
@@ -229,7 +234,10 @@ internal class DevViewModel(
             goal.toFloatOrNull()
                 ?.takeIf { validateAmount(it).isValid }
                 ?.let { amount ->
-                    prefsStorage.setGoalAmount(amount)
+                    val epochDay = todayDate.toEpochDays()
+                    val existing = goalDao.getGoalOnDate(epochDay).first()
+                    if (existing != null) goalDao.update(existing.copy(goalMl = amount))
+                    else goalDao.insert(DailyGoalEntity(effectiveDate = todayDate, goalMl = amount))
                 }
         }
     }

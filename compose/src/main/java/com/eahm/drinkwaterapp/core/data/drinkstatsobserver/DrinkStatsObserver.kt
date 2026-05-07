@@ -1,7 +1,7 @@
 package com.eahm.drinkwaterapp.core.data.drinkstatsobserver
 
-import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.database.AppDatabase
+import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
 import com.eahm.drinkwaterapp.core.domain.extension.toEndOfDayTime
 import com.eahm.drinkwaterapp.core.domain.extension.toStartOfDayTime
 import com.eahm.drinkwaterapp.feature.drink.DateTimeObserver
@@ -24,20 +24,28 @@ val drinkStatsObserverModule = module {
 class DrinkStatsObserver(
     val database: AppDatabase,
     dateTimeObserver: DateTimeObserver,
-    prefsStorage: PrefsStorage,
 ) {
 
-    private val dao = database.getHistoryDao()
+    private val historyDao = database.getHistoryDao()
+    private val goalDao = database.getDailyGoalDao()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val currentDrinkAmount = dateTimeObserver.currentDateTime
         .flatMapLatest { day ->
-            dao.getTotalDrinkAmount(start = day.toStartOfDayTime, end = day.toEndOfDayTime)
+            historyDao.getTotalDrinkAmount(start = day.toStartOfDayTime, end = day.toEndOfDayTime)
         }
         .flowOn(Dispatchers.IO)
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val currentGoalAmount = dateTimeObserver.currentDateTime
+        .flatMapLatest { day ->
+            goalDao.getGoalForDate(day.date.toEpochDays())
+        }
+        .map { it?.goalMl ?: DEFAULT_GOAL_ML }
+        .flowOn(Dispatchers.IO)
+
     val drinkStats = combine(
-        prefsStorage.getGoalAmount(),
+        currentGoalAmount,
         currentDrinkAmount,
     ) { goalAmount, drinkAmount ->
         DrinkStats(

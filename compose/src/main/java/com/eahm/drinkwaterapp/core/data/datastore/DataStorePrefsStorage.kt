@@ -34,7 +34,6 @@ private class DataStorePrefsStorage(
     )
 
     private val firstSetupKey = booleanPreferencesKey("FIRST_SETUP")
-    private val goalAmountKey = floatPreferencesKey("GOAL_AMOUNT")
     private val usernameKey = stringPreferencesKey("USERNAME")
     private val drinkSuggestionsKey = stringPreferencesKey("DRINKS_SUGGESTIONS")
     private val startTimeKey = stringPreferencesKey("START_TIME")
@@ -56,21 +55,6 @@ private class DataStorePrefsStorage(
             preferences.toMutablePreferences()
                 .also {
                     it[firstSetupKey] = value
-                }
-        }
-    }
-
-    override fun getGoalAmount(): Flow<Float> {
-        return dataStore.data.map { preferences ->
-            preferences[goalAmountKey] ?: 1000f
-        }
-    }
-
-    override suspend fun setGoalAmount(amount: Float) {
-        dataStore.updateData { preferences ->
-            preferences.toMutablePreferences()
-                .also {
-                    it[goalAmountKey] = amount
                 }
         }
     }
@@ -168,7 +152,6 @@ private class DataStorePrefsStorage(
     override suspend fun clear() {
         dataStore.edit {
             it.remove(firstSetupKey)
-            it.remove(goalAmountKey)
             it.remove(usernameKey)
             it.remove(drinkSuggestionsKey)
             it.remove(startTimeKey)

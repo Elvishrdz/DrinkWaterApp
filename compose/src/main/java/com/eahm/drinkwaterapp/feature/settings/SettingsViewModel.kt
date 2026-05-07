@@ -4,27 +4,43 @@ import android.app.Application
 import android.provider.Settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
+import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.data.notificationpermission.NotificationPermissionObserver
+import com.eahm.drinkwaterapp.core.database.AppDatabase
+import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
+import com.eahm.drinkwaterapp.core.database.entity.DailyGoalEntity
+import com.eahm.drinkwaterapp.feature.drink.DateTimeObserver
 import com.eahm.drinkwaterapp.feature.settings.data.ActiveTimes
 import com.eahm.drinkwaterapp.ui.inputfield.validateText
 import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 internal class SettingsViewModel(
     val application: Application,
+    val database: AppDatabase,
     val prefsStorage: PrefsStorage,
     val drinkAlarmManager: DrinkAlarmManager,
+    val dateTimeObserver: DateTimeObserver,
     notificationPermissionObserver: NotificationPermissionObserver,
 ) : ViewModel() {
+
+    private val dao = database.getDailyGoalDao()
 
     private val activeTimes = combine(
         prefsStorage.getStartTime(),
@@ -50,16 +66,26 @@ internal class SettingsViewModel(
             )
         )
 
+    val today = dateTimeObserver.currentDateTime
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val goal = dateTimeObserver.currentDateTime
+        .flatMapLatest { today ->
+            dao.getGoalForDate(today.date.toEpochDays())
+        }
+        .map { (it?.goalMl ?: DEFAULT_GOAL_ML).toInt() }
+        .flowOn(Dispatchers.IO)
+
     val state = combine(
         prefsStorage.getUsername(),
-        prefsStorage.getGoalAmount(),
+        goal,
         activeTimes,
         notificationPermissionObserver.hasPermission,
         _state,
     ) { username, goal, activeTimes, hasNotificationPermission, state ->
         state.copy(
             username = username,
-            dailyGoalMl = goal.toInt(),
+            dailyGoalMl = goal,
             notificationsEnabled = hasNotificationPermission,
             startTime = activeTimes?.start,
             endTime = activeTimes?.end,
@@ -86,7 +112,7 @@ internal class SettingsViewModel(
 
     fun onGoalChanged(goalMl: Int) {
         viewModelScope.launch {
-            prefsStorage.setGoalAmount(goalMl.toFloat())
+            setGoalFromToday(goalMl.toFloat())
         }
     }
 
@@ -134,6 +160,14 @@ internal class SettingsViewModel(
 
     fun onDrawOverlayPermissionResult() {
         _state.update { it.copy(goalReachedCelebrationsEnabled = canDrawOverlay) }
+    }
+
+    private suspend fun setGoalFromToday(goalMl: Float) {
+        val current = today.value.date
+        val epochDay = current.toEpochDays()
+        val existing = dao.getGoalOnDate(epochDay).first()
+        if (existing != null) dao.update(existing.copy(goalMl = goalMl))
+        else dao.insert(DailyGoalEntity(effectiveDate = current, goalMl = goalMl))
     }
 
     /**

@@ -18,8 +18,7 @@ data class HistoryEntity(
     @ColumnInfo(name = "drink_amount") val amount: Float,
     @ColumnInfo(name = "status") val status: Status,
     @ColumnInfo(name = "timestamp") val timestamp: LocalDateTime =
-        Clock.System.now()
-            .toLocalDateTime(TimeZone.currentSystemDefault()),
+        Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
 )
 
 enum class Status {
