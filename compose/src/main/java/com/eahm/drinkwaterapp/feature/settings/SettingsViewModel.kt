@@ -8,6 +8,7 @@ import com.eahm.drinkwaterapp.core.data.datastore.ActiveTime
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
+import com.eahm.drinkwaterapp.core.data.notificationpermission.NotificationPermissionObserver
 import com.eahm.drinkwaterapp.feature.settings.data.ActiveTimes
 import com.eahm.drinkwaterapp.ui.inputfield.validateText
 import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
@@ -22,6 +23,7 @@ internal class SettingsViewModel(
     val application: Application,
     val prefsStorage: PrefsStorage,
     val drinkAlarmManager: DrinkAlarmManager,
+    notificationPermissionObserver: NotificationPermissionObserver,
 ) : ViewModel() {
 
     private val activeTimes = combine(
@@ -41,7 +43,7 @@ internal class SettingsViewModel(
         MutableStateFlow(
             SettingsState(
                 username = null,
-                notificationsEnabled = false,
+                notificationsEnabled = notificationPermissionObserver.hasPermission.value,
                 startTime = null,
                 endTime = null,
                 goalReachedCelebrationsEnabled = canDrawOverlay,
@@ -52,12 +54,13 @@ internal class SettingsViewModel(
         prefsStorage.getUsername(),
         prefsStorage.getGoalAmount(),
         activeTimes,
+        notificationPermissionObserver.hasPermission,
         _state,
-    ) { username, goal, activeTimes, state ->
+    ) { username, goal, activeTimes, hasNotificationPermission, state ->
         state.copy(
             username = username,
             dailyGoalMl = goal.toInt(),
-            notificationsEnabled = false,
+            notificationsEnabled = hasNotificationPermission,
             startTime = activeTimes?.start,
             endTime = activeTimes?.end,
         )

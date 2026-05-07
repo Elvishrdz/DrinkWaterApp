@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationManagerCompat
-import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.data.systemnotifications.NotificationService
@@ -26,12 +25,6 @@ class AlarmReceiver : BroadcastReceiver() {
         get() = let {
             val koin = GlobalContext.get()
             koin.get<DrinkAlarmManager>()
-        }
-
-    private val prefsStorage
-        get() = let {
-            val koin = GlobalContext.get()
-            koin.get<PrefsStorage>()
         }
 
     override fun onReceive(context: Context, intent: Intent) = goAsync { _ ->

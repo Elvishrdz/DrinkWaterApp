@@ -104,6 +104,7 @@ internal fun SettingsScreen(
     // ── Notification permission ───────────────────────────────────────────────
     var checkNextOnResumeForNotificationPermission by rememberSaveable { mutableStateOf(false) }
     var showPermissionDeniedDialog by rememberSaveable { mutableStateOf(false) }
+    var showDisableNotificationsDialog by rememberSaveable { mutableStateOf(false) }
 
     val lifecycleOwner = LocalLifecycleOwner.current
 
@@ -148,7 +149,7 @@ internal fun SettingsScreen(
 
     fun handleNotificationToggle(enabled: Boolean) {
         if (!enabled) {
-            viewModel.onNotificationsToggled(false)
+            showDisableNotificationsDialog = true
             return
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -230,6 +231,29 @@ internal fun SettingsScreen(
 
                 } else {
                     // TODO: test this before release
+                    intent.action = "android.settings.APP_NOTIFICATION_SETTINGS"
+                    intent.putExtra("app_package", context.packageName)
+                    intent.putExtra("app_uid", context.applicationInfo.uid)
+                }
+
+                context.startActivity(intent)
+            },
+        )
+    }
+
+    // ── Disable notifications dialog ──────────────────────────────────────────
+    if (showDisableNotificationsDialog) {
+        DisableNotificationsDialog(
+            onDismiss = { showDisableNotificationsDialog = false },
+            onGoToSettings = {
+                showDisableNotificationsDialog = false
+                checkNextOnResumeForNotificationPermission = true
+
+                val intent = Intent()
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    intent.action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
+                    intent.putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                } else {
                     intent.action = "android.settings.APP_NOTIFICATION_SETTINGS"
                     intent.putExtra("app_package", context.packageName)
                     intent.putExtra("app_uid", context.applicationInfo.uid)
@@ -494,6 +518,50 @@ private fun NotificationPermissionDeniedDialog(
             Spacer(Modifier.height(24.dp))
             DwPrimaryButton(
                 text = "Open Settings",
+                onClick = onGoToSettings,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(Modifier.height(8.dp))
+            DwSecondaryButton(
+                text = "Not now",
+                onClick = onDismiss,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DisableNotificationsDialog(
+    onDismiss: () -> Unit,
+    onGoToSettings: () -> Unit,
+) {
+    BasicAlertDialog(onDismissRequest = onDismiss) {
+        Column(
+            modifier = Modifier
+                .clip(RoundedCornerShape(20.dp))
+                .background(DwPaper)
+                .padding(24.dp),
+        ) {
+            Text(
+                text = "Disable notifications",
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                color = DwInk900,
+            )
+            Spacer(Modifier.height(10.dp))
+            Text(
+                text = "To turn off drink reminders, disable notifications for DrinkWater in your phone's Settings.\n\n1. Tap \"Continue to Settings\" below.\n2. Disable notifications for this app.\n3. Press back to return.",
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp,
+                color = DwInk500,
+            )
+            Spacer(Modifier.height(24.dp))
+            DwPrimaryButton(
+                text = "Continue to Settings",
                 onClick = onGoToSettings,
                 modifier = Modifier.fillMaxWidth(),
             )
