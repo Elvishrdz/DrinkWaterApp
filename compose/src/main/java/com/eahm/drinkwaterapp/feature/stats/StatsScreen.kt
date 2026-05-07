@@ -34,19 +34,26 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 import com.eahm.drinkwaterapp.feature.stats.components.MiniStatsCards
 import com.eahm.drinkwaterapp.feature.stats.components.SummaryCard
 import com.eahm.drinkwaterapp.feature.stats.components.WeeklyBarChart
+import com.eahm.drinkwaterapp.ui.calendar.DrinkCalendar
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 internal fun StatsScreen(
     modifier: Modifier = Modifier,
     viewModel: StatsViewModel = koinViewModel(),
+    calendarViewModel: CalendarViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
+    val calendarState by calendarViewModel.state.collectAsState()
 
     StatsContent(
         state = state,
+        calendarState = calendarState,
         onPeriodSelected = viewModel::onPeriodSelected,
         onChartPageChanged = viewModel::onChartPageChanged,
+        onCalendarPrevious = calendarViewModel::navigatePrevious,
+        onCalendarNext = calendarViewModel::navigateNext,
+        onCalendarViewModeToggle = calendarViewModel::setViewMode,
         modifier = modifier,
     )
 }
@@ -54,8 +61,12 @@ internal fun StatsScreen(
 @Composable
 internal fun StatsContent(
     state: StatsState,
+    calendarState: CalendarState,
     onPeriodSelected: (StatsPeriod) -> Unit,
     onChartPageChanged: (Int) -> Unit,
+    onCalendarPrevious: () -> Unit,
+    onCalendarNext: () -> Unit,
+    onCalendarViewModeToggle: (com.eahm.drinkwaterapp.ui.calendar.CalendarViewMode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val periodLabel = when (state.selectedPeriod) {
@@ -117,6 +128,16 @@ internal fun StatsContent(
                 streakDays = state.streakDays,
                 personalBestMl = state.personalBestMl,
                 modifier = Modifier.padding(horizontal = 18.dp)
+            )
+        }
+
+        item {
+            DrinkCalendar(
+                state = calendarState,
+                onPrevious = onCalendarPrevious,
+                onNext = onCalendarNext,
+                onViewModeToggle = onCalendarViewModeToggle,
+                modifier = Modifier.padding(horizontal = 18.dp),
             )
         }
 
@@ -213,8 +234,17 @@ private fun StatsScreenPreview() {
     DrinkWaterAppTheme {
         StatsContent(
             state = previewState,
+            calendarState = CalendarState(
+                displayedMonth = kotlinx.datetime.LocalDate(2026, 5, 1),
+                displayedYear = 2026,
+                today = kotlinx.datetime.LocalDate(2026, 5, 7),
+                rangeLabel = "May 2026",
+            ),
             onPeriodSelected = {},
             onChartPageChanged = {},
+            onCalendarPrevious = {},
+            onCalendarNext = {},
+            onCalendarViewModeToggle = {},
         )
     }
 }

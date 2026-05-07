@@ -217,8 +217,6 @@ private fun RequestNotificationPermissionButton(
     val context = LocalContext.current
     var goToSettings by remember { mutableStateOf(false) }
 
-    // TODO: onResume check goToSettings state again
-
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
