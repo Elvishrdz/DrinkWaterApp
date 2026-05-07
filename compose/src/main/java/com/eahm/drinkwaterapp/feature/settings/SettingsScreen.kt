@@ -34,6 +34,7 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,6 +57,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwSecondaryButton
@@ -98,7 +102,39 @@ internal fun SettingsScreen(
     val context = LocalContext.current
 
     // ── Notification permission ───────────────────────────────────────────────
+    var checkNextOnResumeForNotificationPermission by rememberSaveable { mutableStateOf(false) }
     var showPermissionDeniedDialog by rememberSaveable { mutableStateOf(false) }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsStateWithLifecycle()
+
+    LaunchedEffect(lifecycleState) {
+        when (lifecycleState) {
+            Lifecycle.State.DESTROYED -> {}
+            Lifecycle.State.INITIALIZED -> {}
+            Lifecycle.State.CREATED -> {}
+            Lifecycle.State.STARTED -> {}
+            Lifecycle.State.RESUMED -> {
+                if (checkNextOnResumeForNotificationPermission) {
+                    checkNextOnResumeForNotificationPermission = false
+
+                    val state = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        ContextCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.POST_NOTIFICATIONS
+                        ) == PackageManager.PERMISSION_GRANTED
+
+                    } else {
+                        // No runtime permission needed below Android 13
+                        true
+                    }
+
+                    viewModel.onNotificationsToggled(state)
+                }
+            }
+        }
+    }
 
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -185,8 +221,20 @@ internal fun SettingsScreen(
             onDismiss = { showPermissionDeniedDialog = false },
             onGoToSettings = {
                 showPermissionDeniedDialog = false
-                val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
-                    .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                checkNextOnResumeForNotificationPermission = true
+
+                val intent = Intent()
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    intent.action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
+                    intent.putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+
+                } else {
+                    // TODO: test this before release
+                    intent.action = "android.settings.APP_NOTIFICATION_SETTINGS"
+                    intent.putExtra("app_package", context.packageName)
+                    intent.putExtra("app_uid", context.applicationInfo.uid)
+                }
+
                 context.startActivity(intent)
             },
         )
@@ -780,6 +828,7 @@ private fun SettingsScreenPreview() {
 
 private val settingsStateMock = SettingsState(
     username = null,
+    notificationsEnabled = false,
     startTime = null,
     endTime = null,
     goalReachedCelebrationsEnabled = false,

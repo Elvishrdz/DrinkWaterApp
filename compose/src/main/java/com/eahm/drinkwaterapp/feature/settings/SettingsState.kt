@@ -8,7 +8,7 @@ data class SettingsState(
     val dailyGoalMl: Int = 2000,
     val unit: WaterUnit = WaterUnit.ML,
     val weightUnit: WeightUnit = WeightUnit.KG,
-    val notificationsEnabled: Boolean = false,
+    val notificationsEnabled: Boolean,
     val intervalMinutes: Int = 45,
     val startTime: ActiveTime?,
     val endTime: ActiveTime?,

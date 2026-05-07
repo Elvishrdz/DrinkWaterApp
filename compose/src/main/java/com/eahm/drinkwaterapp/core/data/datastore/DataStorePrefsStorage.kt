@@ -41,6 +41,9 @@ interface PrefsStorage {
     fun getAmountPerDrink(): Flow<Float>
     suspend fun setAmountPerDrink(milliliters: Float)
 
+    fun getNotificationEnabled(): Flow<Boolean>
+    suspend fun setNotificationEnabled(enabled: Boolean)
+
     suspend fun clear()
 }
 
@@ -77,6 +80,7 @@ private class DataStorePrefsStorage(
     private val startTimeKey = stringPreferencesKey("START_TIME")
     private val endTimeKey = stringPreferencesKey("END_TIME")
     private val amountPerDrinkKey = floatPreferencesKey("AMOUNT_PER_DRINK")
+    private val notificationEnabledKey = booleanPreferencesKey("NOTIFICATION_ENABLED")
 
     private val json = Json {
         ignoreUnknownKeys = true
@@ -202,12 +206,31 @@ private class DataStorePrefsStorage(
         }
     }
 
+    override fun getNotificationEnabled(): Flow<Boolean> {
+        return dataStore.data.map { preferences ->
+            preferences[notificationEnabledKey] ?: false
+        }
+    }
+
+    override suspend fun setNotificationEnabled(enabled: Boolean) {
+        dataStore.updateData { preferences ->
+            preferences.toMutablePreferences()
+                .also {
+                    it[notificationEnabledKey] = enabled
+                }
+        }
+    }
+
     override suspend fun clear() {
         dataStore.edit {
             it.remove(firstSetupKey)
             it.remove(goalAmountKey)
             it.remove(usernameKey)
             it.remove(drinkPresetsKey)
+            it.remove(startTimeKey)
+            it.remove(endTimeKey)
+            it.remove(amountPerDrinkKey)
+            it.remove(notificationEnabledKey)
         }
     }
 }

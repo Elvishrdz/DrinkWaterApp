@@ -9,6 +9,7 @@ internal sealed interface AlarmsState {
     data class Data(
         val canScheduleExactAlarms: Boolean,
         val hasNotificationPermissions: Boolean,
+        val appNotificationEnabled: Boolean,
         val isAlarmActive: Boolean,
         val alarmStorageInfo: AlarmStorageInfo?,
         val inActiveHours: Boolean,

@@ -41,6 +41,7 @@ internal class SettingsViewModel(
         MutableStateFlow(
             SettingsState(
                 username = null,
+                notificationsEnabled = false,
                 startTime = null,
                 endTime = null,
                 goalReachedCelebrationsEnabled = canDrawOverlay,
@@ -51,11 +52,13 @@ internal class SettingsViewModel(
         prefsStorage.getUsername(),
         prefsStorage.getGoalAmount(),
         activeTimes,
+        prefsStorage.getNotificationEnabled(),
         _state,
-    ) { username, goal, activeTimes, state ->
+    ) { username, goal, activeTimes, appNotificationEnabled, state ->
         state.copy(
             username = username,
             dailyGoalMl = goal.toInt(),
+            notificationsEnabled = appNotificationEnabled,
             startTime = activeTimes?.start,
             endTime = activeTimes?.end,
         )
@@ -66,7 +69,10 @@ internal class SettingsViewModel(
     )
 
     fun onNotificationsToggled(enabled: Boolean) {
-        _state.update { it.copy(notificationsEnabled = enabled) }
+        viewModelScope.launch {
+            prefsStorage.setNotificationEnabled(enabled)
+            _state.update { it.copy(notificationsEnabled = enabled) }
+        }
     }
 
     fun onUsernameChanged(username: String) {

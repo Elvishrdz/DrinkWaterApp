@@ -3,6 +3,7 @@ package com.eahm.drinkwaterapp.feature.dev.alarms
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.domain.extension.openSystemAppSettings
@@ -19,6 +20,7 @@ internal class AlarmsViewModel(
     private val application: Application,
     private val drinkAlarmManager: DrinkAlarmManager,
     activeHoursObserver: ActiveHoursObserver,
+    private val prefsStorage: PrefsStorage,
 ) : ViewModel() {
 
     private val _events = Channel<AlarmsEvent>(Channel.BUFFERED)
@@ -27,10 +29,12 @@ internal class AlarmsViewModel(
     val state = combine(
         drinkAlarmManager.state,
         activeHoursObserver.inActiveHours,
-    ) { drinkAlarmState, inActiveHours ->
+        prefsStorage.getNotificationEnabled(),
+    ) { drinkAlarmState, inActiveHours, appNotificationEnabled ->
         AlarmsState.Data(
             canScheduleExactAlarms = drinkAlarmState.canScheduleExactAlarms,
             hasNotificationPermissions = drinkAlarmState.hasNotificationPermissions,
+            appNotificationEnabled = appNotificationEnabled,
             isAlarmActive = drinkAlarmState.isAlarmActive,
             alarmStorageInfo = drinkAlarmState.alarmStorageInfo,
             inActiveHours = inActiveHours,
@@ -50,6 +54,7 @@ internal class AlarmsViewModel(
             AlarmsAction.OpenAppPermissionSettings -> openAppPermissionSettings()
             AlarmsAction.SetupAlarm -> setupAlarm()
             AlarmsAction.StopAlarm -> onStopAlarm()
+            is AlarmsAction.AppNotificationStateChanged -> notificationStateChanged(action.enabled)
         }
     }
 
@@ -64,4 +69,7 @@ internal class AlarmsViewModel(
     private fun openAppPermissionSettings() = application.openSystemAppSettings()
     private fun onStopAlarm() = drinkAlarmManager.stopAlarm()
     private fun setupAlarm() = drinkAlarmManager.setupTestAlarm(AlarmSource.AlarmsDevMenu)
+    private fun notificationStateChanged(enabled: Boolean) {
+        viewModelScope.launch { prefsStorage.setNotificationEnabled(enabled) }
+    }
 }
