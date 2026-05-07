@@ -4,12 +4,15 @@ import android.app.Application
 import android.content.Intent
 import android.util.Log
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
+import com.eahm.drinkwaterapp.core.data.drinkalarm.calculator.calculateNextAlarmSlot
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmConfiguration
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSchedule
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.data.drinkalarm.simulator.simulateNextIntervalCalculation
 import com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.WhatToDoNow
 import com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.decideWhatToDoNow
+import com.eahm.drinkwaterapp.core.database.AppDatabase
+import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
 import com.eahm.drinkwaterapp.core.domain.extension.canScheduleExactAlarms
 import com.eahm.drinkwaterapp.core.domain.extension.canShowNotifications
 import com.eahm.drinkwaterapp.core.domain.extension.toLocalDateTime
@@ -30,6 +33,7 @@ import kotlin.time.ExperimentalTime
 class DrinkAlarmManager(
     private val application: Application,
     private val prefsStorage: PrefsStorage,
+    private val database: AppDatabase,
 ) {
     private val _state = MutableStateFlow(getState())
 
@@ -53,18 +57,48 @@ class DrinkAlarmManager(
         val endTime = prefsStorage.getEndTime().firstOrNull()?.toLocalDateTime()
             ?: currentDeviceDateTime
 
-        val nextInterval = simulateNextIntervalCalculation(
-            now = currentDeviceDateTime,
-            startTime = startTime,
-            endTime = endTime,
-        )
+        val testMode = false
+
+        val nextSlotTime = if (testMode) {
+            simulateNextIntervalCalculation(
+                now = currentDeviceDateTime,
+                startTime = startTime,
+                endTime = endTime,
+            )
+        } else {
+            // Effective interval: next-override wins over regular; consume override after use
+            val rawInterval = AlarmIntervals.getNextInterval(application)
+                ?: AlarmIntervals.getInterval(application)
+            if (AlarmIntervals.getNextInterval(application) != null) {
+                AlarmIntervals.clearNextInterval(application)
+            }
+
+            val intervalMinutes = (rawInterval.hour * 60 + rawInterval.minute).coerceAtLeast(1)
+
+            val todayEpoch = currentDeviceDateTime.date.toEpochDays()
+            val goalMl = database.getDailyGoalDao()
+                .getGoalForDate(todayEpoch)
+                .firstOrNull()
+                ?.goalMl ?: DEFAULT_GOAL_ML
+
+            val startDayTime = DayTime(startTime.hour, startTime.minute)
+            val endDayTime = DayTime(endTime.hour, endTime.minute)
+
+            calculateNextAlarmSlot(
+                now = currentDeviceDateTime,
+                startTime = startDayTime,
+                endTime = endDayTime,
+                goalMl = goalMl,
+                intervalMinutes = intervalMinutes,
+            )
+        }
 
         val configuration = AlarmConfiguration(
             source = source,
             schedule = AlarmSchedule.AtExactTime(
-                hour = nextInterval.hour,
-                minute = nextInterval.minute,
-                second = nextInterval.second,
+                hour = nextSlotTime.hour,
+                minute = nextSlotTime.minute,
+                second = nextSlotTime.second,
             ),
         )
 

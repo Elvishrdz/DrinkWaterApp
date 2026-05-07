@@ -49,12 +49,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DayTime
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmCalculator2
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkSchedule
 import com.eahm.drinkwaterapp.core.data.drinkalarm.calculateTimeDifference
 import com.eahm.drinkwaterapp.core.data.drinkalarm.inWholeMinutes
+import com.eahm.drinkwaterapp.core.data.drinkalarm.simulator.calculateNextAlarmSlot
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
@@ -66,8 +66,12 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorButton
 import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
-import org.koin.compose.viewmodel.koinViewModel
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlin.math.roundToInt
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 // ─── Schedule mode ────────────────────────────────────────────────────────────
 
@@ -78,20 +82,30 @@ private enum class ScheduleMode(val label: String) {
 
 private val calculator = DrinkAlarmCalculator2()
 
+@OptIn(ExperimentalTime::class)
 @Composable
 internal fun AlarmCalculatorScreen(
     startTime: DayTime,
     endTime: DayTime,
+    initialGoalMl: Float,
+    initialIntervalMinutes: Int,
     onBackClicked: () -> Unit,
 ) {
     BackHandler(onBack = onBackClicked)
 
     var startTime by remember { mutableStateOf(startTime) }
     var endTime by remember { mutableStateOf(endTime) }
-    var goalAmountMl by remember { mutableFloatStateOf(2_000f) }
-    var mode by remember { mutableStateOf(ScheduleMode.BY_AMOUNT) }
+    var goalAmountMl by remember { mutableFloatStateOf(initialGoalMl) }
+    var mode by remember { mutableStateOf(ScheduleMode.BY_INTERVAL) }
     var amountPerDrink by remember { mutableFloatStateOf(250f) }
-    var desiredIntervalMin by remember { mutableIntStateOf(120) }
+    var desiredIntervalMin by remember {
+        mutableIntStateOf(
+            initialIntervalMinutes.coerceIn(
+                15,
+                240
+            )
+        )
+    }
 
     // Recomputes whenever any input changes — no side effects needed.
     val schedule =
@@ -113,6 +127,22 @@ internal fun AlarmCalculatorScreen(
                     )
                 }
             }.getOrNull()
+        }
+
+    val nextAlarmTime: LocalDateTime? =
+        remember(startTime, endTime, goalAmountMl, desiredIntervalMin, mode) {
+            if (mode == ScheduleMode.BY_INTERVAL) {
+                runCatching {
+                    val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+                    calculateNextAlarmSlot(
+                        now = now,
+                        startTime = startTime,
+                        endTime = endTime,
+                        goalMl = goalAmountMl,
+                        intervalMinutes = desiredIntervalMin,
+                    )
+                }.getOrNull()
+            } else null
         }
 
     Column(
@@ -221,6 +251,7 @@ internal fun AlarmCalculatorScreen(
                 schedule = schedule,
                 startTime = startTime,
                 endTime = endTime,
+                nextAlarmTime = nextAlarmTime,
             )
         } else {
             Text(
@@ -241,6 +272,7 @@ private fun ScheduleVisualization(
     schedule: DrinkSchedule,
     startTime: DayTime,
     endTime: DayTime,
+    nextAlarmTime: LocalDateTime? = null,
 ) {
     // Day coverage = active window / 24 h
     val windowMinutes = DayTime.calculateTimeDifference(startTime, endTime).inWholeMinutes
@@ -262,6 +294,13 @@ private fun ScheduleVisualization(
 
             val base = schedule.slots.firstOrNull()?.amountMl?.roundToInt() ?: 0
             SummaryChip(label = "Per drink", value = "${base}mL")
+
+            nextAlarmTime?.let { time ->
+                SummaryChip(
+                    label = "Next alarm",
+                    value = "${time.hour.pad()}:${time.minute.pad()}",
+                )
+            }
         }
 
         // ── Timeline chart ────────────────────────────────────────────────────

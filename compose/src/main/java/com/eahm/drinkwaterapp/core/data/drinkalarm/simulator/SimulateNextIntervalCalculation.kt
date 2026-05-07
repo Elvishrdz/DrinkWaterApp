@@ -13,6 +13,7 @@ import kotlin.time.ExperimentalTime
  * c) 15:00
  * d) endTime
  * */
+@Deprecated("Use calculateNextAlarmSlot() instead")
 fun simulateNextIntervalCalculation(
     now: LocalDateTime,
     startTime: LocalDateTime,
