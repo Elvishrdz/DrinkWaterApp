@@ -6,7 +6,7 @@ import android.content.Intent
 import android.provider.Settings
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
-import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
+import com.eahm.drinkwaterapp.core.data.datastore.initialAmountPerDrink
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStatsObserver
@@ -15,6 +15,7 @@ import com.eahm.drinkwaterapp.core.data.systemnotifications.NotificationService
 import com.eahm.drinkwaterapp.core.data.systemnotifications.model.Drink
 import com.eahm.drinkwaterapp.core.data.systemnotifications.model.NotificationRemoved
 import com.eahm.drinkwaterapp.core.data.systemnotifications.model.SkipDrink
+import com.eahm.drinkwaterapp.core.data.systemnotifications.notification.DrinkNotification
 import com.eahm.drinkwaterapp.core.data.systemnotifications.notification.DrinkNotification.EXTRA_CODE
 import com.eahm.drinkwaterapp.core.data.systemnotifications.notification.DrinkNotification.EXTRA_NOTIFICATION_ID
 import com.eahm.drinkwaterapp.core.database.AppDatabase
@@ -58,7 +59,11 @@ class AlarmReceiver : BroadcastReceiver() {
 
             Drink.action -> {
                 if (code == Drink.code) {
-                    registerDrink(context)
+                    val amountPerDrink = intent.getFloatExtra(
+                        DrinkNotification.AMOUNT_PER_DRINK_ML,
+                        initialAmountPerDrink
+                    )
+                    registerDrink(context, amountPerDrink)
                     drinkAlarmManager.setupAlarm(AlarmSource.NotificationDrinkButton)
                     removeNotificationFromSystem(context, intent)
                 }
@@ -80,42 +85,41 @@ class AlarmReceiver : BroadcastReceiver() {
         }
     }
 
-    private suspend fun registerDrink(context: Context) = withContext(Dispatchers.IO) {
-        val koin = GlobalContext.get()
-        val database = koin.get<AppDatabase>()
-        val dao = database.getHistoryDao()
-        val drinkStatsObserver = koin.get<DrinkStatsObserver>()
-        val prefsStorage = koin.get<PrefsStorage>()
+    private suspend fun registerDrink(context: Context, amountPerDrink: Float) =
+        withContext(Dispatchers.IO) {
+            val koin = GlobalContext.get()
+            val database = koin.get<AppDatabase>()
+            val dao = database.getHistoryDao()
+            val drinkStatsObserver = koin.get<DrinkStatsObserver>()
 
-        val notificationAmountMl = prefsStorage.getAmountPerDrink().first()
+            // Snapshot goal state before the insert to detect the not-reached → reached transition
+            val statsBefore = drinkStatsObserver.drinkStats.first()
 
-        // Snapshot goal state before the insert to detect the not-reached → reached transition
-        val statsBefore = drinkStatsObserver.drinkStats.first()
+            val record = HistoryEntity(
+                amount = amountPerDrink,
+                status = Status.FROM_NOTIFICATION,
+            )
+            dao.insertAll(record)
 
-        val record = HistoryEntity(
-            amount = notificationAmountMl,
-            status = Status.FROM_NOTIFICATION,
-        )
-        dao.insertAll(record)
+            // Show celebration overlay only when this drink crosses the goal threshold
+            val goalJustReached = !statsBefore.goalReached &&
+                    (statsBefore.drinkAmount + amountPerDrink) >= statsBefore.goalAmount
 
-        // Show celebration overlay only when this drink crosses the goal threshold
-        val goalJustReached = !statsBefore.goalReached &&
-                (statsBefore.drinkAmount + notificationAmountMl) >= statsBefore.goalAmount
-        if (goalJustReached && Settings.canDrawOverlays(context)) {
-            val today = koin.get<DateTimeObserver>().currentDateTime.value
-            val drinkCount = dao.findByTimestamp(
-                start = today.toStartOfDayTime,
-                end = today.toEndOfDayTime,
-            ).first().size
+            if (goalJustReached && Settings.canDrawOverlays(context)) {
+                val today = koin.get<DateTimeObserver>().currentDateTime.value
+                val drinkCount = dao.findByTimestamp(
+                    start = today.toStartOfDayTime,
+                    end = today.toEndOfDayTime,
+                ).first().size
 
-            val serviceIntent = Intent(context, GoalReachedWidget::class.java).apply {
-                putExtra("goalMl", statsBefore.goalAmount)
-                putExtra("drinkCount", drinkCount.coerceAtLeast(1))
-                putExtra("streakDays", 1)
+                val serviceIntent = Intent(context, GoalReachedWidget::class.java).apply {
+                    putExtra("goalMl", statsBefore.goalAmount)
+                    putExtra("drinkCount", drinkCount.coerceAtLeast(1))
+                    putExtra("streakDays", 1)
+                }
+                context.startService(serviceIntent)
             }
-            context.startService(serviceIntent)
         }
-    }
 
     private fun removeNotificationFromSystem(context: Context, intent: Intent) {
         val notificationId = intent.getIntExtra(EXTRA_NOTIFICATION_ID, -1)

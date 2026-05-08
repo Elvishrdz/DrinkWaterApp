@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
 import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
@@ -20,6 +21,7 @@ val prefsStorageModule = module {
 }
 
 val initialInterval = ActiveTime(0, 45)
+const val initialAmountPerDrink = 150f
 
 private class DataStorePrefsStorage(
     private val dataStore: DataStore<Preferences>,
@@ -159,7 +161,7 @@ private class DataStorePrefsStorage(
 
     override fun getAmountPerDrink(): Flow<Float> {
         return dataStore.data.map { preferences ->
-            preferences[amountPerDrinkKey] ?: 150f
+            preferences[amountPerDrinkKey] ?: initialAmountPerDrink
         }
     }
 

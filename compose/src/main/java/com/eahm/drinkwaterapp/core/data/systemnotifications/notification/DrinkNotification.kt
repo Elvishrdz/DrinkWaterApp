@@ -26,13 +26,15 @@ internal object DrinkNotification {
     const val NOTIFICATION_ID = 1
     const val EXTRA_NOTIFICATION_ID = "NOTIFICATION_ID"
     const val EXTRA_CODE = "CODE"
+    const val AMOUNT_PER_DRINK_ML = "AMOUNT_PER_DRINK_ML"
 
     @SuppressLint("MissingPermission")
     fun showNotification(
         context: Context,
         title: String?,
         text: String?,
-        bigText: String?
+        bigText: String?,
+        amountPerDrinkMl: Float,
     ) {
         if (!context.canShowNotifications) return
 
@@ -43,7 +45,7 @@ internal object DrinkNotification {
 
         val contentIntent = getOnNotificationClickedPendingIntent(context)
         val skipIntent = getOnSkipPendingIntent(context)
-        val drinkIntent = getOnDrinkPendingIntent(context)
+        val drinkIntent = getOnDrinkPendingIntent(context, amountPerDrinkMl)
         val deleteIntent = getOnNotificationDeletedPendingIntent(context)
 
         val builder = NotificationCompat.Builder(context, channelId)
@@ -65,7 +67,7 @@ internal object DrinkNotification {
             .addAction(
                 0,
                 // TODO:context.resources.getString(R.string.text_drink),
-                "+150ml",
+                "+$amountPerDrinkMl",
                 drinkIntent
             ) //R.drawable.icon_drink
             //.setCategory(NotificationCompat.CATEGORY_REMINDER)
@@ -202,11 +204,12 @@ internal object DrinkNotification {
         )
     }
 
-    private fun getOnDrinkPendingIntent(context: Context): PendingIntent {
+    private fun getOnDrinkPendingIntent(context: Context, amountPerDrinkMl: Float): PendingIntent {
         val intentDrink = Intent(context, AlarmReceiver::class.java)
         intentDrink.action = Drink.action
         intentDrink.putExtra(EXTRA_NOTIFICATION_ID, NOTIFICATION_ID)
         intentDrink.putExtra(EXTRA_CODE, Drink.code)
+        intentDrink.putExtra(AMOUNT_PER_DRINK_ML, amountPerDrinkMl)
 
         return PendingIntent.getBroadcast(
             context,

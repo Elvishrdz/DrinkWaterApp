@@ -18,10 +18,14 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.eahm.drinkwaterapp.MainActivity
 import com.eahm.drinkwaterapp.R
+import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
+import com.eahm.drinkwaterapp.core.data.datastore.initialAmountPerDrink
 import com.eahm.drinkwaterapp.core.data.systemnotifications.channel.DrinkNotificationChannel
 import com.eahm.drinkwaterapp.core.data.systemnotifications.notification.DrinkNotification
 import com.eahm.drinkwaterapp.core.domain.extension.canShowNotifications
 import com.eahm.drinkwaterapp.ui.awesometexts.AwesomeTextsClass
+import kotlinx.coroutines.flow.firstOrNull
+import org.koin.core.context.GlobalContext
 import kotlin.random.Random
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -34,7 +38,7 @@ object NotificationService {
         DrinkNotificationChannel.createChannel(context)
     }
 
-    fun showDrinkNotification(context: Context) {
+    suspend fun showDrinkNotification(context: Context) {
         // TODO: check if exists, update messages based on:
         //  the status (is this notification visible for too long?
         // time (is midnight? close to end hours? or early morning?
@@ -43,11 +47,17 @@ object NotificationService {
 
         val awesomeTexts = AwesomeTextsClass()
 
+        val koin = GlobalContext.get()
+        val prefsStorage = koin.get<PrefsStorage>()
+        val notificationAmountPerDrinkMl = prefsStorage.getAmountPerDrink().firstOrNull()
+            ?: initialAmountPerDrink
+
         DrinkNotification.showNotification(
             context = context,
             title = awesomeTexts.getTitle(2, context),
             text = awesomeTexts.getText(3, context),
             bigText = awesomeTexts.getBigText(4, context),
+            amountPerDrinkMl = notificationAmountPerDrinkMl,
         )
     }
 
