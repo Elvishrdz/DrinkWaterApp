@@ -3,9 +3,12 @@ package com.eahm.drinkwaterapp.system.broadcast
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.provider.Settings
 import androidx.core.app.NotificationManagerCompat
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
+import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStatsObserver
+import com.eahm.drinkwaterapp.core.data.goalreachedwidget.GoalReachedWidget
 import com.eahm.drinkwaterapp.core.data.systemnotifications.NotificationService
 import com.eahm.drinkwaterapp.core.data.systemnotifications.model.Drink
 import com.eahm.drinkwaterapp.core.data.systemnotifications.model.NotificationRemoved
@@ -15,7 +18,11 @@ import com.eahm.drinkwaterapp.core.data.systemnotifications.notification.DrinkNo
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.database.entity.Status
+import com.eahm.drinkwaterapp.core.domain.extension.toEndOfDayTime
+import com.eahm.drinkwaterapp.core.domain.extension.toStartOfDayTime
+import com.eahm.drinkwaterapp.feature.drink.DateTimeObserver
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import org.koin.core.context.GlobalContext
 
@@ -48,7 +55,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
             Drink.action -> {
                 if (code == Drink.code) {
-                    registerDrink()
+                    registerDrink(context)
                     drinkAlarmManager.setupAlarm(AlarmSource.NotificationDrinkButton)
                     removeNotificationFromSystem(context, intent)
                 }
@@ -70,18 +77,39 @@ class AlarmReceiver : BroadcastReceiver() {
         }
     }
 
-    private suspend fun registerDrink() = withContext(Dispatchers.IO) {
+    private suspend fun registerDrink(context: Context) = withContext(Dispatchers.IO) {
         val koin = GlobalContext.get()
         val database = koin.get<AppDatabase>()
         val dao = database.getHistoryDao()
+        val drinkStatsObserver = koin.get<DrinkStatsObserver>()
+
+        // Snapshot goal state before the insert to detect the not-reached → reached transition
+        val statsBefore = drinkStatsObserver.drinkStats.first()
 
         // TODO: get notification setup amount from shared prefs
         val record = HistoryEntity(
             amount = 150f,
             status = Status.FROM_NOTIFICATION,
         )
-
         dao.insertAll(record)
+
+        // Show celebration overlay only when this drink crosses the goal threshold
+        val goalJustReached = !statsBefore.goalReached &&
+            (statsBefore.drinkAmount + 150f) >= statsBefore.goalAmount
+        if (goalJustReached && Settings.canDrawOverlays(context)) {
+            val today = koin.get<DateTimeObserver>().currentDateTime.value
+            val drinkCount = dao.findByTimestamp(
+                start = today.toStartOfDayTime,
+                end = today.toEndOfDayTime,
+            ).first().size
+
+            val serviceIntent = Intent(context, GoalReachedWidget::class.java).apply {
+                putExtra("goalMl", statsBefore.goalAmount)
+                putExtra("drinkCount", drinkCount.coerceAtLeast(1))
+                putExtra("streakDays", 1)
+            }
+            context.startService(serviceIntent)
+        }
     }
 
     private fun removeNotificationFromSystem(context: Context, intent: Intent) {
