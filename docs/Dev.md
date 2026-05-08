@@ -1,5 +1,11 @@
 Development
 
+Priorities
+- recalculate when drinking water. notification alarm should be rescheduled.
+- Store drink amount and provide it to all drink calculations.
+- organize drink alarm package and all shared code.
+
+
 Next steps
 [] fix admob
 [] request notification permissions to users
