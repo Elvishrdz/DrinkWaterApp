@@ -46,6 +46,7 @@ class DrinkAlarmManager(
         update()
     }
 
+    @Deprecated("this will be removed if determineAction handles everything perfectly")
     @OptIn(ExperimentalTime::class)
     suspend fun setupAlarm(source: AlarmSource) {
         val currentDeviceDateTime =
@@ -136,7 +137,7 @@ class DrinkAlarmManager(
     @OptIn(ExperimentalTime::class)
     suspend fun onAlarmReceived(source: AlarmSource) {
         // always schedule next alarm when previous is received
-        setupAlarm(source)
+        determineAction(source)
 
         val alarmStorageInfo = AlarmScheduler.getAlarmStorageInfo(application, DRINK_ALARM_ID)
 
@@ -255,12 +256,27 @@ class DrinkAlarmManager(
         val alarmInfo = AlarmScheduler.getAlarmStorageInfo(application, DRINK_ALARM_ID)
         val storedAlarmTriggerAt = alarmInfo?.alarmTriggerAt?.toLocalDateTime()
 
+        // Effective interval: next-override wins over regular; consume override after use
+        val rawInterval = AlarmIntervals.getNextInterval(application)
+            ?: AlarmIntervals.getInterval(application)
+        if (AlarmIntervals.getNextInterval(application) != null) {
+            AlarmIntervals.clearNextInterval(application)
+        }
+
+        val todayEpoch = currentDeviceDateTime.date.toEpochDays()
+        val goalMl = database.getDailyGoalDao()
+            .getGoalForDate(todayEpoch)
+            .firstOrNull()
+            ?.goalMl ?: DEFAULT_GOAL_ML
+
         return decideWhatToDoNow(
             now = currentDeviceDateTime,
             startTime = startTime,
             endTime = endTime,
             hasActiveAlarm = alarmActive,
             alarmAlarmTriggersAt = storedAlarmTriggerAt,
+            rawInterval = rawInterval,
+            goalMl = goalMl,
         )
     }
 

@@ -208,7 +208,7 @@ internal class DevViewModel(
 
                 dao.insertAll(record)
 
-                drinkAlarmManager.setupAlarm(AlarmSource.DrinkButtonDevMenu)
+                drinkAlarmManager.determineAction(AlarmSource.DrinkButtonDevMenu)
             }
         }
     }

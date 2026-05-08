@@ -24,6 +24,8 @@ internal fun decideWhatToDoNow(
     // we can receive this value even if no active alarm exists
     // it can be a cached time for a previously existing alarm.
     alarmAlarmTriggersAt: LocalDateTime?,
+    rawInterval: AlarmInterval = AlarmInterval(0, 0), // TODO: fix tests with this
+    goalMl: Float = 1f, // TODO: fix tests with this
 ): WhatToDoNow {
     val undefinedActiveHours = startTime == now && endTime == now
     val invalidActiveHours = startTime == endTime
@@ -37,9 +39,8 @@ internal fun decideWhatToDoNow(
         currentDeviceDateTime = now,
         startTime = startTime,
         endTime = endTime,
-        // TODO: we need goal and raw interval. Check DrinkAlarmManager setupAlarm()
-        goalMl = 1f,
-        rawInterval = AlarmInterval(0, 0),
+        goalMl = goalMl,
+        rawInterval = rawInterval,
     )
 
     val isInActiveTime = now in startTime..endTime

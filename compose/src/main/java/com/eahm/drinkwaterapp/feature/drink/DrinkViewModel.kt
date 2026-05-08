@@ -6,8 +6,8 @@ import android.provider.Settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.core.data.confetti.ConfettiController
-import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
+import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStatsObserver
@@ -172,7 +172,7 @@ internal class DrinkViewModel(
 
                 dao.insertAll(record)
 
-                drinkAlarmManager.setupAlarm(AlarmSource.DrinkButton)
+                drinkAlarmManager.determineAction(AlarmSource.DrinkButton)
             }
         }
     }
