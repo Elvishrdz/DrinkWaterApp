@@ -56,7 +56,6 @@ class DrinkAlarmManager(
         update()
     }
 
-    @Deprecated("this will be removed if determineAction handles everything perfectly")
     @OptIn(ExperimentalTime::class)
     suspend fun setupAlarm(source: AlarmSource) {
         val currentDeviceDateTime =
@@ -77,7 +76,7 @@ class DrinkAlarmManager(
             ?.goalMl ?: DEFAULT_GOAL_ML
 
         val nextSlotTime = getNextAlarmSlot(
-            currentDeviceDateTime = currentDeviceDateTime,
+            now = currentDeviceDateTime,
             startTime = startTime,
             endTime = endTime,
             goalMl = goalMl,
@@ -143,7 +142,8 @@ class DrinkAlarmManager(
     @OptIn(ExperimentalTime::class)
     suspend fun onAlarmReceived(source: AlarmSource) {
         // always schedule next alarm when previous is received
-        determineAction(source)
+        // FIXME: alarma recibida, revisar cual es el siguiente intervalo y programar alarma.
+        setupAlarm(source)
 
         val alarmStorageInfo = AlarmScheduler.getAlarmStorageInfo(application, DRINK_ALARM_ID)
 

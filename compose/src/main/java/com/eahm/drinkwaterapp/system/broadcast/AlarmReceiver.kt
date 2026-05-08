@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.provider.Settings
+import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
@@ -35,6 +36,7 @@ class AlarmReceiver : BroadcastReceiver() {
         }
 
     override fun onReceive(context: Context, intent: Intent) = goAsync { _ ->
+        Log.i("AlarmReceiverLogs", "onReceive: Intent:${intent.action}")
         val code = intent.getIntExtra(EXTRA_CODE, -1)
 
         when (intent.action) {
@@ -95,7 +97,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
         // Show celebration overlay only when this drink crosses the goal threshold
         val goalJustReached = !statsBefore.goalReached &&
-            (statsBefore.drinkAmount + 150f) >= statsBefore.goalAmount
+                (statsBefore.drinkAmount + 150f) >= statsBefore.goalAmount
         if (goalJustReached && Settings.canDrawOverlays(context)) {
             val today = koin.get<DateTimeObserver>().currentDateTime.value
             val drinkCount = dao.findByTimestamp(

@@ -23,7 +23,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DayTime
-import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmCalculator2
 import com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.WhatToDoNow
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwSecondaryButton
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
@@ -69,8 +68,6 @@ internal fun AlarmIntervalsScreen(
         }
     }
 }
-
-private val calculator = DrinkAlarmCalculator2()
 
 @OptIn(ExperimentalTime::class)
 @Composable

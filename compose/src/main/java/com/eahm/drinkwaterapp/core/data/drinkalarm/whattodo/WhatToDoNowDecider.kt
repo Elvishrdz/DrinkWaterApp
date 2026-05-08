@@ -36,7 +36,7 @@ internal fun decideWhatToDoNow(
     }
 
     fun invokeNextAlarmTime() = getNextAlarmSlot(
-        currentDeviceDateTime = now,
+        now = now,
         startTime = startTime,
         endTime = endTime,
         goalMl = goalMl,
@@ -220,7 +220,7 @@ internal fun decideWhatToDoNow(
 
 
 fun getNextAlarmSlot(
-    currentDeviceDateTime: LocalDateTime,
+    now: LocalDateTime,
     startTime: LocalDateTime,
     endTime: LocalDateTime,
     goalMl: Float,
@@ -229,7 +229,7 @@ fun getNextAlarmSlot(
 ): LocalDateTime {
     return if (testMode) {
         simulateNextIntervalCalculation(
-            now = currentDeviceDateTime,
+            now = now,
             startTime = startTime,
             endTime = endTime,
         )
@@ -240,7 +240,7 @@ fun getNextAlarmSlot(
         val endDayTime = DayTime(endTime.hour, endTime.minute)
 
         calculateNextAlarmSlot(
-            now = currentDeviceDateTime,
+            now = now,
             startTime = startDayTime,
             endTime = endDayTime,
             goalMl = goalMl,

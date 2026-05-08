@@ -6,8 +6,8 @@ import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DayTime
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmCalculator2
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkSchedule
-import com.eahm.drinkwaterapp.core.data.drinkalarm.calculator.calculateNextAlarmSlot
 import com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.WhatToDoService
+import com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.getNextAlarmSlot
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
 import com.eahm.drinkwaterapp.core.domain.extension.toLocalDateTime
@@ -182,17 +182,14 @@ internal class AlarmIntervalsViewModel(
         interval: AlarmInterval,
         mode: ScheduleMode = ScheduleMode.BY_INTERVAL,
     ): LocalDateTime? {
-        val start = DayTime(startTime.hour, startTime.minute)
-        val end = DayTime(endTime.hour, endTime.minute)
-
         return if (mode == ScheduleMode.BY_INTERVAL) {
             runCatching {
-                calculateNextAlarmSlot(
+                getNextAlarmSlot(
                     now = time,
-                    startTime = start,
-                    endTime = end,
+                    startTime = startTime,
+                    endTime = endTime,
                     goalMl = goalMl,
-                    intervalMinutes = interval.minute,// TODO: check whole minutes of interval
+                    interval = interval,
                 )
 
             }.getOrNull()
