@@ -56,8 +56,9 @@ internal class SettingsViewModel(
     private val reminderInfo = combine(
         activeTimes,
         prefsStorage.getInterval(),
-    ) { activeTimes, interval ->
-        Pair(activeTimes, interval)
+        prefsStorage.getAmountPerDrink(),
+    ) { activeTimes, interval, notificationAmountMl ->
+        Triple(activeTimes, interval, notificationAmountMl)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
@@ -102,6 +103,7 @@ internal class SettingsViewModel(
             intervalMinutes = reminderInfo?.second?.minute ?: 0,
             startTime = reminderInfo?.first?.start,
             endTime = reminderInfo?.first?.end,
+            notificationAmountMl = reminderInfo?.third ?: 150f,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -138,6 +140,12 @@ internal class SettingsViewModel(
             _state.update { it.copy(intervalMinutes = minutes) }
             prefsStorage.setInterval(ActiveTime(0, minutes))
             drinkAlarmManager.determineAction(AlarmSource.NotificationActiveHoursStartTimeChanged)
+        }
+    }
+
+    fun onNotificationAmountChanged(ml: Float) {
+        viewModelScope.launch {
+            prefsStorage.setAmountPerDrink(ml)
         }
     }
 

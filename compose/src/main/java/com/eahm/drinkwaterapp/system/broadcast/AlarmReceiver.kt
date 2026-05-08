@@ -6,6 +6,7 @@ import android.content.Intent
 import android.provider.Settings
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
+import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStatsObserver
@@ -84,20 +85,22 @@ class AlarmReceiver : BroadcastReceiver() {
         val database = koin.get<AppDatabase>()
         val dao = database.getHistoryDao()
         val drinkStatsObserver = koin.get<DrinkStatsObserver>()
+        val prefsStorage = koin.get<PrefsStorage>()
+
+        val notificationAmountMl = prefsStorage.getAmountPerDrink().first()
 
         // Snapshot goal state before the insert to detect the not-reached → reached transition
         val statsBefore = drinkStatsObserver.drinkStats.first()
 
-        // TODO: get notification setup amount from shared prefs
         val record = HistoryEntity(
-            amount = 150f,
+            amount = notificationAmountMl,
             status = Status.FROM_NOTIFICATION,
         )
         dao.insertAll(record)
 
         // Show celebration overlay only when this drink crosses the goal threshold
         val goalJustReached = !statsBefore.goalReached &&
-                (statsBefore.drinkAmount + 150f) >= statsBefore.goalAmount
+                (statsBefore.drinkAmount + notificationAmountMl) >= statsBefore.goalAmount
         if (goalJustReached && Settings.canDrawOverlays(context)) {
             val today = koin.get<DateTimeObserver>().currentDateTime.value
             val drinkCount = dao.findByTimestamp(

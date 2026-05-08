@@ -80,6 +80,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 import com.eahm.drinkwaterapp.feature.settings.ui.EditButton
 import com.eahm.drinkwaterapp.feature.settings.ui.GoalBottomSheet
 import com.eahm.drinkwaterapp.feature.settings.ui.IntervalBottomSheet
+import com.eahm.drinkwaterapp.feature.settings.ui.NotificationAmountBottomSheet
 import com.eahm.drinkwaterapp.feature.settings.ui.UnitsBottomSheet
 import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorDialog
 import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
@@ -172,6 +173,7 @@ internal fun SettingsScreen(
         onGoalChanged = viewModel::onGoalChanged,
         onUnitChanged = viewModel::onUnitChanged,
         onIntervalChanged = viewModel::onIntervalChanged,
+        onNotificationAmountChanged = viewModel::onNotificationAmountChanged,
         onStartTimeChanged = viewModel::onStartTimeChanged,
         onEndTimeChanged = viewModel::onEndTimeChanged,
         onShareTap = ::handleShare,
@@ -252,6 +254,7 @@ internal fun SettingsContent(
     onGoalChanged: (Int) -> Unit,
     onUnitChanged: (WaterUnit, WeightUnit) -> Unit,
     onIntervalChanged: (Int) -> Unit,
+    onNotificationAmountChanged: (Float) -> Unit,
     onStartTimeChanged: (TimeSelected) -> Unit,
     onEndTimeChanged: (TimeSelected) -> Unit,
     onShareTap: () -> Unit,
@@ -272,6 +275,7 @@ internal fun SettingsContent(
     var showGoalSheet by rememberSaveable { mutableStateOf(false) }
     var showUnitsSheet by rememberSaveable { mutableStateOf(false) }
     var showIntervalSheet by rememberSaveable { mutableStateOf(false) }
+    var showNotificationAmountSheet by rememberSaveable { mutableStateOf(false) }
 
     LazyColumn(
         modifier = modifier
@@ -369,6 +373,16 @@ internal fun SettingsContent(
                     label = "End time",
                     onStartTimeTap = onEndTimeChanged,
                 )
+                HorizontalDivider(color = DwInk100)
+                SettingRow(
+                    icon = DwIcons.Glass,
+                    iconBg = DwTintWater,
+                    iconTint = DwWater,
+                    label = "Notification amount",
+                    onClick = { showNotificationAmountSheet = true },
+                ) {
+                    RowValueTrailing(value = "+${state.notificationAmountMl.toInt()} ml")
+                }
             }
         }
 
@@ -443,6 +457,14 @@ internal fun SettingsContent(
             windowMinutes = windowMinutes,
             onIntervalChanged = onIntervalChanged,
             onDismiss = { showIntervalSheet = false },
+        )
+    }
+
+    if (showNotificationAmountSheet) {
+        NotificationAmountBottomSheet(
+            currentAmountMl = state.notificationAmountMl,
+            onAmountChanged = onNotificationAmountChanged,
+            onDismiss = { showNotificationAmountSheet = false },
         )
     }
 }
@@ -847,6 +869,7 @@ private fun SettingsScreenPreview() {
             onGoalChanged = {},
             onUnitChanged = { _, _ -> },
             onIntervalChanged = {},
+            onNotificationAmountChanged = {},
             onStartTimeChanged = {},
             onEndTimeChanged = {},
             onShareTap = {},
