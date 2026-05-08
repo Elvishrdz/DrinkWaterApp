@@ -6,8 +6,10 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -21,6 +23,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlin.math.PI
@@ -90,7 +93,7 @@ fun BubblesDecor() {
             else -> 1f
         }.coerceIn(0f, 1f)
 
-        val translateY = (-90.dp * progress)
+        val translateY = ((-90).dp * progress)
 
         Box(
             modifier = Modifier
@@ -446,5 +449,81 @@ fun RingsDecor() {
                     )
                 }
         )
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Previews
+// ---------------------------------------------------------------------------
+
+@Preview(name = "Bubbles (Ocean)", widthDp = 200, heightDp = 200)
+@Composable
+private fun PreviewBubbles() {
+    Box(
+        modifier = Modifier
+            .size(200.dp)
+            .background(Color(0xFF1C8EBF))
+    ) {
+        BubblesDecor()
+    }
+}
+
+@Preview(name = "Confetti (Carnival)", widthDp = 200, heightDp = 200)
+@Composable
+private fun PreviewConfetti() {
+    Box(
+        modifier = Modifier
+            .size(200.dp)
+            .background(Color(0xFFB83A95))
+    ) {
+        ConfettiDecor()
+    }
+}
+
+@Preview(name = "Sparkles (Starlight)", widthDp = 200, heightDp = 200)
+@Composable
+private fun PreviewSparkles() {
+    Box(
+        modifier = Modifier
+            .size(200.dp)
+            .background(Color(0xFF0E2235))
+    ) {
+        SparklesDecor()
+    }
+}
+
+@Preview(name = "Drips (Rain)", widthDp = 200, heightDp = 200)
+@Composable
+private fun PreviewDrips() {
+    Box(
+        modifier = Modifier
+            .size(200.dp)
+            .background(Color(0xFF2BA89A))
+    ) {
+        DripsDecor()
+    }
+}
+
+@Preview(name = "Rays (Sunset)", widthDp = 200, heightDp = 200)
+@Composable
+private fun PreviewRays() {
+    Box(
+        modifier = Modifier
+            .size(200.dp)
+            .background(Color(0xFF1C8EBF))
+    ) {
+        RaysDecor()
+    }
+}
+
+@Preview(name = "Rings (Moonlit)", widthDp = 200, heightDp = 200)
+@Composable
+private fun PreviewRings() {
+    Box(
+        modifier = Modifier
+            .size(200.dp)
+            .background(Color(0xFF008577))
+    ) {
+        RingsDecor()
     }
 }
