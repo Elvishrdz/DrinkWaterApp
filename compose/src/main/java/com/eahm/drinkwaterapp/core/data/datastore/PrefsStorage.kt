@@ -27,5 +27,11 @@ interface PrefsStorage {
     fun getAmountPerDrink(): Flow<Float>
     suspend fun setAmountPerDrink(milliliters: Float)
 
+    fun getBestGoalStreak(): Flow<Int>
+    suspend fun setBestGoalStreak(days: Int)
+
+    fun getBestDrinkStreak(): Flow<Int>
+    suspend fun setBestDrinkStreak(days: Int)
+
     suspend fun clear()
 }

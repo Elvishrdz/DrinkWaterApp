@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -47,22 +48,25 @@ internal fun StatsScreen(
     val state by viewModel.state.collectAsState()
     val calendarState by calendarViewModel.state.collectAsState()
 
-    StatsContent(
-        state = state,
-        calendarState = calendarState,
-        onPeriodSelected = { period ->
-            viewModel.onPeriodSelected(period)
-            // Keep calendar view mode in sync: year toggle → year calendar, else → month
-            calendarViewModel.setViewMode(
-                if (period == StatsPeriod.YEAR) CalendarViewMode.YEAR else CalendarViewMode.MONTH
-            )
-        },
-        onChartPageChanged = viewModel::onChartPageChanged,
-        onCalendarPrevious = calendarViewModel::navigatePrevious,
-        onCalendarNext = calendarViewModel::navigateNext,
-        onCalendarViewModeToggle = calendarViewModel::setViewMode,
-        modifier = modifier,
-    )
+    Scaffold { innerPadding ->
+        StatsContent(
+            state = state,
+            calendarState = calendarState,
+            onPeriodSelected = { period ->
+                viewModel.onPeriodSelected(period)
+                // Keep calendar view mode in sync: year toggle → year calendar, else → month
+                calendarViewModel.setViewMode(
+                    if (period == StatsPeriod.YEAR) CalendarViewMode.YEAR else CalendarViewMode.MONTH
+                )
+            },
+            onChartPageChanged = viewModel::onChartPageChanged,
+            onCalendarPrevious = calendarViewModel::navigatePrevious,
+            onCalendarNext = calendarViewModel::navigateNext,
+            onCalendarViewModeToggle = calendarViewModel::setViewMode,
+            modifier = Modifier
+                .padding(innerPadding),
+        )
+    }
 }
 
 @Composable
@@ -133,6 +137,8 @@ internal fun StatsContent(
         item {
             MiniStatsCards(
                 streakDays = state.streakDays,
+                bestStreakDays = state.bestStreakDays,
+                drinkStreakDays = state.drinkStreakDays,
                 personalBestMl = state.personalBestMl,
                 modifier = Modifier.padding(horizontal = 18.dp)
             )
@@ -232,6 +238,9 @@ private val previewState = StatsState(
     avgTrendPercent = 12,
     isTrendPositive = true,
     streakDays = 4,
+    bestStreakDays = 12,
+    drinkStreakDays = 7,
+    bestDrinkStreakDays = 20,
     personalBestMl = 2950,
 )
 

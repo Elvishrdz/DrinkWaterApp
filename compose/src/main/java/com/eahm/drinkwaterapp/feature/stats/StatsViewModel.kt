@@ -2,6 +2,8 @@ package com.eahm.drinkwaterapp.feature.stats
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.eahm.drinkwaterapp.core.data.streak.StreakData
+import com.eahm.drinkwaterapp.core.data.streak.StreakRepository
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
@@ -29,6 +31,7 @@ import kotlin.time.ExperimentalTime
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
 internal class StatsViewModel(
     database: AppDatabase,
+    streakRepository: StreakRepository,
 ) : ViewModel() {
 
     private val historyDao = database.getHistoryDao()
@@ -50,24 +53,35 @@ internal class StatsViewModel(
         .flatMapLatest { period -> loadPagesFlow(period) }
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
+    private val streakData: StateFlow<StreakData> = streakRepository.streakData
+        .stateIn(viewModelScope, SharingStarted.Lazily, StreakData())
+
     val state: StateFlow<StatsState> = combine(
-        _selectedPeriod, _chartPage, pages, todayGoalMl,
-    ) { period, page, pages, dailyGoalMl ->
-        // For YEAR mode bars represent monthly totals, scale goal to match
-        val chartGoal = when (period) {
-            StatsPeriod.YEAR -> dailyGoalMl * 30
-            else -> dailyGoalMl
-        }
-        val safeIndex = page.coerceIn(0, (pages.size - 1).coerceAtLeast(0))
-        val summary = computeSummary(pages, safeIndex)
-        StatsState(
-            selectedPeriod = period,
-            chartPage = page,
-            pages = pages,
-            goalMl = chartGoal,
-            avgMl = summary.avgMl,
-            avgTrendPercent = summary.trendPercent,
-            isTrendPositive = summary.isTrendPositive,
+        combine(_selectedPeriod, _chartPage, pages, todayGoalMl) { period, page, pages, dailyGoalMl ->
+            val chartGoal = when (period) {
+                StatsPeriod.YEAR -> dailyGoalMl * 30
+                else -> dailyGoalMl
+            }
+            val safeIndex = page.coerceIn(0, (pages.size - 1).coerceAtLeast(0))
+            val summary = computeSummary(pages, safeIndex)
+            StatsState(
+                selectedPeriod = period,
+                chartPage = page,
+                pages = pages,
+                goalMl = chartGoal,
+                avgMl = summary.avgMl,
+                avgTrendPercent = summary.trendPercent,
+                isTrendPositive = summary.isTrendPositive,
+            )
+        },
+        streakData,
+    ) { partialState, streak ->
+        partialState.copy(
+            streakDays = streak.currentGoalStreak,
+            bestStreakDays = streak.bestGoalStreak,
+            drinkStreakDays = streak.currentDrinkStreak,
+            bestDrinkStreakDays = streak.bestDrinkStreak,
+            personalBestMl = streak.personalBestMl,
         )
     }.stateIn(
         scope = viewModelScope,

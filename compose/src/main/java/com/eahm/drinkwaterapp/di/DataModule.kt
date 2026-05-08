@@ -7,6 +7,7 @@ import com.eahm.drinkwaterapp.core.data.drinkalarm.drinkAlarmModule
 import com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.whatToDoServiceModule
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.drinkStatsObserverModule
 import com.eahm.drinkwaterapp.core.data.notificationpermission.notificationPermissionModule
+import com.eahm.drinkwaterapp.core.data.streak.streakModule
 import org.koin.dsl.module
 
 internal val dataModule = module {
@@ -17,4 +18,5 @@ internal val dataModule = module {
     includes(whatToDoServiceModule)
     includes(drinkStatsObserverModule)
     includes(notificationPermissionModule)
+    includes(streakModule)
 }

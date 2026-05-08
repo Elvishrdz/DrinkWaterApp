@@ -12,6 +12,8 @@ import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStatsObserver
 import com.eahm.drinkwaterapp.core.data.goalreachedwidget.GoalReachedWidget
+import com.eahm.drinkwaterapp.core.data.streak.StreakData
+import com.eahm.drinkwaterapp.core.data.streak.StreakRepository
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.database.entity.Status
@@ -45,6 +47,7 @@ internal class DrinkViewModel(
     val confettiController: ConfettiController,
     val dateTimeObserver: DateTimeObserver,
     val drinkStatsObserver: DrinkStatsObserver,
+    val streakRepository: StreakRepository,
 ) : ViewModel() {
 
     private val dao = database.getHistoryDao()
@@ -136,26 +139,31 @@ internal class DrinkViewModel(
         initialValue = null,
     )
 
-    val state = combine(
-        extras,
-        history,
-        drinkStatsObserver.drinkStats,
-        drinkAlarmManager.state,
-    ) { extras, history, drinkStats, alarmState ->
-        if (history == null || extras == null) {
-            DrinkState.Loading
-        } else {
-            DrinkState.Data(
-                username = extras.username,
-                currentStreak = 0,
-                quickDrinkSuggestions = extras.quickDrinkSuggestions,
-                allDrinkSuggestions = extras.allDrinkSuggestions,
-                todayLogs = history.todayLogs,
-                drinkStats = drinkStats,
-                alarmTriggerAtMs = alarmState.alarmStorageInfo?.alarmTriggerAtMillis,
-            )
-        }
+    private val streakData = streakRepository.streakData
+        .stateIn(viewModelScope, SharingStarted.Lazily, StreakData())
 
+    val state = combine(
+        combine(extras, history, drinkStatsObserver.drinkStats, drinkAlarmManager.state) { extras, history, drinkStats, alarmState ->
+            if (history == null || extras == null) {
+                DrinkState.Loading
+            } else {
+                DrinkState.Data(
+                    username = extras.username,
+                    currentStreak = 0,
+                    quickDrinkSuggestions = extras.quickDrinkSuggestions,
+                    allDrinkSuggestions = extras.allDrinkSuggestions,
+                    todayLogs = history.todayLogs,
+                    drinkStats = drinkStats,
+                    alarmTriggerAtMs = alarmState.alarmStorageInfo?.alarmTriggerAtMillis,
+                )
+            }
+        },
+        streakData,
+    ) { drinkState, streak ->
+        when (drinkState) {
+            is DrinkState.Loading -> drinkState
+            is DrinkState.Data -> drinkState.copy(currentStreak = streak.currentGoalStreak)
+        }
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
@@ -250,7 +258,7 @@ internal class DrinkViewModel(
             val intent = Intent(application, GoalReachedWidget::class.java).apply {
                 putExtra("goalMl", currentState?.drinkStats?.goalAmount ?: 2400f)
                 putExtra("drinkCount", records.value.size.coerceAtLeast(1))
-                putExtra("streakDays", 1)
+                putExtra("streakDays", streakData.value.currentGoalStreak)
             }
             application.startService(intent)
         }

@@ -9,6 +9,9 @@ data class StatsState(
     val avgTrendPercent: Int = 0,
     val isTrendPositive: Boolean = true,
     val streakDays: Int = 0,
+    val bestStreakDays: Int = 0,
+    val drinkStreakDays: Int = 0,
+    val bestDrinkStreakDays: Int = 0,
     val personalBestMl: Int = 0,
 )
 

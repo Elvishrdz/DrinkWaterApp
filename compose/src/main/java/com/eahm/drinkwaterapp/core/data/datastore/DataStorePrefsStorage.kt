@@ -44,6 +44,8 @@ private class DataStorePrefsStorage(
     private val startTimeKey = stringPreferencesKey("START_TIME")
     private val endTimeKey = stringPreferencesKey("END_TIME")
     private val amountPerDrinkKey = floatPreferencesKey("AMOUNT_PER_DRINK")
+    private val bestGoalStreakKey = intPreferencesKey("BEST_GOAL_STREAK")
+    private val bestDrinkStreakKey = intPreferencesKey("BEST_DRINK_STREAK")
 
     private val json = Json {
         ignoreUnknownKeys = true
@@ -174,6 +176,32 @@ private class DataStorePrefsStorage(
         }
     }
 
+    override fun getBestGoalStreak(): Flow<Int> {
+        return dataStore.data.map { preferences ->
+            preferences[bestGoalStreakKey] ?: 0
+        }
+    }
+
+    override suspend fun setBestGoalStreak(days: Int) {
+        dataStore.updateData { preferences ->
+            preferences.toMutablePreferences()
+                .also { it[bestGoalStreakKey] = days }
+        }
+    }
+
+    override fun getBestDrinkStreak(): Flow<Int> {
+        return dataStore.data.map { preferences ->
+            preferences[bestDrinkStreakKey] ?: 0
+        }
+    }
+
+    override suspend fun setBestDrinkStreak(days: Int) {
+        dataStore.updateData { preferences ->
+            preferences.toMutablePreferences()
+                .also { it[bestDrinkStreakKey] = days }
+        }
+    }
+
     override suspend fun clear() {
         dataStore.edit {
             it.remove(firstSetupKey)
@@ -182,6 +210,8 @@ private class DataStorePrefsStorage(
             it.remove(startTimeKey)
             it.remove(endTimeKey)
             it.remove(amountPerDrinkKey)
+            it.remove(bestGoalStreakKey)
+            it.remove(bestDrinkStreakKey)
         }
     }
 }
