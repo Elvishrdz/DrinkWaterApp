@@ -1,5 +1,6 @@
 package com.eahm.drinkwaterapp.feature.dev.alarmintervals
 
+import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkSchedule
 import com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.WhatToDoNow
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import kotlinx.datetime.LocalDateTime
@@ -9,19 +10,24 @@ internal sealed interface AlarmIntervalsState {
     data object Loading : AlarmIntervalsState
 
     data class Data(
+        val time: LocalDateTime,
         val now: LocalDateTime,
+        val customTime: LocalDateTime?,
         val startTime: LocalDateTime,
         val endTime: LocalDateTime,
         val goalMl: Float,
         val interval: AlarmInterval,
         val intervalMinutes: Int,
         val whatToDoResult: WhatToDoNow,
+        val schedule: DrinkSchedule?,
+        val nextAlarmSlot: LocalDateTime?,
     ) : AlarmIntervalsState
 }
 
-// User intents (UI → ViewModel)
 internal sealed interface AlarmIntervalsAction {
-    // actions added as the feature grows
+
+    data class SetCustomTime(val dateTime: LocalDateTime) : AlarmIntervalsAction
+    data object ClearCustomTime : AlarmIntervalsAction
 }
 
 // One-shot side effects (ViewModel → UI)
