@@ -49,6 +49,7 @@ import com.eahm.drinkwaterapp.core.domain.mock.localDateTimeMock
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import com.eahm.drinkwaterapp.feature.dev.adaptive.AdaptiveScreen
 import com.eahm.drinkwaterapp.feature.dev.alarmcalculator.AlarmCalculatorRoot
+import com.eahm.drinkwaterapp.feature.dev.alarmintervals.AlarmIntervalsRoot
 import com.eahm.drinkwaterapp.feature.dev.alarms.AlarmsRoot
 import com.eahm.drinkwaterapp.feature.dev.dailygoal.DailyGoalDevRoot
 import com.eahm.drinkwaterapp.feature.dev.ui.Adaptive
@@ -77,6 +78,7 @@ enum class DevDestination(
     VALUES("Values", DwIcons.Drop),
     ADAPTIVE("Adaptive", DwIcons.Wave),
     ALARM_CALCULATOR("Calculator", DwIcons.Clock),
+    ALARM_INTERVALS("Intervals", DwIcons.Clock),
     ALARMS("Alarms", DwIcons.Bell),
     DAILY_GOAL("Daily Goal", DwIcons.Drop),
 }
@@ -111,6 +113,10 @@ internal fun DevRoot(onBackClicked: () -> Unit) {
             onBackClicked = onBackClicked,
         )
 
+        DevDestination.ALARM_INTERVALS -> AlarmIntervalsRoot(
+            onBackClicked = onBackClicked,
+        )
+
         DevDestination.ALARMS -> AlarmsRoot(
             onBackClicked = onBackClicked,
         )
@@ -125,18 +131,23 @@ internal fun DevRoot(onBackClicked: () -> Unit) {
 private fun MenuRoot(
     onMenuSelected: (DevDestination) -> Unit
 ) {
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(70.dp),
-    ) {
-        items(DevDestination.entries.filterNot { it == DevDestination.MENU }) {
-            MiniCard(
-                icon = it.icon,
-                iconBg = DwTealSoft,
-                iconTint = DwTealDark,
-                value = "",
-                label = it.label,
-                onClick = { onMenuSelected(it) },
-            )
+    Scaffold { innerPadding ->
+        LazyVerticalGrid(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            columns = GridCells.Adaptive(70.dp),
+        ) {
+            items(DevDestination.entries.filterNot { it == DevDestination.MENU }) {
+                MiniCard(
+                    icon = it.icon,
+                    iconBg = DwTealSoft,
+                    iconTint = DwTealDark,
+                    value = "",
+                    label = it.label,
+                    onClick = { onMenuSelected(it) },
+                )
+            }
         }
     }
 }
