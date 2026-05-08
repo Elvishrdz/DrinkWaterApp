@@ -14,8 +14,13 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.WideNavigationRailDefaults
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -39,8 +44,12 @@ import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.component.card.MiniCard
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk200
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwTeal
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTealDark
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTealSoft
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 import com.eahm.drinkwaterapp.core.domain.mock.Mock
 import com.eahm.drinkwaterapp.core.domain.mock.drinkStatsMock
@@ -96,34 +105,71 @@ internal fun DevRoot(onBackClicked: () -> Unit) {
         currentDestination = DevDestination.MENU
     }
 
-    when (currentDestination) {
-        DevDestination.MENU -> MenuRoot(
-            onMenuSelected = { currentDestination = it },
+    val itemColors = NavigationSuiteDefaults.itemColors(
+        navigationBarItemColors = NavigationBarItemDefaults.colors(
+            selectedIconColor = DwTealDark,
+            selectedTextColor = DwTeal,
+            indicatorColor = DwTintMagenta,
+            unselectedIconColor = DwInk400,
+            unselectedTextColor = DwInk400,
         )
+    )
 
-        DevDestination.VALUES -> ValuesRoot(
-            onBackClicked = onBackClicked,
-        )
+    val suiteColors = NavigationSuiteDefaults.colors(
+        navigationBarContainerColor = DwInk200,
+        wideNavigationRailColors = WideNavigationRailDefaults.colors(
+            containerColor = DwInk200,
+        ),
+    )
 
-        DevDestination.ADAPTIVE -> AdaptiveScreen(
-            onBackClicked = onBackClicked,
-        )
+    NavigationSuiteScaffold(
+        navigationSuiteColors = suiteColors,
+        navigationSuiteItems = {
+            DevDestination.entries.forEach { destination ->
+                item(
+                    icon = {
+                        Icon(
+                            imageVector = destination.icon,
+                            contentDescription = destination.label
+                        )
+                    },
+                    label = { Text(destination.label) },
+                    selected = destination == currentDestination,
+                    onClick = { currentDestination = destination },
+                    colors = itemColors,
+                )
+            }
+        }
+    ) {
+        when (currentDestination) {
+            DevDestination.MENU -> MenuRoot(
+                onMenuSelected = { currentDestination = it },
+            )
 
-        DevDestination.ALARM_CALCULATOR -> AlarmCalculatorRoot(
-            onBackClicked = onBackClicked,
-        )
+            DevDestination.VALUES -> ValuesRoot(
+                onBackClicked = onBackClicked,
+            )
 
-        DevDestination.ALARM_INTERVALS -> AlarmIntervalsRoot(
-            onBackClicked = onBackClicked,
-        )
+            DevDestination.ADAPTIVE -> AdaptiveScreen(
+                onBackClicked = onBackClicked,
+            )
 
-        DevDestination.ALARMS -> AlarmsRoot(
-            onBackClicked = onBackClicked,
-        )
+            DevDestination.ALARM_CALCULATOR -> AlarmCalculatorRoot(
+                onBackClicked = onBackClicked,
+            )
 
-        DevDestination.DAILY_GOAL -> DailyGoalDevRoot(
-            onBackClicked = onBackClicked,
-        )
+            DevDestination.ALARM_INTERVALS -> AlarmIntervalsRoot(
+                onBackClicked = onBackClicked,
+            )
+
+            DevDestination.ALARMS -> AlarmsRoot(
+                onBackClicked = onBackClicked,
+            )
+
+            DevDestination.DAILY_GOAL -> DailyGoalDevRoot(
+                onBackClicked = onBackClicked,
+            )
+        }
     }
 }
 
