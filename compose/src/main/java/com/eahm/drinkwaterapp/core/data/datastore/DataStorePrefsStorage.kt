@@ -19,6 +19,8 @@ val prefsStorageModule = module {
     singleOf(::DataStorePrefsStorage) bind PrefsStorage::class
 }
 
+val initialInterval = ActiveTime(0, 45)
+
 private class DataStorePrefsStorage(
     private val dataStore: DataStore<Preferences>,
 ) : PrefsStorage {
@@ -36,6 +38,7 @@ private class DataStorePrefsStorage(
     private val firstSetupKey = booleanPreferencesKey("FIRST_SETUP")
     private val usernameKey = stringPreferencesKey("USERNAME")
     private val drinkSuggestionsKey = stringPreferencesKey("DRINKS_SUGGESTIONS")
+    private val intervalKey = stringPreferencesKey("DRINKS_SUGGESTIONS")
     private val startTimeKey = stringPreferencesKey("START_TIME")
     private val endTimeKey = stringPreferencesKey("END_TIME")
     private val amountPerDrinkKey = floatPreferencesKey("AMOUNT_PER_DRINK")
@@ -90,6 +93,26 @@ private class DataStorePrefsStorage(
                 .also {
                     val jsonString = Json.encodeToString(suggestions)
                     it[drinkSuggestionsKey] = jsonString
+                }
+        }
+    }
+
+    override fun getInterval(): Flow<ActiveTime> {
+        return dataStore.data.map { preferences ->
+            val jsonString = preferences[intervalKey]
+            jsonString?.let {
+                runCatching { json.decodeFromString<ActiveTime>(it) }
+                    .getOrNull()
+            } ?: initialInterval
+        }
+    }
+
+    override suspend fun setInterval(interval: ActiveTime) {
+        dataStore.updateData { preferences ->
+            preferences.toMutablePreferences()
+                .also {
+                    val jsonString = Json.encodeToString(interval)
+                    it[intervalKey] = jsonString
                 }
         }
     }

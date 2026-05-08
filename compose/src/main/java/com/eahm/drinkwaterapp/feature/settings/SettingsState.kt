@@ -9,7 +9,7 @@ data class SettingsState(
     val unit: WaterUnit = WaterUnit.ML,
     val weightUnit: WeightUnit = WeightUnit.KG,
     val notificationsEnabled: Boolean,
-    val intervalMinutes: Int = 45,
+    val intervalMinutes: Int,
     val startTime: ActiveTime?,
     val endTime: ActiveTime?,
     val timeRangeError: TimeRangeError? = null,

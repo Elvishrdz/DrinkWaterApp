@@ -4,11 +4,11 @@ import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
-import com.eahm.drinkwaterapp.core.data.drinkalarm.AlarmIntervals
+import com.eahm.drinkwaterapp.core.data.datastore.initialInterval
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
+import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import com.eahm.drinkwaterapp.feature.settings.data.ActiveTimes
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -53,8 +53,11 @@ internal class AlarmCalculatorViewModel(
             initialValue = DEFAULT_GOAL_ML,
         )
 
-    val intervalMinutes: StateFlow<Int> = MutableStateFlow(
-        AlarmIntervals.getInterval(application).let { it.hour * 60 + it.minute }
-            .coerceAtLeast(1)
-    )
+    val interval = prefsStorage.getInterval()
+        .map { AlarmInterval(it.hour, it.minute) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Lazily,
+            initialValue = AlarmInterval(initialInterval.hour, initialInterval.minute),
+        )
 }

@@ -53,6 +53,17 @@ internal class SettingsViewModel(
         initialValue = null,
     )
 
+    private val reminderInfo = combine(
+        activeTimes,
+        prefsStorage.getInterval(),
+    ) { activeTimes, interval ->
+        Pair(activeTimes, interval)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Lazily,
+        initialValue = null,
+    )
+
     private val canDrawOverlay get() = Settings.canDrawOverlays(application)
 
     private val _state =
@@ -62,6 +73,7 @@ internal class SettingsViewModel(
                 notificationsEnabled = notificationPermissionObserver.hasPermission.value,
                 startTime = null,
                 endTime = null,
+                intervalMinutes = 0,
                 goalReachedCelebrationsEnabled = canDrawOverlay,
             )
         )
@@ -79,16 +91,17 @@ internal class SettingsViewModel(
     val state = combine(
         prefsStorage.getUsername(),
         goal,
-        activeTimes,
+        reminderInfo,
         notificationPermissionObserver.hasPermission,
         _state,
-    ) { username, goal, activeTimes, hasNotificationPermission, state ->
+    ) { username, goal, reminderInfo, hasNotificationPermission, state ->
         state.copy(
             username = username,
             dailyGoalMl = goal,
             notificationsEnabled = hasNotificationPermission,
-            startTime = activeTimes?.start,
-            endTime = activeTimes?.end,
+            intervalMinutes = reminderInfo?.second?.minute ?: 0,
+            startTime = reminderInfo?.first?.start,
+            endTime = reminderInfo?.first?.end,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -121,7 +134,11 @@ internal class SettingsViewModel(
     }
 
     fun onIntervalChanged(minutes: Int) {
-        _state.update { it.copy(intervalMinutes = minutes) }
+        viewModelScope.launch {
+            _state.update { it.copy(intervalMinutes = minutes) }
+            prefsStorage.setInterval(ActiveTime(0, minutes))
+            drinkAlarmManager.determineAction(AlarmSource.NotificationActiveHoursStartTimeChanged)
+        }
     }
 
     fun onStartTimeChanged(time: TimeSelected) {

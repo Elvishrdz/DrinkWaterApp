@@ -1,8 +1,6 @@
 package com.eahm.drinkwaterapp.feature.dev
 
 import android.app.Application
-import android.content.Intent
-import android.provider.Settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.core.bindings.toUI
@@ -10,7 +8,6 @@ import com.eahm.drinkwaterapp.core.data.confetti.ConfettiController
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStats
-import com.eahm.drinkwaterapp.core.data.goalreachedwidget.GoalReachedWidget
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
 import com.eahm.drinkwaterapp.core.database.entity.DailyGoalEntity
@@ -187,7 +184,6 @@ internal class DevViewModel(
                 drinkStats = drinkStats,
                 isAlarmActive = drinkAlarmState.active,
                 alarmInterval = drinkAlarmState.interval,
-                alarmNextInterval = drinkAlarmState.nextInterval,
                 confettiButtonEnabled = !confettiActive,
             )
         }
@@ -208,7 +204,7 @@ internal class DevViewModel(
 
                 dao.insertAll(record)
 
-                drinkAlarmManager.determineAction(AlarmSource.DrinkButtonDevMenu)
+                drinkAlarmManager.setupAlarm(AlarmSource.DrinkButtonDevMenu)
             }
         }
     }
@@ -243,13 +239,8 @@ internal class DevViewModel(
     }
 
     fun onAlarmIntervalChange(alarmInterval: AlarmInterval) {
-        drinkAlarmManager.setInterval(alarmInterval.hour, alarmInterval.minute)
-    }
-
-    fun displayGoalReachedOverlay() {
-        if (Settings.canDrawOverlays(application)) {
-            val intent = Intent(application, GoalReachedWidget::class.java)
-            application.startService(intent)
+        viewModelScope.launch {
+            drinkAlarmManager.setInterval(alarmInterval.hour, alarmInterval.minute)
         }
     }
 

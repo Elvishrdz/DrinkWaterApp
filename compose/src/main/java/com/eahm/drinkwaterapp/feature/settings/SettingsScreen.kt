@@ -859,6 +859,7 @@ private fun SettingsScreenPreview() {
 private val settingsStateMock = SettingsState(
     username = null,
     notificationsEnabled = false,
+    intervalMinutes = 5,
     startTime = null,
     endTime = null,
     goalReachedCelebrationsEnabled = false,

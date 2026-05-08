@@ -14,14 +14,14 @@ internal fun AlarmCalculatorRoot(
 ) {
     val activeTimes by viewModel.activeTimes.collectAsStateWithLifecycle()
     val goalMl by viewModel.goalMl.collectAsStateWithLifecycle()
-    val intervalMinutes by viewModel.intervalMinutes.collectAsStateWithLifecycle()
+    val interval by viewModel.interval.collectAsStateWithLifecycle()
 
     activeTimes?.let {
         AlarmCalculatorScreen(
             startTime = DayTime(it.start.hour, it.start.minute),
             endTime = DayTime(it.end.hour, it.end.minute),
             initialGoalMl = goalMl,
-            initialIntervalMinutes = intervalMinutes,
+            interval = interval,
             onBackClicked = onBackClicked,
         )
     }

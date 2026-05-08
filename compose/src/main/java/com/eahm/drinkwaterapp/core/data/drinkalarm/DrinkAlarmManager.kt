@@ -4,21 +4,23 @@ import android.app.Application
 import android.content.Intent
 import android.util.Log
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
+import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmConfiguration
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSchedule
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.WhatToDoNow
-import com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.decideWhatToDoNow
+import com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.WhatToDoService
 import com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.getNextAlarmSlot
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
 import com.eahm.drinkwaterapp.core.domain.extension.canScheduleExactAlarms
 import com.eahm.drinkwaterapp.core.domain.extension.canShowNotifications
 import com.eahm.drinkwaterapp.core.domain.extension.toLocalDateTime
+import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler
 import com.eahm.drinkwaterapp.system.broadcast.AlarmReceiver
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.sync.Mutex
@@ -33,10 +35,18 @@ class DrinkAlarmManager(
     private val application: Application,
     private val prefsStorage: PrefsStorage,
     private val database: AppDatabase,
+    private val whatToDoService: WhatToDoService,
 ) {
     private val _state = MutableStateFlow(getState())
 
-    val state: StateFlow<DrinkAlarmState> = _state
+    val state = combine(
+        prefsStorage.getInterval(),
+        _state,
+    ) { interval, state ->
+        state.copy(
+            interval = AlarmInterval(interval.hour, interval.minute),
+        )
+    }
 
     private val isAlarmActive get() = AlarmScheduler.isAlarmActive(application, DRINK_ALARM_ID)
 
@@ -52,17 +62,13 @@ class DrinkAlarmManager(
         val currentDeviceDateTime =
             Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 
+        val interval = prefsStorage.getInterval().firstOrNull()
+            ?.let { AlarmInterval(it.hour, it.minute) }
+            ?: throw Exception("Getting the interval was not possible. Source: $source")
         val startTime = prefsStorage.getStartTime().firstOrNull()?.toLocalDateTime()
             ?: currentDeviceDateTime
         val endTime = prefsStorage.getEndTime().firstOrNull()?.toLocalDateTime()
             ?: currentDeviceDateTime
-
-        // Effective interval: next-override wins over regular; consume override after use
-        val rawInterval = AlarmIntervals.getNextInterval(application)
-            ?: AlarmIntervals.getInterval(application)
-        if (AlarmIntervals.getNextInterval(application) != null) {
-            AlarmIntervals.clearNextInterval(application)
-        }
 
         val todayEpoch = currentDeviceDateTime.date.toEpochDays()
         val goalMl = database.getDailyGoalDao()
@@ -75,7 +81,7 @@ class DrinkAlarmManager(
             startTime = startTime,
             endTime = endTime,
             goalMl = goalMl,
-            rawInterval = rawInterval,
+            interval = interval,
         )
 
         val configuration = AlarmConfiguration(
@@ -160,17 +166,8 @@ class DrinkAlarmManager(
         }
     }
 
-    fun setInterval(hour: Int, minute: Int) {
-        val isAlarmActive = AlarmScheduler.isAlarmActive(application, DRINK_ALARM_ID)
-
-        if (isAlarmActive) {
-            AlarmIntervals.setNextInterval(application, hour, minute)
-
-        } else {
-            AlarmIntervals.clearNextInterval(application)
-            AlarmIntervals.setInterval(application, hour, minute)
-        }
-
+    suspend fun setInterval(hour: Int, minute: Int) {
+        prefsStorage.setInterval(ActiveTime(hour, minute))
         update()
     }
 
@@ -178,13 +175,12 @@ class DrinkAlarmManager(
         _state.update { getState() }
     }
 
-    private fun getState(): DrinkAlarmState {
+    private fun getState(interval: AlarmInterval = AlarmInterval(0, 0)): DrinkAlarmState {
         val alarmStorageInfo = AlarmScheduler.getAlarmStorageInfo(application, DRINK_ALARM_ID)
 
         return DrinkAlarmState(
             active = AlarmScheduler.isAlarmActive(application, DRINK_ALARM_ID),
-            interval = AlarmIntervals.getInterval(application),
-            nextInterval = AlarmIntervals.getNextInterval(application),
+            interval = interval,
             canScheduleExactAlarms = application.canScheduleExactAlarms,
             hasNotificationPermissions = application.canShowNotifications,
             isAlarmActive = isAlarmActive,
@@ -199,7 +195,7 @@ class DrinkAlarmManager(
     suspend fun askWhatToDo(source: String = "unknown") {
         Log.i("DRINK_ALARM_MANAGER", "what to do? source: $source")
 
-        when (val data = whatShouldIDoNow()) {
+        when (val data = whatToDoService.whatShouldIDoNow()) {
             WhatToDoNow.InvalidActiveHours -> {
                 Log.i(
                     "DRINK_ALARM_MANAGER",
@@ -239,47 +235,6 @@ class DrinkAlarmManager(
         }
     }
 
-    @OptIn(ExperimentalTime::class)
-    private suspend fun whatShouldIDoNow(): WhatToDoNow {
-        val currentDeviceDateTime =
-            Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-
-        val startTime = prefsStorage.getStartTime().firstOrNull()?.toLocalDateTime()
-            ?: currentDeviceDateTime
-        val endTime = prefsStorage.getEndTime().firstOrNull()?.toLocalDateTime()
-            ?: currentDeviceDateTime
-
-        val alarmActive = AlarmScheduler.isAlarmActive(application, DRINK_ALARM_ID)
-
-        // cached value, alarm info can exist if the alarm was not triggered
-        // for example when installing an update or restarting the phone with a different time
-        val alarmInfo = AlarmScheduler.getAlarmStorageInfo(application, DRINK_ALARM_ID)
-        val storedAlarmTriggerAt = alarmInfo?.alarmTriggerAt?.toLocalDateTime()
-
-        // Effective interval: next-override wins over regular; consume override after use
-        val rawInterval = AlarmIntervals.getNextInterval(application)
-            ?: AlarmIntervals.getInterval(application)
-        if (AlarmIntervals.getNextInterval(application) != null) {
-            AlarmIntervals.clearNextInterval(application)
-        }
-
-        val todayEpoch = currentDeviceDateTime.date.toEpochDays()
-        val goalMl = database.getDailyGoalDao()
-            .getGoalForDate(todayEpoch)
-            .firstOrNull()
-            ?.goalMl ?: DEFAULT_GOAL_ML
-
-        return decideWhatToDoNow(
-            now = currentDeviceDateTime,
-            startTime = startTime,
-            endTime = endTime,
-            hasActiveAlarm = alarmActive,
-            alarmAlarmTriggersAt = storedAlarmTriggerAt,
-            rawInterval = rawInterval,
-            goalMl = goalMl,
-        )
-    }
-
     fun stopAlarm() {
         AlarmScheduler.cancelAlarm(
             context = application,
@@ -290,7 +245,7 @@ class DrinkAlarmManager(
     }
 
     companion object {
-        private const val DRINK_ALARM_ID = 127
+        internal const val DRINK_ALARM_ID = 127
 
         private val testInterval = 7.seconds.inWholeMilliseconds
     }

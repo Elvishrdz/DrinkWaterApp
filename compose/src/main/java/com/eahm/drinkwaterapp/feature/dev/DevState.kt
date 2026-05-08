@@ -19,7 +19,6 @@ internal sealed interface DevState {
         val drinkStats: DrinkStats?,
         val isAlarmActive: Boolean,
         val alarmInterval: AlarmInterval,
-        val alarmNextInterval: AlarmInterval?,
         val confettiButtonEnabled: Boolean,
     ) : DevState
 }

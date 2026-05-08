@@ -6,7 +6,6 @@ import com.eahm.drinkwaterapp.system.alarm.AlarmStorageInfo
 data class DrinkAlarmState(
     val active: Boolean,
     val interval: AlarmInterval,
-    val nextInterval: AlarmInterval?,
     val canScheduleExactAlarms: Boolean,
     val hasNotificationPermissions: Boolean,
     val isAlarmActive: Boolean,

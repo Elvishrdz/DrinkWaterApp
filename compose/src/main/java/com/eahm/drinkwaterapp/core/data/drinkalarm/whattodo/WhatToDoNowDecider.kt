@@ -24,7 +24,7 @@ internal fun decideWhatToDoNow(
     // we can receive this value even if no active alarm exists
     // it can be a cached time for a previously existing alarm.
     alarmAlarmTriggersAt: LocalDateTime?,
-    rawInterval: AlarmInterval = AlarmInterval(0, 0), // TODO: fix tests with this
+    interval: AlarmInterval = AlarmInterval(0, 0), // TODO: fix tests with this
     goalMl: Float = 1f, // TODO: fix tests with this
 ): WhatToDoNow {
     val undefinedActiveHours = startTime == now && endTime == now
@@ -40,7 +40,7 @@ internal fun decideWhatToDoNow(
         startTime = startTime,
         endTime = endTime,
         goalMl = goalMl,
-        rawInterval = rawInterval,
+        interval = interval,
     )
 
     val isInActiveTime = now in startTime..endTime
@@ -224,7 +224,7 @@ fun getNextAlarmSlot(
     startTime: LocalDateTime,
     endTime: LocalDateTime,
     goalMl: Float,
-    rawInterval: AlarmInterval,
+    interval: AlarmInterval,
     testMode: Boolean = false,
 ): LocalDateTime {
     return if (testMode) {
@@ -234,10 +234,7 @@ fun getNextAlarmSlot(
             endTime = endTime,
         )
     } else {
-
-
-        val intervalMinutes = (rawInterval.hour * 60 + rawInterval.minute).coerceAtLeast(1)
-
+        val intervalMinutes = (interval.hour * 60 + interval.minute).coerceAtLeast(1)
 
         val startDayTime = DayTime(startTime.hour, startTime.minute)
         val endDayTime = DayTime(endTime.hour, endTime.minute)

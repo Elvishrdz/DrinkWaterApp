@@ -172,7 +172,7 @@ internal class DrinkViewModel(
 
                 dao.insertAll(record)
 
-                drinkAlarmManager.determineAction(AlarmSource.DrinkButton)
+                drinkAlarmManager.setupAlarm(AlarmSource.DrinkButton)
             }
         }
     }

@@ -49,21 +49,21 @@ class AlarmReceiver : BroadcastReceiver() {
             Drink.action -> {
                 if (code == Drink.code) {
                     registerDrink()
-                    drinkAlarmManager.determineAction(AlarmSource.NotificationDrinkButton)
+                    drinkAlarmManager.setupAlarm(AlarmSource.NotificationDrinkButton)
                     removeNotificationFromSystem(context, intent)
                 }
             }
 
             SkipDrink.action -> {
                 if (code == SkipDrink.code) {
-                    drinkAlarmManager.determineAction(AlarmSource.NotificationSkipButton)
+                    drinkAlarmManager.setupAlarm(AlarmSource.NotificationSkipButton)
                     removeNotificationFromSystem(context, intent)
                 }
             }
 
             NotificationRemoved.action -> {
                 if (code == NotificationRemoved.code) {
-                    drinkAlarmManager.determineAction(AlarmSource.NotificationRemoved)
+                    drinkAlarmManager.setupAlarm(AlarmSource.NotificationRemoved)
                     removeNotificationFromSystem(context, intent)
                 }
             }

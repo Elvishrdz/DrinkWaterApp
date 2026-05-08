@@ -208,7 +208,6 @@ internal fun DevScreen(
             drinkStats = state.drinkStats,
             isAlarmActive = state.isAlarmActive,
             alarmInterval = state.alarmInterval,
-            alarmNextInterval = state.alarmNextInterval,
             confettiButtonEnabled = state.confettiButtonEnabled,
             onDrink = onDrink,
             onShowConfetti = onShowConfetti,
@@ -230,7 +229,6 @@ private fun Content(
     drinkStats: DrinkStats?,
     isAlarmActive: Boolean,
     alarmInterval: AlarmInterval,
-    alarmNextInterval: AlarmInterval?,
     confettiButtonEnabled: Boolean,
     modifier: Modifier = Modifier,
     onShowConfetti: () -> Unit,
@@ -274,12 +272,6 @@ private fun Content(
             Text(
                 text = "Alarm interval: ${alarmInterval.hour}:${alarmInterval.minute}",
             )
-
-            alarmNextInterval?.let {
-                Text(
-                    text = "Alarm next interval: ${it.hour}:${it.minute}",
-                )
-            }
 
             Text(
                 text = "remaining time: $timer",
@@ -413,7 +405,6 @@ private fun DrinkScreenPreview() {
             drinkStats = Mock.drinkStatsMock,
             isAlarmActive = true,
             alarmInterval = AlarmInterval(0, 5),
-            alarmNextInterval = null,
             confettiButtonEnabled = false,
             onDrink = {},
             onShowConfetti = {},

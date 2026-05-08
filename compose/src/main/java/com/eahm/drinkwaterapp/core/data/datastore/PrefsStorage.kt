@@ -15,6 +15,9 @@ interface PrefsStorage {
     fun getDrinkSuggestions(): Flow<Set<DrinkSuggestion>>
     suspend fun setDrinkSuggestions(suggestions: Set<DrinkSuggestion>)
 
+    fun getInterval(): Flow<ActiveTime>
+    suspend fun setInterval(interval: ActiveTime)
+
     fun getStartTime(): Flow<ActiveTime>
     suspend fun setStartTime(time: ActiveTime)
 
