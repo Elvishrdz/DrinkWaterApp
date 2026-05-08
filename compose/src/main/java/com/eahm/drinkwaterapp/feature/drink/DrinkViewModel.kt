@@ -35,6 +35,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toInstant
+import kotlin.math.roundToInt
 import kotlin.time.ExperimentalTime
 
 internal class DrinkViewModel(
@@ -246,7 +247,14 @@ internal class DrinkViewModel(
 
     fun displayGoalReachedOverlay() {
         if (Settings.canDrawOverlays(application)) {
-            val intent = Intent(application, GoalReachedWidget::class.java)
+            val currentState = state.value as? DrinkState.Data
+            val goalMl = currentState?.drinkStats?.goalAmount ?: 2400f
+            val drinkAmount = currentState?.drinkStats?.drinkAmount ?: 0f
+            val intent = Intent(application, GoalReachedWidget::class.java).apply {
+                putExtra("goalMl", goalMl)
+                putExtra("drinkCount", (drinkAmount / 250f).roundToInt().coerceAtLeast(1))
+                putExtra("streakDays", 1)
+            }
             application.startService(intent)
         }
     }

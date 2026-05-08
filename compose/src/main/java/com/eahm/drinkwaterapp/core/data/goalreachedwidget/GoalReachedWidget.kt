@@ -9,11 +9,9 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
@@ -36,6 +34,10 @@ class GoalReachedWidget : Service(),
     private var widgetView: View? = null
     private lateinit var params: WindowManager.LayoutParams
 
+    private val goalMlState = mutableFloatStateOf(2400f)
+    private val drinkCountState = mutableIntStateOf(1)
+    private val streakDaysState = mutableIntStateOf(1)
+
     private val _lifecycleRegistry = LifecycleRegistry(this)
     private val _savedStateRegistryController: SavedStateRegistryController =
         SavedStateRegistryController.create(this)
@@ -48,6 +50,15 @@ class GoalReachedWidget : Service(),
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        intent?.let {
+            goalMlState.floatValue = it.getFloatExtra("goalMl", goalMlState.floatValue)
+            drinkCountState.intValue = it.getIntExtra("drinkCount", drinkCountState.intValue)
+            streakDaysState.intValue = it.getIntExtra("streakDays", streakDaysState.intValue)
+        }
+        return START_NOT_STICKY
     }
 
     override fun onCreate() {
@@ -73,18 +84,18 @@ class GoalReachedWidget : Service(),
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             params = WindowManager.LayoutParams(
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
                 PixelFormat.TRANSLUCENT
             )
         } else {
             params = WindowManager.LayoutParams(
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.TYPE_PHONE,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
                 PixelFormat.TRANSLUCENT
             )
         }
@@ -99,16 +110,12 @@ class GoalReachedWidget : Service(),
 
         composeView.apply {
             setContent {
-                ButtonContent(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 10.dp),
+                GoalCelebrationOverlay(
+                    variant = todayVariant(),
+                    goalMl = goalMlState.floatValue,
+                    drinkCount = drinkCountState.intValue,
+                    streakDays = streakDaysState.intValue,
                     onClose = { stopSelf() },
-                    onDrag = { dx, dy ->
-                        params.x += dx.toInt()
-                        params.y += dy.toInt()
-                        mWindowManager.updateViewLayout(widgetView, params)
-                    }
                 )
             }
         }
