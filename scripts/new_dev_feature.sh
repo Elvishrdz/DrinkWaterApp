@@ -46,10 +46,11 @@ ask() {
 }
 
 ask_yn() {
-    local prompt="$1" default="${2:-y}" var
+    local prompt="$1" default="${2:-y}" var lvar
     read -r -p "  $prompt [${default}]: " var
     var="${var:-$default}"
-    [[ "${var,,}" == "y" || "${var,,}" == "yes" ]]
+    lvar=$(lower "$var")
+    [[ "$lvar" == "y" || "$lvar" == "yes" ]]
 }
 
 pick_icon() {
@@ -69,7 +70,7 @@ pick_icon() {
         fi
         # Accept name (case-insensitive)
         for icon in "${ICONS[@]}"; do
-            if [[ "${icon,,}" == "${choice,,}" ]]; then
+            if [[ "$(lower "$icon")" == "$(lower "$choice")" ]]; then
                 echo "$icon"
                 return
             fi
@@ -83,6 +84,9 @@ validate_name() {
     local name="$1"
     [[ "$name" =~ ^[A-Z][a-zA-Z0-9]+$ ]]
 }
+
+# ── Main ──────────────────────────────────────────────────────────────────────
+run_main() {
 
 # ── Collect inputs ─────────────────────────────────────────────────────────────
 header "Dev Feature Scaffolder"
@@ -384,3 +388,8 @@ echo -e "  Feature ${BOLD}$FEATURE_NAME${RESET} created at:"
 echo -e "  ${DIM}$FEATURE_DIR${RESET}"
 echo -e "  Run ${BOLD}./gradlew :compose:compileDebugKotlin${RESET} to verify."
 echo
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    run_main
+fi
