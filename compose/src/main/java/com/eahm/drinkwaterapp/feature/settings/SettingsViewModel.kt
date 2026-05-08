@@ -154,7 +154,7 @@ internal class SettingsViewModel(
 
             _state.update { it.copy(timeRangeError = null) }
             prefsStorage.setEndTime(newEnd)
-            drinkAlarmManager.determineAction(AlarmSource.NotificationActiveHoursStartTimeChanged)
+            drinkAlarmManager.determineAction(AlarmSource.NotificationActiveHoursEndTimeChanged)
         }
     }
 

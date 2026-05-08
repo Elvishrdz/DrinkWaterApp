@@ -222,18 +222,16 @@ class DrinkAlarmManager(
             is WhatToDoNow.RescheduleInterval -> {
                 Log.i("DRINK_ALARM_MANAGER", "what to do? reschedule to interval: $data")
 
-                AlarmScheduler.scheduleAlarm(
-                    context = application,
-                    alarmId = DRINK_ALARM_ID,
-                    hour = data.correct.hour,
-                    minute = data.correct.minute,
-                    second = data.correct.second,
+                val configuration = AlarmConfiguration(
+                    source = AlarmSource.CustomSource(source),
+                    schedule = AlarmSchedule.AtExactTime(
+                        hour = data.correct.hour,
+                        minute = data.correct.minute,
+                        second = data.correct.second,
+                    ),
                 )
 
-                val alarmStorageInfo =
-                    AlarmScheduler.getAlarmStorageInfo(application, DRINK_ALARM_ID)
-
-                Log.i("DRINK_ALARM_MANAGER", "we have this stored: $alarmStorageInfo")
+                scheduleDrinkAlarm(configuration)
 
                 update()
             }

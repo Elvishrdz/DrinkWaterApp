@@ -5,16 +5,17 @@ data class AlarmConfiguration(
     val schedule: AlarmSchedule,
 )
 
-enum class AlarmSource {
-    DrinkAlarmReceived,
-    DrinkButton,
-    NotificationDrinkButton,
-    NotificationSkipButton,
-    NotificationRemoved,
-    NotificationActiveHoursStartTimeChanged,
-    NotificationActiveHoursEndTimeChanged,
-    DrinkButtonDevMenu,
-    AlarmsDevMenu,
+sealed interface AlarmSource {
+    data object DrinkAlarmReceived : AlarmSource
+    data object DrinkButton : AlarmSource
+    data object NotificationDrinkButton : AlarmSource
+    data object NotificationSkipButton : AlarmSource
+    data object NotificationRemoved : AlarmSource
+    data object NotificationActiveHoursStartTimeChanged : AlarmSource
+    data object NotificationActiveHoursEndTimeChanged : AlarmSource
+    data object DrinkButtonDevMenu : AlarmSource
+    data object AlarmsDevMenu : AlarmSource
+    data class CustomSource(val source: String) : AlarmSource
 }
 
 sealed interface AlarmSchedule {
