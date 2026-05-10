@@ -6,12 +6,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -46,8 +48,6 @@ import com.eahm.drinkwaterapp.ui.historylist.HourGroup
 import kotlinx.datetime.LocalDateTime
 import org.koin.compose.viewmodel.koinViewModel
 
-// ── Entry point ───────────────────────────────────────────────────────────────
-
 @Composable
 internal fun HistoryV2Root(
     viewModel: HistoryV2ViewModel = koinViewModel(),
@@ -62,8 +62,6 @@ internal fun HistoryV2Root(
         onUpdateRecord = viewModel::onUpdateRecord,
     )
 }
-
-// ── Content dispatcher ────────────────────────────────────────────────────────
 
 @Composable
 internal fun HistoryV2Content(
@@ -93,8 +91,6 @@ internal fun HistoryV2Content(
     }
 }
 
-// ── Main screen ───────────────────────────────────────────────────────────────
-
 @Composable
 internal fun HistoryV2Screen(
     state: HistoryV2State.Data,
@@ -108,13 +104,16 @@ internal fun HistoryV2Screen(
     var editingRecord by remember { mutableStateOf<HistoryUI?>(null) }
     var editAmountText by remember { mutableStateOf("") }
 
-    Box(
+    Scaffold(
         modifier = Modifier
             .fillMaxSize()
             .background(DwInk50),
-    ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize(),
+        ) {
             HistoryHeader()
 
             DayStripRow(
@@ -223,7 +222,6 @@ internal fun HistoryV2Screen(
         )
     }
 }
-
 
 
 private val previewDays = listOf(
