@@ -23,7 +23,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
 import com.eahm.drinkwaterapp.feature.dev.DevRoot
 import com.eahm.drinkwaterapp.feature.drink.DrinkRoot
-import com.eahm.drinkwaterapp.feature.history.HistoryRoot
+import com.eahm.drinkwaterapp.feature.history.v2.HistoryV2Root
 import com.eahm.drinkwaterapp.feature.settings.SettingsScreen
 import com.eahm.drinkwaterapp.feature.stats.StatsScreen
 import com.eahm.drinkwaterapp.ui.confetti.ConfettiFadeMode
@@ -87,7 +87,7 @@ internal fun HomeScreen() {
             )
 
             HomeDestination.STATS -> StatsScreen()
-            HomeDestination.HISTORY -> HistoryRoot()
+            HomeDestination.HISTORY -> HistoryV2Root()
             HomeDestination.SETTINGS -> SettingsScreen()
             HomeDestination.DEV -> DevRoot { currentDestination = HomeDestination.TODAY }
         }
