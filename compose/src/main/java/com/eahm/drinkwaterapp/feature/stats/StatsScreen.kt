@@ -135,9 +135,10 @@ internal fun StatsContent(
 
         item {
             MiniStatsCards(
-                streakDays = state.streakDays,
+                streakDays = state.drinkStreakDays,
                 bestStreakDays = state.bestStreakDays,
-                drinkStreakDays = state.drinkStreakDays,
+                goalStreakDays = state.streakDays,
+                bestGoalStreakDays = null, // TODO: track best goal streak
                 personalBestMl = state.personalBestMl,
                 modifier = Modifier.padding(horizontal = 18.dp)
             )

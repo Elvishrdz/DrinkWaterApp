@@ -20,8 +20,9 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 @Composable
 fun MiniStatsCards(
     streakDays: Int,
-    bestStreakDays: Int,
-    drinkStreakDays: Int,
+    bestStreakDays: Int?,
+    goalStreakDays: Int,
+    bestGoalStreakDays: Int?,
     personalBestMl: Int,
     modifier: Modifier = Modifier,
 ) {
@@ -34,34 +35,51 @@ fun MiniStatsCards(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             MiniCard(
-                icon = DwIcons.Star,
-                iconBg = DwTintMagenta,
-                iconTint = DwMagenta,
-                value = streakDays.toString(),
-                label = "Goal streak",
-                modifier = Modifier.weight(1f),
-            )
-            MiniCard(
-                icon = DwIcons.Star,
+                icon = DwIcons.Drop,
                 iconBg = DwTintWater,
                 iconTint = DwWater,
-                value = bestStreakDays.toString(),
-                label = "Best streak",
+                value = streakDays.toString(),
+                label = "Drink streak",
                 modifier = Modifier.weight(1f),
             )
+            bestStreakDays?.let {
+                MiniCard(
+                    icon = DwIcons.Star,
+                    iconBg = DwTintMagenta,
+                    iconTint = DwMagenta,
+                    value = it.toString(),
+                    label = "Best streak",
+                    modifier = Modifier.weight(1f),
+                )
+            }
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             MiniCard(
-                icon = DwIcons.Drop,
+                icon = DwIcons.Star,
                 iconBg = DwTintWater,
                 iconTint = DwWater,
-                value = drinkStreakDays.toString(),
-                label = "Drink streak",
+                value = goalStreakDays.toString(),
+                label = "Goal streak",
                 modifier = Modifier.weight(1f),
             )
+            bestGoalStreakDays?.let {
+                MiniCard(
+                    icon = DwIcons.Star,
+                    iconBg = DwTintMagenta,
+                    iconTint = DwMagenta,
+                    value = it.toString(),
+                    label = "Best goal streak",
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
             MiniCard(
                 icon = DwIcons.Glass,
                 iconBg = DwTintWater,
@@ -74,14 +92,30 @@ fun MiniStatsCards(
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFFF2F6F9)
+@Preview
 @Composable
-private fun MiniStatsCardsPreview() {
+private fun NoBestStatsPreview() {
     DrinkWaterAppTheme {
         MiniStatsCards(
-            streakDays = 4,
+            streakDays = 7,
+            bestStreakDays = null,
+            goalStreakDays = 4,
+            bestGoalStreakDays = null,
+            personalBestMl = 2950,
+            modifier = Modifier.padding(16.dp),
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun AllStatsPreview() {
+    DrinkWaterAppTheme {
+        MiniStatsCards(
+            streakDays = 7,
             bestStreakDays = 12,
-            drinkStreakDays = 7,
+            goalStreakDays = 4,
+            bestGoalStreakDays = 4,
             personalBestMl = 2950,
             modifier = Modifier.padding(16.dp),
         )
