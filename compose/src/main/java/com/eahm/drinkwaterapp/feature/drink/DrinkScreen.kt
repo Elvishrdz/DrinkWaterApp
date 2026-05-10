@@ -37,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
@@ -54,7 +55,6 @@ import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk50
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk900
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagentaDark
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwPaper
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
@@ -91,8 +91,8 @@ internal fun DrinkScreen(
             Spacer(Modifier.height(it.calculateTopPadding()))
 
             TodayHeader(
-                username = state.username,
                 streak = state.currentStreak,
+                showStreak = state.showStreak,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 20.dp, end = 20.dp, top = 20.dp)
@@ -147,43 +147,24 @@ internal fun DrinkScreen(
 
 @Composable
 private fun TodayHeader(
-    username: String?,
     streak: Int,
+    showStreak: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.Top
     ) {
-
-        Column {
-            Text(
-                text = "Good morning${if (username != null) "," else ""}",
-                fontFamily = PlusJakartaSans,
-                fontWeight = FontWeight.Medium,
-                fontSize = 13.sp,
-                color = DwInk400
-            )
-
-            username?.let {
-                Text(
-                    text = it,
-                    fontFamily = PlusJakartaSans,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 26.sp,
-                    lineHeight = (26 * 1.2).sp,
-                    color = DwInk900
-                )
-            }
-        }
-
-        StreakBadge(streak = streak)
+        StreakBadge(streak = streak, visible = showStreak)
     }
 }
 
 @Composable
-private fun StreakBadge(streak: Int) {
+private fun StreakBadge(
+    streak: Int,
+    visible: Boolean = true,
+) {
     val gradientMagenta = Brush.verticalGradient(
         colors = listOf(
             Color(0xFFB83A95),
@@ -196,6 +177,7 @@ private fun StreakBadge(streak: Int) {
             .clip(RoundedCornerShape(999.dp))
             .background(gradientMagenta)
             .padding(horizontal = 12.dp, vertical = 6.dp)
+            .alpha(alpha = if (visible) 1f else 0f)
     ) {
         Icon(
             imageVector = DwIcons.Star,
@@ -411,8 +393,8 @@ internal val drinkSuggestionsMocks = listOf(
 )
 
 private val stateMock = DrinkState.Data(
-    username = "Dave",
     currentStreak = 1,
+    showStreak = true,
     drinkStats = DrinkStats(
         goalAmount = 2400f,
         drinkAmount = 1500f,

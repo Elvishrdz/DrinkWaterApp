@@ -2,6 +2,7 @@ package com.eahm.drinkwaterapp.feature.drink
 
 import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStats
+import com.eahm.drinkwaterapp.core.data.streak.StreakData
 import com.eahm.drinkwaterapp.feature.drink.ui.DrinkLogEntry
 
 internal sealed interface DrinkState {
@@ -9,8 +10,8 @@ internal sealed interface DrinkState {
     data object Loading : DrinkState
 
     data class Data(
-        val username: String?,
         val currentStreak: Int,
+        val showStreak: Boolean,
         val drinkStats: DrinkStats?,
         val quickDrinkSuggestions: List<DrinkSuggestion>,
         val allDrinkSuggestions: List<DrinkSuggestion>,
@@ -20,7 +21,7 @@ internal sealed interface DrinkState {
 }
 
 data class DrinkExtras(
-    val username: String?,
+    val streakData: StreakData,
     val quickDrinkSuggestions: List<DrinkSuggestion>,
     val allDrinkSuggestions: List<DrinkSuggestion>,
 )
