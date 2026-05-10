@@ -26,8 +26,8 @@ fun AlarmTime.Companion.createWithSeconds(seconds: Int): AlarmTime {
     val results = seconds.createTimeResultFromSeconds()
 
     return AlarmTime(
-        hour = results.hours,
-        minute = results.minutes,
-        second = results.seconds,
+        hour = results.hour,
+        minute = results.minute,
+        second = results.second,
     )
 }

@@ -12,9 +12,9 @@ fun Int.createTimeResultFromSeconds(): TimeResult {
     val millis = roundedSeconds * 1000L
 
     return TimeResult(
-        hours = hours,
-        minutes = minutes,
-        seconds = roundedSeconds,
-        millis = millis,
+        hour = hours,
+        minute = minutes,
+        second = roundedSeconds,
+        millisecond = millis,
     )
 }

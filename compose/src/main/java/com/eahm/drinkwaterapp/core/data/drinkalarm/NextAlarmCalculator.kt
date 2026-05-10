@@ -64,7 +64,10 @@ class NextAlarmCalculator(
             // Case 4: next drink is the second slot (slots[0] == now)
             val nextSlot = schedule.slots[1]
             NextAlarmResult.Schedule(
-                delayMillis = minutesDiff(now, nextSlot.time) * 60_000L,
+                delayMillis = minutesDiff(
+                    now,
+                    DayTime(nextSlot.time.hour, nextSlot.time.minute)
+                ) * 60_000L,
                 nextSlot = nextSlot,
             )
         }

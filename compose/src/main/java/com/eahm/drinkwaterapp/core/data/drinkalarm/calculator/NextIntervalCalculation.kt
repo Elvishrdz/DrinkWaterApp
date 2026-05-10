@@ -1,9 +1,15 @@
 package com.eahm.drinkwaterapp.core.data.drinkalarm.calculator
 
-import com.eahm.drinkwaterapp.core.data.drinkalarm.DayTime
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmCalculator2
-import com.eahm.drinkwaterapp.core.data.drinkalarm.inWholeSeconds
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.TimeResult
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.inWholeMillis
 import kotlinx.datetime.LocalDateTime
+
+// TODO: return time in hours:mins:seconds  example: 11:30:10
+// handle: 11:30:59 should be 11:40
+// handle: 11:30:1 should be 11:40
+// handle: 11:30:59 should be 11:40
+
 
 /**
  * Calculates the next alarm slot time using the real schedule produced by
@@ -15,8 +21,8 @@ import kotlinx.datetime.LocalDateTime
  */
 fun calculateNextAlarmSlot(
     now: LocalDateTime,
-    startTime: DayTime,
-    endTime: DayTime,
+    startTime: TimeResult,
+    endTime: TimeResult,
     goalMl: Float,
     intervalMinutes: Int,
 ): LocalDateTime {
@@ -27,8 +33,9 @@ fun calculateNextAlarmSlot(
         desiredIntervalMinutes = intervalMinutes.coerceAtLeast(1),
     )
 
-    val nowSeconds = now.hour * 3600 + now.minute * 60 + now.second
-    val nextSlot = schedule.slots.firstOrNull { it.time.inWholeSeconds > nowSeconds }
+    val nowMillis = (now.hour * 3600L + now.minute * 60L + now.second) * 1000L +
+            now.nanosecond / 1_000_000L
+    val nextSlot = schedule.slots.firstOrNull { it.time.inWholeMillis > nowMillis }
     val target = nextSlot?.time ?: startTime
 
     return LocalDateTime(
@@ -37,5 +44,7 @@ fun calculateNextAlarmSlot(
         day = now.day,
         hour = target.hour,
         minute = target.minute,
+        second = target.second,
+        nanosecond = (target.millisecond * 1_000_000L).toInt(),
     )
 }

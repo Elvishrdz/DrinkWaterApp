@@ -38,7 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
-import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmTime
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.TimeResult
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwTertiaryButton
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
@@ -310,9 +310,9 @@ private fun ActiveAlarmPreview() {
             alarmStorageInfo = AlarmStorageInfo(
                 alarmId = 127,
                 alarmTriggerTimeMillis = 60_000L,
-                alarmTriggerTime = AlarmTime(0, 1, 0),
+                alarmTriggerTime = TimeResult(0, 1, 0,0),
                 alarmTriggerAtMillis = SystemClock.elapsedRealtime() + 3_661_000L,
-                alarmTriggerAt = AlarmTime(15, 30, 1),
+                alarmTriggerAt = TimeResult(15, 30, 1,0),
             ),
             inActiveHours = false,
         ),

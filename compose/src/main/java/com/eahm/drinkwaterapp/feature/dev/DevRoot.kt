@@ -22,11 +22,9 @@ import androidx.compose.material3.WideNavigationRailDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -74,11 +72,8 @@ import com.eahm.drinkwaterapp.ui.inputfield.toDigitString
 import com.eahm.drinkwaterapp.ui.timepicker.AppTimePickerButton
 import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorButton
 import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 import org.koin.compose.viewmodel.koinViewModel
-import kotlin.time.Duration.Companion.seconds
 
 enum class DevDestination(
     val label: String,
@@ -229,7 +224,6 @@ private fun ValuesRoot(
                 onDateChanged = viewModel::onDateChanged,
                 onStopAlarm = viewModel::onStopAlarm,
                 onGoalAmountChanged = viewModel::onGoalChanged,
-                getRemainingAlarmTime = viewModel::getRemainingAlarmTime,
                 onAlarmIntervalChange = viewModel::onAlarmIntervalChange,
                 onBackClicked = onBackClicked,
             )
@@ -246,7 +240,6 @@ internal fun DevScreen(
     onDateChanged: (LocalDateTime) -> Unit,
     onStopAlarm: () -> Unit,
     onGoalAmountChanged: (String) -> Unit,
-    getRemainingAlarmTime: () -> String,
     onAlarmIntervalChange: (AlarmInterval) -> Unit,
     onBackClicked: () -> Unit,
 ) {
@@ -267,7 +260,6 @@ internal fun DevScreen(
             onDateChanged = onDateChanged,
             onStopAlarm = onStopAlarm,
             onGoalAmountChanged = onGoalAmountChanged,
-            getRemainingAlarmTime = getRemainingAlarmTime,
             onAlarmIntervalChange = onAlarmIntervalChange,
             onBackClicked = onBackClicked,
         )
@@ -289,11 +281,9 @@ private fun Content(
     onDateChanged: (LocalDateTime) -> Unit,
     onStopAlarm: () -> Unit,
     onGoalAmountChanged: (String) -> Unit,
-    getRemainingAlarmTime: () -> String,
     onAlarmIntervalChange: (AlarmInterval) -> Unit,
     onBackClicked: () -> Unit,
 ) {
-    var timer by remember { mutableStateOf("") }
     val context = LocalContext.current
 
     val notificationsAllowed = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -323,10 +313,6 @@ private fun Content(
 
             Text(
                 text = "Alarm interval: ${alarmInterval.hour}:${alarmInterval.minute}",
-            )
-
-            Text(
-                text = "remaining time: $timer",
             )
 
             Button(
@@ -389,17 +375,6 @@ private fun Content(
                     onAlarmIntervalChange(alarmInterval)
                 },
             )
-
-            val scope = rememberCoroutineScope()
-
-            LaunchedEffect(scope) {
-                scope.launch {
-                    while (true) {
-                        delay(1.seconds)
-                        timer = getRemainingAlarmTime()
-                    }
-                }
-            }
 
             AnimatedVisibility(drinkStats != null) {
                 drinkStats?.let {
@@ -464,7 +439,6 @@ private fun DrinkScreenPreview() {
             onDateChanged = {},
             onStopAlarm = {},
             onGoalAmountChanged = {},
-            getRemainingAlarmTime = { "" },
             onAlarmIntervalChange = {},
             onBackClicked = {},
         )

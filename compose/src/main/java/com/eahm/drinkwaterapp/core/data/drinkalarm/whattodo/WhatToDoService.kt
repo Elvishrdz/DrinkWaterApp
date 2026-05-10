@@ -3,6 +3,7 @@ package com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo
 import android.app.Application
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager.Companion.DRINK_ALARM_ID
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.toLocalDateTime
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
 import com.eahm.drinkwaterapp.core.domain.extension.toLocalDateTime

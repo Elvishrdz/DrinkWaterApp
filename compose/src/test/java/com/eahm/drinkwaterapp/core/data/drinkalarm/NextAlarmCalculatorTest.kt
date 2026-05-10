@@ -1,5 +1,6 @@
 package com.eahm.drinkwaterapp.core.data.drinkalarm
 
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.inWholeMinutes
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs

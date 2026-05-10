@@ -8,11 +8,13 @@ import android.os.SystemClock
 import androidx.core.content.edit
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DayTime
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmTime
-import com.eahm.drinkwaterapp.core.domain.extension.createWithSeconds
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.TimeResult
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.createWithSeconds
 import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler.scheduleAlarm
 import com.eahm.drinkwaterapp.system.broadcast.AlarmReceiver
 import java.util.Calendar
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.ExperimentalTime
 
 object AlarmScheduler {
 
@@ -37,23 +39,24 @@ object AlarmScheduler {
     }
 
     /**
-     * @param  [triggerInTimeFromNowMillis] get the time to trigger this alarm in milliseconds. The time
+     * @param  [millisToTriggerFromNow] get the time to trigger this alarm in milliseconds. The time
      * is calculated from the moment the alarm is scheduled. example. passing 5000 will trigger this alarm
      * in 5 seconds from the moment is called.
      * */
-    fun scheduleAlarm(context: Context, alarmId: Int, triggerInTimeFromNowMillis: Long) {
+    fun scheduleAlarm(context: Context, alarmId: Int, millisToTriggerFromNow: Long) {
         val alarmManager = context.getSystemService(AlarmManager::class.java)
 
-        val triggerAt = SystemClock.elapsedRealtime() + triggerInTimeFromNowMillis
+        val triggerAt = SystemClock.elapsedRealtime() + millisToTriggerFromNow
 
+        val intent = Intent(AlarmReceiver.ALARM_ACTION).apply {
+            setPackage(context.packageName)
+            putExtra("alarm_id", alarmId)
+            putExtra("interval_ms", millisToTriggerFromNow)
+        }
         val pendingIntent = PendingIntent.getBroadcast(
             context,
             alarmId,
-            Intent(AlarmReceiver.ALARM_ACTION).apply {
-                setPackage(context.packageName)
-                putExtra("alarm_id", alarmId)
-                putExtra("interval_ms", triggerInTimeFromNowMillis)
-            },
+            intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
@@ -63,26 +66,18 @@ object AlarmScheduler {
             pendingIntent
         )
 
-        saveAlarmToStorage(context, alarmId, triggerInTimeFromNowMillis, triggerAt)
+        saveAlarmToStorage(context, alarmId, millisToTriggerFromNow, triggerAt)
     }
-
-    fun callBroadcastReceiver(context: Context, alarmId: Int) {
-        val intent = Intent(context, AlarmReceiver::class.java).apply {
-            setPackage(context.packageName)
-            action = AlarmReceiver.ALARM_ACTION
-            putExtra("alarm_id", alarmId)
-            putExtra("interval_ms", 0)
-        }
-        context.sendBroadcast(intent)
-    }
-
 
     fun cancelAlarm(context: Context, alarmId: Int) {
         val alarmManager = context.getSystemService(AlarmManager::class.java)
+        val intent = Intent(AlarmReceiver.ALARM_ACTION).apply {
+            setPackage(context.packageName)
+        }
         val pendingIntent = PendingIntent.getBroadcast(
             context,
             alarmId,
-            Intent(AlarmReceiver.ALARM_ACTION).setPackage(context.packageName),
+            intent,
             PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
         )
         pendingIntent?.let {
@@ -94,10 +89,13 @@ object AlarmScheduler {
 
     // TODO: verify this is working
     fun isAlarmActive(context: Context, alarmId: Int): Boolean {
+        val intent = Intent(AlarmReceiver.ALARM_ACTION).apply {
+            setPackage(context.packageName)
+        }
         val pendingIntent = PendingIntent.getBroadcast(
             context,
             alarmId,
-            Intent(AlarmReceiver.ALARM_ACTION).setPackage(context.packageName),
+            intent,
             PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
         )
 
@@ -147,6 +145,7 @@ object AlarmScheduler {
             }
     }
 
+    @OptIn(ExperimentalTime::class)
     fun getAlarmStorageInfo(context: Context, alarmId: Int): AlarmStorageInfo? {
         val prefs = context.getSharedPreferences(ALARM_PREFS_NAME, Context.MODE_PRIVATE)
 
@@ -162,8 +161,8 @@ object AlarmScheduler {
 
         val triggerTimeMillis = prefs.getLong(keyTriggerTimeMillis(id), -1)
 
-        val triggerTime = AlarmTime.createWithSeconds(
-            seconds = triggerTimeMillis.milliseconds.inWholeSeconds.toInt(),
+        val triggerTime = TimeResult.createWithSeconds(
+            seconds = triggerTimeMillis.milliseconds.inWholeSeconds,
         )
 
         val triggerAtMillis = prefs.getLong(keyTriggerAtMillis(id), -1)
@@ -179,7 +178,14 @@ object AlarmScheduler {
             )
         } else {
             triggerAtMillis.asAlarmTime
-        }
+        }.let {
+                TimeResult(
+                    hour = it.hour,
+                    minute = it.minute,
+                    second = it.second,
+                    millisecond = it.second.toLong(),
+                )
+            }
 
         return AlarmStorageInfo(
             alarmId = id,
@@ -254,7 +260,7 @@ object AlarmScheduler {
 data class AlarmStorageInfo(
     val alarmId: Int,
     val alarmTriggerTimeMillis: Long,
-    val alarmTriggerTime: AlarmTime,
+    val alarmTriggerTime: TimeResult,
     val alarmTriggerAtMillis: Long,
-    val alarmTriggerAt: AlarmTime,
+    val alarmTriggerAt: TimeResult,
 )

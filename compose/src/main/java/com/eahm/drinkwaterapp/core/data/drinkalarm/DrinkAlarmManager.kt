@@ -88,7 +88,7 @@ class DrinkAlarmManager(
             schedule = AlarmSchedule.AtExactTime(
                 hour = nextSlotTime.hour,
                 minute = nextSlotTime.minute,
-                second = nextSlotTime.second,
+                second = 0,
             ),
         )
 
@@ -127,7 +127,7 @@ class DrinkAlarmManager(
                 AlarmScheduler.scheduleAlarm(
                     context = application,
                     alarmId = alarmId,
-                    triggerInTimeFromNowMillis = testInterval,
+                    millisToTriggerFromNow = testInterval,
                 )
             }
         }
@@ -186,10 +186,6 @@ class DrinkAlarmManager(
             isAlarmActive = isAlarmActive,
             alarmStorageInfo = alarmStorageInfo,
         )
-    }
-
-    fun remainingTime(): String {
-        return AlarmScheduler.getTimeUntilNextTrigger(application, DRINK_ALARM_ID).toString()
     }
 
     suspend fun askWhatToDo(source: String = "unknown") {

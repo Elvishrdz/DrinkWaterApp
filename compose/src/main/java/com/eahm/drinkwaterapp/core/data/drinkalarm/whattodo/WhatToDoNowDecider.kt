@@ -1,7 +1,7 @@
 package com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo
 
-import com.eahm.drinkwaterapp.core.data.drinkalarm.DayTime
 import com.eahm.drinkwaterapp.core.data.drinkalarm.calculator.calculateNextAlarmSlot
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.TimeResult
 import com.eahm.drinkwaterapp.core.data.drinkalarm.simulator.simulateNextIntervalCalculation
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import kotlinx.datetime.LocalDateTime
@@ -43,6 +43,14 @@ internal fun decideWhatToDoNow(
         interval = interval,
     )
 
+    fun comparePreviousWithNextAlarmTime(prev: LocalDateTime, next: LocalDateTime): Boolean {
+        return prev.year == next.year &&
+                prev.month == next.month &&
+                prev.day == next.day &&
+                prev.hour == next.hour &&
+                prev.minute == next.minute
+    }
+
     val isInActiveTime = now in startTime..endTime
 
     val inActiveHoursDecider: () -> WhatToDoNow = {
@@ -64,7 +72,8 @@ internal fun decideWhatToDoNow(
                     WhatToDoNow.RemindNow
                 } else {
                     // alarm time is in the future, and we are in active hours
-                    val isAtExpectedTime = alarmAlarmTriggersAt == nextAlarmTime
+                    val isAtExpectedTime =
+                        comparePreviousWithNextAlarmTime(alarmAlarmTriggersAt, nextAlarmTime)
 
                     if (isAtExpectedTime) {
                         WhatToDoNow.DoNothing
@@ -99,7 +108,8 @@ internal fun decideWhatToDoNow(
 
                 } else {
                     // always reschedule alarm to create cached alarm
-                    val isAtExpectedTime = alarmAlarmTriggersAt == nextAlarmTime
+                    val isAtExpectedTime =
+                        comparePreviousWithNextAlarmTime(alarmAlarmTriggersAt, nextAlarmTime)
 
                     WhatToDoNow.RescheduleInterval(
                         wrong = if (isAtExpectedTime) null else alarmAlarmTriggersAt,
@@ -135,7 +145,8 @@ internal fun decideWhatToDoNow(
 
                 } else {
                     // cache alarm is in the future, check if is the correct interval
-                    val isAtExpectedTime = alarmAlarmTriggersAt == nextAlarmTime
+                    val isAtExpectedTime =
+                        comparePreviousWithNextAlarmTime(alarmAlarmTriggersAt, nextAlarmTime)
 
                     if (isAtExpectedTime) {
                         WhatToDoNow.DoNothing
@@ -176,7 +187,8 @@ internal fun decideWhatToDoNow(
 
                 } else {
                     // cache is in the future, check if is correct
-                    val isAtExpectedTime = alarmAlarmTriggersAt == nextAlarmTime
+                    val isAtExpectedTime =
+                        comparePreviousWithNextAlarmTime(alarmAlarmTriggersAt, nextAlarmTime)
 
                     if (isAtExpectedTime) {
                         WhatToDoNow.DoNothing
@@ -236,13 +248,13 @@ fun getNextAlarmSlot(
     } else {
         val intervalMinutes = (interval.hour * 60 + interval.minute).coerceAtLeast(1)
 
-        val startDayTime = DayTime(startTime.hour, startTime.minute)
-        val endDayTime = DayTime(endTime.hour, endTime.minute)
+        val startTimeResult = TimeResult(startTime.hour, startTime.minute, 0, 0L)
+        val endTimeResult = TimeResult(endTime.hour, endTime.minute, 0, 0L)
 
         calculateNextAlarmSlot(
             now = now,
-            startTime = startDayTime,
-            endTime = endDayTime,
+            startTime = startTimeResult,
+            endTime = endTimeResult,
             goalMl = goalMl,
             intervalMinutes = intervalMinutes,
         )

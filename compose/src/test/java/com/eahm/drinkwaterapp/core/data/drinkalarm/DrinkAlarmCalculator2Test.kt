@@ -1,5 +1,7 @@
 package com.eahm.drinkwaterapp.core.data.drinkalarm
 
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.TimeResult
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.inWholeMinutes
 import org.junit.Test
 import kotlin.math.abs
 import kotlin.test.assertEquals
@@ -14,7 +16,7 @@ import kotlin.test.assertTrue
  *  - Uniform distribution: middle slots match expected rounded times
  *
  * Reference window used in most tests:
- *   startTime = 07:00, endTime = 22:00 → 15 h = 54 000 s
+ *   startTime = 07:00, endTime = 22:00 → 15 h = 54 000 000 ms
  */
 class DrinkAlarmCalculator2Test {
 
@@ -33,8 +35,10 @@ class DrinkAlarmCalculator2Test {
             amountPerDrinkMl = 250f,
         )
 
-        assertEquals(DayTime(7, 0), result.slots.first().time)
-        assertEquals(DayTime(22, 0), result.slots.last().time)
+        assertEquals(7, result.slots.first().time.hour)
+        assertEquals(0, result.slots.first().time.minute)
+        assertEquals(22, result.slots.last().time.hour)
+        assertEquals(0, result.slots.last().time.minute)
     }
 
     @Test
@@ -97,7 +101,7 @@ class DrinkAlarmCalculator2Test {
 
     @Test
     fun `scheduleByAmount - actual interval for 8 drinks in 15h window`() {
-        // 54 000 s / 7 gaps = 7 714.28 s → DayTime.createWithSeconds(7714) = DayTime(2, 9)
+        // 54 000 000 ms / 7 gaps = 7 714 285 ms → TimeResult(2, 8, 34, 285)
         val result = calculator.scheduleByAmount(
             startTime = DayTime(7, 0),
             endTime = DayTime(22, 0),
@@ -105,19 +109,14 @@ class DrinkAlarmCalculator2Test {
             amountPerDrinkMl = 250f,
         )
 
-        assertEquals(DayTime(2, 9), result.actualInterval)
+        assertEquals(2, result.actualInterval.hour)
+        assertEquals(8, result.actualInterval.minute)
     }
 
     @Test
     fun `scheduleByAmount - uniform slot times for 8 drinks in 15h window`() {
-        // 54 000 s, 7 gaps = 7 714.285 s each.
-        // Computed: startSeconds=25200, exactInterval=7714.285714
-        // i=1: round(7714.285)=7714  → abs=32914 → DayTime(9, 9)
-        // i=2: round(15428.571)=15429 → abs=40629 → DayTime(11,17)
-        // i=3: round(23142.857)=23143 → abs=48343 → DayTime(13,26)
-        // i=4: round(30857.142)=30857 → abs=56057 → DayTime(15,34)
-        // i=5: round(38571.428)=38571 → abs=63771 → DayTime(17,43)
-        // i=6: round(46285.714)=46286 → abs=71486 → DayTime(19,51)
+        // 54 000 000 ms, 7 gaps = 7 714 285 ms each. startMillis=25 200 000.
+        // Slots: 07:00, 09:08, 11:17, 13:25, 15:34, 17:42, 19:51, 22:00
         val result = calculator.scheduleByAmount(
             startTime = DayTime(7, 0),
             endTime = DayTime(22, 0),
@@ -125,20 +124,20 @@ class DrinkAlarmCalculator2Test {
             amountPerDrinkMl = 250f,
         )
 
-        assertEquals(DayTime(7, 0), result.slots[0].time)
-        assertEquals(DayTime(9, 9), result.slots[1].time)
-        assertEquals(DayTime(11, 17), result.slots[2].time)
-        assertEquals(DayTime(13, 26), result.slots[3].time)
-        assertEquals(DayTime(15, 34), result.slots[4].time)
-        assertEquals(DayTime(17, 43), result.slots[5].time)
-        assertEquals(DayTime(19, 51), result.slots[6].time)
-        assertEquals(DayTime(22, 0), result.slots[7].time)
+        assertEquals(7, result.slots[0].time.hour); assertEquals(0, result.slots[0].time.minute)
+        assertEquals(9, result.slots[1].time.hour); assertEquals(8, result.slots[1].time.minute)
+        assertEquals(11, result.slots[2].time.hour); assertEquals(17, result.slots[2].time.minute)
+        assertEquals(13, result.slots[3].time.hour); assertEquals(25, result.slots[3].time.minute)
+        assertEquals(15, result.slots[4].time.hour); assertEquals(34, result.slots[4].time.minute)
+        assertEquals(17, result.slots[5].time.hour); assertEquals(42, result.slots[5].time.minute)
+        assertEquals(19, result.slots[6].time.hour); assertEquals(51, result.slots[6].time.minute)
+        assertEquals(22, result.slots[7].time.hour); assertEquals(0, result.slots[7].time.minute)
     }
 
     @Test
     fun `scheduleByAmount - exact interval when window and count divide evenly`() {
         // 7:00-22:00 = 15h; 2 100ml / 300ml = 7 drinks = 6 gaps
-        // 54 000 / 6 = 9 000 s = 2h 30m exactly
+        // 54 000 000 / 6 = 9 000 000 ms = 2h 30m exactly
         val result = calculator.scheduleByAmount(
             startTime = DayTime(7, 0),
             endTime = DayTime(22, 0),
@@ -147,9 +146,16 @@ class DrinkAlarmCalculator2Test {
         )
 
         assertEquals(7, result.count)
-        assertEquals(DayTime(2, 30), result.actualInterval)
-        assertEquals(DayTime(7, 0), result.slots.first().time)
-        assertEquals(DayTime(22, 0), result.slots.last().time)
+        assertEquals(2, result.actualInterval.hour)
+        assertEquals(30, result.actualInterval.minute)
+        assertEquals(7, result.slots.first().time.hour); assertEquals(
+            0,
+            result.slots.first().time.minute
+        )
+        assertEquals(22, result.slots.last().time.hour); assertEquals(
+            0,
+            result.slots.last().time.minute
+        )
     }
 
     @Test
@@ -163,9 +169,11 @@ class DrinkAlarmCalculator2Test {
         )
 
         assertEquals(1, result.count)
-        assertEquals(DayTime(7, 0), result.slots.first().time)
+        assertEquals(7, result.slots.first().time.hour)
+        assertEquals(0, result.slots.first().time.minute)
         assertEquals(50f, result.slots.first().amountMl)
-        assertEquals(DayTime(0, 0), result.actualInterval)
+        assertEquals(0, result.actualInterval.hour)
+        assertEquals(0, result.actualInterval.minute)
     }
 
     @Test
@@ -179,8 +187,14 @@ class DrinkAlarmCalculator2Test {
         )
 
         assertEquals(2, result.count)
-        assertEquals(DayTime(8, 0), result.slots.first().time)
-        assertEquals(DayTime(20, 0), result.slots.last().time)
+        assertEquals(8, result.slots.first().time.hour); assertEquals(
+            0,
+            result.slots.first().time.minute
+        )
+        assertEquals(20, result.slots.last().time.hour); assertEquals(
+            0,
+            result.slots.last().time.minute
+        )
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -190,68 +204,83 @@ class DrinkAlarmCalculator2Test {
     @Test
     fun `scheduleByInterval - first slot is startTime and last slot is endTime`() {
         val result = calculator.scheduleByInterval(
-            startTime = DayTime(7, 0),
-            endTime = DayTime(22, 0),
+            startTime = TimeResult(7, 0, 0, 0L),
+            endTime = TimeResult(22, 0, 0, 0L),
             goalAmountMl = 2_000f,
             desiredIntervalMinutes = 120,
         )
 
-        assertEquals(DayTime(7, 0), result.slots.first().time)
-        assertEquals(DayTime(22, 0), result.slots.last().time)
+        assertEquals(7, result.slots.first().time.hour); assertEquals(
+            0,
+            result.slots.first().time.minute
+        )
+        assertEquals(22, result.slots.last().time.hour); assertEquals(
+            0,
+            result.slots.last().time.minute
+        )
     }
 
     @Test
     fun `scheduleByInterval - adjusts interval to closest fit for non-exact window`() {
-        // 15h = 54 000s, desired = 2h (7 200s) → gapsFloat = 7.5 → round → 8 gaps → 9 drinks
-        // actualInterval = 54 000/8 = 6 750s → DayTime(1, 53)
+        // 15h = 54 000 000ms, desired = 2h (7 200 000ms) → gapsFloat = 7.5 → round → 8 gaps → 9 drinks
+        // actualInterval = 54 000 000/8 = 6 750 000ms → TimeResult(1, 52, 30, 0)
         val result = calculator.scheduleByInterval(
-            startTime = DayTime(7, 0),
-            endTime = DayTime(22, 0),
+            startTime = TimeResult(7, 0, 0, 0L),
+            endTime = TimeResult(22, 0, 0, 0L),
             goalAmountMl = 2_000f,
             desiredIntervalMinutes = 120,
         )
 
         assertEquals(9, result.count)
-        assertEquals(DayTime(1, 53), result.actualInterval)
+        assertEquals(1, result.actualInterval.hour)
+        assertEquals(52, result.actualInterval.minute)
     }
 
     @Test
     fun `scheduleByInterval - exact fit when window is an exact multiple of desired`() {
-        // 8:00-20:00 = 12h = 43 200s, desired = 2h → gapsFloat = 6.0 → 6 gaps → 7 drinks
-        // actualInterval = 43 200/6 = 7 200s = 2h exactly
+        // 8:00-20:00 = 12h = 43 200 000ms, desired = 2h → gapsFloat = 6.0 → 6 gaps → 7 drinks
+        // actualInterval = 43 200 000/6 = 7 200 000ms = 2h exactly
         val result = calculator.scheduleByInterval(
-            startTime = DayTime(8, 0),
-            endTime = DayTime(20, 0),
+            startTime = TimeResult(8, 0, 0, 0L),
+            endTime = TimeResult(20, 0, 0, 0L),
             goalAmountMl = 2_000f,
             desiredIntervalMinutes = 120,
         )
 
         assertEquals(7, result.count)
-        assertEquals(DayTime(2, 0), result.actualInterval)
-        assertEquals(DayTime(8, 0), result.slots.first().time)
-        assertEquals(DayTime(20, 0), result.slots.last().time)
+        assertEquals(2, result.actualInterval.hour)
+        assertEquals(0, result.actualInterval.minute)
+        assertEquals(8, result.slots.first().time.hour); assertEquals(
+            0,
+            result.slots.first().time.minute
+        )
+        assertEquals(20, result.slots.last().time.hour); assertEquals(
+            0,
+            result.slots.last().time.minute
+        )
     }
 
     @Test
     fun `scheduleByInterval - exact 1h interval when window divides by 1h`() {
         // 7:00-22:00 = 15h, desired = 1h → gapsFloat = 15.0 → 15 gaps → 16 drinks
         val result = calculator.scheduleByInterval(
-            startTime = DayTime(7, 0),
-            endTime = DayTime(22, 0),
+            startTime = TimeResult(7, 0, 0, 0L),
+            endTime = TimeResult(22, 0, 0, 0L),
             goalAmountMl = 2_000f,
             desiredIntervalMinutes = 60,
         )
 
         assertEquals(16, result.count)
-        assertEquals(DayTime(1, 0), result.actualInterval)
+        assertEquals(1, result.actualInterval.hour)
+        assertEquals(0, result.actualInterval.minute)
     }
 
     @Test
     fun `scheduleByInterval - ties prefer more drinks`() {
         // gapsFloat = 7.5 → roundToInt ties toward +∞ → 8 gaps → 9 drinks (not 7 gaps → 8 drinks)
         val result = calculator.scheduleByInterval(
-            startTime = DayTime(7, 0),
-            endTime = DayTime(22, 0),
+            startTime = TimeResult(7, 0, 0, 0L),
+            endTime = TimeResult(22, 0, 0, 0L),
             goalAmountMl = 2_000f,
             desiredIntervalMinutes = 120,
         )
@@ -261,25 +290,31 @@ class DrinkAlarmCalculator2Test {
 
     @Test
     fun `scheduleByInterval - desired interval larger than window gives 2 drinks`() {
-        // 8:00-10:00 = 2h = 7 200s, desired = 3h (10 800s) → gapsFloat = 0.67 → round → 1 gap → 2 drinks
+        // 8:00-10:00 = 2h = 7 200 000ms, desired = 3h (10 800 000ms) → gapsFloat = 0.67 → round → 1 gap → 2 drinks
         val result = calculator.scheduleByInterval(
-            startTime = DayTime(8, 0),
-            endTime = DayTime(10, 0),
+            startTime = TimeResult(8, 0, 0, 0L),
+            endTime = TimeResult(10, 0, 0, 0L),
             goalAmountMl = 1_000f,
             desiredIntervalMinutes = 180,
         )
 
         assertEquals(2, result.count)
-        assertEquals(DayTime(8, 0), result.slots.first().time)
-        assertEquals(DayTime(10, 0), result.slots.last().time)
+        assertEquals(8, result.slots.first().time.hour); assertEquals(
+            0,
+            result.slots.first().time.minute
+        )
+        assertEquals(10, result.slots.last().time.hour); assertEquals(
+            0,
+            result.slots.last().time.minute
+        )
     }
 
     @Test
     fun `scheduleByInterval - sum of amounts equals goalAmountMl`() {
         val goalAmountMl = 2_000f
         val result = calculator.scheduleByInterval(
-            startTime = DayTime(7, 0),
-            endTime = DayTime(22, 0),
+            startTime = TimeResult(7, 0, 0, 0L),
+            endTime = TimeResult(22, 0, 0, 0L),
             goalAmountMl = goalAmountMl,
             desiredIntervalMinutes = 120,
         )
@@ -290,30 +325,31 @@ class DrinkAlarmCalculator2Test {
 
     @Test
     fun `scheduleByInterval - uniform slot times for 9 drinks in 15h window`() {
-        // 54 000s, 8 gaps = 6 750s each. startSeconds=25200.
-        // i=1: abs=31950  → DayTime(8, 53)
-        // i=2: abs=38700  → DayTime(10,45)
-        // i=3: abs=45450  → DayTime(12,38)
-        // i=4: abs=52200  → DayTime(14,30)
-        // i=5: abs=58950  → DayTime(16,23)
-        // i=6: abs=65700  → DayTime(18,15)
-        // i=7: abs=72450  → DayTime(20, 8)
+        // 54 000 000ms, 8 gaps = 6 750 000ms each. startMillis=25 200 000.
+        // slot[i] = 25200000 + i*6750000 ms
+        // i=1: 31950000 → 08:52:30
+        // i=2: 38700000 → 10:45:00
+        // i=3: 45450000 → 12:37:30
+        // i=4: 52200000 → 14:30:00
+        // i=5: 58950000 → 16:22:30
+        // i=6: 65700000 → 18:15:00
+        // i=7: 72450000 → 20:07:30
         val result = calculator.scheduleByInterval(
-            startTime = DayTime(7, 0),
-            endTime = DayTime(22, 0),
+            startTime = TimeResult(7, 0, 0, 0L),
+            endTime = TimeResult(22, 0, 0, 0L),
             goalAmountMl = 2_000f,
             desiredIntervalMinutes = 120,
         )
 
-        assertEquals(DayTime(7, 0), result.slots[0].time)
-        assertEquals(DayTime(8, 53), result.slots[1].time)
-        assertEquals(DayTime(10, 45), result.slots[2].time)
-        assertEquals(DayTime(12, 38), result.slots[3].time)
-        assertEquals(DayTime(14, 30), result.slots[4].time)
-        assertEquals(DayTime(16, 23), result.slots[5].time)
-        assertEquals(DayTime(18, 15), result.slots[6].time)
-        assertEquals(DayTime(20, 8), result.slots[7].time)
-        assertEquals(DayTime(22, 0), result.slots[8].time)
+        assertEquals(7, result.slots[0].time.hour); assertEquals(0, result.slots[0].time.minute)
+        assertEquals(8, result.slots[1].time.hour); assertEquals(52, result.slots[1].time.minute)
+        assertEquals(10, result.slots[2].time.hour); assertEquals(45, result.slots[2].time.minute)
+        assertEquals(12, result.slots[3].time.hour); assertEquals(37, result.slots[3].time.minute)
+        assertEquals(14, result.slots[4].time.hour); assertEquals(30, result.slots[4].time.minute)
+        assertEquals(16, result.slots[5].time.hour); assertEquals(22, result.slots[5].time.minute)
+        assertEquals(18, result.slots[6].time.hour); assertEquals(15, result.slots[6].time.minute)
+        assertEquals(20, result.slots[7].time.hour); assertEquals(7, result.slots[7].time.minute)
+        assertEquals(22, result.slots[8].time.hour); assertEquals(0, result.slots[8].time.minute)
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -323,12 +359,12 @@ class DrinkAlarmCalculator2Test {
     @Test
     fun `scheduleByInterval is closer to desired interval than naive rounding`() {
         // 15h window, desired = 2h.
-        // 8 gaps (9 drinks) → 1h52m deviation = 8 min.
-        // 7 gaps (8 drinks) → 2h09m deviation = 9 min.
+        // 8 gaps (9 drinks) → 6 750 000ms = 1h 52m 30s deviation from 2h = 7m 30s
+        // 7 gaps (8 drinks) → 7 714 285ms = 2h 8m 34s deviation from 2h = 8m 34s
         // → Mode B picks 9 drinks (closer to 2h).
         val result = calculator.scheduleByInterval(
-            startTime = DayTime(7, 0),
-            endTime = DayTime(22, 0),
+            startTime = TimeResult(7, 0, 0, 0L),
+            endTime = TimeResult(22, 0, 0, 0L),
             goalAmountMl = 2_000f,
             desiredIntervalMinutes = 120,
         )
@@ -336,9 +372,9 @@ class DrinkAlarmCalculator2Test {
         val actualIntervalMin = result.actualInterval.inWholeMinutes
         val desiredMin = 120
 
-        // 8 gaps result: 54000/8=6750s=112.5min → 113min (1h53m), deviation=7min
-        // 7 gaps result: 54000/7=7714s=128.6min → 129min (2h09m), deviation=9min
-        // Mode B should give 9 drinks (8 gaps, 113min), which is closer.
+        // 8 gaps result: 54000000/8=6750000ms=112.5min, deviation=7.5min
+        // 7 gaps result: 54000000/7=7714285ms=128.57min, deviation=8.57min
+        // Mode B should give 9 drinks (8 gaps, 112min), which is closer.
         assertTrue(
             abs(actualIntervalMin - desiredMin) <= 8,
             "actualInterval=$actualIntervalMin min should be within 8 min of desired $desiredMin min"

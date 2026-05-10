@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DayTime
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmCalculator2
 import com.eahm.drinkwaterapp.core.data.drinkalarm.calculator.calculateNextAlarmSlot
+import com.eahm.drinkwaterapp.core.data.drinkalarm.toTimeResult
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
@@ -111,8 +112,8 @@ internal fun AlarmCalculatorScreen(
                     )
 
                     ScheduleMode.BY_INTERVAL -> calculator.scheduleByInterval(
-                        startTime = startTime,
-                        endTime = endTime,
+                        startTime = startTime.toTimeResult(),
+                        endTime = endTime.toTimeResult(),
                         goalAmountMl = goalAmountMl,
                         desiredIntervalMinutes = desiredIntervalMin,
                     )
@@ -127,8 +128,8 @@ internal fun AlarmCalculatorScreen(
                     val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                     calculateNextAlarmSlot(
                         now = now,
-                        startTime = startTime,
-                        endTime = endTime,
+                        startTime = startTime.toTimeResult(),
+                        endTime = endTime.toTimeResult(),
                         goalMl = goalAmountMl,
                         intervalMinutes = desiredIntervalMin,
                     )

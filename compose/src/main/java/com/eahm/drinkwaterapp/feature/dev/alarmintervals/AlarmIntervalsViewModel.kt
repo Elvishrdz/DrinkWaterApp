@@ -6,6 +6,7 @@ import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DayTime
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmCalculator2
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkSchedule
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.TimeResult
 import com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.WhatToDoService
 import com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.getNextAlarmSlot
 import com.eahm.drinkwaterapp.core.database.AppDatabase
@@ -152,14 +153,14 @@ internal class AlarmIntervalsViewModel(
         interval: AlarmInterval,
         mode: ScheduleMode = ScheduleMode.BY_INTERVAL,
     ): DrinkSchedule? {
-        val start = DayTime(startTime.hour, startTime.minute)
-        val end = DayTime(endTime.hour, endTime.minute)
+        val start = TimeResult(startTime.hour, startTime.minute, 0, 0L)
+        val end = TimeResult(endTime.hour, endTime.minute, 0, 0L)
 
         return runCatching {
             when (mode) {
                 ScheduleMode.BY_AMOUNT -> calculator.scheduleByAmount(
-                    startTime = start,
-                    endTime = end,
+                    startTime = DayTime(startTime.hour, startTime.minute),
+                    endTime = DayTime(endTime.hour, endTime.minute),
                     goalAmountMl = goalMl,
                     amountPerDrinkMl = 200f,
                 )

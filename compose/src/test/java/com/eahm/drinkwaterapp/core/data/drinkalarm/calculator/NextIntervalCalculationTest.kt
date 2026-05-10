@@ -1,6 +1,6 @@
 package com.eahm.drinkwaterapp.core.data.drinkalarm.calculator
 
-import com.eahm.drinkwaterapp.core.data.drinkalarm.DayTime
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.TimeResult
 import com.eahm.drinkwaterapp.core.data.drinkalarm.simulator.createSimulatedDateTime
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -16,8 +16,8 @@ import kotlin.time.ExperimentalTime
 @OptIn(ExperimentalTime::class)
 class NextIntervalCalculationTest {
 
-    private val start = DayTime(9, 0)
-    private val end = DayTime(18, 0)
+    private val start = TimeResult(9, 0, 0, 0L)
+    private val end = TimeResult(18, 0, 0, 0L)
     private val goalMl = 2_000f
     private val intervalMinutes = 120
 

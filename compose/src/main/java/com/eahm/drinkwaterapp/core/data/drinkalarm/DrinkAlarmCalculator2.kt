@@ -1,16 +1,66 @@
 package com.eahm.drinkwaterapp.core.data.drinkalarm
 
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.TimeResult
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.calculateTimeDifference
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.fromTotalMillis
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.inWholeMillis
+import com.eahm.drinkwaterapp.core.domain.extension.createTimeResultFromSeconds
 import kotlin.math.roundToInt
 
+data class Time(
+    val hour: Int,
+    val minute: Int,
+    val second: Int,
+) {
+    companion object
+}
+
+val Time.inWholeMinutes
+    get() = (hour * 60) + minute
+
+val Time.inWholeSeconds
+    get() = inWholeMinutes * 60 + second
+
+fun DayTime.toTime(): Time {
+    return Time(hour, minute, 0)
+}
+
+fun Time.Companion.createWithSeconds(seconds: Int): Time {
+    val results = seconds.createTimeResultFromSeconds()
+
+    return Time(
+        hour = results.hour,
+        minute = results.minute,
+        second = results.second,
+    )
+}
+
+fun Time.Companion.calculateTimeDifference(
+    start: Time,
+    end: Time,
+): Time {
+    val startSeconds = start.inWholeSeconds
+    val endSeconds = end.inWholeSeconds
+
+    val diffSeconds = if (endSeconds >= startSeconds) {
+        endSeconds - startSeconds
+    } else {
+        (24 * 3600 - startSeconds) + endSeconds
+    }
+
+    return Time.createWithSeconds(diffSeconds)
+}
+
+
 data class DrinkSlot(
-    val time: DayTime,
+    val time: TimeResult,
     val amountMl: Float,
 )
 
 data class DrinkSchedule(
     val slots: List<DrinkSlot>,
     /** Actual interval between consecutive drinks (computed from exact distribution). */
-    val actualInterval: DayTime,
+    val actualInterval: TimeResult,
     val count: Int,
 )
 
@@ -21,7 +71,7 @@ data class DrinkSchedule(
  * Contract:
  * - First slot is always at [startTime], last slot is always at [endTime].
  * - N drinks produce N-1 equal gaps — no slot ever exceeds [endTime].
- * - Middle slots are placed at `startTime + i * (totalTime / (N-1))` rounded to the nearest second.
+ * - Middle slots are placed at `startTime + i * (totalTime / (N-1))` rounded to the nearest millisecond.
  * - The last slot's [DrinkSlot.amountMl] is adjusted so the total equals [goalAmountMl] exactly.
  *
  * Two scheduling modes:
@@ -52,8 +102,8 @@ class DrinkAlarmCalculator2 {
 
         val count = (goalAmountMl / amountPerDrinkMl).roundToInt().coerceAtLeast(1)
         return buildSchedule(
-            startTime = startTime,
-            endTime = endTime,
+            startTime = startTime.toTimeResult(),
+            endTime = endTime.toTimeResult(),
             count = count,
             goalAmountMl = goalAmountMl,
             baseAmountPerDrinkMl = amountPerDrinkMl,
@@ -76,20 +126,20 @@ class DrinkAlarmCalculator2 {
      *   The actual interval will be adjusted to fit the window perfectly.
      */
     fun scheduleByInterval(
-        startTime: DayTime,
-        endTime: DayTime,
+        startTime: TimeResult,
+        endTime: TimeResult,
         goalAmountMl: Float,
         desiredIntervalMinutes: Int,
     ): DrinkSchedule {
         require(desiredIntervalMinutes > 0) { "desiredIntervalMinutes must be positive" }
         require(goalAmountMl > 0) { "goalAmountMl must be positive" }
 
-        val totalSeconds = windowSeconds(startTime, endTime)
-        val desiredIntervalSeconds = desiredIntervalMinutes * 60
+        val totalMillis = windowMillis(startTime, endTime)
+        val desiredIntervalMillis = desiredIntervalMinutes * 60_000L
 
         // gaps = N-1 for N drinks; find the integer gap count closest to the desired interval.
         // roundToInt() rounds ties toward +∞ → prefers more gaps = more drinks.
-        val gapsFloat = totalSeconds.toFloat() / desiredIntervalSeconds.toFloat()
+        val gapsFloat = totalMillis.toFloat() / desiredIntervalMillis.toFloat()
         val gaps = gapsFloat.roundToInt().coerceAtLeast(1)
         val count = gaps + 1
 
@@ -106,8 +156,8 @@ class DrinkAlarmCalculator2 {
     // ── Internal ─────────────────────────────────────────────────────────────
 
     private fun buildSchedule(
-        startTime: DayTime,
-        endTime: DayTime,
+        startTime: TimeResult,
+        endTime: TimeResult,
         count: Int,
         goalAmountMl: Float,
         baseAmountPerDrinkMl: Float,
@@ -116,18 +166,18 @@ class DrinkAlarmCalculator2 {
         if (count == 1) {
             return DrinkSchedule(
                 slots = listOf(DrinkSlot(time = startTime, amountMl = goalAmountMl)),
-                actualInterval = DayTime(0, 0),
+                actualInterval = TimeResult(0, 0, 0, 0L),
                 count = 1,
             )
         }
 
-        val totalSeconds = windowSeconds(startTime, endTime)
+        val totalMillis = windowMillis(startTime, endTime)
         val gaps = count - 1
-        val exactIntervalSeconds = totalSeconds.toDouble() / gaps.toDouble()
-        val actualInterval = DayTime.createWithSeconds(exactIntervalSeconds.roundToInt())
+        val exactIntervalMillis = totalMillis.toDouble() / gaps.toDouble()
+        val actualInterval = TimeResult.fromTotalMillis(exactIntervalMillis.toLong())
 
-        val startSeconds = startTime.inWholeSeconds
-        val daySeconds = 24 * 3600
+        val startMillis = startTime.inWholeMillis
+        val dayMillis = 24L * 3_600_000L
 
         val slots = List(count) { i ->
             val time = when (i) {
@@ -135,8 +185,8 @@ class DrinkAlarmCalculator2 {
                 count - 1 -> endTime
                 else -> {
                     // Independent rounding per slot avoids error accumulation.
-                    val absSeconds = startSeconds + (i * exactIntervalSeconds).roundToInt()
-                    DayTime.createWithSeconds(absSeconds % daySeconds)
+                    val absMillis = startMillis + (i * exactIntervalMillis).toLong()
+                    TimeResult.fromTotalMillis(absMillis % dayMillis)
                 }
             }
             val amount = if (i == count - 1) {
@@ -151,6 +201,6 @@ class DrinkAlarmCalculator2 {
         return DrinkSchedule(slots = slots, actualInterval = actualInterval, count = count)
     }
 
-    private fun windowSeconds(startTime: DayTime, endTime: DayTime): Int =
-        DayTime.calculateTimeDifference(startTime, endTime).inWholeSeconds
+    private fun windowMillis(startTime: TimeResult, endTime: TimeResult): Long =
+        TimeResult.calculateTimeDifference(startTime, endTime).inWholeMillis
 }

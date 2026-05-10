@@ -23,7 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DayTime
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkSchedule
-import com.eahm.drinkwaterapp.core.data.drinkalarm.calculateTimeDifference
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.TimeResult
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.calculateTimeDifference
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.inWholeMillis
 import com.eahm.drinkwaterapp.core.data.drinkalarm.inWholeMinutes
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
@@ -45,7 +47,9 @@ internal fun ScheduleVisualization(
     nextAlarmTime: LocalDateTime? = null,
 ) {
     // Day coverage = active window / 24 h
-    val windowMinutes = DayTime.calculateTimeDifference(startTime, endTime).inWholeMinutes
+    val startMin = startTime.inWholeMinutes
+    val endMin = endTime.inWholeMinutes
+    val windowMinutes = if (endMin >= startMin) endMin - startMin else (24 * 60 - startMin) + endMin
     val dayCoverageFraction = (windowMinutes / (24 * 60).toFloat()).coerceIn(0f, 1f)
     val dayCoveragePct = (dayCoverageFraction * 100).roundToInt()
 
@@ -142,8 +146,9 @@ private fun TimelineChart(schedule: DrinkSchedule) {
     val slots = schedule.slots
     val firstTime = slots.first().time
     val lastTime = slots.last().time
-    val totalMin = DayTime.calculateTimeDifference(firstTime, lastTime)
-        .inWholeMinutes.toFloat().coerceAtLeast(1f)
+    val totalMin =
+        (TimeResult.calculateTimeDifference(firstTime, lastTime).inWholeMillis / 60_000.0)
+            .toFloat().coerceAtLeast(1f)
 
     Box(
         modifier = Modifier
@@ -165,8 +170,11 @@ private fun TimelineChart(schedule: DrinkSchedule) {
 
             // Drink markers
             slots.forEachIndexed { index, slot ->
-                val minFromStart = DayTime.calculateTimeDifference(firstTime, slot.time)
-                    .inWholeMinutes.toFloat()
+                val minFromStart = (TimeResult.calculateTimeDifference(
+                    firstTime,
+                    slot.time
+                ).inWholeMillis / 60_000.0)
+                    .toFloat()
                 val x = (minFromStart / totalMin) * size.width
                 val isEdge = index == 0 || index == slots.lastIndex
 

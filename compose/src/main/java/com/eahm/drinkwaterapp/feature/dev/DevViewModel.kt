@@ -245,5 +245,4 @@ internal class DevViewModel(
     }
 
     fun onStopAlarm() = drinkAlarmManager.stopAlarm()
-    fun getRemainingAlarmTime() = drinkAlarmManager.remainingTime()
 }
