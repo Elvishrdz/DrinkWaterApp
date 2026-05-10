@@ -1,5 +1,18 @@
 Development
 
+Next release priorities
+- Drink water
+- Drink suggestions drag and drop.
+- Stats: graph and streaks
+- History
+- Settings : remove top header with kgs for now
+- Goal reached celebrations.
+
+Analytics
+- Track feature usage for improvements
+- Crashlytics
+
+
 Priorities
 - recalculate when drinking water. notification alarm should be rescheduled.
 - Store drink amount and provide it to all drink calculations.
