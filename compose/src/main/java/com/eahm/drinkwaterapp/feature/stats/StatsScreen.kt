@@ -36,7 +36,6 @@ import com.eahm.drinkwaterapp.feature.stats.components.MiniStatsCards
 import com.eahm.drinkwaterapp.feature.stats.components.SummaryCard
 import com.eahm.drinkwaterapp.feature.stats.components.WeeklyBarChart
 import com.eahm.drinkwaterapp.ui.calendar.CalendarViewMode
-import com.eahm.drinkwaterapp.ui.calendar.DrinkCalendar
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -144,15 +143,15 @@ internal fun StatsContent(
             )
         }
 
-        item {
-            DrinkCalendar(
-                state = calendarState,
-                onPrevious = onCalendarPrevious,
-                onNext = onCalendarNext,
-                onViewModeToggle = onCalendarViewModeToggle,
-                modifier = Modifier.padding(horizontal = 18.dp),
-            )
-        }
+//        item {
+//            DrinkCalendar(
+//                state = calendarState,
+//                onPrevious = onCalendarPrevious,
+//                onNext = onCalendarNext,
+//                onViewModeToggle = onCalendarViewModeToggle,
+//                modifier = Modifier.padding(horizontal = 18.dp),
+//            )
+//        }
 
         item { Spacer(modifier = Modifier.height(8.dp)) }
     }
