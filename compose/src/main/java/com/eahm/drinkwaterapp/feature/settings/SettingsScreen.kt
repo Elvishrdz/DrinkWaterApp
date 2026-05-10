@@ -29,6 +29,7 @@ import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -277,158 +278,161 @@ internal fun SettingsContent(
     var showIntervalSheet by rememberSaveable { mutableStateOf(false) }
     var showNotificationAmountSheet by rememberSaveable { mutableStateOf(false) }
 
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .background(DwInk50),
-        contentPadding = PaddingValues(horizontal = 18.dp, vertical = 18.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        item {
-            Text(
-                text = "Settings",
-                fontFamily = PlusJakartaSans,
-                fontWeight = FontWeight.Bold,
-                fontSize = 26.sp,
-                color = DwInk900,
-            )
-        }
-
-        item {
-            ProfileCard(
-                state = state,
-                onUsernameChanged = onUsernameChanged,
-            )
-        }
-
-        item {
-            SettingsSection(title = "HYDRATION") {
-                SettingRow(
-                    icon = DwIcons.Drop,
-                    iconBg = DwTintWater,
-                    iconTint = DwWater,
-                    label = "Daily goal",
-                    onClick = { showGoalSheet = true },
-                ) {
-                    RowValueTrailing(value = formatGoal(state.dailyGoalMl))
-                }
-                HorizontalDivider(color = DwInk100)
-                SettingRow(
-                    icon = DwIcons.Ruler,
-                    iconBg = DwTintMagenta,
-                    iconTint = DwMagenta,
-                    label = "Units",
-                    onClick = { showUnitsSheet = true },
-                ) {
-                    RowValueTrailing(value = "${state.unit.label} · ${state.weightUnit.label}")
-                }
-            }
-        }
-
-        item {
-            SettingsSection(title = "REMINDERS") {
-                SettingRow(
-                    icon = DwIcons.Bell,
-                    iconBg = DwTintMagenta,
-                    iconTint = DwMagenta,
-                    label = "Notifications",
-                ) {
-                    Switch(
-                        checked = state.notificationsEnabled,
-                        onCheckedChange = onNotificationsToggled,
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = DwPaper,
-                            checkedTrackColor = DwMagenta,
-                            uncheckedThumbColor = DwPaper,
-                            uncheckedTrackColor = DwInk200,
-                            uncheckedBorderColor = DwInk200,
-                        ),
-                    )
-                }
-                HorizontalDivider(color = DwInk100)
-                SettingRow(
-                    icon = DwIcons.Clock,
-                    iconBg = DwTintWater,
-                    iconTint = DwWater,
-                    label = "Interval",
-                    onClick = { showIntervalSheet = true },
-                ) {
-                    RowValueTrailing(value = "every ${state.intervalMinutes} min")
-                }
-                HorizontalDivider(color = DwInk100)
-                SettingRowTimeSelector(
-                    time = state.startTime?.let { TimeSelected(it.hour, it.minute) },
-                    icon = DwIcons.Sun,
-                    iconBg = DwTintWater,
-                    iconTint = DwWater,
-                    label = "Start time",
-                    onStartTimeTap = onStartTimeChanged,
+    Scaffold { innerPadding ->
+        LazyColumn(
+            modifier = modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .background(DwInk50),
+            contentPadding = PaddingValues(horizontal = 18.dp, vertical = 18.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            item {
+                Text(
+                    text = "Settings",
+                    fontFamily = PlusJakartaSans,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 26.sp,
+                    color = DwInk900,
                 )
-                HorizontalDivider(color = DwInk100)
-                SettingRowTimeSelector(
-                    time = state.endTime?.let { TimeSelected(it.hour, it.minute) },
-                    icon = DwIcons.Moon,
-                    iconBg = DwTintMagenta,
-                    iconTint = DwMagenta,
-                    label = "End time",
-                    onStartTimeTap = onEndTimeChanged,
-                )
-                HorizontalDivider(color = DwInk100)
-                SettingRow(
-                    icon = DwIcons.Glass,
-                    iconBg = DwTintWater,
-                    iconTint = DwWater,
-                    label = "Notification amount",
-                    onClick = { showNotificationAmountSheet = true },
-                ) {
-                    RowValueTrailing(value = "+${state.notificationAmountMl.toInt()} ml")
+            }
+
+//            item {
+//                ProfileCard(
+//                    state = state,
+//                    onUsernameChanged = onUsernameChanged,
+//                )
+//            }
+
+            item {
+                SettingsSection(title = "HYDRATION") {
+                    SettingRow(
+                        icon = DwIcons.Drop,
+                        iconBg = DwTintWater,
+                        iconTint = DwWater,
+                        label = "Daily goal",
+                        onClick = { showGoalSheet = true },
+                    ) {
+                        RowValueTrailing(value = formatGoal(state.dailyGoalMl))
+                    }
+                    HorizontalDivider(color = DwInk100)
+                    SettingRow(
+                        icon = DwIcons.Ruler,
+                        iconBg = DwTintMagenta,
+                        iconTint = DwMagenta,
+                        label = "Units",
+                        onClick = { showUnitsSheet = true },
+                    ) {
+                        RowValueTrailing(value = "${state.unit.label} · ${state.weightUnit.label}")
+                    }
                 }
             }
-        }
 
-        item {
-            SettingsSection(title = "OVERLAYS") {
-                SettingRow(
-                    icon = DwIcons.Bell,
-                    iconBg = DwTintMagenta,
-                    iconTint = DwMagenta,
-                    label = "Goal reached celebrations",
-                ) {
-                    Switch(
-                        checked = state.goalReachedCelebrationsEnabled,
-                        onCheckedChange = onGoalCelebrationsToggled,
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = DwPaper,
-                            checkedTrackColor = DwMagenta,
-                            uncheckedThumbColor = DwPaper,
-                            uncheckedTrackColor = DwInk200,
-                            uncheckedBorderColor = DwInk200,
-                        ),
+            item {
+                SettingsSection(title = "REMINDERS") {
+                    SettingRow(
+                        icon = DwIcons.Bell,
+                        iconBg = DwTintMagenta,
+                        iconTint = DwMagenta,
+                        label = "Notifications",
+                    ) {
+                        Switch(
+                            checked = state.notificationsEnabled,
+                            onCheckedChange = onNotificationsToggled,
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = DwPaper,
+                                checkedTrackColor = DwMagenta,
+                                uncheckedThumbColor = DwPaper,
+                                uncheckedTrackColor = DwInk200,
+                                uncheckedBorderColor = DwInk200,
+                            ),
+                        )
+                    }
+                    HorizontalDivider(color = DwInk100)
+                    SettingRow(
+                        icon = DwIcons.Clock,
+                        iconBg = DwTintWater,
+                        iconTint = DwWater,
+                        label = "Interval",
+                        onClick = { showIntervalSheet = true },
+                    ) {
+                        RowValueTrailing(value = "every ${state.intervalMinutes} min")
+                    }
+                    HorizontalDivider(color = DwInk100)
+                    SettingRowTimeSelector(
+                        time = state.startTime?.let { TimeSelected(it.hour, it.minute) },
+                        icon = DwIcons.Sun,
+                        iconBg = DwTintWater,
+                        iconTint = DwWater,
+                        label = "Start time",
+                        onStartTimeTap = onStartTimeChanged,
                     )
+                    HorizontalDivider(color = DwInk100)
+                    SettingRowTimeSelector(
+                        time = state.endTime?.let { TimeSelected(it.hour, it.minute) },
+                        icon = DwIcons.Moon,
+                        iconBg = DwTintMagenta,
+                        iconTint = DwMagenta,
+                        label = "End time",
+                        onStartTimeTap = onEndTimeChanged,
+                    )
+                    HorizontalDivider(color = DwInk100)
+                    SettingRow(
+                        icon = DwIcons.Glass,
+                        iconBg = DwTintWater,
+                        iconTint = DwWater,
+                        label = "Notification amount",
+                        onClick = { showNotificationAmountSheet = true },
+                    ) {
+                        RowValueTrailing(value = "+${state.notificationAmountMl.toInt()} ml")
+                    }
                 }
             }
-        }
 
-        item {
-            SettingsSection(title = "ABOUT") {
-                SettingRow(
-                    icon = DwIcons.Share,
-                    iconBg = DwInk100,
-                    iconTint = DwInk500,
-                    label = "Share with friends",
-                    onClick = onShareTap,
-                ) {
-                    RowChevronTrailing()
+            item {
+                SettingsSection(title = "OVERLAYS") {
+                    SettingRow(
+                        icon = DwIcons.Bell,
+                        iconBg = DwTintMagenta,
+                        iconTint = DwMagenta,
+                        label = "Goal reached celebrations",
+                    ) {
+                        Switch(
+                            checked = state.goalReachedCelebrationsEnabled,
+                            onCheckedChange = onGoalCelebrationsToggled,
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = DwPaper,
+                                checkedTrackColor = DwMagenta,
+                                uncheckedThumbColor = DwPaper,
+                                uncheckedTrackColor = DwInk200,
+                                uncheckedBorderColor = DwInk200,
+                            ),
+                        )
+                    }
                 }
-                HorizontalDivider(color = DwInk100)
-                SettingRow(
-                    icon = DwIcons.Star,
-                    iconBg = DwInk100,
-                    iconTint = DwInk500,
-                    label = "Rate the app",
-                    onClick = onRateTap,
-                ) {
-                    RowChevronTrailing()
+            }
+
+            item {
+                SettingsSection(title = "ABOUT") {
+                    SettingRow(
+                        icon = DwIcons.Share,
+                        iconBg = DwInk100,
+                        iconTint = DwInk500,
+                        label = "Share with friends",
+                        onClick = onShareTap,
+                    ) {
+                        RowChevronTrailing()
+                    }
+                    HorizontalDivider(color = DwInk100)
+                    SettingRow(
+                        icon = DwIcons.Star,
+                        iconBg = DwInk100,
+                        iconTint = DwInk500,
+                        label = "Rate the app",
+                        onClick = onRateTap,
+                    ) {
+                        RowChevronTrailing()
+                    }
                 }
             }
         }
