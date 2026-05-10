@@ -207,8 +207,6 @@ private fun AmountStepperButton(
     }
 }
 
-// ── Previews ──────────────────────────────────────────────────────────────────
-
 @Preview(showBackground = true)
 @Composable
 private fun NotificationAmountSheetContentDefaultPreview() {
