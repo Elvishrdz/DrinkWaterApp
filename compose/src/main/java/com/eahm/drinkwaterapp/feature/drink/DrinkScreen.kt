@@ -50,6 +50,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
+import com.eahm.drinkwaterapp.feature.drink.alarm.HomeAlarmCard
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStats
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -131,6 +132,10 @@ internal fun DrinkScreen(
                 onRestorePreset = onRestorePreset,
                 modifier = Modifier.padding(horizontal = 20.dp)
             )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            HomeAlarmCard(modifier = Modifier.padding(horizontal = 20.dp))
 
             Spacer(modifier = Modifier.height(16.dp))
 

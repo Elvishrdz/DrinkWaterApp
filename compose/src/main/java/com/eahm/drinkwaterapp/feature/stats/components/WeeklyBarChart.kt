@@ -4,7 +4,7 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -39,17 +40,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
 import com.eahm.drinkwaterapp.core.designsystem.component.extension.outlineBorderStyle
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk100
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk300
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk50
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk900
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwPaper
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagentaDark
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterDeep
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterLight
 import com.eahm.drinkwaterapp.core.designsystem.theme.JetBrainsMono
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
@@ -57,21 +60,27 @@ import com.eahm.drinkwaterapp.feature.stats.DayEntry
 import com.eahm.drinkwaterapp.feature.stats.PeriodPage
 import kotlinx.coroutines.launch
 
-private val barGradient = Brush.verticalGradient(
-    colors = listOf(DwWaterLight, DwWaterDeep)
+// Goal met: magenta gradient (design spec)
+private val goalMetBrush = Brush.verticalGradient(
+    colors = listOf(Color(0xFFB83A95), DwMagentaDark)
+)
+
+// Below goal: water gradient (design spec)
+private val belowGoalBrush = Brush.verticalGradient(
+    colors = listOf(DwWaterLight, DwWater)
 )
 
 /**
  * A horizontally paginated bar chart.
  *
- * Each page corresponds to one period (e.g. a week). Users swipe LEFT to view
- * older periods, RIGHT to return to more recent ones.
+ * Pagination model (chronological order):
+ *   pages[0] = oldest period
+ *   pages[N] = most recent period (current week / month / year)
  *
- * Pagination model:
- *   page 0 = most recent period (e.g. current week)
- *   page N = oldest period available
+ * Swiping / navigating RIGHT → more recent dates (avanzar)
+ * Swiping / navigating LEFT  → older dates (retroceder)
  *
- * @param pages          Ordered list of period data. pages[0] = most recent.
+ * @param pages          Ordered list of period data. pages[0] = oldest, pages[N] = most recent.
  * @param goalMl         Daily goal used to calculate bar fill ratios.
  * @param onPageChanged  Callback fired when the visible page changes.
  */
@@ -84,8 +93,16 @@ fun WeeklyBarChart(
 ) {
     if (pages.isEmpty()) return
 
-    val pagerState = rememberPagerState(pageCount = { pages.size })
+    val pagerState = rememberPagerState(
+        initialPage = pages.size - 1,
+        pageCount = { pages.size },
+    )
     val scope = rememberCoroutineScope()
+
+    // Scroll to newest page whenever the list size changes (period switch)
+    LaunchedEffect(pages.size) {
+        pagerState.scrollToPage(pages.size - 1)
+    }
 
     // Keep ViewModel in sync with swipe navigation
     LaunchedEffect(pagerState.currentPage) {
@@ -99,19 +116,21 @@ fun WeeklyBarChart(
             .padding(16.dp)
     ) {
         ChartHeader(
-            rangeLabel = pages[pagerState.currentPage].rangeLabel,
+            rangeLabel = pages.getOrNull(pagerState.currentPage)?.rangeLabel ?: "",
             goalMl = goalMl,
             pagerState = pagerState,
             onNavigatePrev = {
+                // ← Older: go to lower page index
+                scope.launch {
+                    pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                }
+            },
+            onNavigateNext = {
+                // → Newer: go to higher page index
                 scope.launch {
                     pagerState.animateScrollToPage(pagerState.currentPage + 1)
                 }
             },
-            onNavigateNext = {
-                scope.launch {
-                    pagerState.animateScrollToPage(pagerState.currentPage - 1)
-                }
-            }
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -119,11 +138,12 @@ fun WeeklyBarChart(
         HorizontalPager(
             state = pagerState,
             beyondViewportPageCount = 1,
-            modifier = Modifier.fillMaxWidth()
+            pageSpacing = 8.dp,
+            modifier = Modifier.fillMaxWidth(),
         ) { pageIndex ->
             BarChartPage(
                 entries = pages[pageIndex].entries,
-                goalMl = goalMl
+                goalMl = goalMl,
             )
         }
 
@@ -144,21 +164,21 @@ private fun ChartHeader(
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = "Daily intake",
             fontFamily = PlusJakartaSans,
             fontWeight = FontWeight.SemiBold,
             fontSize = 13.sp,
-            color = DwInk900
+            color = DwInk900,
         )
         Text(
             text = "goal $goalMl mL",
             fontFamily = JetBrainsMono,
             fontWeight = FontWeight.SemiBold,
             fontSize = 11.sp,
-            color = DwWater
+            color = DwWater,
         )
     }
 
@@ -167,21 +187,21 @@ private fun ChartHeader(
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
+        // ← Older (lower page index)
         IconButton(
             onClick = onNavigatePrev,
-            enabled = pagerState.currentPage < pagerState.pageCount - 1,
-            modifier = Modifier.size(32.dp)
+            enabled = pagerState.currentPage > 0,
+            modifier = Modifier.size(32.dp),
         ) {
             Icon(
                 imageVector = DwIcons.ChevronRight,
                 contentDescription = "Previous period",
-                tint = if (pagerState.currentPage < pagerState.pageCount - 1) DwInk400
-                else DwInk100,
+                tint = if (pagerState.currentPage > 0) DwInk400 else DwInk100,
                 modifier = Modifier
                     .size(18.dp)
-                    .graphicsLayer { scaleX = -1f } // mirror → acts as left chevron
+                    .graphicsLayer { scaleX = -1f },
             )
         }
 
@@ -190,19 +210,20 @@ private fun ChartHeader(
             fontFamily = PlusJakartaSans,
             fontWeight = FontWeight.SemiBold,
             fontSize = 12.sp,
-            color = DwInk500
+            color = DwInk500,
         )
 
+        // → Newer (higher page index)
         IconButton(
             onClick = onNavigateNext,
-            enabled = pagerState.currentPage > 0,
-            modifier = Modifier.size(32.dp)
+            enabled = pagerState.currentPage < pagerState.pageCount - 1,
+            modifier = Modifier.size(32.dp),
         ) {
             Icon(
                 imageVector = DwIcons.ChevronRight,
                 contentDescription = "Next period",
-                tint = if (pagerState.currentPage > 0) DwInk400 else DwInk100,
-                modifier = Modifier.size(18.dp)
+                tint = if (pagerState.currentPage < pagerState.pageCount - 1) DwInk400 else DwInk100,
+                modifier = Modifier.size(18.dp),
             )
         }
     }
@@ -214,18 +235,24 @@ private fun BarChartPage(
     goalMl: Int,
     modifier: Modifier = Modifier,
 ) {
+    var selectedIndex by remember { mutableStateOf<Int?>(null) }
+
     Row(
         modifier = modifier
             .fillMaxWidth()
             .height(130.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalAlignment = Alignment.Bottom
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.Bottom,
     ) {
-        entries.forEach { entry ->
+        entries.forEachIndexed { index, entry ->
             BarColumn(
                 entry = entry,
                 goalMl = goalMl,
-                modifier = Modifier.weight(1f)
+                isSelected = selectedIndex == index,
+                onClick = {
+                    selectedIndex = if (selectedIndex == index) null else index
+                },
+                modifier = Modifier.weight(1f),
             )
         }
     }
@@ -235,9 +262,10 @@ private fun BarChartPage(
 private fun BarColumn(
     entry: DayEntry,
     goalMl: Int,
+    isSelected: Boolean,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    // Animate fill from 0 whenever this composable enters composition (page appears)
     var triggered by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { triggered = true }
 
@@ -248,7 +276,7 @@ private fun BarColumn(
     val animatedFill by animateFloatAsState(
         targetValue = if (triggered) fillRatio else 0f,
         animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing),
-        label = "bar_${entry.shortLabel}"
+        label = "bar_${entry.shortLabel}",
     )
 
     val goalMet = entry.amountMl >= goalMl
@@ -256,7 +284,7 @@ private fun BarColumn(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom,
-        modifier = modifier
+        modifier = modifier,
     ) {
         Box(
             contentAlignment = Alignment.BottomCenter,
@@ -264,7 +292,8 @@ private fun BarColumn(
                 .weight(1f)
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(6.dp))
-                .background(DwInk100)
+                .background(DwInk50)
+                .clickable { onClick() },
         ) {
             if (animatedFill > 0f) {
                 Box(
@@ -272,15 +301,15 @@ private fun BarColumn(
                         .fillMaxWidth()
                         .fillMaxHeight(animatedFill)
                         .clip(RoundedCornerShape(6.dp))
-                        .background(
-                            if (goalMet) barGradient else Brush.linearGradient(
-                                listOf(
-                                    DwWater,
-                                    DwWater
-                                )
-                            )
-                        )
+                        .background(if (goalMet) goalMetBrush else belowGoalBrush),
                 )
+            }
+
+            // Popup tooltip shown when bar is pressed
+            if (isSelected && entry.amountMl > 0) {
+                Popup(alignment = Alignment.TopCenter) {
+                    BarTooltip(amountMl = entry.amountMl, goalMl = goalMl)
+                }
             }
         }
 
@@ -291,7 +320,34 @@ private fun BarColumn(
             fontFamily = PlusJakartaSans,
             fontWeight = if (entry.isToday) FontWeight.Bold else FontWeight.SemiBold,
             fontSize = 10.sp,
-            color = if (entry.isToday) DwMagenta else DwInk400
+            color = if (entry.isToday) DwMagenta else DwInk400,
+        )
+    }
+}
+
+@Composable
+private fun BarTooltip(amountMl: Int, goalMl: Int) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .shadow(elevation = 6.dp, shape = RoundedCornerShape(8.dp))
+            .clip(RoundedCornerShape(8.dp))
+            .background(DwInk900)
+            .padding(horizontal = 10.dp, vertical = 6.dp),
+    ) {
+        Text(
+            text = "$amountMl mL",
+            fontFamily = PlusJakartaSans,
+            fontWeight = FontWeight.Bold,
+            fontSize = 12.sp,
+            color = Color.White,
+        )
+        Text(
+            text = "/ $goalMl mL",
+            fontFamily = PlusJakartaSans,
+            fontWeight = FontWeight.Normal,
+            fontSize = 10.sp,
+            color = DwInk300,
         )
     }
 }
@@ -299,51 +355,52 @@ private fun BarColumn(
 @Composable
 private fun ChartLegend() {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(14.dp)
+        horizontalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-        LegendItem(color = DwWater, label = "Goal met")
-        LegendItem(color = DwInk100, label = "Below goal")
+        LegendItem(brush = goalMetBrush, label = "Goal met")
+        LegendItem(brush = belowGoalBrush, label = "Below goal")
     }
 }
 
 @Composable
-private fun LegendItem(color: Color, label: String) {
+private fun LegendItem(brush: Brush, label: String) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         Box(
             modifier = Modifier
                 .size(10.dp)
                 .clip(RoundedCornerShape(2.dp))
-                .background(color)
+                .background(brush),
         )
         Text(
             text = label,
             fontFamily = PlusJakartaSans,
             fontWeight = FontWeight.SemiBold,
             fontSize = 11.sp,
-            color = DwInk500
+            color = DwInk500,
         )
     }
 }
 
+// Preview uses chronological order: oldest first, newest last
 private val previewPages = listOf(
-    PeriodPage(
-        rangeLabel = "Apr 27 – May 3",
-        entries = listOf(
-            DayEntry("Mon", 2200), DayEntry("Tue", 1500, isToday = true),
-            DayEntry("Wed", 0), DayEntry("Thu", 0),
-            DayEntry("Fri", 0), DayEntry("Sat", 0), DayEntry("Sun", 0),
-        )
-    ),
     PeriodPage(
         rangeLabel = "Apr 20 – Apr 26",
         entries = listOf(
             DayEntry("Mon", 2300), DayEntry("Tue", 2200),
             DayEntry("Wed", 2550), DayEntry("Thu", 2100),
             DayEntry("Fri", 2400), DayEntry("Sat", 1900), DayEntry("Sun", 2600),
-        )
+        ),
+    ),
+    PeriodPage(
+        rangeLabel = "Apr 27 – May 3",
+        entries = listOf(
+            DayEntry("Mon", 2200), DayEntry("Tue", 1500, isToday = true),
+            DayEntry("Wed", 0), DayEntry("Thu", 0),
+            DayEntry("Fri", 0), DayEntry("Sat", 0), DayEntry("Sun", 0),
+        ),
     ),
 )
 
@@ -355,7 +412,7 @@ private fun WeeklyBarChartPreview() {
             pages = previewPages,
             goalMl = 2400,
             onPageChanged = {},
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.dp),
         )
     }
 }

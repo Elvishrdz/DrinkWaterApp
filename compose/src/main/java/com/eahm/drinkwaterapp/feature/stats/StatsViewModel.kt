@@ -57,7 +57,12 @@ internal class StatsViewModel(
         .stateIn(viewModelScope, SharingStarted.Lazily, StreakData())
 
     val state: StateFlow<StatsState> = combine(
-        combine(_selectedPeriod, _chartPage, pages, todayGoalMl) { period, page, pages, dailyGoalMl ->
+        combine(
+            _selectedPeriod,
+            _chartPage,
+            pages,
+            todayGoalMl
+        ) { period, page, pages, dailyGoalMl ->
             val chartGoal = when (period) {
                 StatsPeriod.YEAR -> dailyGoalMl * 30
                 else -> dailyGoalMl
@@ -91,7 +96,7 @@ internal class StatsViewModel(
 
     fun onPeriodSelected(period: StatsPeriod) {
         _selectedPeriod.value = period
-        _chartPage.value = 0
+        _chartPage.value = Int.MAX_VALUE // clamps to pages.size - 1 (newest page)
     }
 
     fun onChartPageChanged(page: Int) {
@@ -105,7 +110,8 @@ internal class StatsViewModel(
     /**
      * Average intake and period-over-period trend for [pageIndex].
      * Only days/months with amountMl > 0 are counted.
-     * Trend compares against the next older page (pageIndex + 1).
+     * pages[0] = oldest, pages[N] = most recent.
+     * Trend compares against the previous (older) page at pageIndex - 1.
      */
     private fun computeSummary(pages: List<PeriodPage>, pageIndex: Int): Summary {
         if (pages.isEmpty() || pageIndex !in pages.indices) {
@@ -114,7 +120,7 @@ internal class StatsViewModel(
         val amounts = pages[pageIndex].entries.map { it.amountMl }.filter { it > 0 }
         val avg = if (amounts.isNotEmpty()) amounts.average().toInt() else 0
 
-        val prevAmounts = pages.getOrNull(pageIndex + 1)
+        val prevAmounts = pages.getOrNull(pageIndex - 1)
             ?.entries?.map { it.amountMl }?.filter { it > 0 }
         val prevAvg = if (!prevAmounts.isNullOrEmpty()) prevAmounts.average().toInt() else avg
 
@@ -136,7 +142,7 @@ internal class StatsViewModel(
         StatsPeriod.YEAR -> loadYearPages()
     }
 
-    /** 8 pages, most-recent first. Each page = Mon–Sun of a calendar week. */
+    /** 8 pages, oldest first. Each page = Mon–Sun of a calendar week. */
     private fun loadWeekPages(): Flow<List<PeriodPage>> {
         val daysFromMonday = today.dayOfWeek.ordinal  // MONDAY=0 … SUNDAY=6
         val thisMonday = today.minus(daysFromMonday, DateTimeUnit.DAY)
@@ -159,11 +165,11 @@ internal class StatsViewModel(
                             )
                         },
                     )
-                }
+                }.reversed() // pages[0] = oldest, pages[N] = most recent
             }
     }
 
-    /** 6 pages, most-recent first. Each page = all days of a calendar month. */
+    /** 6 pages, oldest first. Each page = all days of a calendar month. */
     private fun loadMonthPages(): Flow<List<PeriodPage>> {
         val monthStarts = (0 until NUM_MONTHS).map { offset ->
             var year = today.year
@@ -193,11 +199,11 @@ internal class StatsViewModel(
                             )
                         },
                     )
-                }
+                }.reversed() // pages[0] = oldest, pages[N] = most recent
             }
     }
 
-    /** 3 pages, most-recent first. Each page = 12 months of a calendar year. */
+    /** 3 pages, oldest first. Each page = 12 months of a calendar year. */
     private fun loadYearPages(): Flow<List<PeriodPage>> {
         val years = (0 until NUM_YEARS).map { today.year - it }
         val rangeStart = LocalDate(years.last(), 1, 1)
@@ -220,7 +226,7 @@ internal class StatsViewModel(
                             )
                         },
                     )
-                }
+                }.reversed() // pages[0] = oldest, pages[N] = most recent
             }
     }
 
