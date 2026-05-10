@@ -45,18 +45,18 @@ internal class DrinkViewModel(
     val database: AppDatabase,
     val prefsStorage: PrefsStorage,
     val confettiController: ConfettiController,
-    val dateTimeObserver: DateTimeObserver,
+    val dateTimeZoneChangedObserver: DateTimeZoneChangedObserver,
     val drinkStatsObserver: DrinkStatsObserver,
     val streakRepository: StreakRepository,
 ) : ViewModel() {
 
     private val dao = database.getHistoryDao()
 
-    private val historyDate = MutableStateFlow(dateTimeObserver.currentDateTime.value)
+    private val historyDate = MutableStateFlow(dateTimeZoneChangedObserver.currentDateTime.value)
 
     init {
         viewModelScope.launch {
-            dateTimeObserver.currentDateTime.collect { historyDate.value = it }
+            dateTimeZoneChangedObserver.currentDateTime.collect { historyDate.value = it }
         }
 
         viewModelScope.launch {
@@ -143,7 +143,12 @@ internal class DrinkViewModel(
         .stateIn(viewModelScope, SharingStarted.Lazily, StreakData())
 
     val state = combine(
-        combine(extras, history, drinkStatsObserver.drinkStats, drinkAlarmManager.state) { extras, history, drinkStats, alarmState ->
+        combine(
+            extras,
+            history,
+            drinkStatsObserver.drinkStats,
+            drinkAlarmManager.state
+        ) { extras, history, drinkStats, alarmState ->
             if (history == null || extras == null) {
                 DrinkState.Loading
             } else {

@@ -4,7 +4,7 @@ import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
-import com.eahm.drinkwaterapp.feature.drink.DateTimeObserver
+import com.eahm.drinkwaterapp.feature.drink.DateTimeZoneChangedObserver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,7 +27,7 @@ val streakModule = module { singleOf(::StreakRepository) }
 class StreakRepository(
     database: AppDatabase,
     private val prefsStorage: PrefsStorage,
-    dateTimeObserver: DateTimeObserver,
+    dateTimeZoneChangedObserver: DateTimeZoneChangedObserver,
 ) {
     private val historyDao = database.getHistoryDao()
     private val goalDao = database.getDailyGoalDao()
@@ -40,7 +40,7 @@ class StreakRepository(
         val personalBestMl: Int,
     )
 
-    private val computedFromDb: Flow<ComputedStreaks> = dateTimeObserver.currentDateTime
+    private val computedFromDb: Flow<ComputedStreaks> = dateTimeZoneChangedObserver.currentDateTime
         .flatMapLatest { now ->
             val today = now.date
             combine(

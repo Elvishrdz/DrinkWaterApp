@@ -4,7 +4,7 @@ import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
 import com.eahm.drinkwaterapp.core.domain.extension.toEndOfDayTime
 import com.eahm.drinkwaterapp.core.domain.extension.toStartOfDayTime
-import com.eahm.drinkwaterapp.feature.drink.DateTimeObserver
+import com.eahm.drinkwaterapp.feature.drink.DateTimeZoneChangedObserver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.combine
@@ -23,21 +23,21 @@ val drinkStatsObserverModule = module {
 
 class DrinkStatsObserver(
     val database: AppDatabase,
-    dateTimeObserver: DateTimeObserver,
+    dateTimeZoneChangedObserver: DateTimeZoneChangedObserver,
 ) {
 
     private val historyDao = database.getHistoryDao()
     private val goalDao = database.getDailyGoalDao()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val currentDrinkAmount = dateTimeObserver.currentDateTime
+    private val currentDrinkAmount = dateTimeZoneChangedObserver.currentDateTime
         .flatMapLatest { day ->
             historyDao.getTotalDrinkAmount(start = day.toStartOfDayTime, end = day.toEndOfDayTime)
         }
         .flowOn(Dispatchers.IO)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val currentGoalAmount = dateTimeObserver.currentDateTime
+    private val currentGoalAmount = dateTimeZoneChangedObserver.currentDateTime
         .flatMapLatest { day ->
             goalDao.getGoalForDate(day.date.toEpochDays())
         }

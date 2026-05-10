@@ -29,12 +29,12 @@ import org.koin.dsl.module
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
-val dateTimeObserverModule = module {
-    singleOf(::DateTimeObserver)
+val dateTimeZoneChangedObserverModule = module {
+    singleOf(::DateTimeZoneChangedObserver)
 }
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
-class DateTimeObserver(
+class DateTimeZoneChangedObserver(
     val application: Application,
 ) {
     private val job = SupervisorJob()

@@ -23,11 +23,14 @@ import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.database.entity.Status
 import com.eahm.drinkwaterapp.core.domain.extension.toEndOfDayTime
 import com.eahm.drinkwaterapp.core.domain.extension.toStartOfDayTime
-import com.eahm.drinkwaterapp.feature.drink.DateTimeObserver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.koin.core.context.GlobalContext
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 class AlarmReceiver : BroadcastReceiver() {
 
@@ -85,6 +88,7 @@ class AlarmReceiver : BroadcastReceiver() {
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     private suspend fun registerDrink(context: Context, amountPerDrink: Float) =
         withContext(Dispatchers.IO) {
             val koin = GlobalContext.get()
@@ -106,7 +110,7 @@ class AlarmReceiver : BroadcastReceiver() {
                     (statsBefore.drinkAmount + amountPerDrink) >= statsBefore.goalAmount
 
             if (goalJustReached && Settings.canDrawOverlays(context)) {
-                val today = koin.get<DateTimeObserver>().currentDateTime.value
+                val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                 val drinkCount = dao.findByTimestamp(
                     start = today.toStartOfDayTime,
                     end = today.toEndOfDayTime,

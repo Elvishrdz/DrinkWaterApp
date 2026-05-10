@@ -11,14 +11,14 @@ val activeHoursObserverModule = module {
 }
 
 class ActiveHoursObserver(
-    dateTimeObserver: DateTimeObserver,
+    clockTickObserver: ClockTickObserver,
     prefsStorage: PrefsStorage,
 ) {
 
     val inActiveHours = combine(
         prefsStorage.getStartTime(),
         prefsStorage.getEndTime(),
-        dateTimeObserver.currentDateTime,
+        clockTickObserver.observe(ClockGranularity.SECOND),
     ) { startTime, endTime, currentDateTime ->
         val start = startTime.toLocalDateTime()
         val end = endTime.toLocalDateTime()

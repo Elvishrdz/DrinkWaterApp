@@ -12,7 +12,7 @@ import com.eahm.drinkwaterapp.core.data.notificationpermission.NotificationPermi
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
 import com.eahm.drinkwaterapp.core.database.entity.DailyGoalEntity
-import com.eahm.drinkwaterapp.feature.drink.DateTimeObserver
+import com.eahm.drinkwaterapp.feature.drink.DateTimeZoneChangedObserver
 import com.eahm.drinkwaterapp.feature.settings.data.ActiveTimes
 import com.eahm.drinkwaterapp.ui.inputfield.validateText
 import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
@@ -36,7 +36,7 @@ internal class SettingsViewModel(
     val database: AppDatabase,
     val prefsStorage: PrefsStorage,
     val drinkAlarmManager: DrinkAlarmManager,
-    val dateTimeObserver: DateTimeObserver,
+    val dateTimeZoneChangedObserver: DateTimeZoneChangedObserver,
     notificationPermissionObserver: NotificationPermissionObserver,
 ) : ViewModel() {
 
@@ -79,10 +79,10 @@ internal class SettingsViewModel(
             )
         )
 
-    val today = dateTimeObserver.currentDateTime
+    val today = dateTimeZoneChangedObserver.currentDateTime
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val goal = dateTimeObserver.currentDateTime
+    private val goal = dateTimeZoneChangedObserver.currentDateTime
         .flatMapLatest { today ->
             dao.getGoalForDate(today.date.toEpochDays())
         }
