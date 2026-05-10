@@ -43,10 +43,10 @@ import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwTertiaryButton
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
+import com.eahm.drinkwaterapp.core.domain.extension.pad
 import com.eahm.drinkwaterapp.feature.dev.alarms.countdown.AlarmCountdown
 import com.eahm.drinkwaterapp.feature.dev.alarms.countdown.CountdownConfig
 import com.eahm.drinkwaterapp.feature.dev.alarms.countdown.CountdownUnit
-import com.eahm.drinkwaterapp.feature.dev.alarms.countdown.pad
 import com.eahm.drinkwaterapp.system.alarm.AlarmStorageInfo
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -310,9 +310,9 @@ private fun ActiveAlarmPreview() {
             alarmStorageInfo = AlarmStorageInfo(
                 alarmId = 127,
                 alarmTriggerTimeMillis = 60_000L,
-                alarmTriggerTime = TimeResult(0, 1, 0,0),
+                alarmTriggerTime = TimeResult(0, 1, 0, 0),
                 alarmTriggerAtMillis = SystemClock.elapsedRealtime() + 3_661_000L,
-                alarmTriggerAt = TimeResult(15, 30, 1,0),
+                alarmTriggerAt = TimeResult(15, 30, 1, 0),
             ),
             inActiveHours = false,
         ),

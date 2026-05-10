@@ -54,6 +54,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterDeep
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
+import com.eahm.drinkwaterapp.core.domain.extension.pad
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import com.eahm.drinkwaterapp.feature.dev.ui.ScheduleVisualization
 import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorButton
@@ -375,8 +376,6 @@ private fun LabeledSlider(
         )
     }
 }
-
-internal fun Int.pad(): String = toString().padStart(2, '0')
 
 @Preview
 @Composable

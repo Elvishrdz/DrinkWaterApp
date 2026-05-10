@@ -153,8 +153,6 @@ private fun CountdownExpired(modifier: Modifier = Modifier) {
     }
 }
 
-fun Int.pad() = toString().padStart(2, '0')
-
 @Preview(name = "Countdown active", showBackground = true)
 @Composable
 private fun AlarmCountdownPreview() {

@@ -18,3 +18,5 @@ fun Int.createTimeResultFromSeconds(): TimeResult {
         millisecond = millis,
     )
 }
+
+fun Int.pad(): String = toString().padStart(2, '0')

@@ -34,7 +34,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterDeep
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
-import com.eahm.drinkwaterapp.feature.dev.alarmcalculator.pad
+import com.eahm.drinkwaterapp.core.domain.extension.pad
 import kotlinx.datetime.LocalDateTime
 import kotlin.math.roundToInt
 
