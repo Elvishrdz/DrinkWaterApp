@@ -36,6 +36,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterDeep
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterLight
 import com.eahm.drinkwaterapp.core.designsystem.theme.JetBrainsMono
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
+import com.eahm.drinkwaterapp.core.domain.extension.sanitizeZeroDecimals
 import kotlin.math.roundToInt
 
 @Composable
@@ -119,7 +120,7 @@ fun ProgressRing(
                             color = DwInk900
                         )
                     ) {
-                        append(current.toString())
+                        append(current.sanitizeZeroDecimals())
                     }
                     withStyle(
                         SpanStyle(
@@ -137,7 +138,7 @@ fun ProgressRing(
             Spacer(modifier = Modifier.height(2.dp))
 
             Text(
-                text = "of ${goal.toLocaleString()} mL",
+                text = "of ${goal.sanitizeZeroDecimals()} mL",
                 style = MaterialTheme.typography.bodySmall,
                 color = DwInk400
             )
@@ -145,9 +146,7 @@ fun ProgressRing(
     }
 }
 
-private fun Float.toLocaleString(): String = "%,d".format(this.toInt()).replace(',', ' ')
-
-@Preview(showBackground = true, backgroundColor = 0xFFF2F6F9)
+@Preview
 @Composable
 private fun ProgressRingPreview() {
     DrinkWaterAppTheme {
