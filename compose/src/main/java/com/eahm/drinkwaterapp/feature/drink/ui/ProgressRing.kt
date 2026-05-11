@@ -45,6 +45,7 @@ fun ProgressRing(
     goal: Float,
     modifier: Modifier = Modifier,
     size: Dp = 220.dp,
+    displayZeroPercentage: Boolean = true,
 ) {
     val percent = ((current / goal) * 100f)
         .takeIf { !it.isNaN() } ?: 0f
@@ -97,15 +98,19 @@ fun ProgressRing(
         }
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            val percentage = runCatching { animatedPercent.roundToInt() }
+                .getOrDefault(0)
+                .takeIf { if (displayZeroPercentage) it >= 0 else it > 0 }
+
             Text(
-                text = runCatching { animatedPercent.roundToInt() }
-                    .getOrDefault(0)
-                    .let { "${it}%" },
+                text = "${percentage}%",
                 fontFamily = JetBrainsMono,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 11.sp,
                 letterSpacing = 0.08.sp,
-                color = DwWater
+                color = DwWater.copy(
+                    alpha = if (percentage != null) 1f else 0f
+                )
             )
 
             Spacer(modifier = Modifier.height(2.dp))
