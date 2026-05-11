@@ -29,6 +29,7 @@ import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -68,9 +69,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk100
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk200
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk50
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk900
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagentaDark
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwPaper
@@ -303,8 +302,7 @@ internal fun SettingsContent(
         LazyColumn(
             modifier = modifier
                 .padding(innerPadding)
-                .fillMaxSize()
-                .background(DwInk50),
+                .fillMaxSize(),
             contentPadding = PaddingValues(horizontal = 18.dp, vertical = 18.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
@@ -314,7 +312,7 @@ internal fun SettingsContent(
                     fontFamily = PlusJakartaSans,
                     fontWeight = FontWeight.Bold,
                     fontSize = 26.sp,
-                    color = DwInk900,
+                    color = MaterialTheme.colorScheme.onBackground,
                 )
             }
 
@@ -530,7 +528,7 @@ private fun NotificationPermissionDeniedDialog(
         Column(
             modifier = Modifier
                 .clip(RoundedCornerShape(20.dp))
-                .background(DwPaper)
+                .background(color = MaterialTheme.colorScheme.background)
                 .padding(24.dp),
         ) {
             Text(
@@ -538,7 +536,7 @@ private fun NotificationPermissionDeniedDialog(
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
-                color = DwInk900,
+                color = MaterialTheme.colorScheme.onBackground,
             )
             Spacer(Modifier.height(10.dp))
             Text(
@@ -574,7 +572,7 @@ private fun DisableNotificationsDialog(
         Column(
             modifier = Modifier
                 .clip(RoundedCornerShape(20.dp))
-                .background(DwPaper)
+                .background(color = MaterialTheme.colorScheme.background)
                 .padding(24.dp),
         ) {
             Text(
@@ -582,7 +580,7 @@ private fun DisableNotificationsDialog(
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
-                color = DwInk900,
+                color = MaterialTheme.colorScheme.onBackground,
             )
             Spacer(Modifier.height(10.dp))
             Text(
@@ -646,7 +644,7 @@ Then press back and return to the app.
         Column(
             modifier = Modifier
                 .clip(RoundedCornerShape(20.dp))
-                .background(DwPaper)
+                .background(color = MaterialTheme.colorScheme.background)
                 .padding(24.dp),
         ) {
             Text(
@@ -654,7 +652,7 @@ Then press back and return to the app.
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
-                color = DwInk900,
+                color = MaterialTheme.colorScheme.onBackground,
             )
             Spacer(Modifier.height(10.dp))
             Text(
@@ -800,7 +798,7 @@ private fun SettingsSection(
             fontFamily = JetBrainsMono,
             fontWeight = FontWeight.Medium,
             fontSize = 11.sp,
-            color = DwInk500,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             letterSpacing = TextUnit(0.10f, TextUnitType.Em),
             modifier = Modifier.padding(horizontal = 4.dp),
         )
@@ -826,6 +824,7 @@ private fun SettingRow(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         modifier = modifier
             .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface)
             .then(clickModifier)
             .padding(horizontal = 14.dp, vertical = 12.dp),
     ) {
@@ -848,7 +847,7 @@ private fun SettingRow(
             fontFamily = PlusJakartaSans,
             fontWeight = FontWeight.SemiBold,
             fontSize = 14.sp,
-            color = DwInk900,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.weight(1f),
         )
         trailing()
@@ -886,8 +885,6 @@ private fun RowChevronTrailing() {
         modifier = Modifier.size(16.dp),
     )
 }
-
-// ── Formatters ────────────────────────────────────────────────────────────────
 
 private fun formatGoal(ml: Int): String {
     if (ml < 1000) return "$ml mL"

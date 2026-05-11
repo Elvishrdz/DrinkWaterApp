@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -79,7 +80,7 @@ private fun SlotChip(
             fontFamily = Nunito,
             fontWeight = FontWeight.Bold,
             fontSize = 10.sp,
-            color = DwInk500,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }

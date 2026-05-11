@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -34,7 +35,6 @@ import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk900
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
@@ -79,7 +79,7 @@ internal fun GoalBottomSheet(
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
-                color = DwInk900,
+                color = MaterialTheme.colorScheme.onBackground,
             )
 
             Spacer(Modifier.height(32.dp))
@@ -104,7 +104,7 @@ internal fun GoalBottomSheet(
                         fontFamily = Nunito,
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 48.sp,
-                        color = DwInk900,
+                        color = MaterialTheme.colorScheme.onBackground,
                     )
                     Text(
                         text = "mL",

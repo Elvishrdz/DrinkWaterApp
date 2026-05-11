@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -37,8 +38,6 @@ import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk100
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk900
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwPaper
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.JetBrainsMono
@@ -62,6 +61,7 @@ fun TodayLogSection(
         modifier = modifier
             .fillMaxWidth()
             .outlineBorderStyle()
+            .background(MaterialTheme.colorScheme.surface)
             .padding(14.dp)
     ) {
         Row(
@@ -74,14 +74,14 @@ fun TodayLogSection(
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp,
-                color = DwInk900
+                color = MaterialTheme.colorScheme.onSurface,
             )
             TextButton(
                 onClick = onSeeAll,
                 contentPadding = PaddingValues(
                     horizontal = 4.dp,
                     vertical = 0.dp
-                )
+                ),
             ) {
                 Text(
                     text = "SEE ALL",
@@ -89,7 +89,7 @@ fun TodayLogSection(
                     fontWeight = FontWeight.Bold,
                     fontSize = 11.sp,
                     letterSpacing = 0.05.sp,
-                    color = DwMagenta
+                    color = MaterialTheme.colorScheme.primary,
                 )
             }
         }
@@ -180,7 +180,7 @@ private fun DrinkLogRow(entry: DrinkLogEntry) {
             fontFamily = Nunito,
             fontWeight = FontWeight.Bold,
             fontSize = 14.sp,
-            color = DwInk900,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 12.dp)
@@ -190,7 +190,7 @@ private fun DrinkLogRow(entry: DrinkLogEntry) {
             text = entry.time,
             fontFamily = JetBrainsMono,
             fontSize = 11.sp,
-            color = DwInk400
+            color = DwInk400,
         )
     }
 }
@@ -203,7 +203,7 @@ val previewLogEntries = listOf(
     DrinkLogEntry("14:20", 400f, "5"),
 )
 
-@Preview(showBackground = true, backgroundColor = 0xFFF2F6F9)
+@Preview
 @Composable
 private fun TodayLogSectionPreview() {
     DrinkWaterAppTheme {
@@ -215,7 +215,7 @@ private fun TodayLogSectionPreview() {
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFFF2F6F9)
+@Preview
 @Composable
 private fun TodayLogSectionEmptyPreview() {
     DrinkWaterAppTheme {

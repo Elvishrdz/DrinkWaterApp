@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,7 +41,6 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 internal fun StatsScreen(
-    modifier: Modifier = Modifier,
     viewModel: StatsViewModel = koinViewModel(),
     calendarViewModel: CalendarViewModel = koinViewModel(),
 ) {
@@ -87,8 +87,7 @@ internal fun StatsContent(
 
     LazyColumn(
         modifier = modifier
-            .fillMaxSize()
-            .background(DwPaperWarm),
+            .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         item {
@@ -104,7 +103,7 @@ internal fun StatsContent(
                     fontFamily = PlusJakartaSans,
                     fontWeight = FontWeight.Bold,
                     fontSize = 26.sp,
-                    color = DwInk900
+                    color = MaterialTheme.colorScheme.onBackground,
                 )
                 SegmentedControl(
                     options = StatsPeriod.entries.map { it.label },

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -28,10 +29,7 @@ import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk300
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk50
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk900
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.JetBrainsMono
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 import com.eahm.drinkwaterapp.core.domain.mock.Mock
@@ -74,7 +72,6 @@ internal fun HistoryScreen(
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = DwInk50,
     ) { innerPadding ->
         Content(
             modifier = Modifier
@@ -117,7 +114,7 @@ private fun Content(
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Bold,
                 fontSize = 26.sp,
-                color = DwInk900,
+                color = MaterialTheme.colorScheme.onBackground,
             )
 
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -136,7 +133,7 @@ private fun Content(
                                 fontFamily = PlusJakartaSans,
                                 fontWeight = FontWeight.SemiBold,
                                 fontSize = 13.sp,
-                                color = DwWater,
+                                color = MaterialTheme.colorScheme.secondary,
                             )
                         }
                     }
@@ -238,7 +235,7 @@ private fun StatChip(
             fontFamily = PlusJakartaSans,
             fontWeight = FontWeight.SemiBold,
             fontSize = 20.sp,
-            color = DwInk900,
+            color = MaterialTheme.colorScheme.onBackground,
         )
     }
 }

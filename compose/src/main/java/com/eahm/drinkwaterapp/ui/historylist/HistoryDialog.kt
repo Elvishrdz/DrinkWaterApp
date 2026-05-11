@@ -44,7 +44,6 @@ import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk100
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk300
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk900
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
@@ -207,7 +206,7 @@ private fun TimelineHourGroup(
                 fontFamily = JetBrainsMono,
                 fontWeight = FontWeight.Medium,
                 fontSize = 11.sp,
-                color = if (isCurrentHour) DwWater else DwInk500,
+                color = if (isCurrentHour) DwWater else MaterialTheme.colorScheme.onSurfaceVariant,
                 letterSpacing = TextUnit(0.10f, TextUnitType.Em),
             )
             if (isCurrentHour) {
@@ -224,7 +223,11 @@ private fun TimelineHourGroup(
         }
 
         // Items grouped in an outline-bordered card, separated by dividers
-        Column(modifier = Modifier.outlineBorderStyle()) {
+        Column(
+            modifier = Modifier
+                .outlineBorderStyle()
+                .background(MaterialTheme.colorScheme.surface)
+        ) {
             hourGroup.items.forEachIndexed { index, item ->
                 TimelineItemCard(item = item, onDelete = onDelete)
                 if (index < hourGroup.items.lastIndex) {
@@ -248,7 +251,6 @@ private fun TimelineItemCard(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        // Icon box — same pattern as SettingRow
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
@@ -264,7 +266,6 @@ private fun TimelineItemCard(
             )
         }
 
-        // Amount + timestamp
         Column(modifier = Modifier.weight(1f)) {
             val unit = stringResource(R.string.text_vol_unit_mililiters)
             Text(
@@ -272,7 +273,7 @@ private fun TimelineItemCard(
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 14.sp,
-                color = DwInk900,
+                color = MaterialTheme.colorScheme.onSurface,
             )
             Text(
                 text = formatTime(item.timestamp),
@@ -283,7 +284,6 @@ private fun TimelineItemCard(
             )
         }
 
-        // Delete — small icon button
         IconButton(
             onClick = { onDelete(item) },
             modifier = Modifier.size(32.dp),

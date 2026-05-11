@@ -1,6 +1,7 @@
 package com.eahm.drinkwaterapp.feature.home
 
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
@@ -17,10 +18,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.eahm.drinkwaterapp.core.data.confetti.ConfettiController
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk100
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
 import com.eahm.drinkwaterapp.feature.dev.DevRoot
 import com.eahm.drinkwaterapp.feature.drink.DrinkRoot
 import com.eahm.drinkwaterapp.feature.history.HistoryRoot
@@ -50,16 +48,16 @@ internal fun HomeScreen() {
 
     val itemColors = NavigationSuiteDefaults.itemColors(
         navigationBarItemColors = NavigationBarItemDefaults.colors(
-            selectedIconColor = DwMagenta,
-            selectedTextColor = DwMagenta,
-            indicatorColor = DwTintMagenta,
+            selectedIconColor = MaterialTheme.colorScheme.primary,
+            selectedTextColor = MaterialTheme.colorScheme.primary,
+            indicatorColor = MaterialTheme.colorScheme.primaryContainer,
             unselectedIconColor = DwInk400,
             unselectedTextColor = DwInk400,
         )
     )
 
     val suiteColors = NavigationSuiteDefaults.colors(
-        navigationBarContainerColor = DwInk100.copy(alpha = 0.96f),
+        navigationBarContainerColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.96f),
     )
 
     NavigationSuiteScaffold(

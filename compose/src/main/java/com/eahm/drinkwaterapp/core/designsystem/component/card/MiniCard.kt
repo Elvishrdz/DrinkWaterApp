@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,8 +25,6 @@ import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.core.designsystem.component.extension.outlineBorderStyle
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwThemePreview
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk900
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTealDark
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTealSoft
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
@@ -48,6 +47,7 @@ fun MiniCard(
     Column(
         modifier = modifier
             .outlineBorderStyle()
+            .background(MaterialTheme.colorScheme.surface)
             .then(clickableModifier)
             .padding(14.dp)
     ) {
@@ -74,7 +74,7 @@ fun MiniCard(
             fontWeight = FontWeight.ExtraBold,
             fontSize = 28.sp,
             lineHeight = (28 * 1.05).sp,
-            color = DwInk900
+            color = MaterialTheme.colorScheme.onSurface,
         )
 
         Spacer(modifier = Modifier.height(2.dp))
@@ -84,7 +84,7 @@ fun MiniCard(
             fontFamily = PlusJakartaSans,
             fontWeight = FontWeight.Normal,
             fontSize = 11.sp,
-            color = DwInk500
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }

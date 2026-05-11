@@ -14,24 +14,24 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk100
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk700
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk900
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 import com.eahm.drinkwaterapp.feature.settings.WaterUnit
 import com.eahm.drinkwaterapp.feature.settings.WeightUnit
 import com.eahm.drinkwaterapp.ui.bottomsheet.AppBottomSheet
-import androidx.compose.ui.graphics.Color
 
 /** Maps a [WaterUnit] to its paired [WeightUnit] (metric ↔ imperial). */
 private fun WaterUnit.pairedWeightUnit() = when (this) {
@@ -59,7 +59,7 @@ internal fun UnitsBottomSheet(
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
-                color = DwInk900,
+                color = MaterialTheme.colorScheme.onBackground,
             )
 
             Spacer(Modifier.height(20.dp))

@@ -21,6 +21,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -50,7 +51,6 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk100
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk300
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk50
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk900
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagentaDark
@@ -120,6 +120,7 @@ fun WeeklyBarChart(
         modifier = modifier
             .fillMaxWidth()
             .outlineBorderStyle()
+            .background(MaterialTheme.colorScheme.surface)
             .padding(16.dp)
     ) {
         ChartHeader(
@@ -192,7 +193,7 @@ private fun ChartHeader(
             fontFamily = PlusJakartaSans,
             fontWeight = FontWeight.SemiBold,
             fontSize = 13.sp,
-            color = DwInk900,
+            color = MaterialTheme.colorScheme.onSurface,
         )
         if (!isToday) {
             Text(
@@ -236,7 +237,7 @@ private fun ChartHeader(
             fontFamily = PlusJakartaSans,
             fontWeight = FontWeight.SemiBold,
             fontSize = 12.sp,
-            color = DwInk500,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         // → Newer (higher page index)
@@ -422,7 +423,7 @@ private fun LegendItem(brush: Brush, label: String) {
             fontFamily = PlusJakartaSans,
             fontWeight = FontWeight.SemiBold,
             fontSize = 11.sp,
-            color = DwInk500,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }

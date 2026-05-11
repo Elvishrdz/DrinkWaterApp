@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk900
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterDeep
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterLight
@@ -108,9 +107,9 @@ fun ProgressRing(
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 11.sp,
                 letterSpacing = 0.08.sp,
-                color = DwWater.copy(
+                color = MaterialTheme.colorScheme.secondary.copy(
                     alpha = if (percentage != null) 1f else 0f
-                )
+                ),
             )
 
             Spacer(modifier = Modifier.height(2.dp))
@@ -122,7 +121,7 @@ fun ProgressRing(
                             fontFamily = Nunito,
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 36.sp,
-                            color = DwInk900
+                            color = MaterialTheme.colorScheme.onBackground,
                         )
                     ) {
                         append(current.sanitizeZeroDecimals())
@@ -132,12 +131,11 @@ fun ProgressRing(
                             fontFamily = Nunito,
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp,
-                            color = DwInk400
                         )
                     ) {
                         append(" mL")
                     }
-                }
+                },
             )
 
             Spacer(modifier = Modifier.height(2.dp))

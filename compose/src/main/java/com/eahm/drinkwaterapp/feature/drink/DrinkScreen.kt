@@ -26,6 +26,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -55,10 +56,8 @@ import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStats
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk50
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagentaDark
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwPaper
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 import com.eahm.drinkwaterapp.feature.drink.alarm.HomeAlarmCard
@@ -82,9 +81,7 @@ internal fun DrinkScreen(
     onNavigateToSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Scaffold(
-        containerColor = DwInk50,
-    ) {
+    Scaffold {
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -258,7 +255,7 @@ private fun RotatingInfoPill(
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(999.dp))
-            .background(DwTintWater)
+            .background(MaterialTheme.colorScheme.secondaryContainer)
             .animateContentSize(
                 animationSpec = spring(
                     dampingRatio = Spring.DampingRatioMediumBouncy,
@@ -287,7 +284,7 @@ private fun RotatingInfoPill(
                                 withStyle(
                                     SpanStyle(
                                         fontWeight = FontWeight.Bold,
-                                        color = DwWater
+                                        color = MaterialTheme.colorScheme.secondary,
                                     )
                                 ) {
                                     append("${remaining.toDigitString()} mL")
@@ -306,7 +303,7 @@ private fun RotatingInfoPill(
                                 withStyle(
                                     SpanStyle(
                                         fontWeight = FontWeight.Bold,
-                                        color = DwWater
+                                        color = MaterialTheme.colorScheme.secondary,
                                     )
                                 ) {
                                     append("Goal reached")

@@ -14,6 +14,7 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -58,7 +59,7 @@ fun DateTimePickerButton(
         modifier = modifier
             .fillMaxWidth()
             .clip(rowShape)
-            .background(androidx.compose.ui.graphics.Color.White)
+            .background(MaterialTheme.colorScheme.surface)
             .border(1.dp, DwInk100, rowShape)
             .clickable { showDatePicker = true }
             .padding(horizontal = 14.dp, vertical = 12.dp),
@@ -85,7 +86,7 @@ fun DateTimePickerButton(
             fontFamily = PlusJakartaSans,
             fontWeight = FontWeight.SemiBold,
             fontSize = 14.sp,
-            color = if (selectedDate != null) DwInk900 else DwInk400,
+            color = if (selectedDate != null) MaterialTheme.colorScheme.onBackground else DwInk400,
             modifier = Modifier.weight(1f),
         )
 
