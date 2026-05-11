@@ -3,14 +3,20 @@ Development
 Next release priorities
 - Drink water
 - Drink suggestions drag and drop.
-- Stats: graph and streaks
-- History
-- Settings : remove top header with kgs for now
-- Goal reached celebrations.
+- Stats: graph
+- History: V1
+- Goal reached one celebration.
 
 Analytics
 - Track feature usage for improvements
 - Crashlytics
+
+Out of scope
+- Stats: streaks
+- History: V2
+- Settings: User profile
+- Settings: Change units
+- Goal reached more celebrations.
 
 
 Priorities
