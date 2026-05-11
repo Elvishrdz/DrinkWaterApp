@@ -29,14 +29,16 @@ class StreakRepository(
     private val prefsStorage: PrefsStorage,
     dateTimeZoneChangedObserver: DateTimeZoneChangedObserver,
 ) {
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
     private val historyDao = database.getHistoryDao()
     private val goalDao = database.getDailyGoalDao()
 
     private data class ComputedStreaks(
-        val currentGoalStreak: Int,
         val currentDrinkStreak: Int,
-        val bestGoalStreak: Int,
+        val currentGoalStreak: Int,
         val bestDrinkStreak: Int,
+        val bestGoalStreak: Int,
         val personalBestMl: Int,
     )
 
@@ -47,17 +49,20 @@ class StreakRepository(
                 historyDao.getAll(),
                 goalDao.getGoalForDate(today.toEpochDays()),
             ) { records, goalEntity ->
-                computeStreaks(today, records, goalEntity?.goalMl ?: DEFAULT_GOAL_ML)
+                computeStreaks(
+                    today = today,
+                    records = records,
+                    goalThreshold = goalEntity?.goalMl ?: DEFAULT_GOAL_ML,
+                )
             }
         }
-
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     init {
         scope.launch {
             computedFromDb.collect { computed ->
                 if (computed.bestGoalStreak > prefsStorage.getBestGoalStreak().first())
                     prefsStorage.setBestGoalStreak(computed.bestGoalStreak)
+
                 if (computed.bestDrinkStreak > prefsStorage.getBestDrinkStreak().first())
                     prefsStorage.setBestDrinkStreak(computed.bestDrinkStreak)
             }
@@ -70,10 +75,10 @@ class StreakRepository(
         prefsStorage.getBestDrinkStreak(),
     ) { computed, bestGoal, bestDrink ->
         StreakData(
-            currentGoalStreak = computed.currentGoalStreak,
             currentDrinkStreak = computed.currentDrinkStreak,
-            bestGoalStreak = maxOf(computed.bestGoalStreak, bestGoal),
+            currentGoalStreak = computed.currentGoalStreak,
             bestDrinkStreak = maxOf(computed.bestDrinkStreak, bestDrink),
+            bestGoalStreak = maxOf(computed.bestGoalStreak, bestGoal),
             personalBestMl = computed.personalBestMl,
         )
     }
