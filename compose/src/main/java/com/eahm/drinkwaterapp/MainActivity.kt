@@ -14,7 +14,7 @@ import org.koin.core.context.GlobalContext
 
 class MainActivity : ComponentActivity() {
 
-    val viewModel = GlobalContext.get().get<MainViewModel>()
+    private val viewModel = GlobalContext.get().get<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
