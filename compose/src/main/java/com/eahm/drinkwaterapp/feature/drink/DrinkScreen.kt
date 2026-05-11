@@ -50,7 +50,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
-import com.eahm.drinkwaterapp.feature.drink.alarm.HomeAlarmCard
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStats
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -61,6 +60,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwPaper
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
+import com.eahm.drinkwaterapp.feature.drink.alarm.HomeAlarmCard
 import com.eahm.drinkwaterapp.feature.drink.ui.ProgressRing
 import com.eahm.drinkwaterapp.feature.drink.ui.QuickAddRow
 import com.eahm.drinkwaterapp.feature.drink.ui.TodayLogSection
@@ -179,10 +179,10 @@ private fun StreakBadge(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
+            .alpha(alpha = if (visible) 1f else 0f)
             .clip(RoundedCornerShape(999.dp))
             .background(gradientMagenta)
-            .padding(horizontal = 12.dp, vertical = 6.dp)
-            .alpha(alpha = if (visible) 1f else 0f)
+            .padding(horizontal = 12.dp, vertical = 6.dp),
     ) {
         Icon(
             imageVector = DwIcons.Star,
@@ -398,8 +398,8 @@ internal val drinkSuggestionsMocks = listOf(
 )
 
 private val stateMock = DrinkState.Data(
-    currentStreak = 1,
-    showStreak = true,
+    currentStreak = 0,
+    showStreak = false,
     drinkStats = DrinkStats(
         goalAmount = 2400f,
         drinkAmount = 1500f,
