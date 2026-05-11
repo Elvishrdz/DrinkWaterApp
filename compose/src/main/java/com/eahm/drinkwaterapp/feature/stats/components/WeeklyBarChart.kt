@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -59,6 +60,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.JetBrainsMono
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 import com.eahm.drinkwaterapp.feature.stats.DayEntry
 import com.eahm.drinkwaterapp.feature.stats.PeriodPage
+import com.eahm.drinkwaterapp.feature.stats.StatsPeriod
 import kotlinx.coroutines.launch
 
 // Goal met: magenta gradient (design spec)
@@ -87,6 +89,7 @@ private val belowGoalBrush = Brush.verticalGradient(
  */
 @Composable
 fun WeeklyBarChart(
+    period: StatsPeriod,
     pages: List<PeriodPage>,
     goalMl: Int,
     onPageChanged: (page: Int) -> Unit,
@@ -94,8 +97,10 @@ fun WeeklyBarChart(
 ) {
     if (pages.isEmpty()) return
 
+    val initialPage = pages.size - 1
+    var currentPage by remember { mutableIntStateOf(initialPage) }
     val pagerState = rememberPagerState(
-        initialPage = pages.size - 1,
+        initialPage = currentPage,
         pageCount = { pages.size },
     )
     val scope = rememberCoroutineScope()
@@ -107,6 +112,7 @@ fun WeeklyBarChart(
 
     // Keep ViewModel in sync with swipe navigation
     LaunchedEffect(pagerState.currentPage) {
+        currentPage = pagerState.currentPage
         onPageChanged(pagerState.currentPage)
     }
 
@@ -117,9 +123,15 @@ fun WeeklyBarChart(
             .padding(16.dp)
     ) {
         ChartHeader(
+            period = period,
             rangeLabel = pages.getOrNull(pagerState.currentPage)?.rangeLabel ?: "",
-            goalMl = goalMl,
             pagerState = pagerState,
+            isToday = currentPage == initialPage,
+            onNavigateToToday = {
+                scope.launch {
+                    pagerState.animateScrollToPage(initialPage)
+                }
+            },
             onNavigatePrev = {
                 // ← Older: go to lower page index
                 scope.launch {
@@ -156,31 +168,44 @@ fun WeeklyBarChart(
 
 @Composable
 private fun ChartHeader(
+    period: StatsPeriod,
     rangeLabel: String,
-    goalMl: Int,
     pagerState: PagerState,
+    isToday: Boolean,
+    onNavigateToToday: () -> Unit,
     onNavigatePrev: () -> Unit,
     onNavigateNext: () -> Unit,
 ) {
+    val label = when (period) {
+        StatsPeriod.WEEK -> "Daily intake"
+        StatsPeriod.MONTH -> "Daily intake"
+        StatsPeriod.YEAR -> "Monthly intake"
+    }
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = "Daily intake",
+            text = label,
             fontFamily = PlusJakartaSans,
             fontWeight = FontWeight.SemiBold,
             fontSize = 13.sp,
             color = DwInk900,
         )
-        Text(
-            text = "goal $goalMl mL",
-            fontFamily = JetBrainsMono,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 11.sp,
-            color = DwWater,
-        )
+        if (!isToday) {
+            Text(
+                text = "Today",
+                fontFamily = JetBrainsMono,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 11.sp,
+                color = DwWater,
+                modifier = Modifier.clickable(
+                    onClick = onNavigateToToday,
+                )
+            )
+        }
     }
 
     Spacer(modifier = Modifier.height(8.dp))
@@ -427,6 +452,7 @@ private val previewPages = listOf(
 private fun WeeklyBarChartPreview() {
     DrinkWaterAppTheme {
         WeeklyBarChart(
+            period = StatsPeriod.WEEK,
             pages = previewPages,
             goalMl = 2400,
             onPageChanged = {},

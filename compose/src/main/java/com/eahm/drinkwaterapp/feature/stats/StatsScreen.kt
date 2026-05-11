@@ -126,6 +126,7 @@ internal fun StatsContent(
 
         item {
             WeeklyBarChart(
+                period = state.selectedPeriod,
                 pages = state.pages,
                 goalMl = state.goalMl,
                 onPageChanged = onChartPageChanged,
