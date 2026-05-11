@@ -241,11 +241,11 @@ fun DraggablePresetGrid(
     presets: List<DrinkSuggestion>,
     onDrink: (Float) -> Unit,
     onReorder: (List<DrinkSuggestion>) -> Unit,
+    modifier: Modifier = Modifier,
     onDelete: (DrinkSuggestion) -> Unit = {},
     onDraggingChanged: (Boolean) -> Unit = {},
     onDeleteHover: (Boolean) -> Unit = {},
     columns: Int = GRID_COLUMNS,
-    modifier: Modifier = Modifier,
 ) {
     var currentPresets by remember { mutableStateOf(presets) }
     var previousPresets by remember { mutableStateOf(emptyList<DrinkSuggestion>()) }
@@ -294,7 +294,7 @@ fun DraggablePresetGrid(
 
     Column(
         modifier = modifier
-            .zIndex(10f)
+            .zIndex(1f)
             .onSizeChanged { gridHeight = it.height.toFloat() }
             .nestedScroll(nestedScrollConnection)
             // Single grid-level gesture — survives cross-row swaps intact.

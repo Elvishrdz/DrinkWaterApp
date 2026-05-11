@@ -14,10 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -121,7 +118,8 @@ internal fun AddDrinkButton(
                     DraggablePresetGrid(
                         modifier = Modifier
                             .wrapContentHeight()
-                            .verticalScroll(rememberScrollState()),
+                            //.verticalScroll(rememberScrollState()) ,
+                            .zIndex(1f),
                         presets = presets,
                         onDrink = { amount ->
                             onDrink(amount)
@@ -165,11 +163,15 @@ internal fun AddDrinkButton(
                                 },
                             )
                             if (isDragging) {
-                                DeleteButton(
+                                Box(
                                     modifier = Modifier
                                         .background(MaterialTheme.colorScheme.background)
+                                        .matchParentSize(),
+                                )
+                                DeleteButton(
+                                    modifier = Modifier
                                         .matchParentSize()
-                                        .zIndex(1f),
+                                        .zIndex(2f),
                                     isHovered = isOverDeleteZone,
                                 )
                             }
