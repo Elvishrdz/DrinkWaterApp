@@ -94,8 +94,8 @@ internal fun DrinkScreen(
             Spacer(Modifier.height(it.calculateTopPadding()))
 
             TodayHeader(
-                streak = state.currentStreak,
-                showStreak = state.showStreak,
+                streak = state.drinkStreakDays,
+                showStreak = state.showStreakBadge,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 20.dp, end = 20.dp, top = 20.dp)
@@ -410,8 +410,8 @@ internal val drinkSuggestionsMocks = listOf(
 )
 
 private val stateMock = DrinkState.Data(
-    currentStreak = 0,
-    showStreak = false,
+    drinkStreakDays = 0,
+    showStreakBadge = false,
     drinkStats = DrinkStats(
         goalAmount = 2400f,
         drinkAmount = 1500f,

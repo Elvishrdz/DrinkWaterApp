@@ -148,8 +148,8 @@ internal class DrinkViewModel(
             DrinkState.Loading
         } else {
             DrinkState.Data(
-                currentStreak = extras.streakData.currentDrinkStreak,
-                showStreak = extras.streakData.currentDrinkStreak > 0,
+                drinkStreakDays = extras.streakData.drinkStreakDays,
+                showStreakBadge = extras.streakData.drinkStreakDays > 0,
                 quickDrinkSuggestions = extras.quickDrinkSuggestions,
                 allDrinkSuggestions = extras.allDrinkSuggestions,
                 todayLogs = history.todayLogs,
@@ -251,7 +251,7 @@ internal class DrinkViewModel(
             val intent = Intent(application, GoalReachedWidget::class.java).apply {
                 putExtra("goalMl", currentState?.drinkStats?.goalAmount ?: 2400f)
                 putExtra("drinkCount", records.value.size.coerceAtLeast(1))
-                putExtra("streakDays", streakRepository.streakData.firstOrNull()?.currentGoalStreak)
+                putExtra("streakDays", streakRepository.streakData.firstOrNull()?.goalStreakDays)
             }
             application.startService(intent)
         }

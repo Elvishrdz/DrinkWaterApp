@@ -75,10 +75,12 @@ class StreakRepository(
         prefsStorage.getBestDrinkStreak(),
     ) { computed, bestGoal, bestDrink ->
         StreakData(
-            currentDrinkStreak = computed.currentDrinkStreak,
-            currentGoalStreak = computed.currentGoalStreak,
-            bestDrinkStreak = maxOf(computed.bestDrinkStreak, bestDrink),
-            bestGoalStreak = maxOf(computed.bestGoalStreak, bestGoal),
+            drinkStreakDays = computed.currentDrinkStreak,
+            goalStreakDays = computed.currentGoalStreak,
+            bestDrinkStreakDays = maxOf(computed.bestDrinkStreak, bestDrink)
+                .takeIf { it > 0 },
+            bestGoalStreakDays = maxOf(computed.bestGoalStreak, bestGoal)
+                .takeIf { it > 0 },
             personalBestMl = computed.personalBestMl,
         )
     }

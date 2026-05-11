@@ -82,10 +82,10 @@ internal class StatsViewModel(
         streakData,
     ) { partialState, streak ->
         partialState.copy(
-            streakDays = streak.currentGoalStreak,
-            bestStreakDays = streak.bestGoalStreak,
-            drinkStreakDays = streak.currentDrinkStreak,
-            bestDrinkStreakDays = streak.bestDrinkStreak,
+            drinkStreakDays = streak.drinkStreakDays,
+            bestDrinkStreakDays = streak.bestDrinkStreakDays,
+            goalStreakDays = streak.goalStreakDays,
+            bestGoalStreakDays = streak.bestGoalStreakDays,
             personalBestMl = streak.personalBestMl,
         )
     }.stateIn(

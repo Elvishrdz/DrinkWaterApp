@@ -53,10 +53,10 @@ internal class StreakDevViewModel(
         _drinkAmountInput,
     ) { streakData, storedGoal, storedDrink, date, amount ->
         StreakDevState.Data(
-            currentGoalStreak = streakData.currentGoalStreak,
-            currentDrinkStreak = streakData.currentDrinkStreak,
-            bestGoalStreak = streakData.bestGoalStreak,
-            bestDrinkStreak = streakData.bestDrinkStreak,
+            currentGoalStreak = streakData.goalStreakDays,
+            currentDrinkStreak = streakData.drinkStreakDays,
+            bestGoalStreak = streakData.bestGoalStreakDays,
+            bestDrinkStreak = streakData.bestDrinkStreakDays,
             personalBestMl = streakData.personalBestMl,
             storedBestGoalStreak = storedGoal,
             storedBestDrinkStreak = storedDrink,

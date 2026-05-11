@@ -19,8 +19,8 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 
 @Composable
 fun MiniStatsCards(
-    streakDays: Int,
-    bestStreakDays: Int?,
+    drinkStreakDays: Int,
+    bestDrinkStreakDays: Int?,
     goalStreakDays: Int,
     bestGoalStreakDays: Int?,
     personalBestMl: Int,
@@ -38,11 +38,11 @@ fun MiniStatsCards(
                 icon = DwIcons.Drop,
                 iconBg = DwTintWater,
                 iconTint = DwWater,
-                value = streakDays.toString(),
+                value = drinkStreakDays.toString(),
                 label = "Drink streak",
                 modifier = Modifier.weight(1f),
             )
-            bestStreakDays?.let {
+            bestDrinkStreakDays?.let {
                 MiniCard(
                     icon = DwIcons.Star,
                     iconBg = DwTintMagenta,
@@ -97,8 +97,8 @@ fun MiniStatsCards(
 private fun NoBestStatsPreview() {
     DrinkWaterAppTheme {
         MiniStatsCards(
-            streakDays = 7,
-            bestStreakDays = null,
+            drinkStreakDays = 7,
+            bestDrinkStreakDays = null,
             goalStreakDays = 4,
             bestGoalStreakDays = null,
             personalBestMl = 2950,
@@ -112,8 +112,8 @@ private fun NoBestStatsPreview() {
 private fun AllStatsPreview() {
     DrinkWaterAppTheme {
         MiniStatsCards(
-            streakDays = 7,
-            bestStreakDays = 12,
+            drinkStreakDays = 7,
+            bestDrinkStreakDays = 12,
             goalStreakDays = 4,
             bestGoalStreakDays = 4,
             personalBestMl = 2950,

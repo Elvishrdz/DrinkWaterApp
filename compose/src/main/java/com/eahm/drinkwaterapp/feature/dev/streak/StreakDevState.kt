@@ -8,8 +8,8 @@ internal sealed interface StreakDevState {
     data class Data(
         val currentGoalStreak: Int,
         val currentDrinkStreak: Int,
-        val bestGoalStreak: Int,
-        val bestDrinkStreak: Int,
+        val bestGoalStreak: Int?,
+        val bestDrinkStreak: Int?,
         val personalBestMl: Int,
         val storedBestGoalStreak: Int,
         val storedBestDrinkStreak: Int,

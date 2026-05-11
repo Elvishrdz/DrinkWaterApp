@@ -136,10 +136,10 @@ internal fun StatsContent(
 
         item {
             MiniStatsCards(
-                streakDays = state.drinkStreakDays,
-                bestStreakDays = state.bestStreakDays,
-                goalStreakDays = state.streakDays,
-                bestGoalStreakDays = null, // TODO: track best goal streak
+                drinkStreakDays = state.drinkStreakDays,
+                bestDrinkStreakDays = state.bestDrinkStreakDays,
+                goalStreakDays = state.goalStreakDays,
+                bestGoalStreakDays = state.bestGoalStreakDays,
                 personalBestMl = state.personalBestMl,
                 modifier = Modifier.padding(horizontal = 18.dp)
             )
@@ -238,8 +238,8 @@ private val previewState = StatsState(
     avgMl = 1850,
     avgTrendPercent = 12,
     isTrendPositive = true,
-    streakDays = 4,
-    bestStreakDays = 12,
+    goalStreakDays = 4,
+    bestGoalStreakDays = 12,
     drinkStreakDays = 7,
     bestDrinkStreakDays = 20,
     personalBestMl = 2950,
