@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -26,6 +27,7 @@ import com.eahm.drinkwaterapp.core.bindings.toEntity
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk300
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk50
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk900
@@ -103,8 +105,6 @@ private fun Content(
     onGoToToday: () -> Unit,
 ) {
     Column(modifier = modifier) {
-
-        // ── Header (title + date selector) ──────────────────────────────────
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -120,7 +120,6 @@ private fun Content(
                 color = DwInk900,
             )
 
-            // Date section — label + picker + Today button
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -149,7 +148,6 @@ private fun Content(
                 )
             }
 
-            // Summary section — consumed vs goal
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 SectionLabel("SUMMARY")
                 DaySummaryRow(consumedMl = consumedMl, goalMl = goalMl)
@@ -158,7 +156,6 @@ private fun Content(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ── Logs section label ───────────────────────────────────────────────
         SectionLabel(
             text = "LOGS",
             modifier = Modifier.padding(horizontal = 22.dp),
@@ -166,12 +163,31 @@ private fun Content(
 
         Spacer(modifier = Modifier.height(6.dp))
 
-        // ── Timeline ─────────────────────────────────────────────────────────
-        HistoryTimeline(
-            historyRecords = historyRecords,
-            onDelete = { onDelete(it.toEntity()) },
-            modifier = Modifier.weight(1f),
-        )
+        if (historyRecords.isNotEmpty()) {
+            HistoryTimeline(
+                historyRecords = historyRecords,
+                onDelete = { onDelete(it.toEntity()) },
+                modifier = Modifier.weight(1f),
+            )
+        } else {
+            val text = if (isToday) {
+                "No drinks logged yet — tap Add water to start."
+            } else {
+                "No drinks logged"
+            }
+
+            Text(
+                text = text,
+                fontFamily = PlusJakartaSans,
+                fontSize = 13.sp,
+                color = DwInk400,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .fillMaxWidth()
+                    .padding(vertical = 12.dp)
+            )
+        }
     }
 }
 
