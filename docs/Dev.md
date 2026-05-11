@@ -1,5 +1,14 @@
 Development
 
+To Complete
+- adjust notification messages
+- adjust celebration
+- onboarding
+- analytics
+- ads
+- paid version
+- translations.
+
 Next release priorities
 - Drink water
 - Drink suggestions drag and drop.
