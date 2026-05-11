@@ -151,7 +151,15 @@ internal fun SettingsScreen(
     fun handleRequestFeature() {
         val intent = Intent(Intent.ACTION_SENDTO).apply {
             data =
-                Uri.parse("mailto:drink@gmail.com?subject=New%20feature%20request%20for%20DrinkWater%20App&body=Hi%20developers%20at%20DrinkWaterApp%20I%20would%20like%20to%20request%20the%20following%20feature%20for%20a%20future%20app%20release%3A%0A%0A")
+                "mailto:drink@gmail.com?subject=New%20feature%20request%20for%20DrinkWater%20App&body=Hi%20developers%20at%20DrinkWaterApp%20I%20would%20like%20to%20request%20the%20following%20feature%20for%20a%20future%20app%20release%3A%0A%0A".toUri()
+        }
+        context.startActivity(intent)
+    }
+
+    fun handleReportProblem() {
+        val intent = Intent(Intent.ACTION_SENDTO).apply {
+            data =
+                "mailto:drink@gmail.com?subject=Problem%20report%20for%20DrinkWater%20App&body=Hi%20developers%20at%20DrinkWaterApp%20I%20would%20like%20to%20report%20the%20following%20problem%3A%0A%0A".toUri()
         }
         context.startActivity(intent)
     }
@@ -189,6 +197,7 @@ internal fun SettingsScreen(
         onShareTap = ::handleShare,
         onRateTap = ::handleRate,
         onRequestFeatureTap = ::handleRequestFeature,
+        onReportProblemTap = ::handleReportProblem,
         onGoalCelebrationsToggled = { handleDrawOverlayToggle() },
         modifier = modifier,
     )
@@ -271,6 +280,7 @@ internal fun SettingsContent(
     onShareTap: () -> Unit,
     onRateTap: () -> Unit,
     onRequestFeatureTap: () -> Unit,
+    onReportProblemTap: () -> Unit,
     onGoalCelebrationsToggled: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -457,6 +467,16 @@ internal fun SettingsContent(
                         ) {
                             RowChevronTrailing()
                         }
+                    }
+                    HorizontalDivider(color = DwInk100)
+                    SettingRow(
+                        icon = DwIcons.Flag,
+                        iconBg = DwInk100,
+                        iconTint = DwInk500,
+                        label = "Report a problem",
+                        onClick = onReportProblemTap,
+                    ) {
+                        RowChevronTrailing()
                     }
                 }
             }
@@ -904,6 +924,7 @@ private fun SettingsScreenPreview() {
             onShareTap = {},
             onRateTap = {},
             onRequestFeatureTap = {},
+            onReportProblemTap = {},
             onGoalCelebrationsToggled = {},
         )
     }

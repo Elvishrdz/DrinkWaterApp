@@ -481,6 +481,39 @@ object DwIcons {
         }.build()
     }
 
+    val Flag: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "DwFlag",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).apply {
+            // Flagpole
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(4f, 21f)
+                verticalLineTo(3f)
+            }
+            // Flag shape
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(4f, 3f)
+                lineTo(18f, 8f)
+                lineTo(4f, 13f)
+                close()
+            }
+        }.build()
+    }
+
     val Lightbulb: ImageVector by lazy {
         ImageVector.Builder(
             name = "DwLightbulb",
