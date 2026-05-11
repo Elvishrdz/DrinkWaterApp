@@ -35,8 +35,8 @@ enum class HomeDestination(
     val icon: ImageVector,
 ) {
     TODAY("Today", DwIcons.Drop),
-    STATS("Stats", DwIcons.Wave),
     HISTORY("History", DwIcons.History),
+    STATS("Stats", DwIcons.Wave),
     SETTINGS("Settings", DwIcons.Settings),
     DEV("Development", DwIcons.Ruler),
 }
@@ -87,8 +87,8 @@ internal fun HomeScreen() {
                 onNavigateToSettings = { currentDestination = HomeDestination.SETTINGS },
             )
 
-            HomeDestination.STATS -> StatsScreen()
             HomeDestination.HISTORY -> HistoryRoot()
+            HomeDestination.STATS -> StatsScreen()
             HomeDestination.SETTINGS -> SettingsScreen()
             HomeDestination.DEV -> DevRoot { currentDestination = HomeDestination.TODAY }
         }
