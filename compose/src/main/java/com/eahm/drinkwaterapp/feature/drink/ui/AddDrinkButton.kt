@@ -229,6 +229,7 @@ fun InputFieldArea(
     enabled: Boolean = true,
 ) {
     var customAmount by rememberSaveable { mutableStateOf<Float?>(null) }
+    var disableButtons by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = modifier,
@@ -241,6 +242,9 @@ fun InputFieldArea(
             onValueChanged = {
                 customAmount = it.toFloatOrNull()
             },
+            onHasError = {
+                disableButtons = it
+            },
             enabled = enabled,
         )
 
@@ -251,7 +255,7 @@ fun InputFieldArea(
         ) {
             DwSecondaryButton(
                 text = "Create",
-                enabled = customAmount != null && enabled,
+                enabled = !disableButtons && enabled,
                 onClick = {
                     customAmount?.let {
                         onCreatePreset(it)
@@ -263,7 +267,7 @@ fun InputFieldArea(
 
             DwPrimaryButton(
                 text = "Drink",
-                enabled = enabled,
+                enabled = !disableButtons && enabled,
                 onClick = {
                     customAmount?.let {
                         onDrink(it)
