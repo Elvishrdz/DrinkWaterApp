@@ -21,6 +21,7 @@ fun AppInputField(
     label: String,
     value: String,
     onValueChanged: (String) -> Unit,
+    enabled: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
     var inputValue by rememberSaveable { mutableStateOf(value) }
@@ -54,7 +55,8 @@ fun AppInputField(
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Decimal,
             ),
-            singleLine = true
+            singleLine = true,
+            enabled = enabled,
         )
 
         if (errorMessage.isNotEmpty()) {

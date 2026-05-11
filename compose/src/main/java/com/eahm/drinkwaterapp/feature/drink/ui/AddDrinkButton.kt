@@ -1,10 +1,10 @@
 package com.eahm.drinkwaterapp.feature.drink.ui
 
-import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,7 +18,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,6 +51,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwSecondaryButton
@@ -153,19 +156,29 @@ internal fun AddDrinkButton(
                     Column {
                         Spacer(Modifier.height(12.dp))
 
-                        Crossfade(
-                            targetState = isDragging,
-                            label = "delete_zone_toggle"
-                        ) { dragging ->
-                            if (dragging) {
-                                DeleteZone(isHovered = isOverDeleteZone)
-                            } else {
-                                InputFieldArea(
-                                    onCreatePreset = onCreatePreset,
-                                    onDrink = { amount ->
+                        Box {
+                            InputFieldArea(
+                                onCreatePreset = {
+                                    // disable inputs when dragging is active
+                                    if (!isDragging) {
+                                        onCreatePreset(it)
+                                    }
+                                },
+                                onDrink = { amount ->
+                                    // disable inputs when dragging is active
+                                    if (!isDragging) {
                                         onDrink(amount)
                                         dismissBottomSheet()
-                                    },
+                                    }
+                                },
+                            )
+                            if (isDragging) {
+                                DeleteZone(
+                                    modifier = Modifier
+                                        .background(MaterialTheme.colorScheme.background)
+                                        .matchParentSize()
+                                        .zIndex(1f),
+                                    isHovered = isOverDeleteZone,
                                 )
                             }
                         }
@@ -218,11 +231,13 @@ fun Header(
 fun InputFieldArea(
     onCreatePreset: (Float) -> Unit,
     onDrink: (Float) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     var customAmount by rememberSaveable { mutableStateOf<Float?>(null) }
 
     Column(
-        modifier = Modifier,
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(7.dp),
     ) {
         AppInputField(
@@ -232,6 +247,7 @@ fun InputFieldArea(
             onValueChanged = {
                 customAmount = it.toFloatOrNull()
             },
+            enabled = enabled,
         )
 
         Row(
@@ -241,7 +257,7 @@ fun InputFieldArea(
         ) {
             DwSecondaryButton(
                 text = "Create",
-                enabled = customAmount != null,
+                enabled = customAmount != null && enabled,
                 onClick = {
                     customAmount?.let {
                         onCreatePreset(it)
@@ -253,6 +269,7 @@ fun InputFieldArea(
 
             DwPrimaryButton(
                 text = "Drink",
+                enabled = enabled,
                 onClick = {
                     customAmount?.let {
                         onDrink(it)
@@ -297,11 +314,20 @@ internal fun ChipButton(
 }
 
 @Composable
-private fun DeleteZone(isHovered: Boolean) {
+private fun DeleteZone(
+    isHovered: Boolean,
+    modifier: Modifier = Modifier,
+) {
     val binScale by animateFloatAsState(
         targetValue = if (isHovered) 1.4f else 1f,
         animationSpec = spring(),
         label = "delete_bin_scale",
+    )
+
+    val circleSize by animateFloatAsState(
+        targetValue = if (isHovered) 27.dp.value else 24.dp.value,
+        animationSpec = spring(),
+        label = "delete_bin_circle_size",
     )
     val gradientAlpha by animateFloatAsState(
         targetValue = if (isHovered) 1f else 0.5f,
@@ -309,23 +335,47 @@ private fun DeleteZone(isHovered: Boolean) {
         label = "delete_gradient_alpha",
     )
     val iconTint by animateColorAsState(
-        targetValue = if (isHovered) Color(0xFFE53935) else DwInk300,
+        targetValue = if (isHovered) Color.White else DwInk300,
         animationSpec = spring(),
         label = "delete_icon_tint",
     )
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(88.dp)
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color.Transparent,
-                        Color(0xFFFFE5E5).copy(alpha = gradientAlpha)
-                    ),
-                )
+    val borderColor by animateColorAsState(
+        targetValue = if (isHovered) Color.Red else DwInk300,
+        animationSpec = spring(),
+        label = "delete_icon_tint",
+    )
+
+    val brush = if (isHovered) {
+        Brush.radialGradient(
+            colors = listOf(
+                Color.Red.copy(alpha = gradientAlpha),
+                Color.Transparent,
             ),
+        )
+    } else {
+        Brush.radialGradient(
+            colors = listOf(
+                Color.Transparent,
+                Color.Transparent,
+            ),
+        )
+    }
+
+    Box(
+        modifier = modifier
+            .wrapContentSize()
+            .border(
+                width = 2.dp,
+                color = borderColor.copy(alpha = 0.5f),
+                shape = CircleShape
+            )
+            .background(
+                brush = brush,
+                shape = CircleShape,
+            )
+            .clip(CircleShape)
+            .padding(circleSize.dp),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
@@ -333,13 +383,28 @@ private fun DeleteZone(isHovered: Boolean) {
             contentDescription = "Drop here to delete",
             tint = iconTint,
             modifier = Modifier
-                .size(28.dp)
                 .graphicsLayer {
                     scaleX = binScale
                     scaleY = binScale
                 },
         )
     }
+}
+
+@Preview
+@Composable
+private fun HoveredPreview() {
+    DeleteZone(
+        isHovered = true,
+    )
+}
+
+@Preview
+@Composable
+private fun DefaultStatePreview() {
+    DeleteZone(
+        isHovered = false,
+    )
 }
 
 @Preview
