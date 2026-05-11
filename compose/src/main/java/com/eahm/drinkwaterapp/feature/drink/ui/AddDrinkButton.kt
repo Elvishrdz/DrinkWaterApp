@@ -213,7 +213,7 @@ fun Header(
             onClick = onCloseClicked,
         ) {
             Icon(
-                imageVector = DwIcons.Trash,
+                imageVector = DwIcons.Close,
                 contentDescription = "Close",
                 tint = DwInk300,
             )

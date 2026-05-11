@@ -593,4 +593,24 @@ object DwIcons {
             }
         }.build()
     }
+
+    val Close: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "DwClose",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).apply {
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(18f, 6f); lineTo(6f, 18f)
+                moveTo(6f, 6f); lineTo(18f, 18f)
+            }
+        }.build()
+    }
 }
