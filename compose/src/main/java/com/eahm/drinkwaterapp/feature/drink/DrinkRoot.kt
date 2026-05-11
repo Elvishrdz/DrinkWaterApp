@@ -8,6 +8,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 internal fun DrinkRoot(
     onNavigateToHistory: () -> Unit,
+    onNavigateToSettings: () -> Unit,
     viewModel: DrinkViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -26,6 +27,7 @@ internal fun DrinkRoot(
                 onDeletePreset = viewModel::onDeletePreset,
                 onRestorePreset = viewModel::onRestorePreset,
                 onNavigateToHistory = onNavigateToHistory,
+                onNavigateToSettings = onNavigateToSettings,
             )
         }
     }

@@ -56,6 +56,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 internal fun HomeAlarmCard(
+    onNavigateToSettings: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeAlarmViewModel = koinViewModel(),
 ) {
@@ -64,7 +65,7 @@ internal fun HomeAlarmCard(
     when (val s = state) {
         HomeAlarmState.Loading -> {}
         HomeAlarmState.NoPermission -> NoPermissionCard(modifier)
-        HomeAlarmState.NotConfigured -> NotConfiguredCard(modifier)
+        HomeAlarmState.NotConfigured -> NotConfiguredCard(modifier, onNavigateToSettings)
         is HomeAlarmState.Active -> ActiveScheduleCard(state = s, modifier = modifier)
     }
 }
@@ -130,12 +131,16 @@ private fun NoPermissionCard(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun NotConfiguredCard(modifier: Modifier = Modifier) {
+private fun NotConfiguredCard(
+    modifier: Modifier = Modifier,
+    onNavigateToSettings: () -> Unit,
+) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
             .background(DwInk100)
+            .clickable(onClick = onNavigateToSettings)
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp),
@@ -450,7 +455,10 @@ private fun NoPermissionPreview() {
 @Composable
 private fun NotConfiguredPreview() {
     DrinkWaterAppTheme {
-        NotConfiguredCard(Modifier.padding(20.dp))
+        NotConfiguredCard(
+            onNavigateToSettings = {},
+            modifier = Modifier.padding(20.dp),
+        )
     }
 }
 

@@ -79,6 +79,7 @@ internal fun DrinkScreen(
     onDeletePreset: (DrinkSuggestion) -> Unit,
     onRestorePreset: (DrinkSuggestion) -> Unit,
     onNavigateToHistory: () -> Unit,
+    onNavigateToSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -139,7 +140,10 @@ internal fun DrinkScreen(
 
             val isPreview = LocalInspectionMode.current
             if (!isPreview) {
-                HomeAlarmCard(modifier = Modifier.padding(horizontal = 20.dp))
+                HomeAlarmCard(
+                    modifier = Modifier.padding(horizontal = 20.dp),
+                    onNavigateToSettings = onNavigateToSettings,
+                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -359,7 +363,8 @@ private fun DrinkScreenPreview() {
             onCreatePreset = {},
             onDeletePreset = {},
             onRestorePreset = {},
-            onNavigateToHistory = {}
+            onNavigateToHistory = {},
+            onNavigateToSettings = {},
         )
     }
 }
@@ -375,7 +380,8 @@ private fun DrinkScreenEmptyPreview() {
             onCreatePreset = {},
             onDeletePreset = {},
             onRestorePreset = {},
-            onNavigateToHistory = {}
+            onNavigateToHistory = {},
+            onNavigateToSettings = {},
         )
     }
 }
@@ -391,7 +397,8 @@ private fun DrinkScreenGoalReachedPreview() {
             onCreatePreset = {},
             onDeletePreset = {},
             onRestorePreset = {},
-            onNavigateToHistory = {}
+            onNavigateToHistory = {},
+            onNavigateToSettings = {},
         )
     }
 }

@@ -84,6 +84,7 @@ internal fun HomeScreen() {
         when (currentDestination) {
             HomeDestination.TODAY -> DrinkRoot(
                 onNavigateToHistory = { currentDestination = HomeDestination.HISTORY },
+                onNavigateToSettings = { currentDestination = HomeDestination.SETTINGS },
             )
 
             HomeDestination.STATS -> StatsScreen()

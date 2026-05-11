@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmCalculator2
+import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkSchedule
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.TimeResult
 import com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.getNextAlarmSlot
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.LocalDateTime
 
 internal class HomeAlarmViewModel(
+    val drinkAlarmManager: DrinkAlarmManager,
     clockTickObserver: ClockTickObserver,
     private val notificationPermissionObserver: NotificationPermissionObserver,
     private val prefsStorage: PrefsStorage,
@@ -29,7 +31,6 @@ internal class HomeAlarmViewModel(
 
     private val calculator = DrinkAlarmCalculator2()
 
-    // Bundle the three alarm prefs into a single flow to stay within 4-arg combine
     private val alarmPrefs = combine(
         prefsStorage.getInterval(),
         prefsStorage.getStartTime(),
@@ -37,10 +38,11 @@ internal class HomeAlarmViewModel(
     ) { interval, start, end -> Triple(interval, start, end) }
 
     val state = combine(
+        drinkAlarmManager.state,
         notificationPermissionObserver.hasPermission,
         clockTickObserver.observe(ClockGranularity.MINUTE),
         alarmPrefs,
-    ) { hasPermission, now, prefs ->
+    ) { drinkAlarmState, hasPermission, now, prefs ->
         if (!hasPermission) return@combine HomeAlarmState.NoPermission
 
         val (intervalPref, startTimePref, endTimePref) = prefs
@@ -48,13 +50,7 @@ internal class HomeAlarmViewModel(
         val endTime = endTimePref.toLocalDateTime()
         val alarmInterval = AlarmInterval(intervalPref.hour, intervalPref.minute)
 
-        val undefinedActiveHours =
-            startTime.hour == now.hour && startTime.minute == now.minute &&
-                    endTime.hour == now.hour && endTime.minute == now.minute
-        val invalidActiveHours =
-            startTime.hour == endTime.hour && startTime.minute == endTime.minute
-
-        if (undefinedActiveHours || invalidActiveHours) return@combine HomeAlarmState.NotConfigured
+        if (!drinkAlarmState.isAlarmActive) return@combine HomeAlarmState.NotConfigured
 
         val goalMl = database.getDailyGoalDao()
             .getGoalForDate(now.date.toEpochDays())
