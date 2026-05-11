@@ -25,6 +25,22 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    flavorDimensions += "environment"
+    productFlavors {
+        create("beta") {
+            dimension = "environment"
+            applicationIdSuffix = ".beta"
+            versionNameSuffix = "-beta"
+            buildConfigField("boolean", "IS_BETA", "true")
+            buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "true")
+        }
+        create("production") {
+            dimension = "environment"
+            buildConfigField("boolean", "IS_BETA", "false")
+            buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "false")
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -40,6 +56,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 

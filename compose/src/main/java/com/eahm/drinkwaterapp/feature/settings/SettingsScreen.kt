@@ -58,6 +58,8 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.eahm.drinkwaterapp.R
+import com.eahm.drinkwaterapp.core.config.BuildEnvironment
+import com.eahm.drinkwaterapp.core.config.FeatureFlags
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwSecondaryButton
 import com.eahm.drinkwaterapp.core.designsystem.component.extension.outlineBorderStyle
@@ -146,7 +148,14 @@ internal fun SettingsScreen(
         showOverlayInstructionsDialog = true
     }
 
-    // ── Share & Rate ──────────────────────────────────────────────────────────
+    fun handleRequestFeature() {
+        val intent = Intent(Intent.ACTION_SENDTO).apply {
+            data =
+                Uri.parse("mailto:drink@gmail.com?subject=New%20feature%20request%20for%20DrinkWater%20App&body=Hi%20developers%20at%20DrinkWaterApp%20I%20would%20like%20to%20request%20the%20following%20feature%20for%20a%20future%20app%20release%3A%0A%0A")
+        }
+        context.startActivity(intent)
+    }
+
     fun handleShare() {
         val shareIntent = Intent.createChooser(
             Intent(Intent.ACTION_SEND).apply {
@@ -179,6 +188,7 @@ internal fun SettingsScreen(
         onEndTimeChanged = viewModel::onEndTimeChanged,
         onShareTap = ::handleShare,
         onRateTap = ::handleRate,
+        onRequestFeatureTap = ::handleRequestFeature,
         onGoalCelebrationsToggled = { handleDrawOverlayToggle() },
         modifier = modifier,
     )
@@ -260,6 +270,7 @@ internal fun SettingsContent(
     onEndTimeChanged: (TimeSelected) -> Unit,
     onShareTap: () -> Unit,
     onRateTap: () -> Unit,
+    onRequestFeatureTap: () -> Unit,
     onGoalCelebrationsToggled: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -413,6 +424,8 @@ internal fun SettingsContent(
             }
 
             item {
+                val showRequestFeature =
+                    FeatureFlags.requestFeatureEnabled && BuildEnvironment.isBeta
                 SettingsSection(title = "ABOUT") {
                     SettingRow(
                         icon = DwIcons.Share,
@@ -432,6 +445,18 @@ internal fun SettingsContent(
                         onClick = onRateTap,
                     ) {
                         RowChevronTrailing()
+                    }
+                    if (showRequestFeature) {
+                        HorizontalDivider(color = DwInk100)
+                        SettingRow(
+                            icon = DwIcons.Lightbulb,
+                            iconBg = DwInk100,
+                            iconTint = DwInk500,
+                            label = "Request a feature",
+                            onClick = onRequestFeatureTap,
+                        ) {
+                            RowChevronTrailing()
+                        }
                     }
                 }
             }
@@ -878,6 +903,7 @@ private fun SettingsScreenPreview() {
             onEndTimeChanged = {},
             onShareTap = {},
             onRateTap = {},
+            onRequestFeatureTap = {},
             onGoalCelebrationsToggled = {},
         )
     }

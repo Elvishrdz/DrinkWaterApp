@@ -481,6 +481,45 @@ object DwIcons {
         }.build()
     }
 
+    val Lightbulb: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "DwLightbulb",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).apply {
+            // Bulb body
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(12f, 3f)
+                curveToRelative(-3.866f, 0f, -7f, 3.134f, -7f, 7f)
+                curveToRelative(0f, 2.386f, 1.2f, 4.485f, 3f, 5.745f)
+                verticalLineTo(17f)
+                arcToRelative(1f, 1f, 0f, false, false, 1f, 1f)
+                horizontalLineToRelative(6f)
+                arcToRelative(1f, 1f, 0f, false, false, 1f, -1f)
+                verticalLineTo(15.745f)
+                curveToRelative(1.8f, -1.26f, 3f, -3.359f, 3f, -5.745f)
+                curveToRelative(0f, -3.866f, -3.134f, -7f, -7f, -7f)
+                close()
+            }
+            // Base lines
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round
+            ) {
+                moveTo(9f, 21f)
+                horizontalLineTo(15f)
+            }
+        }.build()
+    }
+
     val Ruler: ImageVector by lazy {
         ImageVector.Builder(
             name = "DwRuler",
