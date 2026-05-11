@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -237,6 +238,10 @@ private fun BarChartPage(
 ) {
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
 
+    // Monthly view: 28–31 bars. Show sparse labels to avoid vertical text stacking.
+    // Show label only for day 1, multiples of 10 (10, 20, 30), and today.
+    val isMonthly = entries.size in 28..31
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -245,9 +250,17 @@ private fun BarChartPage(
         verticalAlignment = Alignment.Bottom,
     ) {
         entries.forEachIndexed { index, entry ->
+            val dayNum = entry.shortLabel.toIntOrNull() ?: 0
+            val showLabel = !isMonthly ||
+                    entry.isToday ||
+                    dayNum == 1 ||
+                    dayNum % 10 == 0
+
             BarColumn(
                 entry = entry,
                 goalMl = goalMl,
+                displayLabel = if (showLabel) entry.shortLabel else "",
+                isMonthly = isMonthly,
                 isSelected = selectedIndex == index,
                 onClick = {
                     selectedIndex = if (selectedIndex == index) null else index
@@ -262,6 +275,8 @@ private fun BarChartPage(
 private fun BarColumn(
     entry: DayEntry,
     goalMl: Int,
+    displayLabel: String,
+    isMonthly: Boolean,
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -316,11 +331,14 @@ private fun BarColumn(
         Spacer(modifier = Modifier.height(6.dp))
 
         Text(
-            text = entry.shortLabel,
+            text = displayLabel,
             fontFamily = PlusJakartaSans,
             fontWeight = if (entry.isToday) FontWeight.Bold else FontWeight.SemiBold,
-            fontSize = 10.sp,
+            fontSize = if (isMonthly) 9.sp else 10.sp,
             color = if (entry.isToday) DwMagenta else DwInk400,
+            maxLines = 1,
+            softWrap = false,
+            overflow = TextOverflow.Visible,
         )
     }
 }
