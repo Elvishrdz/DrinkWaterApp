@@ -454,7 +454,7 @@ object DwIcons {
                 moveTo(3f, 6f)
                 horizontalLineTo(21f)
             }
-            // Handle
+            // Handle tab
             path(
                 stroke = SolidColor(Color.Black),
                 strokeLineWidth = 2f,
@@ -463,20 +463,35 @@ object DwIcons {
             ) {
                 moveTo(8f, 6f)
                 verticalLineTo(4f)
-                horizontalLineTo(16f)
+                arcToRelative(1f, 1f, 0f, false, true, 1f, -1f)
+                horizontalLineToRelative(6f)
+                arcToRelative(1f, 1f, 0f, false, true, 1f, 1f)
                 verticalLineTo(6f)
             }
-            // Body
+            // Rounded body
             path(
                 stroke = SolidColor(Color.Black),
                 strokeLineWidth = 2f,
                 strokeLineCap = StrokeCap.Round,
                 strokeLineJoin = StrokeJoin.Round,
             ) {
-                moveTo(5f, 6f)
-                lineToRelative(1f, 14f)
-                horizontalLineToRelative(12f)
-                lineToRelative(1f, -14f)
+                moveTo(19f, 6f)
+                lineToRelative(-1f, 13f)
+                arcToRelative(2f, 2f, 0f, false, true, -2f, 2f)
+                horizontalLineTo(8f)
+                arcToRelative(2f, 2f, 0f, false, true, -2f, -2f)
+                lineToRelative(-1f, -13f)
+            }
+            // Internal lines
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeAlpha = 0.4f,
+            ) {
+                moveTo(9f, 10f); verticalLineTo(17f)
+                moveTo(12f, 10f); verticalLineTo(17f)
+                moveTo(15f, 10f); verticalLineTo(17f)
             }
         }.build()
     }
