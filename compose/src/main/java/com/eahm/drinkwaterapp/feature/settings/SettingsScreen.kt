@@ -334,15 +334,18 @@ internal fun SettingsContent(
                     ) {
                         RowValueTrailing(value = formatGoal(state.dailyGoalMl))
                     }
-                    HorizontalDivider(color = DwInk100)
-                    SettingRow(
-                        icon = DwIcons.Ruler,
-                        iconBg = DwTintMagenta,
-                        iconTint = DwMagenta,
-                        label = "Units",
-                        onClick = { showUnitsSheet = true },
-                    ) {
-                        RowValueTrailing(value = "${state.unit.label} · ${state.weightUnit.label}")
+                    if (false) {
+                        // TODO: setup units in the app
+                        HorizontalDivider(color = DwInk100)
+                        SettingRow(
+                            icon = DwIcons.Ruler,
+                            iconBg = DwTintMagenta,
+                            iconTint = DwMagenta,
+                            label = "Units",
+                            onClick = { showUnitsSheet = true },
+                        ) {
+                            RowValueTrailing(value = "${state.unit.label} · ${state.weightUnit.label}")
+                        }
                     }
                 }
             }
