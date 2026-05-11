@@ -49,6 +49,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterDeep
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
+import com.eahm.drinkwaterapp.core.domain.extension.pad
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import kotlinx.datetime.LocalDateTime
 import org.koin.compose.viewmodel.koinViewModel
@@ -67,8 +68,6 @@ internal fun HomeAlarmCard(
         is HomeAlarmState.Active -> ActiveScheduleCard(state = s, modifier = modifier)
     }
 }
-
-// ─── No Permission ────────────────────────────────────────────────────────────
 
 @Composable
 private fun NoPermissionCard(modifier: Modifier = Modifier) {
@@ -130,8 +129,6 @@ private fun NoPermissionCard(modifier: Modifier = Modifier) {
     }
 }
 
-// ─── Not Configured ───────────────────────────────────────────────────────────
-
 @Composable
 private fun NotConfiguredCard(modifier: Modifier = Modifier) {
     Row(
@@ -177,8 +174,6 @@ private fun NotConfiguredCard(modifier: Modifier = Modifier) {
     }
 }
 
-// ─── Active Schedule ──────────────────────────────────────────────────────────
-
 @Composable
 private fun ActiveScheduleCard(
     state: HomeAlarmState.Active,
@@ -199,7 +194,7 @@ private fun ActiveScheduleCard(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = "Alarm Schedule",
+                text = "Reminders",
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
@@ -228,8 +223,6 @@ private fun ActiveScheduleCard(
         )
     }
 }
-
-// ─── Active Status Badge ──────────────────────────────────────────────────────
 
 @Composable
 private fun ActiveStatusBadge(isActive: Boolean) {
@@ -261,8 +254,6 @@ private fun ActiveStatusBadge(isActive: Boolean) {
         )
     }
 }
-
-// ─── Timeline ─────────────────────────────────────────────────────────────────
 
 @Composable
 private fun HomeScheduleTimeline(
@@ -391,8 +382,6 @@ private fun HomeScheduleTimeline(
     }
 }
 
-// ─── Summary Chips ────────────────────────────────────────────────────────────
-
 @Composable
 private fun SummaryRow(
     schedule: DrinkSchedule?,
@@ -449,13 +438,7 @@ private fun SummaryChip(label: String, value: String) {
     }
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-private fun Int.pad(): String = toString().padStart(2, '0')
-
-// ─── Previews ─────────────────────────────────────────────────────────────────
-
-@Preview(showBackground = true, backgroundColor = 0xFFF2F6F9)
+@Preview
 @Composable
 private fun NoPermissionPreview() {
     DrinkWaterAppTheme {
@@ -463,7 +446,7 @@ private fun NoPermissionPreview() {
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFFF2F6F9)
+@Preview
 @Composable
 private fun NotConfiguredPreview() {
     DrinkWaterAppTheme {
@@ -471,7 +454,7 @@ private fun NotConfiguredPreview() {
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFFF2F6F9)
+@Preview
 @Composable
 private fun ActiveInActiveHoursPreview() {
     DrinkWaterAppTheme {
@@ -490,7 +473,7 @@ private fun ActiveInActiveHoursPreview() {
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFFF2F6F9)
+@Preview
 @Composable
 private fun ActiveRestingPreview() {
     DrinkWaterAppTheme {

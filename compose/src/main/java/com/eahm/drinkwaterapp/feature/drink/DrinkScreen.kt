@@ -42,6 +42,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -136,7 +137,10 @@ internal fun DrinkScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            HomeAlarmCard(modifier = Modifier.padding(horizontal = 20.dp))
+            val isPreview = LocalInspectionMode.current
+            if (!isPreview) {
+                HomeAlarmCard(modifier = Modifier.padding(horizontal = 20.dp))
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
