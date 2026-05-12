@@ -85,8 +85,11 @@ object NotificationService {
         //val text = awesomeTexts.getText(3, context)
         //val bigText = awesomeTexts.getBigText(4, context)
         val title = titleMessages.getTitle(category)
-        val text = textMessages.getText(category)
-        val bigText = bigTextMessages.getBigText(category)
+
+        val text = if (Random.nextInt(11) > 5)
+            bigTextMessages.getBigText(category)
+        else
+            textMessages.getText(category)
 
         val notificationAmountPerDrinkMl = prefsStorage.getAmountPerDrink().firstOrNull()
             ?: initialAmountPerDrink
@@ -95,7 +98,7 @@ object NotificationService {
             context = context,
             title = title,
             text = text,
-            bigText = bigText,
+            bigText = null,
             amountPerDrinkMl = notificationAmountPerDrinkMl,
         )
     }
