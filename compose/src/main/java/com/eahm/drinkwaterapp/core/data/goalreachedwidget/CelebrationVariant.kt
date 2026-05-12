@@ -154,12 +154,12 @@ val CELEBRATIONS: List<CelebrationVariant> by lazy {
 }
 
 fun getStyle(value: CelebrationStyle?): CelebrationVariant {
-    if (value == null) {
-        return CELEBRATIONS.random()
-    }
+    // only ocean available for next release
+    return oceanStyle
 
     return when (value) {
         CelebrationStyle.Ocean -> oceanStyle
         CelebrationStyle.Carnival -> carnivalStyle
+        null -> CELEBRATIONS.random()
     }
 }
