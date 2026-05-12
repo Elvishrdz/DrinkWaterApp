@@ -3,14 +3,13 @@ package com.eahm.drinkwaterapp.feature.dev.notifications
 // UI state (Loading skeleton → Data)
 internal sealed interface NotificationsState {
     data object Loading : NotificationsState
-    class Data(
-        // fields added as the feature grows
-    ) : NotificationsState
+    data class Data(val hasNotificationPermissions: Boolean) : NotificationsState
 }
 
-// User intents (UI → ViewModel)
 internal sealed interface NotificationsAction {
-    // actions added as the feature grows
+
+    data object ShowNotification : NotificationsAction
+    data object ShowNotificationUsingBroadcast : NotificationsAction
 }
 
 // One-shot side effects (ViewModel → UI)

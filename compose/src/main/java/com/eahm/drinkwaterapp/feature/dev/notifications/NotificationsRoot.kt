@@ -8,8 +8,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-internal fun NotificationsRoot(onBackClicked: () -> Unit) {
-    val viewModel: NotificationsViewModel = koinViewModel()
+internal fun NotificationsRoot(
+    onBackClicked: () -> Unit,
+    viewModel: NotificationsViewModel = koinViewModel(),
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
