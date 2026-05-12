@@ -59,6 +59,7 @@ import com.eahm.drinkwaterapp.feature.dev.alarmcalculator.AlarmCalculatorRoot
 import com.eahm.drinkwaterapp.feature.dev.alarmintervals.AlarmIntervalsRoot
 import com.eahm.drinkwaterapp.feature.dev.alarms.AlarmsRoot
 import com.eahm.drinkwaterapp.feature.dev.dailygoal.DailyGoalDevRoot
+import com.eahm.drinkwaterapp.feature.dev.notifications.NotificationsRoot
 import com.eahm.drinkwaterapp.feature.dev.streak.StreakDevRoot
 import com.eahm.drinkwaterapp.feature.dev.ui.Adaptive
 import com.eahm.drinkwaterapp.ui.drinkbutton.DrinkButton
@@ -87,6 +88,7 @@ enum class DevDestination(
     ALARMS("Alarms", DwIcons.Bell),
     DAILY_GOAL("Daily Goal", DwIcons.Drop),
     STREAK("Streak", DwIcons.Star),
+    NOTIFICATION("Notification", DwIcons.Bell),
 }
 
 
@@ -168,6 +170,10 @@ internal fun DevRoot(onBackClicked: () -> Unit) {
             )
 
             DevDestination.STREAK -> StreakDevRoot(
+                onBackClicked = onBackClicked,
+            )
+
+            DevDestination.NOTIFICATION -> NotificationsRoot(
                 onBackClicked = onBackClicked,
             )
         }
