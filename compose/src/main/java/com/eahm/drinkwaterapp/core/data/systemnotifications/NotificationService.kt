@@ -23,8 +23,10 @@ import com.eahm.drinkwaterapp.core.data.datastore.initialAmountPerDrink
 import com.eahm.drinkwaterapp.core.data.systemnotifications.channel.DrinkNotificationChannel
 import com.eahm.drinkwaterapp.core.data.systemnotifications.notification.DrinkNotification
 import com.eahm.drinkwaterapp.core.domain.extension.canShowNotifications
-import com.eahm.drinkwaterapp.ui.awesometexts.AwesomeTextsClass
-import com.eahm.drinkwaterapp.ui.awesometexts.NotificationMessages
+import com.eahm.drinkwaterapp.ui.awesometexts.MessageCategory
+import com.eahm.drinkwaterapp.ui.awesometexts.NotificationBigTextMessages
+import com.eahm.drinkwaterapp.ui.awesometexts.NotificationTextMessages
+import com.eahm.drinkwaterapp.ui.awesometexts.NotificationTitleMessages
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -37,8 +39,9 @@ object NotificationService {
 
     private const val LOG_NOTIFICATIONS = "LOG_NOTIFICATIONS"
 
-    private val messages = NotificationMessages()
-    private val awesomeTexts = AwesomeTextsClass()
+    private val titleMessages = NotificationTitleMessages()
+    private val textMessages = NotificationTextMessages()
+    private val bigTextMessages = NotificationBigTextMessages()
 
     fun setup(context: Context) {
         DrinkNotificationChannel.createChannel(context)
@@ -67,20 +70,24 @@ object NotificationService {
 
         val category = when {
             startTime != null && startTime.hour == hour && startTime.minute == minute
-                -> NotificationMessages.Category.Start
+                -> MessageCategory.Start
 
             endTime != null && endTime.hour == hour && endTime.minute == minute
-                -> NotificationMessages.Category.End
+                -> MessageCategory.End
 
             else ->
-                NotificationMessages.Category.ActiveHours(
+                MessageCategory.ActiveHours(
                     hour = hour ?: currentTime.hour,
                 )
         }
 
-        val title = messages.getTitle(category, context)
-        val text = awesomeTexts.getText(3, context)
-        val bigText = awesomeTexts.getBigText(4, context)
+        //val title = awesomeTexts.getTitle(3, context)
+        //val text = awesomeTexts.getText(3, context)
+        //val bigText = awesomeTexts.getBigText(4, context)
+        val title = titleMessages.getTitle(category)
+        val text = textMessages.getText(category)
+        val bigText = bigTextMessages.getBigText(category)
+
         val notificationAmountPerDrinkMl = prefsStorage.getAmountPerDrink().firstOrNull()
             ?: initialAmountPerDrink
 

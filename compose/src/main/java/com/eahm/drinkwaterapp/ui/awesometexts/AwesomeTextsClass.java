@@ -76,6 +76,7 @@ public class AwesomeTextsClass {
     }
 
     public String getTitle(int category, Context context) {
+        // TODO: use Random.nextInt(5) to get random values.
         //<>
         String title = "";
         //switch random text here!
