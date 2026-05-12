@@ -2,12 +2,14 @@ Development
 
 To Complete
 - [x] Adjust notification messages 
-- [] onboarding
-- adjust celebration
+- [x] onboarding
+- []adjust celebration
+- translations.
+- adaptive layouts
 - analytics
 - ads
 - paid version
-- translations.
+
 
 Next release priorities
 - Drink water
