@@ -5,11 +5,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.eahm.drinkwaterapp.core.data.systemnotifications.handleNotificationIntentOnCreate
 import com.eahm.drinkwaterapp.core.data.systemnotifications.handleNotificationIntentOnNewIntent
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.feature.home.HomeScreen
+import com.eahm.drinkwaterapp.feature.onboarding.OnboardingScreen
 import org.koin.core.context.GlobalContext
 
 class MainActivity : ComponentActivity() {
@@ -17,13 +20,27 @@ class MainActivity : ComponentActivity() {
     private val viewModel = GlobalContext.get().get<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
+        val splashScreen = installSplashScreen()
+        splashScreen.setKeepOnScreenCondition { viewModel.state.value is MainState.Ready }
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         handleNotificationIntentOnCreate(intent)
         setContent {
             DrinkWaterAppTheme {
-                HomeScreen()
+                val state by viewModel.state.collectAsStateWithLifecycle()
+
+                when (val data = state) {
+                    MainState.Startup -> {}
+                    is MainState.Ready -> {
+                        if (data.onboardingCompleted) {
+                            HomeScreen()
+                        } else {
+                            OnboardingScreen(
+                                onComplete = viewModel::onOnboardingCompleted,
+                            )
+                        }
+                    }
+                }
             }
         }
     }

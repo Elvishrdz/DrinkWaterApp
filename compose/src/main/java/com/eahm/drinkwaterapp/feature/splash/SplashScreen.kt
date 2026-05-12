@@ -27,12 +27,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
-import com.eahm.drinkwaterapp.core.designsystem.preview.DwThemePreview
-import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
-import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
+import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterDeep
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterLight
+import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
+import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 
 @Composable
 fun SplashScreen() {
@@ -135,7 +135,7 @@ private fun SplashMark() {
 @DwPreview
 @Composable
 private fun SplashScreenPreview() {
-    DwThemePreview {
+    DrinkWaterAppTheme {
         SplashScreen()
     }
 }

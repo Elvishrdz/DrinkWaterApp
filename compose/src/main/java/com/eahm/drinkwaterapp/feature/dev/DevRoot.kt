@@ -62,6 +62,7 @@ import com.eahm.drinkwaterapp.feature.dev.dailygoal.DailyGoalDevRoot
 import com.eahm.drinkwaterapp.feature.dev.notifications.NotificationsRoot
 import com.eahm.drinkwaterapp.feature.dev.streak.StreakDevRoot
 import com.eahm.drinkwaterapp.feature.dev.ui.Adaptive
+import com.eahm.drinkwaterapp.feature.onboarding.OnboardingScreen
 import com.eahm.drinkwaterapp.ui.drinkbutton.DrinkButton
 import com.eahm.drinkwaterapp.ui.drinks.BubbleConfig
 import com.eahm.drinkwaterapp.ui.drinks.DrinkAppearance
@@ -89,6 +90,7 @@ enum class DevDestination(
     DAILY_GOAL("Daily Goal", DwIcons.Drop),
     STREAK("Streak", DwIcons.Star),
     NOTIFICATION("Notification", DwIcons.Bell),
+    ONBOARDING("OnBoarding", DwIcons.Sun),
 }
 
 
@@ -175,6 +177,10 @@ internal fun DevRoot(onBackClicked: () -> Unit) {
 
             DevDestination.NOTIFICATION -> NotificationsRoot(
                 onBackClicked = onBackClicked,
+            )
+
+            DevDestination.ONBOARDING -> OnboardingScreen(
+                onComplete = onBackClicked,
             )
         }
     }
