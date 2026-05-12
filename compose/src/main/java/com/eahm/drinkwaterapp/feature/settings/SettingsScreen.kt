@@ -59,7 +59,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.eahm.drinkwaterapp.R
-import com.eahm.drinkwaterapp.core.config.BuildEnvironment
 import com.eahm.drinkwaterapp.core.config.FeatureFlags
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwSecondaryButton
@@ -435,8 +434,6 @@ internal fun SettingsContent(
             }
 
             item {
-                val showRequestFeature =
-                    FeatureFlags.requestFeatureEnabled && BuildEnvironment.isBeta
                 SettingsSection(title = "ABOUT") {
                     SettingRow(
                         icon = DwIcons.Share,
@@ -457,7 +454,7 @@ internal fun SettingsContent(
                     ) {
                         RowChevronTrailing()
                     }
-                    if (showRequestFeature) {
+                    if (FeatureFlags.requestFeatureEnabled) {
                         HorizontalDivider(color = DwInk100)
                         SettingRow(
                             icon = DwIcons.Lightbulb,

@@ -25,29 +25,39 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    flavorDimensions += "environment"
-    productFlavors {
-        create("beta") {
-            dimension = "environment"
-            applicationIdSuffix = ".beta"
-            versionNameSuffix = "-beta"
-            buildConfigField("boolean", "IS_BETA", "true")
-            buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "true")
-        }
-        create("production") {
-            dimension = "environment"
-            buildConfigField("boolean", "IS_BETA", "false")
-            buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "false")
-        }
-    }
-
     buildTypes {
+        // Local development — all features on, debug tools visible
+        debug {
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+            buildConfigField("boolean", "IS_DEV", "true")
+            buildConfigField("boolean", "IS_STAGING", "false")
+            buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "true")
+            buildConfigField("boolean", "LOGS_ENABLED", "true")
+        }
+
+        // QA / Internal Testing track — beta features on, no dev tools
+        create("staging") {
+            initWith(getByName("release"))
+            applicationIdSuffix = ".staging"
+            versionNameSuffix = "-staging"
+            buildConfigField("boolean", "IS_DEV", "false")
+            buildConfigField("boolean", "IS_STAGING", "true")
+            buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "true")
+            buildConfigField("boolean", "LOGS_ENABLED", "true")
+        }
+
+        // Closed testing, open testing and production track
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("boolean", "IS_DEV", "false")
+            buildConfigField("boolean", "IS_STAGING", "false")
+            buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "false")
+            buildConfigField("boolean", "LOGS_ENABLED", "false")
         }
     }
     compileOptions {
