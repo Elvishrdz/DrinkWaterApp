@@ -1,5 +1,6 @@
 package com.eahm.drinkwaterapp.feature.dev.celebrations
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,12 +53,19 @@ internal fun CelebrationsScreen(
 
 @Composable
 private fun Content(onAction: (CelebrationsAction) -> Unit) {
-    Column {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(7.dp),
+    ) {
         Text("Celebrations playground")
 
         DwPrimaryButton(
-            text = "Day",
-            onClick = { onAction(CelebrationsAction.ShowDayCelebration) },
+            text = "Ocean",
+            onClick = { onAction(CelebrationsAction.ShowOceanStyle) },
+        )
+
+        DwPrimaryButton(
+            text = "Carnival",
+            onClick = { onAction(CelebrationsAction.ShowCarnivalStyle) },
         )
     }
 }

@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Intent
 import android.provider.Settings
 import androidx.lifecycle.ViewModel
+import com.eahm.drinkwaterapp.core.data.goalreachedwidget.CelebrationStyle
 import com.eahm.drinkwaterapp.core.data.goalreachedwidget.GoalReachedWidget
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -28,13 +29,15 @@ internal class CelebrationsViewModel(
 
     fun onAction(action: CelebrationsAction) {
         when (action) {
-            CelebrationsAction.ShowDayCelebration -> displayGoalReachedOverlay()
+            CelebrationsAction.ShowOceanStyle -> displayGoalReachedOverlay(CelebrationStyle.Ocean)
+            CelebrationsAction.ShowCarnivalStyle -> displayGoalReachedOverlay(CelebrationStyle.Carnival)
         }
     }
 
-    private fun displayGoalReachedOverlay() {
+    private fun displayGoalReachedOverlay(style: CelebrationStyle) {
         if (Settings.canDrawOverlays(application)) {
             val intent = Intent(application, GoalReachedWidget::class.java).apply {
+                putExtra("style", style)
                 putExtra("goalMl", 2400f)
                 putExtra("drinkCount", 15)
                 putExtra("streakDays", 5)

@@ -20,7 +20,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 
 /**
  * Full-screen overlay that centers [GoalCelebrationCard] over an animated scrim.
@@ -40,7 +42,6 @@ fun GoalCelebrationOverlay(
     LaunchedEffect(Unit) { visible = true }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Scrim — tap to dismiss
         AnimatedVisibility(
             visible = visible,
             enter = fadeIn(animationSpec = tween(durationMillis = 220)),
@@ -57,7 +58,6 @@ fun GoalCelebrationOverlay(
             )
         }
 
-        // Card — centered, slides in from below
         AnimatedVisibility(
             visible = visible,
             enter = scaleIn(
@@ -78,5 +78,19 @@ fun GoalCelebrationOverlay(
                 modifier = Modifier.padding(horizontal = 20.dp),
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun GoalCelebrationOverlayPreview() {
+    DrinkWaterAppTheme {
+        GoalCelebrationOverlay(
+            variant = getStyle(value = CelebrationStyle.Ocean),
+            goalMl = 10f,
+            drinkCount = 5,
+            streakDays = 1,
+            onClose = {},
+        )
     }
 }

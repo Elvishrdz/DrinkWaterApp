@@ -18,15 +18,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -48,6 +48,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.R
+import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
+import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
 
@@ -79,183 +81,192 @@ fun GoalCelebrationCard(
     )
 
     Card(
-        modifier = modifier.widthIn(max = 320.dp),
+        modifier = modifier
+            .wrapContentSize()
+            .widthIn(max = 320.dp),
         shape = RoundedCornerShape(28.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
     ) {
-        // ── Hero section ────────────────────────────────────────────────────
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(variant.heroBrush)
-        ) {
-            // Optional overlay brush (STARLIGHT / MOONLIT) — fills full hero
-            variant.heroOverlayBrush?.let { overlay ->
-                Box(
-                    modifier = Modifier
-                        .matchParentSize()
-                        .background(overlay)
-                )
-            }
-
-            // Particle decor layer (absolute, fills full hero, no pointer events)
-            DecorLayer(variant.decorKind)
-
-            // Glass shine layer — top-left diagonal highlight
+        Column {
             Box(
                 modifier = Modifier
-                    .matchParentSize()
-                    .background(
-                        Brush.linearGradient(
-                            colors = listOf(
-                                Color.White.copy(alpha = 0.10f),
-                                Color.Transparent,
+                    .wrapContentSize()
+                    .background(variant.heroBrush)
+            ) {
+                // Optional overlay brush (STARLIGHT / MOONLIT) — fills full hero
+                variant.heroOverlayBrush?.let { overlay ->
+                    Box(
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .background(overlay)
+                    )
+                }
+
+                // Particle decor layer (absolute, fills full hero, no pointer events)
+                DecorLayer(
+                    decorKind = variant.decorKind,
+                    modifier = Modifier
+                        .matchParentSize(),
+                )
+
+                // Glass shine layer — top-left diagonal highlight
+                Box(
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .background(
+                            Brush.linearGradient(
+                                colors = listOf(
+                                    Color.White.copy(alpha = 0.10f),
+                                    Color.Transparent,
+                                )
                             )
                         )
-                    )
-            )
+                )
 
-            // Hero content column — padding lives here so decor fills the full hero
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 28.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                // Close button (top-right aligned)
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    IconButton(
-                        onClick = onClose,
+                // Hero content column — padding lives here so decor fills the full hero
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp, vertical = 28.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    // Close button (top-right aligned)
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        IconButton(
+                            onClick = onClose,
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .size(32.dp)
+                                .background(Color.White.copy(alpha = 0.22f), CircleShape),
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_close),
+                                contentDescription = "Close",
+                                tint = Color.White,
+                                modifier = Modifier.size(14.dp),
+                            )
+                        }
+                    }
+
+                    // Medallion
+                    Box(
                         modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .size(32.dp)
-                            .background(Color.White.copy(alpha = 0.22f), CircleShape),
+                            .size(96.dp)
+                            .scale(medallionScale)
+                            .rotate(medallionRotation)
+                            .background(Color.White.copy(alpha = 0.18f), CircleShape),
+                        contentAlignment = Alignment.Center,
                     ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_close),
-                            contentDescription = "Close",
-                            tint = Color.White,
-                            modifier = Modifier.size(14.dp),
+                        when (val m = variant.mark) {
+                            is CelebrationMark.Image -> androidx.compose.foundation.Image(
+                                painter = painterResource(id = m.resId),
+                                contentDescription = null,
+                                modifier = Modifier.size(56.dp),
+                            )
+
+                            is CelebrationMark.Glyph -> Text(
+                                text = m.text,
+                                fontSize = 44.sp,
+                                textAlign = TextAlign.Center,
+                            )
+                        }
+                    }
+
+                    // Eyebrow chip
+                    Box(
+                        modifier = Modifier
+                            .background(Color.White.copy(alpha = 0.22f), RoundedCornerShape(50))
+                            .padding(horizontal = 12.dp, vertical = 4.dp),
+                    ) {
+                        Text(
+                            text = variant.eyebrow.uppercase(),
+                            color = Color.White,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            letterSpacing = 0.5.sp,
                         )
                     }
-                }
 
-                // Medallion
-                Box(
-                    modifier = Modifier
-                        .size(96.dp)
-                        .scale(medallionScale)
-                        .rotate(medallionRotation)
-                        .background(Color.White.copy(alpha = 0.18f), CircleShape),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    when (val m = variant.mark) {
-                        is CelebrationMark.Image -> androidx.compose.foundation.Image(
-                            painter = painterResource(id = m.resId),
-                            contentDescription = null,
-                            modifier = Modifier.size(56.dp),
-                        )
-
-                        is CelebrationMark.Glyph -> Text(
-                            text = m.text,
-                            fontSize = 44.sp,
-                            textAlign = TextAlign.Center,
-                        )
-                    }
-                }
-
-                // Eyebrow chip
-                Box(
-                    modifier = Modifier
-                        .background(Color.White.copy(alpha = 0.22f), RoundedCornerShape(50))
-                        .padding(horizontal = 12.dp, vertical = 4.dp),
-                ) {
+                    // Headline
                     Text(
-                        text = variant.eyebrow,
+                        modifier = Modifier
+                            .padding(horizontal = 10.dp),
+                        text = variant.headline,
                         color = Color.White,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        letterSpacing = 0.5.sp,
+                        fontSize = 26.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        lineHeight = 30.sp,
+                        textAlign = TextAlign.Center,
+                    )
+
+                    // Sub copy
+                    Text(
+                        text = variant.sub,
+                        color = Color.White.copy(alpha = 0.92f),
+                        fontSize = 14.sp,
+                        lineHeight = 20.sp,
+                        textAlign = TextAlign.Center,
                     )
                 }
-
-                // Headline
-                Text(
-                    text = variant.headline,
-                    color = Color.White,
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    letterSpacing = (-0.26).sp,
-                    textAlign = TextAlign.Center,
-                )
-
-                // Sub copy
-                Text(
-                    text = variant.sub,
-                    color = Color.White.copy(alpha = 0.92f),
-                    fontSize = 14.sp,
-                    lineHeight = 20.sp,
-                    textAlign = TextAlign.Center,
-                )
-            }
-        }
-
-        // ── Stats strip ─────────────────────────────────────────────────────
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(IntrinsicSize.Min),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-        ) {
-            StatCell(
-                value = "%.1f".format(goalMl / 1000f),
-                unit = "L",
-                label = "Reached",
-                modifier = Modifier.weight(1f),
-            )
-            StatCell(
-                value = "$drinkCount",
-                unit = "",
-                label = "Glasses",
-                modifier = Modifier.weight(1f),
-            )
-            StatCell(
-                value = "$streakDays",
-                unit = "d",
-                label = "Streak",
-                modifier = Modifier.weight(1f),
-            )
-        }
-        HorizontalDivider(color = Color(0xFFE0E0E0))
-
-        // ── Actions section ─────────────────────────────────────────────────
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 18.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Button(
-                onClick = onClose,
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = DwMagenta),
-                shape = RoundedCornerShape(12.dp),
-            ) {
-                Text(
-                    text = variant.cta,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 15.sp,
-                )
             }
 
-            TextButton(onClick = onClose) {
-                Text(
-                    text = "Share progress",
-                    color = DwInk500,
-                    fontSize = 14.sp,
-                )
+            Column {
+                Column(
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.background)
+                ) {
+                    // ── Stats strip ─────────────────────────────────────────────────────
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(IntrinsicSize.Min),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                    ) {
+                        StatCell(
+                            value = "%.1f".format(goalMl / 1000f),
+                            unit = "L",
+                            label = "Reached",
+                            modifier = Modifier.weight(1f),
+                        )
+                        StatCell(
+                            value = "$drinkCount",
+                            unit = "",
+                            label = "Glasses",
+                            modifier = Modifier.weight(1f),
+                        )
+                        StatCell(
+                            value = "$streakDays",
+                            unit = "d",
+                            label = "Streak",
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                    HorizontalDivider(color = Color(0xFFE0E0E0))
+
+                    // ── Actions section ─────────────────────────────────────────────────
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 18.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        DwPrimaryButton(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = variant.cta,
+                            onClick = onClose,
+                        )
+
+                        TextButton(onClick = onClose) {
+                            Text(
+                                text = "Share progress",
+                                color = DwInk500,
+                                fontSize = 14.sp,
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -298,76 +309,86 @@ private fun StatCell(
     }
 }
 
-// ── Previews ─────────────────────────────────────────────────────────────────
-
-@Preview(showBackground = true, name = "Ocean")
+@Preview(name = "Ocean")
 @Composable
 private fun PreviewOcean() {
-    GoalCelebrationCard(
-        variant = CELEBRATIONS[0],
-        goalMl = 2400f,
-        drinkCount = 8,
-        streakDays = 3,
-        onClose = {},
-    )
+    DrinkWaterAppTheme {
+        GoalCelebrationCard(
+            variant = CELEBRATIONS[0],
+            goalMl = 2400f,
+            drinkCount = 8,
+            streakDays = 3,
+            onClose = {},
+        )
+    }
 }
 
 @Preview(showBackground = true, name = "Carnival")
 @Composable
 private fun PreviewCarnival() {
-    GoalCelebrationCard(
-        variant = CELEBRATIONS[1],
-        goalMl = 2400f,
-        drinkCount = 8,
-        streakDays = 3,
-        onClose = {},
-    )
+    DrinkWaterAppTheme {
+        GoalCelebrationCard(
+            variant = CELEBRATIONS[1],
+            goalMl = 2400f,
+            drinkCount = 8,
+            streakDays = 3,
+            onClose = {},
+        )
+    }
 }
 
 @Preview(showBackground = true, name = "Starlight")
 @Composable
 private fun PreviewStarlight() {
-    GoalCelebrationCard(
-        variant = CELEBRATIONS[2],
-        goalMl = 2400f,
-        drinkCount = 8,
-        streakDays = 3,
-        onClose = {},
-    )
+    DrinkWaterAppTheme {
+        GoalCelebrationCard(
+            variant = CELEBRATIONS[2],
+            goalMl = 2400f,
+            drinkCount = 8,
+            streakDays = 3,
+            onClose = {},
+        )
+    }
 }
 
 @Preview(showBackground = true, name = "Rain")
 @Composable
 private fun PreviewRain() {
-    GoalCelebrationCard(
-        variant = CELEBRATIONS[3],
-        goalMl = 2400f,
-        drinkCount = 8,
-        streakDays = 3,
-        onClose = {},
-    )
+    DrinkWaterAppTheme {
+        GoalCelebrationCard(
+            variant = CELEBRATIONS[3],
+            goalMl = 2400f,
+            drinkCount = 8,
+            streakDays = 3,
+            onClose = {},
+        )
+    }
 }
 
 @Preview(showBackground = true, name = "Sunset")
 @Composable
 private fun PreviewSunset() {
-    GoalCelebrationCard(
-        variant = CELEBRATIONS[4],
-        goalMl = 2400f,
-        drinkCount = 8,
-        streakDays = 3,
-        onClose = {},
-    )
+    DrinkWaterAppTheme {
+        GoalCelebrationCard(
+            variant = CELEBRATIONS[4],
+            goalMl = 2400f,
+            drinkCount = 8,
+            streakDays = 3,
+            onClose = {},
+        )
+    }
 }
 
 @Preview(showBackground = true, name = "Moonlit")
 @Composable
 private fun PreviewMoonlit() {
-    GoalCelebrationCard(
-        variant = CELEBRATIONS[5],
-        goalMl = 2400f,
-        drinkCount = 8,
-        streakDays = 3,
-        onClose = {},
-    )
+    DrinkWaterAppTheme {
+        GoalCelebrationCard(
+            variant = CELEBRATIONS[5],
+            goalMl = 2400f,
+            drinkCount = 8,
+            streakDays = 3,
+            onClose = {},
+        )
+    }
 }

@@ -30,9 +30,12 @@ fun DrinkWaterAppTheme(
     }
 
     val view = LocalView.current
-    if (!view.isInEditMode) {
+    val context = view.context
+
+    // check is activity to not crash in GoalReachedWidget.kt overlay
+    if (!view.isInEditMode && context is Activity) {
         SideEffect {
-            val window = (view.context as Activity).window
+            val window = context.window
             val insetsController = WindowCompat.getInsetsController(window, view)
             insetsController.isAppearanceLightStatusBars = !darkTheme
             insetsController.isAppearanceLightNavigationBars = !darkTheme

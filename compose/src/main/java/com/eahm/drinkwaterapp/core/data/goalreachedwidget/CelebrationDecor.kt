@@ -8,8 +8,8 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -31,15 +31,22 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 @Composable
-fun DecorLayer(decorKind: DecorKind) {
+fun DecorLayer(
+    decorKind: DecorKind,
+    modifier: Modifier = Modifier,
+) {
     Box(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = modifier
             .pointerInput(Unit) { /* consume no events */ }
     ) {
         when (decorKind) {
-            DecorKind.BUBBLES -> BubblesDecor()
-            DecorKind.CONFETTI -> ConfettiDecor()
+            DecorKind.BUBBLES -> BubblesDecor(
+                modifier = Modifier.matchParentSize(),
+            )
+
+            DecorKind.CONFETTI -> ConfettiDecor(
+                modifier = Modifier.matchParentSize(),
+            )
             DecorKind.SPARKLES -> SparklesDecor()
             DecorKind.DRIPS -> DripsDecor()
             DecorKind.RAYS -> RaysDecor()
@@ -61,6 +68,7 @@ private data class BubbleSpec(
 
 private val bubbleSpecs = listOf(
     BubbleSpec(0.15f, 0.80f, 10.dp, 0),
+    BubbleSpec(0.05f, 0.04f, 5.dp, 500),
     BubbleSpec(0.35f, 0.70f, 16.dp, 600),
     BubbleSpec(0.55f, 0.85f, 22.dp, 1200),
     BubbleSpec(0.75f, 0.75f, 26.dp, 1800),
@@ -69,8 +77,8 @@ private val bubbleSpecs = listOf(
 )
 
 @Composable
-fun BubblesDecor() {
-    val durationMs = 4000
+fun BubblesDecor(modifier: Modifier = Modifier) {
+    val durationMs = 3000
     bubbleSpecs.forEach { spec ->
         val transition = rememberInfiniteTransition(label = "bubble_${spec.delayMs}")
         val progress by transition.animateFloat(
@@ -96,8 +104,7 @@ fun BubblesDecor() {
         val translateY = ((-90).dp * progress)
 
         Box(
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = modifier
                 .drawBehind {
                     val x = size.width * spec.xFraction
                     val y = size.height * spec.yStartFraction + translateY.toPx()
@@ -138,7 +145,7 @@ private val confettiSpecs = (0 until 14).map { i ->
 }
 
 @Composable
-fun ConfettiDecor() {
+fun ConfettiDecor(modifier: Modifier = Modifier) {
     val durationMs = 2600
     confettiSpecs.forEach { spec ->
         val transition = rememberInfiniteTransition(label = "confetti_${spec.delayMs}")
@@ -157,8 +164,7 @@ fun ConfettiDecor() {
         )
 
         Box(
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = modifier
                 .drawBehind {
                     val x = size.width * spec.xFraction
                     val y = progress * (size.height * 0.85f)
@@ -256,7 +262,7 @@ fun SparklesDecor() {
 
         Box(
             modifier = Modifier
-                .fillMaxSize()
+                .wrapContentSize()
                 .drawBehind {
                     val cx = size.width * spec.xFraction
                     val cy = size.height * spec.yFraction
@@ -308,7 +314,7 @@ fun DripsDecor() {
 
         Box(
             modifier = Modifier
-                .fillMaxSize()
+                .wrapContentSize()
                 .drawBehind {
                     val x = size.width * spec.xFraction
                     val y = progress * size.height * 0.80f
@@ -367,7 +373,7 @@ fun RaysDecor() {
 
         Box(
             modifier = Modifier
-                .fillMaxSize()
+                .wrapContentSize()
                 .drawBehind {
                     val cx = size.width * 0.5f
                     val cy = size.height * 0.35f
@@ -436,7 +442,7 @@ fun RingsDecor() {
 
         Box(
             modifier = Modifier
-                .fillMaxSize()
+                .wrapContentSize()
                 .drawBehind {
                     val cx = size.width * 0.5f
                     val cy = size.height * 0.35f
@@ -451,10 +457,6 @@ fun RingsDecor() {
         )
     }
 }
-
-// ---------------------------------------------------------------------------
-// Previews
-// ---------------------------------------------------------------------------
 
 @Preview(name = "Bubbles (Ocean)", widthDp = 200, heightDp = 200)
 @Composable

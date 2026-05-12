@@ -11,6 +11,7 @@ import android.view.View
 import android.view.WindowManager
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -24,6 +25,7 @@ import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.eahm.drinkwaterapp.R
+import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 
 class GoalReachedWidget : Service(),
     LifecycleOwner,
@@ -34,6 +36,7 @@ class GoalReachedWidget : Service(),
     private var widgetView: View? = null
     private lateinit var params: WindowManager.LayoutParams
 
+    private val style = mutableStateOf<CelebrationStyle?>(null)
     private val goalMlState = mutableFloatStateOf(2400f)
     private val drinkCountState = mutableIntStateOf(1)
     private val streakDaysState = mutableIntStateOf(1)
@@ -54,6 +57,13 @@ class GoalReachedWidget : Service(),
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         intent?.let {
+            style.value = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                it.getSerializableExtra("style", CelebrationStyle::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                it.getSerializableExtra("style") as? CelebrationStyle
+            }
+
             goalMlState.floatValue = it.getFloatExtra("goalMl", goalMlState.floatValue)
             drinkCountState.intValue = it.getIntExtra("drinkCount", drinkCountState.intValue)
             streakDaysState.intValue = it.getIntExtra("streakDays", streakDaysState.intValue)
@@ -110,13 +120,15 @@ class GoalReachedWidget : Service(),
 
         composeView.apply {
             setContent {
-                GoalCelebrationOverlay(
-                    variant = todayVariant(),
-                    goalMl = goalMlState.floatValue,
-                    drinkCount = drinkCountState.intValue,
-                    streakDays = streakDaysState.intValue,
-                    onClose = { stopSelf() },
-                )
+                DrinkWaterAppTheme {
+                    GoalCelebrationOverlay(
+                        variant = getStyle(style.value),
+                        goalMl = goalMlState.floatValue,
+                        drinkCount = drinkCountState.intValue,
+                        streakDays = streakDaysState.intValue,
+                        onClose = { stopSelf() },
+                    )
+                }
             }
         }
     }
