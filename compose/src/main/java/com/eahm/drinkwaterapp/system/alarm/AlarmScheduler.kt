@@ -12,6 +12,8 @@ import com.eahm.drinkwaterapp.core.data.drinkalarm.data.TimeResult
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.createWithSeconds
 import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler.scheduleAlarm
 import com.eahm.drinkwaterapp.system.broadcast.AlarmReceiver
+import com.eahm.drinkwaterapp.system.broadcast.AlarmReceiver.Companion.ALARM_EXTRAS_HOUR
+import com.eahm.drinkwaterapp.system.broadcast.AlarmReceiver.Companion.ALARM_EXTRAS_MINUTE
 import java.util.Calendar
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
@@ -48,11 +50,18 @@ object AlarmScheduler {
 
         val triggerAt = SystemClock.elapsedRealtime() + millisToTriggerFromNow
 
-        val intent = Intent(AlarmReceiver.ALARM_ACTION).apply {
-            setPackage(context.packageName)
-            putExtra("alarm_id", alarmId)
-            putExtra("interval_ms", millisToTriggerFromNow)
-        }
+        val triggerTime = TimeResult.createWithSeconds(
+            seconds = millisToTriggerFromNow.milliseconds.inWholeSeconds,
+        )
+
+        val intent = getAlarmIntent(
+            context = context,
+            alarmId = alarmId,
+            millisToTriggerFromNow = millisToTriggerFromNow,
+            hour = triggerTime.hour,
+            minute = triggerTime.minute,
+        )
+
         val pendingIntent = PendingIntent.getBroadcast(
             context,
             alarmId,
@@ -67,6 +76,22 @@ object AlarmScheduler {
         )
 
         saveAlarmToStorage(context, alarmId, millisToTriggerFromNow, triggerAt)
+    }
+
+    fun getAlarmIntent(
+        context: Context,
+        alarmId: Int,
+        millisToTriggerFromNow: Long,
+        hour: Int,
+        minute: Int,
+    ): Intent {
+        return Intent(AlarmReceiver.ALARM_ACTION).apply {
+            setPackage(context.packageName)
+            putExtra(ALARM_EXTRAS_HOUR, hour)
+            putExtra(ALARM_EXTRAS_MINUTE, minute)
+            putExtra("alarm_id", alarmId)
+            putExtra("interval_ms", millisToTriggerFromNow)
+        }
     }
 
     fun cancelAlarm(context: Context, alarmId: Int) {
@@ -179,13 +204,13 @@ object AlarmScheduler {
         } else {
             triggerAtMillis.asAlarmTime
         }.let {
-                TimeResult(
-                    hour = it.hour,
-                    minute = it.minute,
-                    second = it.second,
-                    millisecond = it.second.toLong(),
-                )
-            }
+            TimeResult(
+                hour = it.hour,
+                minute = it.minute,
+                second = it.second,
+                millisecond = it.second.toLong(),
+            )
+        }
 
         return AlarmStorageInfo(
             alarmId = id,

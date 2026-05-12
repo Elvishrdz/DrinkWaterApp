@@ -24,7 +24,10 @@ import com.eahm.drinkwaterapp.core.data.systemnotifications.channel.DrinkNotific
 import com.eahm.drinkwaterapp.core.data.systemnotifications.notification.DrinkNotification
 import com.eahm.drinkwaterapp.core.domain.extension.canShowNotifications
 import com.eahm.drinkwaterapp.ui.awesometexts.AwesomeTextsClass
+import com.eahm.drinkwaterapp.ui.awesometexts.NotificationMessages
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.koin.core.context.GlobalContext
 import kotlin.random.Random
 import kotlin.time.Clock
@@ -34,29 +37,58 @@ object NotificationService {
 
     private const val LOG_NOTIFICATIONS = "LOG_NOTIFICATIONS"
 
+    private val messages = NotificationMessages()
+    private val awesomeTexts = AwesomeTextsClass()
+
     fun setup(context: Context) {
         DrinkNotificationChannel.createChannel(context)
     }
 
-    suspend fun showDrinkNotification(context: Context) {
+    @OptIn(ExperimentalTime::class)
+    suspend fun showDrinkNotification(
+        context: Context,
+        hour: Int?,
+        minute: Int?,
+    ) {
         // TODO: check if exists, update messages based on:
         //  the status (is this notification visible for too long?
         // time (is midnight? close to end hours? or early morning?
         // goal amount, display how much
         if (!context.canShowNotifications) return
 
-        val awesomeTexts = AwesomeTextsClass()
-
         val koin = GlobalContext.get()
         val prefsStorage = koin.get<PrefsStorage>()
+
+        val currentTime = Clock.System.now()
+            .toLocalDateTime(TimeZone.currentSystemDefault())
+
+        val startTime = prefsStorage.getStartTime().firstOrNull()
+        val endTime = prefsStorage.getEndTime().firstOrNull()
+
+        val category = when {
+            startTime != null && startTime.hour == hour && startTime.minute == minute
+                -> NotificationMessages.Category.Start
+
+            endTime != null && endTime.hour == hour && endTime.minute == minute
+                -> NotificationMessages.Category.End
+
+            else ->
+                NotificationMessages.Category.ActiveHours(
+                    hour = hour ?: currentTime.hour,
+                )
+        }
+
+        val title = messages.getTitle(category, context)
+        val text = awesomeTexts.getText(3, context)
+        val bigText = awesomeTexts.getBigText(4, context)
         val notificationAmountPerDrinkMl = prefsStorage.getAmountPerDrink().firstOrNull()
             ?: initialAmountPerDrink
 
         DrinkNotification.showNotification(
             context = context,
-            title = awesomeTexts.getTitle(2, context),
-            text = awesomeTexts.getText(3, context),
-            bigText = awesomeTexts.getBigText(4, context),
+            title = title,
+            text = text,
+            bigText = bigText,
             amountPerDrinkMl = notificationAmountPerDrinkMl,
         )
     }
