@@ -55,8 +55,8 @@ class AlarmReceiver : BroadcastReceiver() {
             }
 
             ALARM_ACTION -> {
-                val hour = intent.getIntExtra(ALARM_EXTRAS_HOUR, -1).takeIf { it != -1 }
-                val minute = intent.getIntExtra(ALARM_EXTRAS_MINUTE, -1).takeIf { it != -1 }
+                val hour = intent.getIntExtra(ALARM_EXTRAS_TRIGGER_HOUR, -1).takeIf { it != -1 }
+                val minute = intent.getIntExtra(ALARM_EXTRAS_TRIGGER_MINUTE, -1).takeIf { it != -1 }
 
                 drinkAlarmManager.onAlarmReceived(AlarmSource.DrinkAlarmReceived)
 
@@ -137,7 +137,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
         // Action should match action in the AndroidManifest.xml receiver intent-filter
         const val ALARM_ACTION = "com.eahm.drinkwaterapp.ALARM_ACTION"
-        const val ALARM_EXTRAS_HOUR = "EXTRAS_HOUR"
-        const val ALARM_EXTRAS_MINUTE = "EXTRAS_MINUTE"
+        const val ALARM_EXTRAS_TRIGGER_HOUR = "EXTRAS_TRIGGER_HOUR"
+        const val ALARM_EXTRAS_TRIGGER_MINUTE = "EXTRAS_TRIGGER_MINUTE"
     }
 }

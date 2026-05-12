@@ -12,8 +12,8 @@ import com.eahm.drinkwaterapp.core.data.drinkalarm.data.TimeResult
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.createWithSeconds
 import com.eahm.drinkwaterapp.system.alarm.AlarmScheduler.scheduleAlarm
 import com.eahm.drinkwaterapp.system.broadcast.AlarmReceiver
-import com.eahm.drinkwaterapp.system.broadcast.AlarmReceiver.Companion.ALARM_EXTRAS_HOUR
-import com.eahm.drinkwaterapp.system.broadcast.AlarmReceiver.Companion.ALARM_EXTRAS_MINUTE
+import com.eahm.drinkwaterapp.system.broadcast.AlarmReceiver.Companion.ALARM_EXTRAS_TRIGGER_HOUR
+import com.eahm.drinkwaterapp.system.broadcast.AlarmReceiver.Companion.ALARM_EXTRAS_TRIGGER_MINUTE
 import java.util.Calendar
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
@@ -48,18 +48,14 @@ object AlarmScheduler {
     fun scheduleAlarm(context: Context, alarmId: Int, millisToTriggerFromNow: Long) {
         val alarmManager = context.getSystemService(AlarmManager::class.java)
 
-        val triggerAt = SystemClock.elapsedRealtime() + millisToTriggerFromNow
-
-        val triggerTime = TimeResult.createWithSeconds(
-            seconds = millisToTriggerFromNow.milliseconds.inWholeSeconds,
-        )
+        val triggerAtMillis = SystemClock.elapsedRealtime() + millisToTriggerFromNow
 
         val intent = getAlarmIntent(
             context = context,
             alarmId = alarmId,
             millisToTriggerFromNow = millisToTriggerFromNow,
-            hour = triggerTime.hour,
-            minute = triggerTime.minute,
+            extraTriggerHour = triggerAtMillis.asAlarmTime.hour,
+            extraTriggerMinute = triggerAtMillis.asAlarmTime.minute,
         )
 
         val pendingIntent = PendingIntent.getBroadcast(
@@ -71,24 +67,24 @@ object AlarmScheduler {
 
         alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.ELAPSED_REALTIME_WAKEUP,
-            triggerAt,
+            triggerAtMillis,
             pendingIntent
         )
 
-        saveAlarmToStorage(context, alarmId, millisToTriggerFromNow, triggerAt)
+        saveAlarmToStorage(context, alarmId, millisToTriggerFromNow, triggerAtMillis)
     }
 
     fun getAlarmIntent(
         context: Context,
         alarmId: Int,
         millisToTriggerFromNow: Long,
-        hour: Int,
-        minute: Int,
+        extraTriggerHour: Int,
+        extraTriggerMinute: Int,
     ): Intent {
         return Intent(AlarmReceiver.ALARM_ACTION).apply {
             setPackage(context.packageName)
-            putExtra(ALARM_EXTRAS_HOUR, hour)
-            putExtra(ALARM_EXTRAS_MINUTE, minute)
+            putExtra(ALARM_EXTRAS_TRIGGER_HOUR, extraTriggerHour)
+            putExtra(ALARM_EXTRAS_TRIGGER_MINUTE, extraTriggerMinute)
             putExtra("alarm_id", alarmId)
             putExtra("interval_ms", millisToTriggerFromNow)
         }

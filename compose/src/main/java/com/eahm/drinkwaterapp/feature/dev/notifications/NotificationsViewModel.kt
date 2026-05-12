@@ -65,8 +65,8 @@ internal class NotificationsViewModel(
             context = application,
             alarmId = DRINK_ALARM_ID,
             millisToTriggerFromNow = 0,
-            hour = time.value.hour,
-            minute = time.value.minute,
+            extraTriggerHour = time.value.hour,
+            extraTriggerMinute = time.value.minute,
         )
 
         application.sendBroadcast(intent)
