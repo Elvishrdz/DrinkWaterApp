@@ -7,6 +7,7 @@ import com.eahm.drinkwaterapp.feature.dev.alarmintervals.AlarmIntervalsViewModel
 import com.eahm.drinkwaterapp.feature.dev.alarms.AlarmsViewModel
 import com.eahm.drinkwaterapp.feature.dev.dailygoal.DailyGoalDevViewModel
 import com.eahm.drinkwaterapp.feature.dev.notifications.NotificationsViewModel
+import com.eahm.drinkwaterapp.feature.dev.onboarding.OnboardingDevViewModel
 import com.eahm.drinkwaterapp.feature.dev.streak.StreakDevViewModel
 import com.eahm.drinkwaterapp.feature.drink.DrinkViewModel
 import com.eahm.drinkwaterapp.feature.drink.alarm.HomeAlarmViewModel
@@ -39,4 +40,5 @@ internal val featureModule = module {
     viewModelOf(::DailyGoalDevViewModel)
     viewModelOf(::StreakDevViewModel)
     viewModelOf(::NotificationsViewModel)
+    viewModelOf(::OnboardingDevViewModel)
 }

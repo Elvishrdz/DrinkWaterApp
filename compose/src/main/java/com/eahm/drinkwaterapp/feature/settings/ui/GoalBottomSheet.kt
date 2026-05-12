@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -42,9 +43,9 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 import com.eahm.drinkwaterapp.ui.bottomsheet.AppBottomSheet
 import kotlinx.coroutines.launch
 
-private const val GOAL_STEP = 100
-private const val GOAL_MIN = 100
-private const val GOAL_MAX = 5_000
+internal const val GOAL_STEP = 100
+internal const val GOAL_MIN = 100
+internal const val GOAL_MAX = 5_000
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,7 +74,6 @@ internal fun GoalBottomSheet(
                 .navigationBarsPadding(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            // Title
             Text(
                 text = "Daily goal",
                 fontFamily = PlusJakartaSans,
@@ -84,61 +84,10 @@ internal fun GoalBottomSheet(
 
             Spacer(Modifier.height(32.dp))
 
-            // Stepper row
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                StepperCircleButton(
-                    enabled = value > GOAL_MIN,
-                    onClick = { value -= GOAL_STEP },
-                    icon = { MinusLine() },
-                )
-
-                Spacer(Modifier.width(28.dp))
-
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = "%,d".format(value).replace(",", " "),
-                        fontFamily = Nunito,
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 48.sp,
-                        color = MaterialTheme.colorScheme.onBackground,
-                    )
-                    Text(
-                        text = "mL",
-                        fontFamily = PlusJakartaSans,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 16.sp,
-                        color = DwInk400,
-                    )
-                }
-
-                Spacer(Modifier.width(28.dp))
-
-                StepperCircleButton(
-                    enabled = value < GOAL_MAX,
-                    onClick = { value += GOAL_STEP },
-                    icon = {
-                        androidx.compose.material3.Icon(
-                            imageVector = DwIcons.Plus,
-                            contentDescription = "Increase",
-                            tint = DwWater,
-                            modifier = Modifier.size(20.dp),
-                        )
-                    },
-                )
-            }
-
-            Spacer(Modifier.height(8.dp))
-
-            Text(
-                text = "Min $GOAL_MIN mL · Max $GOAL_MAX mL",
-                fontFamily = PlusJakartaSans,
-                fontWeight = FontWeight.Normal,
-                fontSize = 12.sp,
-                color = DwInk500,
+            GoalStepperRow(
+                value = value,
+                onDecrement = { value -= GOAL_STEP },
+                onIncrement = { value += GOAL_STEP },
             )
 
             Spacer(Modifier.height(32.dp))
@@ -152,6 +101,75 @@ internal fun GoalBottomSheet(
                 modifier = Modifier.fillMaxWidth(),
             )
         }
+    }
+}
+
+@Composable
+internal fun GoalStepperRow(
+    value: Int,
+    onDecrement: () -> Unit,
+    onIncrement: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            StepperCircleButton(
+                enabled = value > GOAL_MIN,
+                onClick = onDecrement,
+                icon = { MinusLine() },
+            )
+
+            Spacer(Modifier.width(28.dp))
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "%,d".format(value).replace(",", " "),
+                    fontFamily = Nunito,
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 48.sp,
+                    color = MaterialTheme.colorScheme.onBackground,
+                )
+                Text(
+                    text = "mL",
+                    fontFamily = PlusJakartaSans,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 16.sp,
+                    color = DwInk400,
+                )
+            }
+
+            Spacer(Modifier.width(28.dp))
+
+            StepperCircleButton(
+                enabled = value < GOAL_MAX,
+                onClick = onIncrement,
+                icon = {
+                    Icon(
+                        imageVector = DwIcons.Plus,
+                        contentDescription = "Increase",
+                        tint = DwWater,
+                        modifier = Modifier.size(20.dp),
+                    )
+                },
+            )
+        }
+
+        Spacer(Modifier.height(8.dp))
+
+        Text(
+            text = "Min $GOAL_MIN mL · Max $GOAL_MAX mL",
+            fontFamily = PlusJakartaSans,
+            fontWeight = FontWeight.Normal,
+            fontSize = 12.sp,
+            color = DwInk500,
+        )
     }
 }
 

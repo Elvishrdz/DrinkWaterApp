@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface PrefsStorage {
 
-    fun getFirstSetupDone(): Flow<Boolean>
-    suspend fun setFirstSetupDone(value: Boolean)
+    fun getOnboardingCompleted(): Flow<Boolean>
+    suspend fun setOnboardingCompleted(value: Boolean)
 
     fun getUsername(): Flow<String?>
     suspend fun setUsername(name: String)

@@ -4,6 +4,7 @@ import android.app.Application
 import android.provider.Settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.eahm.drinkwaterapp.core.config.AppInfoService
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
@@ -38,6 +39,7 @@ internal class SettingsViewModel(
     val drinkAlarmManager: DrinkAlarmManager,
     val dateTimeZoneChangedObserver: DateTimeZoneChangedObserver,
     notificationPermissionObserver: NotificationPermissionObserver,
+    val appInfoService: AppInfoService,
 ) : ViewModel() {
 
     private val dao = database.getDailyGoalDao()
@@ -76,6 +78,8 @@ internal class SettingsViewModel(
                 endTime = null,
                 intervalMinutes = 0,
                 goalReachedCelebrationsEnabled = canDrawOverlay,
+                appVersion = appInfoService.versionName,
+                buildVariant = appInfoService.buildVariant,
             )
         )
 

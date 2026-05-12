@@ -25,13 +25,14 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterDeep
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
-import com.eahm.drinkwaterapp.feature.onboarding.TOTAL_STEPS
+import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps
+import com.eahm.drinkwaterapp.feature.onboarding.totalSteps
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbArtCircle
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbShell
 
-/** Step 10 — Computed daily goal reveal. */
 @Composable
-internal fun StepGoal(
+internal fun StepGoalResult(
+    step: Int,
     goalMl: Int,
     onNext: () -> Unit,
     onBack: () -> Unit,
@@ -40,8 +41,8 @@ internal fun StepGoal(
     val glasses = (goalMl / 250.0).toInt()
 
     OnbShell(
-        step = 10,
-        total = TOTAL_STEPS,
+        step = step,
+        total = OnboardingSteps.totalSteps,
         title = "Your daily goal",
         subtitle = "Tailored to your weight and activity level.",
         art = { OnbArtCircle(icon = DwIcons.Drop) },
@@ -122,8 +123,13 @@ private fun GoalDisplay(
 
 @DwPreview
 @Composable
-private fun StepGoalPreview() {
+private fun StepGoalResultPreview() {
     DrinkWaterAppTheme {
-        StepGoal(goalMl = 2200, onNext = {}, onBack = {})
+        StepGoalResult(
+            step = 1,
+            goalMl = 2200,
+            onNext = {},
+            onBack = {},
+        )
     }
 }

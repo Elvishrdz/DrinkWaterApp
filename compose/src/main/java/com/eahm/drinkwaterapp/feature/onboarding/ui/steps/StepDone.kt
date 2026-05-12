@@ -1,5 +1,11 @@
 package com.eahm.drinkwaterapp.feature.onboarding.ui.steps
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,12 +22,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.unit.dp
-import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -30,30 +40,41 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingFormState
-import com.eahm.drinkwaterapp.feature.onboarding.TOTAL_STEPS
+import com.eahm.drinkwaterapp.feature.onboarding.ui.components.DwPrimaryButtonAnimated
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbShell
+import kotlinx.coroutines.delay
+
+private const val ROW_STAGGER_MS = 150L
+private const val ROW_START_DELAY_MS = 150L
+private const val BUTTON_DELAY_MS = 900L
 
 /** Step 11 — Summary / done screen. No art circle; gradient header is minimal. */
 @Composable
 internal fun StepDone(
+    step: Int,
     state: OnboardingFormState,
     onStart: () -> Unit,
     onBack: () -> Unit,
 ) {
-    val displayName = state.name.ifBlank { "friend" }
+    val title = if (state.name.isBlank()) {
+        "You're all set!"
+    } else {
+        "You're all set, ${state.name}"
+    }
     val liters = "%.2f".format(state.computedGoalMl / 1000.0)
 
     OnbShell(
-        step = TOTAL_STEPS,
-        total = TOTAL_STEPS,
-        title = "You're all set, $displayName",
+        step = step,
+        total = step,
+        title = title,
         subtitle = "Here's your starting plan — change any of it later in Settings.",
         onBack = onBack,
         footer = {
-            DwPrimaryButton(
+            DwPrimaryButtonAnimated(
                 text = "Start drinking",
                 onClick = onStart,
                 modifier = Modifier.fillMaxWidth(),
+                delayMs = BUTTON_DELAY_MS,
             )
         },
     ) {
@@ -80,7 +101,7 @@ private fun SummaryCard(
             iconBg = DwTintMagenta,
             iconTint = DwMagenta,
             label = "Reminder",
-            value = "every ${state.intervalMinutes} min",
+            value = formatInterval(state.intervalMinutes),
         ),
         SummaryRowData(
             icon = DwIcons.Sun,
@@ -98,6 +119,16 @@ private fun SummaryCard(
         ),
     )
 
+    val isPreview = LocalInspectionMode.current
+    val rowVisible = remember { List(rows.size) { mutableStateOf(isPreview) } }
+
+    LaunchedEffect(Unit) {
+        rows.indices.forEach { index ->
+            delay(ROW_START_DELAY_MS + ROW_STAGGER_MS * index)
+            rowVisible[index].value = true
+        }
+    }
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -105,12 +136,25 @@ private fun SummaryCard(
             .background(MaterialTheme.colorScheme.surfaceVariant),
     ) {
         rows.forEachIndexed { index, row ->
-            SummaryRow(data = row)
-            if (index < rows.lastIndex) {
-                HorizontalDivider(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    color = MaterialTheme.colorScheme.outlineVariant,
-                )
+            AnimatedVisibility(
+                visible = rowVisible[index].value,
+                enter = fadeIn(animationSpec = tween(250)) + slideInVertically(
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessMediumLow,
+                    ),
+                    initialOffsetY = { -it },
+                ),
+            ) {
+                Column {
+                    if (index > 0) {
+                        HorizontalDivider(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            color = MaterialTheme.colorScheme.outlineVariant,
+                        )
+                    }
+                    SummaryRow(data = row)
+                }
             }
         }
     }
@@ -118,8 +162,8 @@ private fun SummaryCard(
 
 private data class SummaryRowData(
     val icon: ImageVector,
-    val iconBg: androidx.compose.ui.graphics.Color,
-    val iconTint: androidx.compose.ui.graphics.Color,
+    val iconBg: Color,
+    val iconTint: Color,
     val label: String,
     val value: String,
 )
@@ -165,14 +209,37 @@ private fun SummaryRow(
     }
 }
 
+private fun formatInterval(minutes: Int): String = when {
+    minutes < 60 -> "every $minutes min"
+    minutes % 60 == 0 -> "every ${minutes / 60}h"
+    else -> "every ${minutes / 60}h ${minutes % 60}min"
+}
 
 @DwPreview
 @Composable
 private fun StepDonePreview() {
     DrinkWaterAppTheme {
         StepDone(
+            step = 1,
             state = OnboardingFormState(
                 name = "Alex",
+                intervalMinutes = 45,
+                computedGoalMl = 2200,
+            ),
+            onStart = {},
+            onBack = {},
+        )
+    }
+}
+
+@DwPreview
+@Composable
+private fun StepDoneNoNamePreview() {
+    DrinkWaterAppTheme {
+        StepDone(
+            step = 1,
+            state = OnboardingFormState(
+                name = "",
                 intervalMinutes = 45,
                 computedGoalMl = 2200,
             ),

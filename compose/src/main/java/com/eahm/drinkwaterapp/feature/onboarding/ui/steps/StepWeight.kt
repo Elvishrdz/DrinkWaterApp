@@ -29,8 +29,9 @@ import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterDeep
-import com.eahm.drinkwaterapp.feature.onboarding.TOTAL_STEPS
+import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps
 import com.eahm.drinkwaterapp.feature.onboarding.WeightUnit
+import com.eahm.drinkwaterapp.feature.onboarding.totalSteps
 import com.eahm.drinkwaterapp.feature.onboarding.ui.icons.OnbIcons
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbArtCircle
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbShell
@@ -47,7 +48,7 @@ internal fun StepWeight(
 ) {
     OnbShell(
         step = 5,
-        total = TOTAL_STEPS,
+        total = OnboardingSteps.totalSteps,
         title = "What's your weight?",
         subtitle = "We use this to calculate your daily water goal.",
         art = { OnbArtCircle(icon = OnbIcons.Scale) },

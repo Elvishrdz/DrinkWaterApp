@@ -11,7 +11,8 @@ import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.feature.onboarding.ActivityLevel
-import com.eahm.drinkwaterapp.feature.onboarding.TOTAL_STEPS
+import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps
+import com.eahm.drinkwaterapp.feature.onboarding.totalSteps
 import com.eahm.drinkwaterapp.feature.onboarding.ui.components.ChoiceCard
 import com.eahm.drinkwaterapp.feature.onboarding.ui.icons.OnbIcons
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbArtCircle
@@ -39,7 +40,7 @@ internal fun StepActivity(
 ) {
     OnbShell(
         step = 6,
-        total = TOTAL_STEPS,
+        total = OnboardingSteps.totalSteps,
         title = "How active are you?",
         subtitle = "Active days need ~15% more water than rest days.",
         art = { OnbArtCircle(icon = OnbIcons.ActivityRun) },

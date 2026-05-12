@@ -37,7 +37,7 @@ private class DataStorePrefsStorage(
         DrinkSuggestion(6, 250f),
     )
 
-    private val firstSetupKey = booleanPreferencesKey("FIRST_SETUP")
+    private val onboardingCompletedKey = booleanPreferencesKey("ONBOARDING_COMPLETED")
     private val usernameKey = stringPreferencesKey("USERNAME")
     private val drinkSuggestionsKey = stringPreferencesKey("DRINKS_SUGGESTIONS")
     private val intervalKey = stringPreferencesKey("DRINKS_SUGGESTIONS")
@@ -51,17 +51,17 @@ private class DataStorePrefsStorage(
         ignoreUnknownKeys = true
     }
 
-    override fun getFirstSetupDone(): Flow<Boolean> {
+    override fun getOnboardingCompleted(): Flow<Boolean> {
         return dataStore.data.map { preferences ->
-            preferences[firstSetupKey] ?: false
+            preferences[onboardingCompletedKey] ?: false
         }
     }
 
-    override suspend fun setFirstSetupDone(value: Boolean) {
+    override suspend fun setOnboardingCompleted(value: Boolean) {
         dataStore.updateData { preferences ->
             preferences.toMutablePreferences()
                 .also {
-                    it[firstSetupKey] = value
+                    it[onboardingCompletedKey] = value
                 }
         }
     }
@@ -204,7 +204,7 @@ private class DataStorePrefsStorage(
 
     override suspend fun clear() {
         dataStore.edit {
-            it.remove(firstSetupKey)
+            it.remove(onboardingCompletedKey)
             it.remove(usernameKey)
             it.remove(drinkSuggestionsKey)
             it.remove(startTimeKey)

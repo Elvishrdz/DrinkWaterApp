@@ -51,6 +51,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -478,6 +479,13 @@ internal fun SettingsContent(
                     }
                 }
             }
+
+            item {
+                BuildInfoFooter(
+                    appVersion = state.appVersion,
+                    buildVariant = state.buildVariant,
+                )
+            }
         }
     }
 
@@ -877,6 +885,20 @@ private fun RowValueTrailing(value: String) {
 }
 
 @Composable
+private fun BuildInfoFooter(appVersion: String, buildVariant: String) {
+    Text(
+        text = "v$appVersion · $buildVariant",
+        fontFamily = JetBrainsMono,
+        fontSize = 11.sp,
+        color = DwInk400,
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 4.dp, bottom = 8.dp),
+    )
+}
+
+@Composable
 private fun RowChevronTrailing() {
     Icon(
         imageVector = DwIcons.ChevronRight,
@@ -934,4 +956,6 @@ private val settingsStateMock = SettingsState(
     startTime = null,
     endTime = null,
     goalReachedCelebrationsEnabled = false,
+    appVersion = "1.1.4-dev",
+    buildVariant = "debug",
 )

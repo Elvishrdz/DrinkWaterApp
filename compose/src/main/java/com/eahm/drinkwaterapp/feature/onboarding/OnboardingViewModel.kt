@@ -9,6 +9,7 @@ import com.eahm.drinkwaterapp.core.database.entity.DailyGoalEntity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
@@ -30,9 +31,32 @@ internal class OnboardingViewModel(
     fun onWeightChange(value: String) = _state.update { it.copy(weightValue = value) }
     fun onWeightUnitChange(unit: WeightUnit) = _state.update { it.copy(weightUnit = unit) }
     fun onActivitySelect(level: ActivityLevel) = _state.update { it.copy(activityLevel = level) }
-    fun onWakeTimeChange(time: OnbTimeSelection) = _state.update { it.copy(wakeTime = time) }
-    fun onSleepTimeChange(time: OnbTimeSelection) = _state.update { it.copy(sleepTime = time) }
-    fun onIntervalSelect(minutes: Int) = _state.update { it.copy(intervalMinutes = minutes) }
+    fun onWakeTimeChange(time: OnbTimeSelection) {
+        _state.update { it.copy(wakeTime = time) }
+        viewModelScope.launch { prefs.setStartTime(time.toActiveTime()) }
+    }
+
+    fun onSleepTimeChange(time: OnbTimeSelection) {
+        _state.update { it.copy(sleepTime = time) }
+        viewModelScope.launch { prefs.setEndTime(time.toActiveTime()) }
+    }
+
+    fun onIntervalSelect(minutes: Int) {
+        _state.update { it.copy(intervalMinutes = minutes) }
+        viewModelScope.launch {
+            prefs.setInterval(ActiveTime(hour = minutes / 60, minute = minutes % 60))
+        }
+    }
+
+    fun onNotifAmountChange(ml: Float) {
+        _state.update { it.copy(notifAmountMl = ml) }
+        viewModelScope.launch { prefs.setAmountPerDrink(ml) }
+    }
+
+    fun onComputedGoalChange(ml: Int) {
+        _state.update { it.copy(computedGoalMl = ml) }
+        viewModelScope.launch { upsertGoalForToday(ml) }
+    }
 
     fun computeGoal() {
         val s = _state.value
@@ -62,16 +86,23 @@ internal class OnboardingViewModel(
                     minute = s.intervalMinutes % 60,
                 )
             )
-            database.getDailyGoalDao().insert(
-                DailyGoalEntity(
-                    effectiveDate = Clock.System.now()
-                        .toLocalDateTime(TimeZone.currentSystemDefault())
-                        .date,
-                    goalMl = s.computedGoalMl.toFloat(),
-                )
-            )
-            prefs.setFirstSetupDone(true)
+            upsertGoalForToday(s.computedGoalMl)
+            prefs.setAmountPerDrink(s.notifAmountMl)
+            prefs.setOnboardingCompleted(true)
             onComplete()
+        }
+    }
+
+    private suspend fun upsertGoalForToday(ml: Int) {
+        val today = Clock.System.now()
+            .toLocalDateTime(TimeZone.currentSystemDefault())
+            .date
+        val dao = database.getDailyGoalDao()
+        val existing = dao.getGoalOnDate(today.toEpochDays()).first()
+        if (existing != null) {
+            dao.update(existing.copy(goalMl = ml.toFloat()))
+        } else {
+            dao.insert(DailyGoalEntity(effectiveDate = today, goalMl = ml.toFloat()))
         }
     }
 

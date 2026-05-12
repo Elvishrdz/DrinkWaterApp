@@ -1,76 +1,31 @@
 package com.eahm.drinkwaterapp.feature.onboarding.ui.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.StrokeJoin
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.path
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.anhaki.picktime.PickHourMinute
+import com.anhaki.picktime.utils.PickTimeFocusIndicator
+import com.anhaki.picktime.utils.PickTimeTextStyle
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterDeep
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterLight
 import com.eahm.drinkwaterapp.feature.onboarding.OnbTimeSelection
 
-private val ChevronUp: ImageVector by lazy {
-    ImageVector.Builder(
-        name = "OnbChevronUp",
-        defaultWidth = 24.dp, defaultHeight = 24.dp,
-        viewportWidth = 24f, viewportHeight = 24f,
-    ).apply {
-        path(
-            stroke = SolidColor(Color.Black),
-            strokeLineWidth = 2f,
-            strokeLineCap = StrokeCap.Round,
-            strokeLineJoin = StrokeJoin.Round,
-        ) { moveTo(6f, 15f); lineTo(12f, 9f); lineTo(18f, 15f) }
-    }.build()
-}
-
-private val ChevronDown: ImageVector by lazy {
-    ImageVector.Builder(
-        name = "OnbChevronDown",
-        defaultWidth = 24.dp, defaultHeight = 24.dp,
-        viewportWidth = 24f, viewportHeight = 24f,
-    ).apply {
-        path(
-            stroke = SolidColor(Color.Black),
-            strokeLineWidth = 2f,
-            strokeLineCap = StrokeCap.Round,
-            strokeLineJoin = StrokeJoin.Round,
-        ) { moveTo(6f, 9f); lineTo(12f, 15f); lineTo(18f, 9f) }
-    }.build()
-}
-
 /**
- * A tactile time-picker wheel showing hour : minute with an AM / PM toggle.
+ * Scrollable time-picker wheel showing hour : minute.
  *
- * Hours cycle 1–12; minutes step in 5-minute increments.
- * Matches the design-system TimeWheel component from Onboarding.jsx.
+ * Displays in 24-hour format (0–23) and converts to/from [OnbTimeSelection] (12-hour + AM/PM).
  */
 @Composable
 internal fun OnbTimeWheel(
@@ -78,134 +33,43 @@ internal fun OnbTimeWheel(
     onTimeChange: (OnbTimeSelection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center,
-    ) {
-        // Hour spinner
-        TimeSpinnerCell(
-            value = time.hour.toString().padStart(2, '0'),
-            onIncrement = {
-                val next = if (time.hour >= 12) 1 else time.hour + 1
-                onTimeChange(time.copy(hour = next))
+    Box(modifier = modifier, contentAlignment = Alignment.Center) {
+        PickHourMinute(
+            initialHour = time.toHour24(),
+            onHourChange = { newHour24 ->
+                val isPm = newHour24 >= 12
+                val hour12 = when {
+                    newHour24 == 0 -> 12
+                    newHour24 > 12 -> newHour24 - 12
+                    else -> newHour24
+                }
+                onTimeChange(time.copy(hour = hour12, isPm = isPm))
             },
-            onDecrement = {
-                val prev = if (time.hour <= 1) 12 else time.hour - 1
-                onTimeChange(time.copy(hour = prev))
+            initialMinute = time.minute,
+            onMinuteChange = { newMinute ->
+                onTimeChange(time.copy(minute = newMinute))
             },
+            containerColor = Color.Transparent,
+            focusIndicator = PickTimeFocusIndicator(
+                enabled = true,
+                widthFull = false,
+                background = MaterialTheme.colorScheme.surface,
+                shape = RoundedCornerShape(12.dp),
+                border = BorderStroke(1.5.dp, DwWater),
+            ),
+            selectedTextStyle = PickTimeTextStyle(
+                color = MaterialTheme.colorScheme.onSurface,
+                fontSize = 24.sp,
+                fontFamily = FontFamily.Default,
+                fontWeight = FontWeight.Bold,
+            ),
+            unselectedTextStyle = PickTimeTextStyle(
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.35f),
+                fontSize = 18.sp,
+                fontFamily = FontFamily.Default,
+                fontWeight = FontWeight.Normal,
+            ),
         )
-
-        TimeSeparator()
-
-        // Minute spinner (5-min steps)
-        TimeSpinnerCell(
-            value = time.minute.toString().padStart(2, '0'),
-            onIncrement = {
-                val next = (time.minute + 5) % 60
-                onTimeChange(time.copy(minute = next))
-            },
-            onDecrement = {
-                val prev = (time.minute - 5 + 60) % 60
-                onTimeChange(time.copy(minute = prev))
-            },
-        )
-
-        Spacer(Modifier.width(16.dp))
-
-        // AM / PM toggle
-        AmPmToggle(
-            isPm = time.isPm,
-            onToggle = { isPm -> onTimeChange(time.copy(isPm = isPm)) },
-        )
-    }
-}
-
-@Composable
-private fun TimeSpinnerCell(
-    value: String,
-    onIncrement: () -> Unit,
-    onDecrement: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val numGradient = Brush.verticalGradient(listOf(DwWaterLight, DwWater, DwWaterDeep))
-
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        IconButton(onClick = onIncrement, modifier = Modifier.size(40.dp)) {
-            Icon(
-                imageVector = ChevronUp,
-                contentDescription = "Increment",
-                tint = MaterialTheme.colorScheme.secondary,
-                modifier = Modifier.size(20.dp),
-            )
-        }
-
-        Box(
-            modifier = Modifier
-                .size(width = 72.dp, height = 64.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(numGradient),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = value,
-                style = MaterialTheme.typography.displaySmall,
-                color = Color.White,
-            )
-        }
-
-        IconButton(onClick = onDecrement, modifier = Modifier.size(40.dp)) {
-            Icon(
-                imageVector = ChevronDown,
-                contentDescription = "Decrement",
-                tint = MaterialTheme.colorScheme.secondary,
-                modifier = Modifier.size(20.dp),
-            )
-        }
-    }
-}
-
-@Composable
-private fun TimeSeparator() {
-    Text(
-        text = ":",
-        style = MaterialTheme.typography.headlineLarge,
-        color = MaterialTheme.colorScheme.secondary,
-        modifier = Modifier.padding(horizontal = 4.dp),
-    )
-}
-
-@Composable
-private fun AmPmToggle(
-    isPm: Boolean,
-    onToggle: (Boolean) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(6.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        listOf(false to "AM", true to "PM").forEach { (pm, label) ->
-            val active = isPm == pm
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelLarge,
-                color = if (active) MaterialTheme.colorScheme.secondary
-                else MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .background(
-                        if (active) MaterialTheme.colorScheme.secondaryContainer
-                        else Color.Transparent,
-                    )
-                    .clickable { onToggle(pm) }
-                    .padding(horizontal = 14.dp, vertical = 8.dp),
-            )
-        }
     }
 }
 

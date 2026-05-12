@@ -1,57 +1,202 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.eahm.drinkwaterapp.feature.onboarding.ui.steps
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
+import com.eahm.drinkwaterapp.core.designsystem.component.button.DwSecondaryButton
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
-import com.eahm.drinkwaterapp.feature.onboarding.TOTAL_STEPS
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
+import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
+import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
+import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps
+import com.eahm.drinkwaterapp.feature.onboarding.totalSteps
+import com.eahm.drinkwaterapp.feature.onboarding.ui.components.DwPrimaryButtonAnimated
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbArtCircle
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbShell
 
-/** Step 2 — Notifications permission. */
+private const val AMOUNT_STEP = 50
+private const val AMOUNT_MIN = 50
+private const val AMOUNT_MAX = 500
+
+/**
+ * Unified notification onboarding step — two designs in one composable.
+ *
+ * Internal flow:
+ *  - Already has permission  → Config UI directly
+ *  - No permission           → Permission UI
+ *      → Allow granted       → Config UI
+ *      → Skip / deny         → [onSkip] (bypasses Config)
+ */
 @Composable
 internal fun StepNotifs(
+    step: Int,
+    intervalMinutes: Int,
+    notifAmountMl: Float,
+    onAmountChange: (Float) -> Unit,
+    onNext: () -> Unit,
+    onSkip: () -> Unit,
+    onBack: () -> Unit,
+) {
+    val context = LocalContext.current
+
+    // Computed once: did the user already have permission when landing on this step?
+    val startedWithPermission = remember {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ContextCompat.checkSelfPermission(
+                context, Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+        } else {
+            true
+        }
+    }
+
+    var showConfig by rememberSaveable { mutableStateOf(startedWithPermission) }
+    var showDeniedDialog by rememberSaveable { mutableStateOf(false) }
+
+    // Local stepper state — initialized from ViewModel, flushed to VM on Continue
+    var localAmount by rememberSaveable {
+        mutableIntStateOf(
+            notifAmountMl.toInt()
+                .coerceIn(AMOUNT_MIN, AMOUNT_MAX)
+                .let { it - (it % AMOUNT_STEP) }
+                .coerceAtLeast(AMOUNT_MIN)
+        )
+    }
+
+    val notifLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+    ) { isGranted ->
+        if (isGranted) showConfig = true else showDeniedDialog = true
+    }
+
+    fun requestPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            notifLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            showConfig = true
+        }
+    }
+
+    // ── UI selection ──────────────────────────────────────────────────────────
+    if (showConfig) {
+        NotifsConfigContent(
+            step = step,
+            localAmount = localAmount,
+            onDecrement = { localAmount = (localAmount - AMOUNT_STEP).coerceAtLeast(AMOUNT_MIN) },
+            onIncrement = { localAmount = (localAmount + AMOUNT_STEP).coerceAtMost(AMOUNT_MAX) },
+            // Back from config: go to permission UI if we came from there, else prev step
+            onBack = if (startedWithPermission) onBack else ({ showConfig = false }),
+            onContinue = {
+                onAmountChange(localAmount.toFloat())
+                onNext()
+            },
+        )
+    } else {
+        NotifsPermissionContent(
+            step = step,
+            intervalMinutes = intervalMinutes,
+            onAllow = { requestPermission() },
+            onSkip = onSkip,
+            onBack = onBack,
+        )
+    }
+
+    // ── Permission denied dialog ──────────────────────────────────────────────
+    if (showDeniedDialog) {
+        NotifsDeniedDialog(
+            onGoToSettings = {
+                showDeniedDialog = false
+                val intent = Intent().apply {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
+                        putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                    } else {
+                        action = "android.settings.APP_NOTIFICATION_SETTINGS"
+                        putExtra("app_package", context.packageName)
+                        putExtra("app_uid", context.applicationInfo.uid)
+                    }
+                }
+                context.startActivity(intent)
+            },
+            onDismiss = {
+                showDeniedDialog = false
+            },
+        )
+    }
+}
+
+// ── Design 1: Permission ──────────────────────────────────────────────────────
+
+@Composable
+private fun NotifsPermissionContent(
+    step: Int,
+    intervalMinutes: Int,
     onAllow: () -> Unit,
     onSkip: () -> Unit,
     onBack: () -> Unit,
 ) {
+    val intervalLabel = formatIntervalLabel(intervalMinutes)
+
     OnbShell(
-        step = 2,
-        total = TOTAL_STEPS,
+        step = step,
+        total = OnboardingSteps.totalSteps,
         title = "Stay on track",
-        subtitle = "We'll send a gentle reminder every 45 minutes so you never forget to hydrate.",
+        subtitle = "We'll send a gentle reminder every $intervalLabel so you never forget to hydrate.",
         art = { OnbArtCircle(icon = DwIcons.Bell) },
         onBack = onBack,
         footer = {
-            DwPrimaryButton(
-                text = "Allow notifications",
-                onClick = onAllow,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            Spacer(Modifier.height(8.dp))
             TextButton(
                 onClick = onSkip,
                 modifier = Modifier.fillMaxWidth(),
@@ -62,6 +207,12 @@ internal fun StepNotifs(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
+            Spacer(Modifier.height(8.dp))
+            DwPrimaryButton(
+                text = "Allow notifications",
+                onClick = onAllow,
+                modifier = Modifier.fillMaxWidth(),
+            )
         },
     ) {
         PermissionCard()
@@ -104,11 +255,240 @@ private fun PermissionCard() {
     }
 }
 
+// ── Design 2: Config ─────────────────────────────────────────────────────────
+
+@Composable
+private fun NotifsConfigContent(
+    step: Int,
+    localAmount: Int,
+    onDecrement: () -> Unit,
+    onIncrement: () -> Unit,
+    onBack: () -> Unit,
+    onContinue: () -> Unit,
+) {
+    OnbShell(
+        step = step,
+        total = OnboardingSteps.totalSteps,
+        title = "Notification amount",
+        subtitle = "We'll log this amount each time you tap drink from a reminder.",
+        art = { OnbArtCircle(icon = DwIcons.Glass) },
+        onBack = onBack,
+        footer = {
+            DwPrimaryButtonAnimated(
+                text = "Continue",
+                onClick = onContinue,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        },
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            AmountStepper(
+                value = localAmount,
+                isAtMin = localAmount <= AMOUNT_MIN,
+                isAtMax = localAmount >= AMOUNT_MAX,
+                onDecrement = onDecrement,
+                onIncrement = onIncrement,
+            )
+            Spacer(Modifier.height(16.dp))
+            Text(
+                text = "Amount logged when tapping drink in the notification",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            )
+        }
+    }
+}
+
+@Composable
+private fun AmountStepper(
+    value: Int,
+    isAtMin: Boolean,
+    isAtMax: Boolean,
+    onDecrement: () -> Unit,
+    onIncrement: () -> Unit,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        AmountStepperButton(enabled = !isAtMin, onClick = onDecrement) {
+            Box(
+                modifier = Modifier
+                    .size(width = 16.dp, height = 2.5.dp)
+                    .clip(RoundedCornerShape(2.dp))
+                    .background(if (!isAtMin) DwWater else DwWater.copy(alpha = 0.4f)),
+            )
+        }
+
+        Spacer(Modifier.width(32.dp))
+
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "$value",
+                fontFamily = Nunito,
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 56.sp,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Text(
+                text = "ml",
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Normal,
+                fontSize = 16.sp,
+                color = DwInk400,
+            )
+        }
+
+        Spacer(Modifier.width(32.dp))
+
+        AmountStepperButton(enabled = !isAtMax, onClick = onIncrement) {
+            Icon(
+                imageVector = DwIcons.Plus,
+                contentDescription = "Increase",
+                tint = if (!isAtMax) DwWater else DwWater.copy(alpha = 0.4f),
+                modifier = Modifier.size(22.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun AmountStepperButton(
+    enabled: Boolean,
+    onClick: () -> Unit,
+    content: @Composable () -> Unit,
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .size(56.dp)
+            .clip(CircleShape)
+            .background(if (enabled) DwTintWater else DwTintWater.copy(alpha = 0.5f))
+            .clickable(enabled = enabled, onClick = onClick),
+    ) {
+        content()
+    }
+}
+
+// ── Denial dialog ─────────────────────────────────────────────────────────────
+
+@Composable
+private fun NotifsDeniedDialog(
+    onGoToSettings: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    BasicAlertDialog(onDismissRequest = onDismiss) {
+        Column(
+            modifier = Modifier
+                .clip(RoundedCornerShape(20.dp))
+                .background(MaterialTheme.colorScheme.background)
+                .padding(24.dp),
+        ) {
+            Text(
+                text = "Notifications disabled",
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+            Spacer(Modifier.height(10.dp))
+            Text(
+                text = "To receive drink reminders, please enable notifications for DrinkWater in your phone's Settings.",
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp,
+                color = DwInk500,
+            )
+            Spacer(Modifier.height(24.dp))
+            DwPrimaryButton(
+                text = "Open Settings",
+                onClick = onGoToSettings,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(Modifier.height(8.dp))
+            DwSecondaryButton(
+                text = "Cancel",
+                onClick = onDismiss,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+/** "45m", "1h", "1h 30m" */
+internal fun formatIntervalLabel(minutes: Int): String {
+    val h = minutes / 60
+    val m = minutes % 60
+    return buildString {
+        if (h > 0) append("${h}h ")
+        if (m > 0 || h == 0) append("${m}m")
+    }.trim()
+}
+
+// ── Previews ──────────────────────────────────────────────────────────────────
 
 @DwPreview
 @Composable
-private fun StepNotifsPreview() {
+private fun StepNotifsPermissionPreview() {
     DrinkWaterAppTheme {
-        StepNotifs(onAllow = {}, onSkip = {}, onBack = {})
+        NotifsPermissionContent(
+            step = 6,
+            intervalMinutes = 45,
+            onAllow = {},
+            onSkip = {},
+            onBack = {},
+        )
+    }
+}
+
+@DwPreview
+@Composable
+private fun StepNotifsPermissionCustomIntervalPreview() {
+    DrinkWaterAppTheme {
+        NotifsPermissionContent(
+            step = 6,
+            intervalMinutes = 90,
+            onAllow = {},
+            onSkip = {},
+            onBack = {},
+        )
+    }
+}
+
+@DwPreview
+@Composable
+private fun StepNotifsConfigPreview() {
+    DrinkWaterAppTheme {
+        NotifsConfigContent(
+            step = 6,
+            localAmount = 150,
+            onDecrement = {},
+            onIncrement = {},
+            onBack = {},
+            onContinue = {},
+        )
+    }
+}
+
+@DwPreview
+@Composable
+private fun StepNotifsConfigAtMinPreview() {
+    DrinkWaterAppTheme {
+        NotifsConfigContent(
+            step = 6,
+            localAmount = AMOUNT_MIN,
+            onDecrement = {},
+            onIncrement = {},
+            onBack = {},
+            onContinue = {},
+        )
     }
 }

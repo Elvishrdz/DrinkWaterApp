@@ -1,0 +1,89 @@
+package com.eahm.drinkwaterapp.feature.onboarding.ui.steps
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
+import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
+import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
+import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps
+import com.eahm.drinkwaterapp.feature.onboarding.totalSteps
+import com.eahm.drinkwaterapp.feature.onboarding.ui.components.DwPrimaryButtonAnimated
+import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbArtCircle
+import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbShell
+import com.eahm.drinkwaterapp.feature.settings.ui.GOAL_MAX
+import com.eahm.drinkwaterapp.feature.settings.ui.GOAL_MIN
+import com.eahm.drinkwaterapp.feature.settings.ui.GOAL_STEP
+import com.eahm.drinkwaterapp.feature.settings.ui.GoalStepperRow
+
+@Composable
+internal fun StepSetGoal(
+    step: Int,
+    goalMl: Int,
+    onGoalChanged: (Int) -> Unit,
+    onNext: () -> Unit,
+    onBack: () -> Unit,
+) {
+    var currentGoal by remember { mutableIntStateOf(goalMl.coerceIn(GOAL_MIN, GOAL_MAX)) }
+
+    OnbShell(
+        step = step,
+        total = OnboardingSteps.totalSteps,
+        title = "Set your daily goal",
+        subtitle = "Define what you want to achieve per day.",
+        art = { OnbArtCircle(icon = DwIcons.Drop) },
+        onBack = onBack,
+        footer = {
+            DwPrimaryButtonAnimated(
+                text = "Set my goal",
+                onClick = onNext,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        },
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            GoalStepperRow(
+                value = currentGoal,
+                onDecrement = {
+                    val next = (currentGoal - GOAL_STEP).coerceAtLeast(GOAL_MIN)
+                    currentGoal = next
+                    onGoalChanged(next)
+                },
+                onIncrement = {
+                    val next = (currentGoal + GOAL_STEP).coerceAtMost(GOAL_MAX)
+                    currentGoal = next
+                    onGoalChanged(next)
+                },
+            )
+        }
+    }
+}
+
+@DwPreview
+@Composable
+private fun StepSetGoalPreview() {
+    DrinkWaterAppTheme {
+        StepSetGoal(
+            step = 1,
+            goalMl = 2200,
+            onGoalChanged = {},
+            onNext = {},
+            onBack = {},
+        )
+    }
+}

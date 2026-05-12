@@ -10,7 +10,8 @@ import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.feature.onboarding.Gender
-import com.eahm.drinkwaterapp.feature.onboarding.TOTAL_STEPS
+import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps
+import com.eahm.drinkwaterapp.feature.onboarding.totalSteps
 import com.eahm.drinkwaterapp.feature.onboarding.ui.components.ChoiceCard
 import com.eahm.drinkwaterapp.feature.onboarding.ui.icons.OnbIcons
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbArtCircle
@@ -26,7 +27,7 @@ internal fun StepGender(
 ) {
     OnbShell(
         step = 4,
-        total = TOTAL_STEPS,
+        total = OnboardingSteps.totalSteps,
         title = "A bit about you",
         subtitle = "Helps us refine your hydration formula. You can skip this.",
         art = { OnbArtCircle(icon = OnbIcons.Person) },

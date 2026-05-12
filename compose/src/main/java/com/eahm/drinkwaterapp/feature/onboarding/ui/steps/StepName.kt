@@ -13,7 +13,8 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
-import com.eahm.drinkwaterapp.feature.onboarding.TOTAL_STEPS
+import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps
+import com.eahm.drinkwaterapp.feature.onboarding.totalSteps
 import com.eahm.drinkwaterapp.feature.onboarding.ui.icons.OnbIcons
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbArtCircle
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbShell
@@ -21,14 +22,15 @@ import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbShell
 /** Step 3 — Name input. */
 @Composable
 internal fun StepName(
+    step: Int,
     name: String,
     onNameChange: (String) -> Unit,
     onNext: () -> Unit,
     onBack: () -> Unit,
 ) {
     OnbShell(
-        step = 3,
-        total = TOTAL_STEPS,
+        step = step,
+        total = OnboardingSteps.totalSteps,
         title = "What's your name?",
         subtitle = "We'll use it to greet you on the home screen.",
         art = { OnbArtCircle(icon = OnbIcons.Person) },
@@ -72,6 +74,12 @@ internal fun StepName(
 @Composable
 private fun StepNamePreview() {
     DrinkWaterAppTheme {
-        StepName(name = "Alex", onNameChange = {}, onNext = {}, onBack = {})
+        StepName(
+            step = 1,
+            name = "Alex",
+            onNameChange = {},
+            onNext = {},
+            onBack = {},
+        )
     }
 }

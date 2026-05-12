@@ -34,7 +34,8 @@ class MainViewModel(
         viewModelScope.launch {
             state.update {
                 MainState.Ready(
-                    onboardingCompleted = prefsStorage.getFirstSetupDone().firstOrNull() ?: false,
+                    onboardingCompleted = prefsStorage.getOnboardingCompleted().firstOrNull()
+                        ?: false,
                 )
             }
         }

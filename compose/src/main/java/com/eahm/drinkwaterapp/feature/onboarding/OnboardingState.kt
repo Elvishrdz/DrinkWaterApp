@@ -2,7 +2,6 @@ package com.eahm.drinkwaterapp.feature.onboarding
 
 import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
 
-internal const val TOTAL_STEPS = 11
 
 internal enum class Gender { FEMALE, MALE, PREFER_NOT_TO_SAY }
 internal enum class WeightUnit { LB, KG }
@@ -41,4 +40,41 @@ internal data class OnboardingFormState(
     val sleepTime: OnbTimeSelection = OnbTimeSelection(hour = 10, minute = 0, isPm = true),
     val intervalMinutes: Int = 45,
     val computedGoalMl: Int = 2000,
+    val notifAmountMl: Float = 150f,
 )
+
+sealed interface OnboardingSteps {
+
+    data object Intro : OnboardingSteps
+    data object DailyGoal : OnboardingSteps
+
+    sealed interface RemindersSteps : OnboardingSteps {
+        data object StartTime : RemindersSteps
+        data object EndTime : RemindersSteps
+        data object Interval : RemindersSteps
+        data object Notification : RemindersSteps
+    }
+
+    data object Celebrations : OnboardingSteps
+
+    data object Summary : OnboardingSteps
+
+    companion object
+}
+
+
+internal val OnboardingSteps.Companion.totalSteps: Int get() = 8
+
+fun OnboardingSteps.Companion.byStep(step: Int) = when (step) {
+    1 -> OnboardingSteps.Intro
+    2 -> OnboardingSteps.DailyGoal
+
+    3 -> OnboardingSteps.RemindersSteps.StartTime
+    4 -> OnboardingSteps.RemindersSteps.EndTime
+    5 -> OnboardingSteps.RemindersSteps.Interval
+    6 -> OnboardingSteps.RemindersSteps.Notification
+    7 -> OnboardingSteps.Celebrations
+
+    totalSteps -> OnboardingSteps.Summary
+    else -> OnboardingSteps.Intro
+}

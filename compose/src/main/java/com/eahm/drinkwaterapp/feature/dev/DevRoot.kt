@@ -60,9 +60,9 @@ import com.eahm.drinkwaterapp.feature.dev.alarmintervals.AlarmIntervalsRoot
 import com.eahm.drinkwaterapp.feature.dev.alarms.AlarmsRoot
 import com.eahm.drinkwaterapp.feature.dev.dailygoal.DailyGoalDevRoot
 import com.eahm.drinkwaterapp.feature.dev.notifications.NotificationsRoot
+import com.eahm.drinkwaterapp.feature.dev.onboarding.OnboardingDevRoot
 import com.eahm.drinkwaterapp.feature.dev.streak.StreakDevRoot
 import com.eahm.drinkwaterapp.feature.dev.ui.Adaptive
-import com.eahm.drinkwaterapp.feature.onboarding.OnboardingScreen
 import com.eahm.drinkwaterapp.ui.drinkbutton.DrinkButton
 import com.eahm.drinkwaterapp.ui.drinks.BubbleConfig
 import com.eahm.drinkwaterapp.ui.drinks.DrinkAppearance
@@ -179,8 +179,8 @@ internal fun DevRoot(onBackClicked: () -> Unit) {
                 onBackClicked = onBackClicked,
             )
 
-            DevDestination.ONBOARDING -> OnboardingScreen(
-                onComplete = onBackClicked,
+            DevDestination.ONBOARDING -> OnboardingDevRoot(
+                onBackClicked = onBackClicked,
             )
         }
     }
