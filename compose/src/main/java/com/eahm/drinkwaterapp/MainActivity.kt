@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
-        splashScreen.setKeepOnScreenCondition { viewModel.state.value is MainState.Ready }
+        splashScreen.setKeepOnScreenCondition { viewModel.state.value is MainState.Startup }
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         handleNotificationIntentOnCreate(intent)
