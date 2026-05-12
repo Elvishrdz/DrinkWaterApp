@@ -1,9 +1,9 @@
 Development
 
 To Complete
-- adjust notification messages
+- [x] Adjust notification messages 
+- [] onboarding
 - adjust celebration
-- onboarding
 - analytics
 - ads
 - paid version
