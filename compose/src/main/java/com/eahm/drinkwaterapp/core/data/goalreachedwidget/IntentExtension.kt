@@ -1,0 +1,13 @@
+package com.eahm.drinkwaterapp.core.data.goalreachedwidget
+
+import android.content.Intent
+import android.os.Build
+
+internal fun Intent.getSerializableCelebrationStyle(name: String): CelebrationStyle? {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        getSerializableExtra(name, CelebrationStyle::class.java)
+    } else {
+        @Suppress("DEPRECATION")
+        getSerializableExtra(name) as? CelebrationStyle
+    }
+}

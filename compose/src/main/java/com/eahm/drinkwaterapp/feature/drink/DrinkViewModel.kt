@@ -1,7 +1,6 @@
 package com.eahm.drinkwaterapp.feature.drink
 
 import android.app.Application
-import android.content.Intent
 import android.provider.Settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,7 +10,9 @@ import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStatsObserver
+import com.eahm.drinkwaterapp.core.data.goalreachedwidget.CelebrationStyle
 import com.eahm.drinkwaterapp.core.data.goalreachedwidget.GoalReachedWidget
+import com.eahm.drinkwaterapp.core.data.goalreachedwidget.createIntent
 import com.eahm.drinkwaterapp.core.data.streak.StreakRepository
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
@@ -248,11 +249,13 @@ internal class DrinkViewModel(
     private suspend fun displayGoalReachedOverlay() {
         if (Settings.canDrawOverlays(application)) {
             val currentState = state.value as? DrinkState.Data
-            val intent = Intent(application, GoalReachedWidget::class.java).apply {
-                putExtra("goalMl", currentState?.drinkStats?.goalAmount ?: 2400f)
-                putExtra("drinkCount", records.value.size.coerceAtLeast(1))
-                putExtra("streakDays", streakRepository.streakData.firstOrNull()?.goalStreakDays)
-            }
+            val intent = GoalReachedWidget.createIntent(
+                context = application,
+                style = CelebrationStyle.Ocean,
+                goalMl = currentState?.drinkStats?.goalAmount ?: 2400f,
+                drinkCount = records.value.size.coerceAtLeast(1),
+                streakDays = streakRepository.streakData.firstOrNull()?.goalStreakDays ?: 0,
+            )
             application.startService(intent)
         }
     }

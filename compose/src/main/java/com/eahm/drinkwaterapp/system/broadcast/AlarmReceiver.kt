@@ -10,7 +10,9 @@ import com.eahm.drinkwaterapp.core.data.datastore.initialAmountPerDrink
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStatsObserver
+import com.eahm.drinkwaterapp.core.data.goalreachedwidget.CelebrationStyle
 import com.eahm.drinkwaterapp.core.data.goalreachedwidget.GoalReachedWidget
+import com.eahm.drinkwaterapp.core.data.goalreachedwidget.createIntent
 import com.eahm.drinkwaterapp.core.data.systemnotifications.NotificationService
 import com.eahm.drinkwaterapp.core.data.systemnotifications.model.Drink
 import com.eahm.drinkwaterapp.core.data.systemnotifications.model.NotificationRemoved
@@ -119,12 +121,15 @@ class AlarmReceiver : BroadcastReceiver() {
                     end = today.toEndOfDayTime,
                 ).first().size
 
-                val serviceIntent = Intent(context, GoalReachedWidget::class.java).apply {
-                    putExtra("goalMl", statsBefore.goalAmount)
-                    putExtra("drinkCount", drinkCount.coerceAtLeast(1))
-                    putExtra("streakDays", 1)
-                }
-                context.startService(serviceIntent)
+                val intent = GoalReachedWidget.createIntent(
+                    context = context,
+                    style = CelebrationStyle.Ocean,
+                    goalMl = statsBefore.goalAmount,
+                    drinkCount = drinkCount.coerceAtLeast(1),
+                    streakDays = 0,
+                )
+
+                context.startService(intent)
             }
         }
 
