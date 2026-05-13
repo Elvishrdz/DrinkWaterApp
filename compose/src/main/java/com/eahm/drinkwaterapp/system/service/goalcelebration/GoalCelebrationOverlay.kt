@@ -98,7 +98,7 @@ class GoalCelebrationOverlay : Service(),
                             streakDays = streakDaysState.intValue,
                             draggable = true,
                             dragConstraints = DragConstraints(
-                                top = 0.dp,
+                                top = 5.dp,
                                 bottom = 30.dp,
                                 start = 7.dp,
                                 end = 7.dp,
