@@ -51,7 +51,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -79,6 +78,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.JetBrainsMono
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
+import com.eahm.drinkwaterapp.core.presentation.composable.BuildInfoFooter
 import com.eahm.drinkwaterapp.feature.settings.ui.EditButton
 import com.eahm.drinkwaterapp.feature.settings.ui.GoalBottomSheet
 import com.eahm.drinkwaterapp.feature.settings.ui.IntervalBottomSheet
@@ -182,7 +182,6 @@ internal fun SettingsScreen(
         context.startActivity(intent)
     }
 
-    // ── Content ───────────────────────────────────────────────────────────────
     SettingsContent(
         state = state,
         onNotificationsToggled = ::handleNotificationToggle,
@@ -882,20 +881,6 @@ private fun RowValueTrailing(value: String) {
             modifier = Modifier.size(16.dp),
         )
     }
-}
-
-@Composable
-private fun BuildInfoFooter(appVersion: String, buildVariant: String) {
-    Text(
-        text = "v$appVersion · $buildVariant",
-        fontFamily = JetBrainsMono,
-        fontSize = 11.sp,
-        color = DwInk400,
-        textAlign = TextAlign.Center,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 4.dp, bottom = 8.dp),
-    )
 }
 
 @Composable

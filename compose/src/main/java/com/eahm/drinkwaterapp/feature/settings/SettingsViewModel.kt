@@ -37,9 +37,9 @@ internal class SettingsViewModel(
     val database: AppDatabase,
     val prefsStorage: PrefsStorage,
     val drinkAlarmManager: DrinkAlarmManager,
-    val dateTimeZoneChangedObserver: DateTimeZoneChangedObserver,
+    dateTimeZoneChangedObserver: DateTimeZoneChangedObserver,
     notificationPermissionObserver: NotificationPermissionObserver,
-    val appInfoService: AppInfoService,
+    appInfoService: AppInfoService,
 ) : ViewModel() {
 
     private val dao = database.getDailyGoalDao()

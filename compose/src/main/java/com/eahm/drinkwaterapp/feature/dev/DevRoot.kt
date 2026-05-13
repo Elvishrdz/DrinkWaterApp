@@ -10,9 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -39,14 +36,12 @@ import com.eahm.drinkwaterapp.core.bindings.toEntity
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStats
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
-import com.eahm.drinkwaterapp.core.designsystem.component.card.MiniCard
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk200
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTeal
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTealDark
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwTealSoft
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 import com.eahm.drinkwaterapp.core.domain.mock.Mock
@@ -60,6 +55,7 @@ import com.eahm.drinkwaterapp.feature.dev.alarmintervals.AlarmIntervalsRoot
 import com.eahm.drinkwaterapp.feature.dev.alarms.AlarmsRoot
 import com.eahm.drinkwaterapp.feature.dev.celebrations.CelebrationsRoot
 import com.eahm.drinkwaterapp.feature.dev.dailygoal.DailyGoalDevRoot
+import com.eahm.drinkwaterapp.feature.dev.menu.DevMenuRoot
 import com.eahm.drinkwaterapp.feature.dev.notifications.NotificationsRoot
 import com.eahm.drinkwaterapp.feature.dev.onboarding.OnboardingDevRoot
 import com.eahm.drinkwaterapp.feature.dev.streak.StreakDevRoot
@@ -145,7 +141,7 @@ internal fun DevRoot(onBackClicked: () -> Unit) {
         }
     ) {
         when (currentDestination) {
-            DevDestination.MENU -> MenuRoot(
+            DevDestination.MENU -> DevMenuRoot(
                 onMenuSelected = { currentDestination = it },
             )
 
@@ -188,31 +184,6 @@ internal fun DevRoot(onBackClicked: () -> Unit) {
             DevDestination.CELEBRATIONS -> CelebrationsRoot(
                 onBackClicked = onBackClicked,
             )
-        }
-    }
-}
-
-@Composable
-private fun MenuRoot(
-    onMenuSelected: (DevDestination) -> Unit
-) {
-    Scaffold { innerPadding ->
-        LazyVerticalGrid(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            columns = GridCells.Adaptive(70.dp),
-        ) {
-            items(DevDestination.entries.filterNot { it == DevDestination.MENU }) {
-                MiniCard(
-                    icon = it.icon,
-                    iconBg = DwTealSoft,
-                    iconTint = DwTealDark,
-                    value = "",
-                    label = it.label,
-                    onClick = { onMenuSelected(it) },
-                )
-            }
         }
     }
 }

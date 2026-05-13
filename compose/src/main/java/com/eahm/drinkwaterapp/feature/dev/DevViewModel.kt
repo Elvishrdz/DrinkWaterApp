@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.core.bindings.toUI
+import com.eahm.drinkwaterapp.core.config.AppInfoService
 import com.eahm.drinkwaterapp.core.data.confetti.ConfettiController
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
@@ -49,6 +50,7 @@ internal class DevViewModel(
     val drinkAlarmManager: DrinkAlarmManager,
     val database: AppDatabase,
     val confettiController: ConfettiController,
+    val appInfoService: AppInfoService,
 ) : ViewModel() {
 
     private val dao = database.getHistoryDao()
@@ -185,6 +187,8 @@ internal class DevViewModel(
                 isAlarmActive = drinkAlarmState.active,
                 alarmInterval = drinkAlarmState.interval,
                 confettiButtonEnabled = !confettiActive,
+                appVersionName = appInfoService.versionName,
+                appBuildVariant = appInfoService.buildVariant,
             )
         }
 

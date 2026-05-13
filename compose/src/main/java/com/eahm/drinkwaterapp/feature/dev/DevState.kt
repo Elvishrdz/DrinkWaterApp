@@ -20,5 +20,7 @@ internal sealed interface DevState {
         val isAlarmActive: Boolean,
         val alarmInterval: AlarmInterval,
         val confettiButtonEnabled: Boolean,
+        val appVersionName: String,
+        val appBuildVariant: String,
     ) : DevState
 }
