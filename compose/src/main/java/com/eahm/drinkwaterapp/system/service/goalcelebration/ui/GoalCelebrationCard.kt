@@ -46,6 +46,7 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -53,6 +54,8 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.graphics.shadow.Shadow
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -81,6 +84,7 @@ fun GoalCelebrationCard(
     modifier: Modifier = Modifier,
     showStreakDays: Boolean = true,
     showShareProgressButton: Boolean = true,
+    onBoundsInRoot: ((Rect) -> Unit)? = null,
 ) {
     val graphicsLayer = rememberGraphicsLayer()
     val coroutineScope = rememberCoroutineScope()
@@ -111,7 +115,10 @@ fun GoalCelebrationCard(
                 drawLayer(graphicsLayer)
             }
             .wrapContentSize()
-            .widthIn(max = 320.dp),
+            .widthIn(max = 320.dp)
+            // Placed after wrapContentSize so it reports the card's actual visual bounds,
+            // not the full-screen node that wrapContentSize reports to its parent.
+            .onGloballyPositioned { onBoundsInRoot?.invoke(it.boundsInRoot()) },
         shape = RoundedCornerShape(28.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
     ) {

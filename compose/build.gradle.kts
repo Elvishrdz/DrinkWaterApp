@@ -32,8 +32,9 @@ android {
             versionNameSuffix = "-dev"
             buildConfigField("boolean", "IS_DEV", "true")
             buildConfigField("boolean", "IS_STAGING", "false")
-            buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "true")
             buildConfigField("boolean", "LOGS_ENABLED", "true")
+            buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "true")
+            buildConfigField("boolean", "FEATURE_STREAKS", "false")
         }
 
         // QA / Internal Testing track — beta features on, no dev tools
@@ -43,8 +44,9 @@ android {
             versionNameSuffix = "-staging"
             buildConfigField("boolean", "IS_DEV", "false")
             buildConfigField("boolean", "IS_STAGING", "true")
-            buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "true")
             buildConfigField("boolean", "LOGS_ENABLED", "true")
+            buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "true")
+            buildConfigField("boolean", "FEATURE_STREAKS", "false")
         }
 
         // Closed testing, open testing and production track
@@ -56,8 +58,9 @@ android {
             )
             buildConfigField("boolean", "IS_DEV", "false")
             buildConfigField("boolean", "IS_STAGING", "false")
-            buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "false")
             buildConfigField("boolean", "LOGS_ENABLED", "false")
+            buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "false")
+            buildConfigField("boolean", "FEATURE_STREAKS", "false")
         }
     }
     compileOptions {

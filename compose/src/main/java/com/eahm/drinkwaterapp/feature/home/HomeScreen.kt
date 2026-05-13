@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.eahm.drinkwaterapp.core.config.BuildEnvironment
 import com.eahm.drinkwaterapp.core.data.confetti.ConfettiController
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -63,7 +64,13 @@ internal fun HomeScreen() {
     NavigationSuiteScaffold(
         navigationSuiteColors = suiteColors,
         navigationSuiteItems = {
-            HomeDestination.entries.forEach { destination ->
+            val menus = if (BuildEnvironment.isProduction) {
+                HomeDestination.entries.filterNot { it == HomeDestination.DEV }
+            } else {
+                HomeDestination.entries
+            }
+
+            menus.forEach { destination ->
                 item(
                     icon = {
                         Icon(

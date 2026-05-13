@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.eahm.drinkwaterapp.core.config.FeatureFlags
 import com.eahm.drinkwaterapp.core.designsystem.component.card.MiniCard
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -30,50 +31,52 @@ fun MiniStatsCards(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            MiniCard(
-                icon = DwIcons.Drop,
-                iconBg = DwTintWater,
-                iconTint = DwWater,
-                value = drinkStreakDays.toString(),
-                label = "Drink streak",
-                modifier = Modifier.weight(1f),
-            )
-            bestDrinkStreakDays?.let {
+        if (FeatureFlags.streakFeatureEnabled) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
                 MiniCard(
-                    icon = DwIcons.Star,
-                    iconBg = DwTintMagenta,
-                    iconTint = DwMagenta,
-                    value = it.toString(),
-                    label = "Best streak",
+                    icon = DwIcons.Drop,
+                    iconBg = DwTintWater,
+                    iconTint = DwWater,
+                    value = drinkStreakDays.toString(),
+                    label = "Drink streak",
                     modifier = Modifier.weight(1f),
                 )
+                bestDrinkStreakDays?.let {
+                    MiniCard(
+                        icon = DwIcons.Star,
+                        iconBg = DwTintMagenta,
+                        iconTint = DwMagenta,
+                        value = it.toString(),
+                        label = "Best streak",
+                        modifier = Modifier.weight(1f),
+                    )
+                }
             }
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            MiniCard(
-                icon = DwIcons.Star,
-                iconBg = DwTintWater,
-                iconTint = DwWater,
-                value = goalStreakDays.toString(),
-                label = "Goal streak",
-                modifier = Modifier.weight(1f),
-            )
-            bestGoalStreakDays?.let {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
                 MiniCard(
                     icon = DwIcons.Star,
-                    iconBg = DwTintMagenta,
-                    iconTint = DwMagenta,
-                    value = it.toString(),
-                    label = "Best goal streak",
+                    iconBg = DwTintWater,
+                    iconTint = DwWater,
+                    value = goalStreakDays.toString(),
+                    label = "Goal streak",
                     modifier = Modifier.weight(1f),
                 )
+                bestGoalStreakDays?.let {
+                    MiniCard(
+                        icon = DwIcons.Star,
+                        iconBg = DwTintMagenta,
+                        iconTint = DwMagenta,
+                        value = it.toString(),
+                        label = "Best goal streak",
+                        modifier = Modifier.weight(1f),
+                    )
+                }
             }
         }
         Row(
