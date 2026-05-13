@@ -8,6 +8,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +29,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -41,17 +43,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.graphics.rememberGraphicsLayer
+import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.R
@@ -154,38 +160,45 @@ fun GoalCelebrationCard(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
-                        // Close button (top-right aligned)
-                        Box(modifier = Modifier.fillMaxWidth()) {
-                            IconButton(
-                                onClick = onClose,
-                                modifier = Modifier
-                                    .align(Alignment.TopEnd)
-                                    .size(32.dp)
-                                    .background(Color.White.copy(alpha = 0.22f), CircleShape),
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_close),
-                                    contentDescription = "Close",
-                                    tint = Color.White,
-                                    modifier = Modifier.size(14.dp),
-                                )
-                            }
-                        }
-
-                        // Medallion
+                        val medallionShape = CircleShape
                         Box(
                             modifier = Modifier
                                 .size(96.dp)
                                 .scale(medallionScale)
                                 .rotate(medallionRotation)
-                                .background(Color.White.copy(alpha = 0.18f), CircleShape),
+                                .background(
+                                    Color.White.copy(alpha = 0.24f),
+                                    medallionShape,
+                                )
+                                .border(
+                                    width = 1.dp,
+                                    color = Color.White.copy(alpha = 0.34f),
+                                    shape = medallionShape,
+                                ),
                             contentAlignment = Alignment.Center,
                         ) {
+                            // background shadow
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.Center)
+                                    .size(width = 23.dp, height = 49.dp)
+                                    .dropShadow(
+                                        shape = RectangleShape,
+                                        shadow = Shadow(
+                                            radius = 5.dp,
+                                            spread = 5.dp,
+                                            color = Color.Black.copy(alpha = 0.07f),
+                                            offset = DpOffset(x = 0.dp, y = 3.dp),
+                                        )
+                                    )
+                            )
+
                             when (val m = variant.mark) {
                                 is CelebrationMark.Image -> Image(
                                     painter = painterResource(id = m.resId),
                                     contentDescription = null,
-                                    modifier = Modifier.size(56.dp),
+                                    modifier = Modifier
+                                        .size(56.dp),
                                 )
 
                                 is CelebrationMark.Glyph -> Text(
@@ -196,11 +209,14 @@ fun GoalCelebrationCard(
                             }
                         }
 
-                        // Eyebrow chip
+                        val eyebrowShape = RoundedCornerShape(100)
                         Box(
                             modifier = Modifier
-                                .background(Color.White.copy(alpha = 0.22f), RoundedCornerShape(50))
-                                .padding(horizontal = 12.dp, vertical = 4.dp),
+                                .background(
+                                    color = Color.White.copy(alpha = 0.24f),
+                                    shape = eyebrowShape,
+                                )
+                                .padding(horizontal = 10.dp),
                         ) {
                             Text(
                                 text = variant.eyebrow.uppercase(),
@@ -231,6 +247,30 @@ fun GoalCelebrationCard(
                             lineHeight = 20.sp,
                             textAlign = TextAlign.Center,
                         )
+                    }
+
+                    // Close button (top-right aligned)
+                    Box(
+                        modifier = Modifier
+                            .padding(top = 28.dp, end = 24.dp)
+                            .fillMaxWidth(),
+                    ) {
+                        IconButton(
+                            onClick = onClose,
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .size(32.dp),
+                            colors = IconButtonDefaults.iconButtonColors(
+                                containerColor = Color.White.copy(alpha = 0.25f),
+                                contentColor = Color.White,
+                            )
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_close),
+                                contentDescription = "Close",
+                                modifier = Modifier.size(14.dp),
+                            )
+                        }
                     }
                 }
 
