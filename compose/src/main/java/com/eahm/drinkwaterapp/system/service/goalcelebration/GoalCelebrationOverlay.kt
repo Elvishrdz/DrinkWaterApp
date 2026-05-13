@@ -11,6 +11,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
@@ -28,6 +29,7 @@ import com.eahm.drinkwaterapp.system.service.goalcelebration.data.OverlayConfigu
 import com.eahm.drinkwaterapp.system.service.goalcelebration.data.getStyle
 import com.eahm.drinkwaterapp.system.service.goalcelebration.extension.getSerializableCelebrationStyle
 import com.eahm.drinkwaterapp.system.service.goalcelebration.extension.shareBitmap
+import com.eahm.drinkwaterapp.system.service.goalcelebration.ui.DragConstraints
 import com.eahm.drinkwaterapp.system.service.goalcelebration.ui.GoalCelebrationScreen
 
 class GoalCelebrationOverlay : Service(),
@@ -95,6 +97,12 @@ class GoalCelebrationOverlay : Service(),
                             drinkCount = drinkCountState.intValue,
                             streakDays = streakDaysState.intValue,
                             draggable = true,
+                            dragConstraints = DragConstraints(
+                                top = 0.dp,
+                                bottom = 30.dp,
+                                start = 7.dp,
+                                end = 7.dp,
+                            ),
                             showScrim = false,
                             onClose = ::stopSelf,
                             onShare = ::shareGoalCelebration,
