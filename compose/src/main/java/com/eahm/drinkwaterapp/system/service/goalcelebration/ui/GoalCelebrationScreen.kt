@@ -46,6 +46,8 @@ fun GoalCelebrationScreen(
             AnimatedVisibility(
                 visible = visible,
                 enter = fadeIn(animationSpec = tween(durationMillis = 220)),
+                modifier = Modifier
+                    .fillMaxSize(),
             ) {
                 Box(
                     modifier = Modifier
@@ -69,7 +71,9 @@ fun GoalCelebrationScreen(
                 initialOffsetY = { 24 },
                 animationSpec = tween(durationMillis = 460),
             ),
-            modifier = Modifier.align(Alignment.Center),
+            modifier = Modifier
+                .fillMaxSize()
+                .align(Alignment.Center),
         ) {
             GoalCelebrationCard(
                 variant = variant,
