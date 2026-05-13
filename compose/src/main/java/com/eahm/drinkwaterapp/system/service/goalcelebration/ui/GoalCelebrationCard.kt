@@ -160,54 +160,70 @@ fun GoalCelebrationCard(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
-                        val medallionShape = CircleShape
-                        Box(
-                            modifier = Modifier
-                                .size(96.dp)
-                                .scale(medallionScale)
-                                .rotate(medallionRotation)
-                                .background(
-                                    Color.White.copy(alpha = 0.24f),
-                                    medallionShape,
-                                )
-                                .border(
-                                    width = 1.dp,
-                                    color = Color.White.copy(alpha = 0.34f),
-                                    shape = medallionShape,
-                                ),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            // background shadow
+                        Box {
+                            val medallionShape = CircleShape
+                            // static fill
                             Box(
                                 modifier = Modifier
-                                    .align(Alignment.Center)
-                                    .size(width = 23.dp, height = 49.dp)
-                                    .dropShadow(
-                                        shape = RectangleShape,
-                                        shadow = Shadow(
-                                            radius = 5.dp,
-                                            spread = 5.dp,
-                                            color = Color.Black.copy(alpha = 0.07f),
-                                            offset = DpOffset(x = 0.dp, y = 3.dp),
-                                        )
-                                    )
+                                    .size(96.dp)
+                                    .scale(medallionScale)
+                                    .rotate(45f)
+                                    .background(
+                                        brush = Brush.verticalGradient(
+                                            colorStops = arrayOf(
+                                                0.1f to Color.White.copy(alpha = 0.27f),
+                                                0.5f to Color.White.copy(alpha = 0.15f),
+                                                0.9f to Color.White.copy(alpha = 0.09f),
+                                            ),
+                                        ),
+                                        medallionShape,
+                                    ),
                             )
-
-                            when (val m = variant.mark) {
-                                is CelebrationMark.Image -> Image(
-                                    painter = painterResource(id = m.resId),
-                                    contentDescription = null,
+                            Box(
+                                modifier = Modifier
+                                    .size(96.dp)
+                                    .scale(medallionScale)
+                                    .rotate(medallionRotation)
+                                    .border(
+                                        width = 1.dp,
+                                        color = Color.White.copy(alpha = 0.34f),
+                                        shape = medallionShape,
+                                    ),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                // background shadow
+                                Box(
                                     modifier = Modifier
-                                        .size(56.dp),
+                                        .align(Alignment.Center)
+                                        .size(width = 23.dp, height = 49.dp)
+                                        .dropShadow(
+                                            shape = RectangleShape,
+                                            shadow = Shadow(
+                                                radius = 5.dp,
+                                                spread = 5.dp,
+                                                color = Color.Black.copy(alpha = 0.07f),
+                                                offset = DpOffset(x = 0.dp, y = 3.dp),
+                                            )
+                                        )
                                 )
 
-                                is CelebrationMark.Glyph -> Text(
-                                    text = m.text,
-                                    fontSize = 44.sp,
-                                    textAlign = TextAlign.Center,
-                                )
+                                when (val m = variant.mark) {
+                                    is CelebrationMark.Image -> Image(
+                                        painter = painterResource(id = m.resId),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(56.dp),
+                                    )
+
+                                    is CelebrationMark.Glyph -> Text(
+                                        text = m.text,
+                                        fontSize = 44.sp,
+                                        textAlign = TextAlign.Center,
+                                    )
+                                }
                             }
                         }
+
 
                         val eyebrowShape = RoundedCornerShape(100)
                         Box(
