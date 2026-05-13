@@ -70,6 +70,9 @@ fun GoalCelebrationScreen(
     streakDays: Int,
     draggable: Boolean = false,
     dragConstraints: DragConstraints = DragConstraints(),
+    // When true, a drag gesture is only recognised if the initial touch lands inside
+    // the card's visual bounds. When false, dragging from anywhere on screen moves the card.
+    dragFromCardOnly: Boolean = true,
     showScrim: Boolean = true,
     onClose: () -> Unit,
     onShare: (Bitmap) -> Unit,
@@ -118,9 +121,14 @@ fun GoalCelebrationScreen(
                 )
             }
         }
-        // rememberUpdatedState lets the gesture handler always see the latest limits
+        // rememberUpdatedState lets the gesture handler always see the latest values
         // without restarting the pointerInput coroutine.
         val currentLimits by rememberUpdatedState(dragLimits)
+        val currentDragFromCardOnly by rememberUpdatedState(dragFromCardOnly)
+        val currentNaturalBounds by rememberUpdatedState(naturalBounds)
+        // Matches the horizontal padding applied to the card modifier below. Used to
+        // translate the pointerInput node's local X coordinates back to root coordinates.
+        val cardPaddingPx = with(density) { 20.dp.toPx() }
 
         if (showScrim) {
             AnimatedVisibility(
@@ -169,13 +177,44 @@ fun GoalCelebrationScreen(
                     .offset { IntOffset(dragOffset.x.roundToInt(), dragOffset.y.roundToInt()) }
                     .then(
                         if (dragEnabled) Modifier.pointerInput(Unit) {
-                            detectDragGestures { _, dragAmount ->
-                                val limits = currentLimits
-                                dragOffset = Offset(
-                                    x = (dragOffset.x + dragAmount.x).coerceIn(limits.minX, limits.maxX),
-                                    y = (dragOffset.y + dragAmount.y).coerceIn(limits.minY, limits.maxY),
-                                )
-                            }
+                            // Tracks whether the current gesture started inside the card.
+                            var activeDrag = false
+                            detectDragGestures(
+                                onDragStart = { startPosition ->
+                                    activeDrag = if (!currentDragFromCardOnly) {
+                                        true
+                                    } else {
+                                        // The pointerInput node is placed after the offset modifier,
+                                        // so its local origin is shifted by -cardPaddingPx on X
+                                        // (the padding modifier shrinks the node's left edge inward).
+                                        // naturalBounds is in root coordinates at dragOffset = zero,
+                                        // so subtracting cardPaddingPx converts the card's root left/right
+                                        // to this node's local coordinate system.
+                                        val nb = currentNaturalBounds
+                                        val pp = cardPaddingPx
+                                        nb != Rect.Zero &&
+                                                startPosition.x in (nb.left - pp)..(nb.right - pp) &&
+                                                startPosition.y in nb.top..nb.bottom
+                                    }
+                                },
+                                onDragEnd = { activeDrag = false },
+                                onDragCancel = { activeDrag = false },
+                                onDrag = { _, dragAmount ->
+                                    if (activeDrag) {
+                                        val limits = currentLimits
+                                        dragOffset = Offset(
+                                            x = (dragOffset.x + dragAmount.x).coerceIn(
+                                                limits.minX,
+                                                limits.maxX
+                                            ),
+                                            y = (dragOffset.y + dragAmount.y).coerceIn(
+                                                limits.minY,
+                                                limits.maxY
+                                            ),
+                                        )
+                                    }
+                                },
+                            )
                         } else Modifier
                     ),
                 onBoundsInRoot = { actualBounds ->
