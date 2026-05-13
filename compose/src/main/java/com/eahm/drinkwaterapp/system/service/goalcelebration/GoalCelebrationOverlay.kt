@@ -2,6 +2,7 @@ package com.eahm.drinkwaterapp.system.service.goalcelebration
 
 import android.app.Service
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
@@ -26,6 +27,7 @@ import com.eahm.drinkwaterapp.system.service.goalcelebration.data.CelebrationSty
 import com.eahm.drinkwaterapp.system.service.goalcelebration.data.OverlayConfigurations
 import com.eahm.drinkwaterapp.system.service.goalcelebration.data.getStyle
 import com.eahm.drinkwaterapp.system.service.goalcelebration.extension.getSerializableCelebrationStyle
+import com.eahm.drinkwaterapp.system.service.goalcelebration.extension.shareBitmap
 import com.eahm.drinkwaterapp.system.service.goalcelebration.ui.GoalCelebrationScreen
 
 class GoalCelebrationOverlay : Service(),
@@ -93,7 +95,8 @@ class GoalCelebrationOverlay : Service(),
                             drinkCount = drinkCountState.intValue,
                             streakDays = streakDaysState.intValue,
                             showScrim = false,
-                            onClose = { stopSelf() },
+                            onClose = ::stopSelf,
+                            onShare = ::shareGoalCelebration,
                         )
                     }
                 }
@@ -107,6 +110,18 @@ class GoalCelebrationOverlay : Service(),
         widgetView?.let { mWindowManager?.removeView(it) }
         _lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
         _viewModelStore.clear()
+    }
+
+    private fun shareGoalCelebration(bitmap: Bitmap) {
+        val liters = "%.1f".format(goalMlState.floatValue / 1000f)
+        val shareText =
+            "I just hit my daily water goal! ${liters}L in ${drinkCountState.intValue} glasses — day ${streakDaysState.intValue} streak!\n\nGet DrinkWater: https://drinkwaterapp.page.link/isR1"
+
+        shareBitmap(
+            bitmap = bitmap,
+            shareText = shareText,
+            fileName = "goal_progress.png",
+        )
     }
 
     companion object {

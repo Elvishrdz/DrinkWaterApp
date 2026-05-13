@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.core.app.ActivityCompat
+import com.eahm.drinkwaterapp.R
 
 fun Context.openSystemAppSettings() {
     startActivity(
@@ -34,7 +35,6 @@ internal val Context.canShowNotifications: Boolean
         return permission == PackageManager.PERMISSION_GRANTED
     }
 
-
 internal val Context.canScheduleExactAlarms: Boolean
     get() = let {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -44,3 +44,39 @@ internal val Context.canScheduleExactAlarms: Boolean
             true
         }
     }
+
+fun Context.startTextSendIntent(
+    shareText: String
+) {
+    val fallbackIntent = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_TEXT, shareText)
+    }
+    val chooser = Intent.createChooser(
+        fallbackIntent,
+        getString(R.string.text_share_title),
+    )
+        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+    startActivity(chooser)
+}
+
+fun Context.startImageSendIntent(
+    imageUri: Uri,
+    shareText: String
+) {
+    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+        type = "image/png"
+        putExtra(Intent.EXTRA_STREAM, imageUri)
+        putExtra(Intent.EXTRA_TEXT, shareText)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+
+    val chooser = Intent.createChooser(
+        shareIntent,
+        getString(R.string.text_share_title),
+    )
+        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+    startActivity(chooser)
+}

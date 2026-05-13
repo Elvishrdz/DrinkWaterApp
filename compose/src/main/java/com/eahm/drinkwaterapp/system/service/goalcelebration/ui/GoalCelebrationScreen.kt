@@ -1,5 +1,6 @@
 package com.eahm.drinkwaterapp.system.service.goalcelebration.ui
 
+import android.graphics.Bitmap
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -35,6 +36,7 @@ fun GoalCelebrationScreen(
     streakDays: Int,
     showScrim: Boolean = true,
     onClose: () -> Unit,
+    onShare: (Bitmap) -> Unit,
 ) {
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { visible = true }
@@ -75,6 +77,9 @@ fun GoalCelebrationScreen(
                 drinkCount = drinkCount,
                 streakDays = streakDays,
                 onClose = onClose,
+                onShare = onShare,
+                showStreakDays = false, // Streak disabled until is working
+                showShareProgressButton = false, // Share disabled until is fully ready
                 modifier = Modifier.padding(horizontal = 20.dp),
             )
         }
@@ -91,6 +96,7 @@ private fun GoalCelebrationScreenPreview() {
             drinkCount = 5,
             streakDays = 1,
             onClose = {},
+            onShare = {},
         )
     }
 }

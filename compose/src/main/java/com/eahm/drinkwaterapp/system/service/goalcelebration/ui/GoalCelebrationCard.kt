@@ -1,5 +1,6 @@
 package com.eahm.drinkwaterapp.system.service.goalcelebration.ui
 
+import android.graphics.Bitmap
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -35,13 +36,18 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.layer.drawLayer
+import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -56,6 +62,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
 import com.eahm.drinkwaterapp.system.service.goalcelebration.data.CELEBRATIONS
 import com.eahm.drinkwaterapp.system.service.goalcelebration.data.CelebrationMark
 import com.eahm.drinkwaterapp.system.service.goalcelebration.data.CelebrationVariant
+import kotlinx.coroutines.launch
 
 @Composable
 fun GoalCelebrationCard(
@@ -64,8 +71,14 @@ fun GoalCelebrationCard(
     drinkCount: Int,
     streakDays: Int,
     onClose: () -> Unit,
+    onShare: (Bitmap) -> Unit,
     modifier: Modifier = Modifier,
+    showStreakDays: Boolean = true,
+    showShareProgressButton: Boolean = true,
 ) {
+    val graphicsLayer = rememberGraphicsLayer()
+    val coroutineScope = rememberCoroutineScope()
+
     // Medallion pop-in animation
     var medallionVisible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { medallionVisible = true }
@@ -86,141 +99,146 @@ fun GoalCelebrationCard(
 
     Card(
         modifier = modifier
+            .drawWithContent {
+                // Captured region: all card
+                graphicsLayer.record { this@drawWithContent.drawContent() }
+                drawLayer(graphicsLayer)
+            }
             .wrapContentSize()
             .widthIn(max = 320.dp),
         shape = RoundedCornerShape(28.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
     ) {
         Column {
-            Box(
-                modifier = Modifier
-                    .wrapContentSize()
-                    .background(variant.heroBrush)
-            ) {
-                // Optional overlay brush (STARLIGHT / MOONLIT) — fills full hero
-                variant.heroOverlayBrush?.let { overlay ->
-                    Box(
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .background(overlay)
-                    )
-                }
-
-                // Particle decor layer (absolute, fills full hero, no pointer events)
-                DecorLayer(
-                    decorKind = variant.decorKind,
-                    modifier = Modifier
-                        .matchParentSize(),
-                )
-
-                // Glass shine layer — top-left diagonal highlight
+            Column {
                 Box(
                     modifier = Modifier
                         .wrapContentSize()
-                        .background(
-                            Brush.linearGradient(
-                                colors = listOf(
-                                    Color.White.copy(alpha = 0.10f),
-                                    Color.Transparent,
+                        .background(variant.heroBrush)
+                ) {
+                    // Optional overlay brush (STARLIGHT / MOONLIT) fills full hero
+                    variant.heroOverlayBrush?.let { overlay ->
+                        Box(
+                            modifier = Modifier
+                                .wrapContentSize()
+                                .background(overlay)
+                        )
+                    }
+
+                    // Particle decor layer (absolute, fills full hero, no pointer events)
+                    DecorLayer(
+                        decorKind = variant.decorKind,
+                        modifier = Modifier
+                            .matchParentSize(),
+                    )
+
+                    // Glass shine layer top-left diagonal highlight
+                    Box(
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .background(
+                                Brush.linearGradient(
+                                    colors = listOf(
+                                        Color.White.copy(alpha = 0.10f),
+                                        Color.Transparent,
+                                    )
                                 )
                             )
-                        )
-                )
+                    )
 
-                // Hero content column — padding lives here so decor fills the full hero
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 28.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    // Close button (top-right aligned)
-                    Box(modifier = Modifier.fillMaxWidth()) {
-                        IconButton(
-                            onClick = onClose,
+                    // Hero content column padding lives here so decor fills the full hero
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp, vertical = 28.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        // Close button (top-right aligned)
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            IconButton(
+                                onClick = onClose,
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .size(32.dp)
+                                    .background(Color.White.copy(alpha = 0.22f), CircleShape),
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_close),
+                                    contentDescription = "Close",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(14.dp),
+                                )
+                            }
+                        }
+
+                        // Medallion
+                        Box(
                             modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .size(32.dp)
-                                .background(Color.White.copy(alpha = 0.22f), CircleShape),
+                                .size(96.dp)
+                                .scale(medallionScale)
+                                .rotate(medallionRotation)
+                                .background(Color.White.copy(alpha = 0.18f), CircleShape),
+                            contentAlignment = Alignment.Center,
                         ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_close),
-                                contentDescription = "Close",
-                                tint = Color.White,
-                                modifier = Modifier.size(14.dp),
+                            when (val m = variant.mark) {
+                                is CelebrationMark.Image -> Image(
+                                    painter = painterResource(id = m.resId),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(56.dp),
+                                )
+
+                                is CelebrationMark.Glyph -> Text(
+                                    text = m.text,
+                                    fontSize = 44.sp,
+                                    textAlign = TextAlign.Center,
+                                )
+                            }
+                        }
+
+                        // Eyebrow chip
+                        Box(
+                            modifier = Modifier
+                                .background(Color.White.copy(alpha = 0.22f), RoundedCornerShape(50))
+                                .padding(horizontal = 12.dp, vertical = 4.dp),
+                        ) {
+                            Text(
+                                text = variant.eyebrow.uppercase(),
+                                color = Color.White,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                letterSpacing = 0.5.sp,
                             )
                         }
-                    }
 
-                    // Medallion
-                    Box(
-                        modifier = Modifier
-                            .size(96.dp)
-                            .scale(medallionScale)
-                            .rotate(medallionRotation)
-                            .background(Color.White.copy(alpha = 0.18f), CircleShape),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        when (val m = variant.mark) {
-                            is CelebrationMark.Image -> Image(
-                                painter = painterResource(id = m.resId),
-                                contentDescription = null,
-                                modifier = Modifier.size(56.dp),
-                            )
-
-                            is CelebrationMark.Glyph -> Text(
-                                text = m.text,
-                                fontSize = 44.sp,
-                                textAlign = TextAlign.Center,
-                            )
-                        }
-                    }
-
-                    // Eyebrow chip
-                    Box(
-                        modifier = Modifier
-                            .background(Color.White.copy(alpha = 0.22f), RoundedCornerShape(50))
-                            .padding(horizontal = 12.dp, vertical = 4.dp),
-                    ) {
+                        // Headline
                         Text(
-                            text = variant.eyebrow.uppercase(),
+                            modifier = Modifier
+                                .padding(horizontal = 10.dp),
+                            text = variant.headline,
                             color = Color.White,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            letterSpacing = 0.5.sp,
+                            fontSize = 26.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            lineHeight = 30.sp,
+                            textAlign = TextAlign.Center,
+                        )
+
+                        // Sub copy
+                        Text(
+                            text = variant.sub,
+                            color = Color.White.copy(alpha = 0.92f),
+                            fontSize = 14.sp,
+                            lineHeight = 20.sp,
+                            textAlign = TextAlign.Center,
                         )
                     }
-
-                    // Headline
-                    Text(
-                        modifier = Modifier
-                            .padding(horizontal = 10.dp),
-                        text = variant.headline,
-                        color = Color.White,
-                        fontSize = 26.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        lineHeight = 30.sp,
-                        textAlign = TextAlign.Center,
-                    )
-
-                    // Sub copy
-                    Text(
-                        text = variant.sub,
-                        color = Color.White.copy(alpha = 0.92f),
-                        fontSize = 14.sp,
-                        lineHeight = 20.sp,
-                        textAlign = TextAlign.Center,
-                    )
                 }
-            }
 
-            Column {
+                // ── Stats strip ──────────────────────────────────────────────────
                 Column(
                     modifier = Modifier
                         .background(MaterialTheme.colorScheme.background)
                 ) {
-                    // ── Stats strip ─────────────────────────────────────────────────────
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -239,36 +257,44 @@ fun GoalCelebrationCard(
                             label = "Glasses",
                             modifier = Modifier.weight(1f),
                         )
-                        StatCell(
-                            value = "$streakDays",
-                            unit = "d",
-                            label = "Streak",
-                            modifier = Modifier.weight(1f),
-                        )
-                    }
-                    HorizontalDivider(color = Color(0xFFE0E0E0))
-
-                    // ── Actions section ─────────────────────────────────────────────────
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 18.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        DwPrimaryButton(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = variant.cta,
-                            onClick = onClose,
-                        )
-
-                        TextButton(onClick = onClose) {
-                            Text(
-                                text = "Share progress",
-                                color = DwInk500,
-                                fontSize = 14.sp,
+                        if (showStreakDays) {
+                            StatCell(
+                                value = "$streakDays",
+                                unit = "d",
+                                label = "Streak",
+                                modifier = Modifier.weight(1f),
                             )
                         }
+                    }
+                    HorizontalDivider(color = Color(0xFFE0E0E0))
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.background)
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 18.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                DwPrimaryButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = variant.cta,
+                    onClick = onClose,
+                )
+
+                if (showShareProgressButton) {
+                    TextButton(onClick = {
+                        coroutineScope.launch {
+                            onShare(graphicsLayer.toImageBitmap().asAndroidBitmap())
+                        }
+                    }) {
+                        Text(
+                            text = "Share progress",
+                            color = DwInk500,
+                            fontSize = 14.sp,
+                        )
                     }
                 }
             }
@@ -323,6 +349,7 @@ private fun PreviewOcean() {
             drinkCount = 8,
             streakDays = 3,
             onClose = {},
+            onShare = {},
         )
     }
 }
@@ -337,6 +364,7 @@ private fun PreviewCarnival() {
             drinkCount = 8,
             streakDays = 3,
             onClose = {},
+            onShare = {},
         )
     }
 }
@@ -351,6 +379,7 @@ private fun PreviewStarlight() {
             drinkCount = 8,
             streakDays = 3,
             onClose = {},
+            onShare = {},
         )
     }
 }
@@ -365,6 +394,7 @@ private fun PreviewRain() {
             drinkCount = 8,
             streakDays = 3,
             onClose = {},
+            onShare = {},
         )
     }
 }
@@ -379,6 +409,7 @@ private fun PreviewSunset() {
             drinkCount = 8,
             streakDays = 3,
             onClose = {},
+            onShare = {},
         )
     }
 }
@@ -393,6 +424,7 @@ private fun PreviewMoonlit() {
             drinkCount = 8,
             streakDays = 3,
             onClose = {},
+            onShare = {},
         )
     }
 }
