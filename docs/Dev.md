@@ -3,8 +3,8 @@ Development
 To Complete
 - [x] Adjust notification messages 
 - [x] onboarding
-- []adjust celebration
-- translations.
+- [x] Adjust celebration
+- [] translations.
 - adaptive layouts
 - analytics
 - ads
