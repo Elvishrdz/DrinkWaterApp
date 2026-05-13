@@ -1,5 +1,8 @@
 package com.eahm.drinkwaterapp.feature.home
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -11,10 +14,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.eahm.drinkwaterapp.ads.banner.DrinkWaterBannerAd
 import com.eahm.drinkwaterapp.core.config.BuildEnvironment
 import com.eahm.drinkwaterapp.core.data.confetti.ConfettiController
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
@@ -86,17 +91,29 @@ internal fun HomeScreen() {
             }
         }
     ) {
-        when (currentDestination) {
-            HomeDestination.TODAY -> DrinkRoot(
-                onNavigateToHistory = { currentDestination = HomeDestination.HISTORY },
-                onNavigateToSettings = { currentDestination = HomeDestination.SETTINGS },
-            )
+        Column(Modifier.fillMaxSize()) {
+            Column(Modifier
+                .fillMaxSize()
+                .weight(1f)) {
+                when (currentDestination) {
+                    HomeDestination.TODAY -> DrinkRoot(
+                        onNavigateToHistory = { currentDestination = HomeDestination.HISTORY },
+                        onNavigateToSettings = { currentDestination = HomeDestination.SETTINGS },
+                    )
 
-            HomeDestination.HISTORY -> HistoryRoot()
-            HomeDestination.STATS -> StatsScreen()
-            HomeDestination.SETTINGS -> SettingsScreen()
-            HomeDestination.DEV -> DevRoot { currentDestination = HomeDestination.TODAY }
+                    HomeDestination.HISTORY -> HistoryRoot()
+                    HomeDestination.STATS -> StatsScreen()
+                    HomeDestination.SETTINGS -> SettingsScreen()
+                    HomeDestination.DEV -> DevRoot { currentDestination = HomeDestination.TODAY }
+                }
+            }
+
+            //TODO: set banner together with the bottom navigation instead
+            DrinkWaterBannerAd(
+                modifier = Modifier.fillMaxWidth()
+            )
         }
+
     }
 
     ConfettiOverlay(
