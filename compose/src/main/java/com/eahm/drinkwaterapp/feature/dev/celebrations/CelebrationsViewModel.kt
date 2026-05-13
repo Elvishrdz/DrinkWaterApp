@@ -3,9 +3,9 @@ package com.eahm.drinkwaterapp.feature.dev.celebrations
 import android.app.Application
 import android.provider.Settings
 import androidx.lifecycle.ViewModel
-import com.eahm.drinkwaterapp.core.data.goalreachedwidget.CelebrationStyle
-import com.eahm.drinkwaterapp.core.data.goalreachedwidget.GoalReachedWidget
-import com.eahm.drinkwaterapp.core.data.goalreachedwidget.createIntent
+import com.eahm.drinkwaterapp.system.service.goalcelebration.GoalCelebrationOverlay
+import com.eahm.drinkwaterapp.system.service.goalcelebration.data.CelebrationStyle
+import com.eahm.drinkwaterapp.system.service.goalcelebration.extension.createIntent
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,7 +36,7 @@ internal class CelebrationsViewModel(
 
     private fun displayGoalReachedOverlay(style: CelebrationStyle) {
         if (Settings.canDrawOverlays(application)) {
-            val intent = GoalReachedWidget.createIntent(
+            val intent = GoalCelebrationOverlay.createIntent(
                 context = application,
                 style = style,
                 goalMl = 2400f,

@@ -1,4 +1,4 @@
-package com.eahm.drinkwaterapp.core.data.goalreachedwidget
+package com.eahm.drinkwaterapp.system.service.goalcelebration.data
 
 import androidx.annotation.DrawableRes
 import androidx.compose.ui.geometry.Offset

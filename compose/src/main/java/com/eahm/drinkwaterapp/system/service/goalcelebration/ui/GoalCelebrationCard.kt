@@ -1,10 +1,11 @@
-package com.eahm.drinkwaterapp.core.data.goalreachedwidget
+package com.eahm.drinkwaterapp.system.service.goalcelebration.ui
 
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -52,6 +53,9 @@ import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
+import com.eahm.drinkwaterapp.system.service.goalcelebration.data.CELEBRATIONS
+import com.eahm.drinkwaterapp.system.service.goalcelebration.data.CelebrationMark
+import com.eahm.drinkwaterapp.system.service.goalcelebration.data.CelebrationVariant
 
 @Composable
 fun GoalCelebrationCard(
@@ -159,7 +163,7 @@ fun GoalCelebrationCard(
                         contentAlignment = Alignment.Center,
                     ) {
                         when (val m = variant.mark) {
-                            is CelebrationMark.Image -> androidx.compose.foundation.Image(
+                            is CelebrationMark.Image -> Image(
                                 painter = painterResource(id = m.resId),
                                 contentDescription = null,
                                 modifier = Modifier.size(56.dp),

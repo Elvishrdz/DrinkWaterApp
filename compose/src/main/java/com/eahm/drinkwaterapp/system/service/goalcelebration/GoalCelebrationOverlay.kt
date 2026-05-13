@@ -1,4 +1,4 @@
-package com.eahm.drinkwaterapp.core.data.goalreachedwidget
+package com.eahm.drinkwaterapp.system.service.goalcelebration
 
 import android.app.Service
 import android.content.Intent
@@ -22,8 +22,13 @@ import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
+import com.eahm.drinkwaterapp.system.service.goalcelebration.data.CelebrationStyle
+import com.eahm.drinkwaterapp.system.service.goalcelebration.data.OverlayConfigurations
+import com.eahm.drinkwaterapp.system.service.goalcelebration.data.getStyle
+import com.eahm.drinkwaterapp.system.service.goalcelebration.extension.getSerializableCelebrationStyle
+import com.eahm.drinkwaterapp.system.service.goalcelebration.ui.GoalCelebrationScreen
 
-class GoalReachedWidget : Service(),
+class GoalCelebrationOverlay : Service(),
     LifecycleOwner,
     SavedStateRegistryOwner,
     ViewModelStoreOwner {
@@ -82,7 +87,7 @@ class GoalReachedWidget : Service(),
             composeView.apply {
                 setContent {
                     DrinkWaterAppTheme {
-                        GoalCelebrationOverlay(
+                        GoalCelebrationScreen(
                             variant = getStyle(style.value),
                             goalMl = goalMlState.floatValue,
                             drinkCount = drinkCountState.intValue,

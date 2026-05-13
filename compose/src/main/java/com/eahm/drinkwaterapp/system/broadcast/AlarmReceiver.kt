@@ -10,9 +10,6 @@ import com.eahm.drinkwaterapp.core.data.datastore.initialAmountPerDrink
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStatsObserver
-import com.eahm.drinkwaterapp.core.data.goalreachedwidget.CelebrationStyle
-import com.eahm.drinkwaterapp.core.data.goalreachedwidget.GoalReachedWidget
-import com.eahm.drinkwaterapp.core.data.goalreachedwidget.createIntent
 import com.eahm.drinkwaterapp.core.data.systemnotifications.NotificationService
 import com.eahm.drinkwaterapp.core.data.systemnotifications.model.Drink
 import com.eahm.drinkwaterapp.core.data.systemnotifications.model.NotificationRemoved
@@ -25,6 +22,9 @@ import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.database.entity.Status
 import com.eahm.drinkwaterapp.core.domain.extension.toEndOfDayTime
 import com.eahm.drinkwaterapp.core.domain.extension.toStartOfDayTime
+import com.eahm.drinkwaterapp.system.service.goalcelebration.GoalCelebrationOverlay
+import com.eahm.drinkwaterapp.system.service.goalcelebration.data.CelebrationStyle
+import com.eahm.drinkwaterapp.system.service.goalcelebration.extension.createIntent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
@@ -121,7 +121,7 @@ class AlarmReceiver : BroadcastReceiver() {
                     end = today.toEndOfDayTime,
                 ).first().size
 
-                val intent = GoalReachedWidget.createIntent(
+                val intent = GoalCelebrationOverlay.createIntent(
                     context = context,
                     style = CelebrationStyle.Ocean,
                     goalMl = statsBefore.goalAmount,

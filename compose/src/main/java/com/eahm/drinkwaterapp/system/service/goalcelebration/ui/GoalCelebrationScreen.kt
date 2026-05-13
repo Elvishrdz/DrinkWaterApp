@@ -1,4 +1,4 @@
-package com.eahm.drinkwaterapp.core.data.goalreachedwidget
+package com.eahm.drinkwaterapp.system.service.goalcelebration.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -23,15 +23,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
+import com.eahm.drinkwaterapp.system.service.goalcelebration.data.CelebrationStyle
+import com.eahm.drinkwaterapp.system.service.goalcelebration.data.CelebrationVariant
+import com.eahm.drinkwaterapp.system.service.goalcelebration.data.getStyle
 
-/**
- * Full-screen overlay that centers [GoalCelebrationCard] over an animated scrim.
- *
- * Note: `backdrop-filter: blur` has no equivalent below API 31. The scrim uses
- * alpha-only (`0x6B` ≈ 42%) for broad compatibility.
- */
 @Composable
-fun GoalCelebrationOverlay(
+fun GoalCelebrationScreen(
     variant: CelebrationVariant,
     goalMl: Float,
     drinkCount: Int,
@@ -86,9 +83,9 @@ fun GoalCelebrationOverlay(
 
 @Preview
 @Composable
-private fun GoalCelebrationOverlayPreview() {
+private fun GoalCelebrationScreenPreview() {
     DrinkWaterAppTheme {
-        GoalCelebrationOverlay(
+        GoalCelebrationScreen(
             variant = getStyle(value = CelebrationStyle.Ocean),
             goalMl = 10f,
             drinkCount = 5,

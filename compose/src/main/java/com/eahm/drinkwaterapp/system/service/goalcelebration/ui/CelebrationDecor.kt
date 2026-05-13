@@ -1,4 +1,4 @@
-package com.eahm.drinkwaterapp.core.data.goalreachedwidget
+package com.eahm.drinkwaterapp.system.service.goalcelebration.ui
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -26,6 +26,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.eahm.drinkwaterapp.system.service.goalcelebration.data.DecorKind
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -47,6 +48,7 @@ fun DecorLayer(
             DecorKind.CONFETTI -> ConfettiDecor(
                 modifier = Modifier.matchParentSize(),
             )
+
             DecorKind.SPARKLES -> SparklesDecor()
             DecorKind.DRIPS -> DripsDecor()
             DecorKind.RAYS -> RaysDecor()

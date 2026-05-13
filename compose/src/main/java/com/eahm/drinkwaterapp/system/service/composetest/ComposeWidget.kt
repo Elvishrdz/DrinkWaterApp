@@ -1,4 +1,4 @@
-package com.eahm.drinkwaterapp.core.data.goalreachedwidget
+package com.eahm.drinkwaterapp.system.service.composetest
 
 import android.app.Service
 import android.content.Context
@@ -49,7 +49,7 @@ class ComposeWidget : Service(),
 
     private val _lifecycleRegistry = LifecycleRegistry(this)
     private val _savedStateRegistryController: SavedStateRegistryController =
-        SavedStateRegistryController.create(this)
+        SavedStateRegistryController.Companion.create(this)
 
     override val savedStateRegistry: SavedStateRegistry =
         _savedStateRegistryController.savedStateRegistry
@@ -124,13 +124,13 @@ class ComposeWidget : Service(),
             setViewTreeSavedStateRegistryOwner(this@ComposeWidget)
             setContent {
                 Box(
-                    modifier = Modifier
+                    modifier = Modifier.Companion
                         .fillMaxSize()
                 ) {
                     var clicks by remember { mutableStateOf(0) }
                     Card(
-                        modifier = Modifier
-                            .align(Alignment.TopCenter)
+                        modifier = Modifier.Companion
+                            .align(Alignment.Companion.TopCenter)
                             .clickable(
                                 onClick = {
                                     clicks++
@@ -140,7 +140,7 @@ class ComposeWidget : Service(),
                         Column {
                             Text("Clicks $clicks")
                             Image(
-                                modifier = Modifier
+                                modifier = Modifier.Companion
                                     .width(200.dp)
                                     .offset(y = 100.dp),
                                 painter = painterResource(id = R.drawable.icon_trophy_01),

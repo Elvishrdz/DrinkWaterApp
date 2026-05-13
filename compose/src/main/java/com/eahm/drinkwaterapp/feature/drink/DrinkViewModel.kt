@@ -10,9 +10,6 @@ import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStatsObserver
-import com.eahm.drinkwaterapp.core.data.goalreachedwidget.CelebrationStyle
-import com.eahm.drinkwaterapp.core.data.goalreachedwidget.GoalReachedWidget
-import com.eahm.drinkwaterapp.core.data.goalreachedwidget.createIntent
 import com.eahm.drinkwaterapp.core.data.streak.StreakRepository
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
@@ -21,6 +18,9 @@ import com.eahm.drinkwaterapp.core.domain.extension.toEndOfDayTime
 import com.eahm.drinkwaterapp.core.domain.extension.toStartOfDayTime
 import com.eahm.drinkwaterapp.feature.drink.data.HistoryData
 import com.eahm.drinkwaterapp.feature.drink.ui.DrinkLogEntry
+import com.eahm.drinkwaterapp.system.service.goalcelebration.GoalCelebrationOverlay
+import com.eahm.drinkwaterapp.system.service.goalcelebration.data.CelebrationStyle
+import com.eahm.drinkwaterapp.system.service.goalcelebration.extension.createIntent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -249,7 +249,7 @@ internal class DrinkViewModel(
     private suspend fun displayGoalReachedOverlay() {
         if (Settings.canDrawOverlays(application)) {
             val currentState = state.value as? DrinkState.Data
-            val intent = GoalReachedWidget.createIntent(
+            val intent = GoalCelebrationOverlay.createIntent(
                 context = application,
                 style = CelebrationStyle.Ocean,
                 goalMl = currentState?.drinkStats?.goalAmount ?: 2400f,

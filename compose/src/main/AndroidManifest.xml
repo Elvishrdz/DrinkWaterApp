@@ -53,7 +53,7 @@
         </receiver>
 
         <service
-            android:name=".core.data.goalreachedwidget.GoalReachedWidget"
+            android:name=".system.service.goalcelebration.GoalCelebrationOverlay"
             android:enabled="true"
             android:exported="false" />
 
