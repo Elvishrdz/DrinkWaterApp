@@ -206,6 +206,25 @@
     <!-- Ajustes — Sheet de cantidad de notificación -->
     <string name="settings_notif_amount_hint">Cantidad registrada al tocar bebida en la notificación</string>
 
+    <!-- Ajustes — Sheet de quitar anuncios -->
+    <string name="settings_remove_ads_title">Quitar anuncios</string>
+    <string name="settings_remove_ads_body">Disfruta DrinkWater sin anuncios con una compra única. Vinculada a tu cuenta de la tienda, puedes restaurarla en cualquier momento y desde cualquier dispositivo.</string>
+    <string name="settings_remove_ads_cta">Quitar anuncios</string>
+    <string name="settings_remove_ads_cta_with_price">Quitar anuncios · %1$s</string>
+    <string name="settings_remove_ads_restore_cta">Restaurar compra</string>
+    <string name="settings_remove_ads_error">Algo salió mal: %1$s</string>
+    <string name="settings_remove_ads_nothing_to_restore">No se encontró ninguna compra previa para esta cuenta.</string>
+
+    <!-- Ajustes — Diálogo de compra exitosa -->
+    <string name="settings_purchase_success_title">¡Anuncios eliminados!</string>
+    <string name="settings_purchase_success_body">Gracias por apoyar DrinkWater.\n¡Disfruta la app completamente sin anuncios!</string>
+    <string name="settings_purchase_success_cta">¡Genial, gracias!</string>
+
+    <!-- Ajustes — Diálogo de restauración exitosa -->
+    <string name="settings_restore_success_title">¡Compra restaurada!</string>
+    <string name="settings_restore_success_body">Tu compra sin anuncios ha sido restaurada.\n¡Disfruta DrinkWater sin ningún anuncio!</string>
+    <string name="settings_restore_success_cta">¡Entendido!</string>
+
     <!-- Ajustes — Sheet de unidades -->
     <string name="settings_unit_metric_label">Mililitros</string>
     <string name="settings_unit_metric_sublabel">mL · kg</string>

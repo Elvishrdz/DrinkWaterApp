@@ -196,6 +196,25 @@
     <string name="settings_overlay_allow_instructions">To show goal reached celebration, we need permission to display over other apps.\n\n1. Find the app in the list of apps when continuing to the settings.\n2. Finalize by enabling \"Allow display over other apps\".\n\nThen press back and return to the app.</string>
     <string name="settings_overlay_disable_instructions">To disable the goal reached celebration, you need to remove the permission explicitly.\n\n1. Find the app in the list of apps when continuing to the settings.\n2. Disable \"Allow display over other apps\".\n\nPress back and return to the app.</string>
 
+    <!-- Settings — Remove Ads bottom sheet -->
+    <string name="settings_remove_ads_title">Remove Ads</string>
+    <string name="settings_remove_ads_body">Enjoy DrinkWater completely ad-free with a one-time purchase. Tied to your app store account — restore anytime on any device.</string>
+    <string name="settings_remove_ads_cta">Remove Ads</string>
+    <string name="settings_remove_ads_cta_with_price">Remove Ads · %1$s</string>
+    <string name="settings_remove_ads_restore_cta">Restore Purchase</string>
+    <string name="settings_remove_ads_error">Something went wrong: %1$s</string>
+    <string name="settings_remove_ads_nothing_to_restore">No previous purchase found for this account.</string>
+
+    <!-- Settings — Purchase success dialog -->
+    <string name="settings_purchase_success_title">Ads Removed!</string>
+    <string name="settings_purchase_success_body">Thank you for supporting DrinkWaterApp.\nEnjoy the app completely ad-free!</string>
+    <string name="settings_purchase_success_cta">Awesome, thanks!</string>
+
+    <!-- Settings — Restore success dialog -->
+    <string name="settings_restore_success_title">Purchase Restored!</string>
+    <string name="settings_restore_success_body">Your ad-free purchase has been restored.\nEnjoy DrinkWater without any ads!</string>
+    <string name="settings_restore_success_cta">Got it!</string>
+
     <!-- Settings — Goal sheet -->
     <string name="settings_goal_range">Min %1$d mL · Max %2$d mL</string>
 

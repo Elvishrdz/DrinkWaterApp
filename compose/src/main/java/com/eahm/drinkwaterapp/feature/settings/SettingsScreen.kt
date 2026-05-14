@@ -58,6 +58,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -66,6 +67,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.eahm.drinkwaterapp.R
+import com.eahm.drinkwaterapp.core.billing.PurchaseState
 import com.eahm.drinkwaterapp.core.config.FeatureFlags
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwSecondaryButton
@@ -117,9 +119,28 @@ internal fun SettingsScreen(
 
     // ── Remove Ads purchase sheet ─────────────────────────────────────────────
     var showRemoveAdsSheet by rememberSaveable { mutableStateOf(false) }
+    var showPurchaseSuccessDialog by rememberSaveable { mutableStateOf(false) }
+    var showRestoreSuccessDialog by rememberSaveable { mutableStateOf(false) }
     var rcPackage by remember { mutableStateOf<RcPackage?>(null) }
     var rcPriceString by remember { mutableStateOf<String?>(null) }
     val activity = context as Activity
+
+    LaunchedEffect(state.purchaseState) {
+        if (!showRemoveAdsSheet) return@LaunchedEffect
+        when (state.purchaseState) {
+            is PurchaseState.Success -> {
+                showRemoveAdsSheet = false
+                showPurchaseSuccessDialog = true
+            }
+
+            is PurchaseState.Restored -> {
+                showRemoveAdsSheet = false
+                showRestoreSuccessDialog = true
+            }
+
+            else -> Unit
+        }
+    }
 
     fun handleRemoveAdsTap() {
         viewModel.onFetchOfferings { pkg ->
@@ -315,6 +336,16 @@ internal fun SettingsScreen(
             onRestore = viewModel::onRestorePurchase,
             onDismiss = { showRemoveAdsSheet = false },
         )
+    }
+
+    // ── Purchase success dialog ───────────────────────────────────────────────
+    if (showPurchaseSuccessDialog) {
+        PurchaseSuccessDialog(onDismiss = { showPurchaseSuccessDialog = false })
+    }
+
+    // ── Restore success dialog ────────────────────────────────────────────────
+    if (showRestoreSuccessDialog) {
+        RestoreSuccessDialog(onDismiss = { showRestoreSuccessDialog = false })
     }
 }
 
@@ -1088,6 +1119,130 @@ private fun formatTime(hour: Int, minute: Int): String {
         else -> hour
     }
     return "$displayHour:${minute.toString().padStart(2, '0')} $ampm"
+}
+
+// ── Purchase success dialog ───────────────────────────────────────────────────
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PurchaseSuccessDialog(onDismiss: () -> Unit) {
+    BasicAlertDialog(onDismissRequest = onDismiss) {
+        Column(
+            modifier = Modifier
+                .clip(RoundedCornerShape(28.dp))
+                .background(MaterialTheme.colorScheme.background)
+                .padding(28.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape)
+                    .background(gradientMagentaHero),
+            ) {
+                Icon(
+                    imageVector = DwIcons.Star,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(40.dp),
+                )
+            }
+
+            Spacer(Modifier.height(22.dp))
+
+            Text(
+                text = stringResource(R.string.settings_purchase_success_title),
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Bold,
+                fontSize = 22.sp,
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center,
+            )
+
+            Spacer(Modifier.height(10.dp))
+
+            Text(
+                text = stringResource(R.string.settings_purchase_success_body),
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp,
+                color = DwInk500,
+                textAlign = TextAlign.Center,
+            )
+
+            Spacer(Modifier.height(28.dp))
+
+            DwPrimaryButton(
+                text = stringResource(R.string.settings_purchase_success_cta),
+                onClick = onDismiss,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun RestoreSuccessDialog(onDismiss: () -> Unit) {
+    BasicAlertDialog(onDismissRequest = onDismiss) {
+        Column(
+            modifier = Modifier
+                .clip(RoundedCornerShape(28.dp))
+                .background(MaterialTheme.colorScheme.background)
+                .padding(28.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape)
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(DwWater, Color(0xFF0D6B9A))
+                        )
+                    ),
+            ) {
+                Icon(
+                    imageVector = DwIcons.Drop,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(38.dp),
+                )
+            }
+
+            Spacer(Modifier.height(22.dp))
+
+            Text(
+                text = stringResource(R.string.settings_restore_success_title),
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Bold,
+                fontSize = 22.sp,
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center,
+            )
+
+            Spacer(Modifier.height(10.dp))
+
+            Text(
+                text = stringResource(R.string.settings_restore_success_body),
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp,
+                color = DwInk500,
+                textAlign = TextAlign.Center,
+            )
+
+            Spacer(Modifier.height(28.dp))
+
+            DwPrimaryButton(
+                text = stringResource(R.string.settings_restore_success_cta),
+                onClick = onDismiss,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
 }
 
 // ── Preview ───────────────────────────────────────────────────────────────────

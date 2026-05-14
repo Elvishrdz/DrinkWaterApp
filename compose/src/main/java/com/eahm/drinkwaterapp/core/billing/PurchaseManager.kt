@@ -96,7 +96,7 @@ internal class PurchaseManager(
             override fun onReceived(customerInfo: CustomerInfo) {
                 _isAdFree.value = customerInfo.entitlements[ENTITLEMENT_ADS_FREE]?.isActive == true
                 _purchaseState.value = if (_isAdFree.value) {
-                    PurchaseState.Success
+                    PurchaseState.Restored
                 } else {
                     PurchaseState.NothingToRestore
                 }
@@ -119,6 +119,7 @@ sealed interface PurchaseState {
     data object Idle : PurchaseState
     data object Loading : PurchaseState
     data object Success : PurchaseState
+    data object Restored : PurchaseState
     data object NothingToRestore : PurchaseState
     data class Error(val message: String) : PurchaseState
 }

@@ -17,9 +17,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.billing.PurchaseState
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwSecondaryButton
@@ -61,7 +63,7 @@ internal fun RemoveAdsBottomSheet(
             verticalArrangement = Arrangement.spacedBy(0.dp),
         ) {
             Text(
-                text = "Remove Ads",
+                text = stringResource(R.string.settings_remove_ads_title),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
@@ -71,7 +73,7 @@ internal fun RemoveAdsBottomSheet(
             Spacer(Modifier.height(12.dp))
 
             Text(
-                text = "Enjoy DrinkWater completely ad-free with a one-time purchase. Tied to your Play Store account — restore anytime on any device.",
+                text = stringResource(R.string.settings_remove_ads_body),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Normal,
                 fontSize = 14.sp,
@@ -81,7 +83,11 @@ internal fun RemoveAdsBottomSheet(
             Spacer(Modifier.height(24.dp))
 
             DwPrimaryButton(
-                text = if (priceString != null) "Remove Ads · $priceString" else "Remove Ads",
+                text = if (priceString != null) {
+                    stringResource(R.string.settings_remove_ads_cta_with_price, priceString)
+                } else {
+                    stringResource(R.string.settings_remove_ads_cta)
+                },
                 onClick = onPurchase,
                 enabled = !isLoading,
                 modifier = Modifier.fillMaxWidth(),
@@ -90,7 +96,7 @@ internal fun RemoveAdsBottomSheet(
             Spacer(Modifier.height(10.dp))
 
             DwSecondaryButton(
-                text = "Restore Purchase",
+                text = stringResource(R.string.settings_remove_ads_restore_cta),
                 onClick = onRestore,
                 enabled = !isLoading,
                 modifier = Modifier.fillMaxWidth(),
@@ -100,7 +106,7 @@ internal fun RemoveAdsBottomSheet(
                 is PurchaseState.Error -> {
                     Spacer(Modifier.height(12.dp))
                     Text(
-                        text = "Something went wrong: ${s.message}",
+                        text = stringResource(R.string.settings_remove_ads_error, s.message),
                         fontFamily = PlusJakartaSans,
                         fontWeight = FontWeight.Normal,
                         fontSize = 13.sp,
@@ -111,7 +117,7 @@ internal fun RemoveAdsBottomSheet(
                 PurchaseState.NothingToRestore -> {
                     Spacer(Modifier.height(12.dp))
                     Text(
-                        text = "No previous purchase found for this account.",
+                        text = stringResource(R.string.settings_remove_ads_nothing_to_restore),
                         fontFamily = PlusJakartaSans,
                         fontWeight = FontWeight.Normal,
                         fontSize = 13.sp,
