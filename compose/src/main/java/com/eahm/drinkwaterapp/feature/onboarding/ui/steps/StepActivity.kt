@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
@@ -24,12 +26,6 @@ private data class ActivityOption(
     val subtitle: String,
 )
 
-private val activityOptions = listOf(
-    ActivityOption(ActivityLevel.LIGHT, "Light", "Mostly sitting, little exercise"),
-    ActivityOption(ActivityLevel.MODERATE, "Moderate", "Walks, light workouts 2–3×/week"),
-    ActivityOption(ActivityLevel.ACTIVE, "Active", "Daily training or active job"),
-)
-
 /** Step 6 — Activity level selection. */
 @Composable
 internal fun StepActivity(
@@ -38,16 +34,34 @@ internal fun StepActivity(
     onNext: () -> Unit,
     onBack: () -> Unit,
 ) {
+    val activityOptions = listOf(
+        ActivityOption(
+            ActivityLevel.LIGHT,
+            stringResource(R.string.onb_activity_light_title),
+            stringResource(R.string.onb_activity_light_subtitle)
+        ),
+        ActivityOption(
+            ActivityLevel.MODERATE,
+            stringResource(R.string.onb_activity_moderate_title),
+            stringResource(R.string.onb_activity_moderate_subtitle)
+        ),
+        ActivityOption(
+            ActivityLevel.ACTIVE,
+            stringResource(R.string.onb_activity_active_title),
+            stringResource(R.string.onb_activity_active_subtitle)
+        ),
+    )
+
     OnbShell(
         step = 6,
         total = OnboardingSteps.totalSteps,
-        title = "How active are you?",
-        subtitle = "Active days need ~15% more water than rest days.",
+        title = stringResource(R.string.onb_activity_title),
+        subtitle = stringResource(R.string.onb_activity_subtitle),
         art = { OnbArtCircle(icon = OnbIcons.ActivityRun) },
         onBack = onBack,
         footer = {
             DwPrimaryButton(
-                text = "Continue",
+                text = stringResource(R.string.onb_cta_continue),
                 onClick = onNext,
                 enabled = selected != null,
                 modifier = Modifier.fillMaxWidth(),

@@ -31,7 +31,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -48,7 +50,6 @@ private const val ROW_STAGGER_MS = 150L
 private const val ROW_START_DELAY_MS = 150L
 private const val BUTTON_DELAY_MS = 900L
 
-/** Step 11 — Summary / done screen. No art circle; gradient header is minimal. */
 @Composable
 internal fun StepDone(
     step: Int,
@@ -57,9 +58,9 @@ internal fun StepDone(
     onBack: () -> Unit,
 ) {
     val title = if (state.name.isBlank()) {
-        "You're all set!"
+        stringResource(R.string.onb_done_title)
     } else {
-        "You're all set, ${state.name}"
+        stringResource(R.string.onb_done_title_with_name, state.name)
     }
     val liters = "%.2f".format(state.computedGoalMl / 1000.0)
 
@@ -67,11 +68,11 @@ internal fun StepDone(
         step = step,
         total = step,
         title = title,
-        subtitle = "Here's your starting plan — change any of it later in Settings.",
+        subtitle = stringResource(R.string.onb_done_subtitle),
         onBack = onBack,
         footer = {
             DwPrimaryButtonAnimated(
-                text = "Start drinking",
+                text = stringResource(R.string.onb_done_cta),
                 onClick = onStart,
                 modifier = Modifier.fillMaxWidth(),
                 delayMs = BUTTON_DELAY_MS,
@@ -93,28 +94,28 @@ private fun SummaryCard(
             icon = DwIcons.Drop,
             iconBg = DwTintWater,
             iconTint = DwWater,
-            label = "Daily goal",
+            label = stringResource(R.string.onb_done_row_daily_goal),
             value = "$liters L",
         ),
         SummaryRowData(
             icon = DwIcons.Bell,
             iconBg = DwTintMagenta,
             iconTint = DwMagenta,
-            label = "Reminder",
+            label = stringResource(R.string.onb_done_row_reminder),
             value = formatInterval(state.intervalMinutes),
         ),
         SummaryRowData(
             icon = DwIcons.Sun,
             iconBg = DwTintWater,
             iconTint = DwWater,
-            label = "Wake",
+            label = stringResource(R.string.onb_done_row_start_time),
             value = state.wakeTime.label(),
         ),
         SummaryRowData(
             icon = DwIcons.Moon,
             iconBg = DwTintMagenta,
             iconTint = DwMagenta,
-            label = "Bedtime",
+            label = stringResource(R.string.onb_done_row_end_time),
             value = state.sleepTime.label(),
         ),
     )

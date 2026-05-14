@@ -8,8 +8,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -35,14 +37,14 @@ internal fun StepWake(
     OnbShell(
         step = step,
         total = OnboardingSteps.totalSteps,
-        title = "When do you wake up?",
-        subtitle = "We'll start reminding you about 30 minutes after.",
+        title = stringResource(R.string.onb_wake_title),
+        subtitle = stringResource(R.string.onb_wake_subtitle),
         art = { OnbArtCircle(icon = DwIcons.Sun) },
         onBack = onBack,
         footer = {
             if (isSameTime) {
                 Text(
-                    text = "Wake-up and bedtime can't be the same.",
+                    text = stringResource(R.string.onb_wake_same_time_error),
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall,
                     textAlign = TextAlign.Center,
@@ -52,7 +54,7 @@ internal fun StepWake(
                 )
             }
             DwPrimaryButtonAnimated(
-                text = "Continue",
+                text = stringResource(R.string.onb_cta_continue),
                 onClick = onNext,
                 enabled = !isSameTime,
                 modifier = Modifier.fillMaxWidth(),
@@ -68,7 +70,6 @@ internal fun StepWake(
         )
     }
 }
-
 
 @DwPreview
 @Composable

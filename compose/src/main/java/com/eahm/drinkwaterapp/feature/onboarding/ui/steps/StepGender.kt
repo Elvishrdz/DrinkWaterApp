@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -28,13 +30,13 @@ internal fun StepGender(
     OnbShell(
         step = 4,
         total = OnboardingSteps.totalSteps,
-        title = "A bit about you",
-        subtitle = "Helps us refine your hydration formula. You can skip this.",
+        title = stringResource(R.string.onb_gender_title),
+        subtitle = stringResource(R.string.onb_gender_subtitle),
         art = { OnbArtCircle(icon = OnbIcons.Person) },
         onBack = onBack,
         footer = {
             DwPrimaryButton(
-                text = "Continue",
+                text = stringResource(R.string.onb_cta_continue),
                 onClick = onNext,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -42,19 +44,19 @@ internal fun StepGender(
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             ChoiceCard(
-                title = "Female",
+                title = stringResource(R.string.onb_gender_option_female),
                 selected = selected == Gender.FEMALE,
                 onClick = { onSelect(Gender.FEMALE) },
                 leadingIcon = OnbIcons.GenderFemale,
             )
             ChoiceCard(
-                title = "Male",
+                title = stringResource(R.string.onb_gender_option_male),
                 selected = selected == Gender.MALE,
                 onClick = { onSelect(Gender.MALE) },
                 leadingIcon = OnbIcons.GenderMale,
             )
             ChoiceCard(
-                title = "Prefer not to say",
+                title = stringResource(R.string.onb_gender_option_prefer_not_to_say),
                 selected = selected == Gender.PREFER_NOT_TO_SAY,
                 onClick = { onSelect(Gender.PREFER_NOT_TO_SAY) },
                 leadingIcon = OnbIcons.GenderNeutral,

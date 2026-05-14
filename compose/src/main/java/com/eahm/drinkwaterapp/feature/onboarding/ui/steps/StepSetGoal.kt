@@ -11,7 +11,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -38,13 +40,13 @@ internal fun StepSetGoal(
     OnbShell(
         step = step,
         total = OnboardingSteps.totalSteps,
-        title = "Set your daily goal",
-        subtitle = "Define what you want to achieve per day.",
+        title = stringResource(R.string.onb_goal_title),
+        subtitle = stringResource(R.string.onb_set_goal_subtitle),
         art = { OnbArtCircle(icon = DwIcons.Drop) },
         onBack = onBack,
         footer = {
             DwPrimaryButtonAnimated(
-                text = "Set my goal",
+                text = stringResource(R.string.onb_set_goal_cta),
                 onClick = onNext,
                 modifier = Modifier.fillMaxWidth(),
             )

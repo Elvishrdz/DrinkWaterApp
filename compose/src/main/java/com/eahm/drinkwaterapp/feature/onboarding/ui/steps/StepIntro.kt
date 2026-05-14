@@ -21,7 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -45,12 +47,12 @@ internal fun StepIntro(
     OnbShell(
         step = step,
         total = OnboardingSteps.totalSteps,
-        title = "Let's build a great habit",
-        subtitle = "In the next steps, we'll quickly set up your hydration goal and reminders.",
+        title = stringResource(R.string.onb_intro_title),
+        subtitle = stringResource(R.string.onb_intro_subtitle),
         art = { OnbArtCircle(icon = DwIcons.Drop) },
         footer = {
             DwPrimaryButtonAnimated(
-                text = "Get started",
+                text = stringResource(R.string.onb_intro_cta_text),
                 onClick = onNext,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -73,22 +75,22 @@ private fun IntroFeatureCards() {
             icon = DwIcons.Drop,
             cardBackground = DwTintWater,
             iconBackground = DwWater,
-            title = "Your daily goal",
-            description = "Decide exactly how much you want to achieve.",
+            title = stringResource(R.string.onb_intro_card_goal_title),
+            description = stringResource(R.string.onb_intro_card_goal_description),
         )
         IntroFeatureCard(
             icon = DwIcons.Bell,
             cardBackground = DwTintMagenta,
             iconBackground = DwMagenta,
-            title = "Daily reminders",
-            description = "Notifications to let you know when is a good time to have a sip.",
+            title = stringResource(R.string.onb_intro_card_reminders_title),
+            description = stringResource(R.string.onb_intro_card_reminders_description),
         )
         IntroFeatureCard(
             icon = DwIcons.Wave,
             cardBackground = DwTintWater,
             iconBackground = DwWaterDeep,
-            title = "History and stats",
-            description = "Overview to your progress. Build a healthy habit, one day at a time.",
+            title = stringResource(R.string.onb_intro_card_stats_title),
+            description = stringResource(R.string.onb_intro_card_stats_description),
         )
     }
 }

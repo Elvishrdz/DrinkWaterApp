@@ -20,10 +20,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -49,13 +51,13 @@ internal fun StepWeight(
     OnbShell(
         step = 5,
         total = OnboardingSteps.totalSteps,
-        title = "What's your weight?",
-        subtitle = "We use this to calculate your daily water goal.",
+        title = stringResource(R.string.onb_weight_title),
+        subtitle = stringResource(R.string.onb_weight_subtitle),
         art = { OnbArtCircle(icon = OnbIcons.Scale) },
         onBack = onBack,
         footer = {
             DwPrimaryButton(
-                text = "Continue",
+                text = stringResource(R.string.onb_cta_continue),
                 onClick = onNext,
                 modifier = Modifier.fillMaxWidth(),
             )

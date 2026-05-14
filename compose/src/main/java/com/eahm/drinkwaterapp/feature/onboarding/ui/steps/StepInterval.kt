@@ -10,7 +10,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -25,14 +27,7 @@ import com.eahm.drinkwaterapp.feature.settings.ui.IntervalBottomSheet
 
 private data class IntervalOption(val minutes: Int, val title: String, val subtitle: String)
 
-private val intervalOptions = listOf(
-    IntervalOption(30, "Every 30 minutes", "Most consistent"),
-    IntervalOption(45, "Every 45 minutes", "Recommended"),
-    IntervalOption(60, "Every hour", "Light touch"),
-    IntervalOption(120, "Every 2 hours", "Minimal"),
-)
-
-private val presetMinutes = intervalOptions.map { it.minutes }.toSet()
+private val presetMinutes = setOf(30, 45, 60, 120)
 
 @Composable
 internal fun StepInterval(
@@ -44,6 +39,29 @@ internal fun StepInterval(
     onNext: () -> Unit,
     onBack: () -> Unit,
 ) {
+    val intervalOptions = listOf(
+        IntervalOption(
+            30,
+            stringResource(R.string.onb_interval_30_title),
+            stringResource(R.string.onb_interval_30_subtitle)
+        ),
+        IntervalOption(
+            45,
+            stringResource(R.string.onb_interval_45_title),
+            stringResource(R.string.onb_interval_45_subtitle)
+        ),
+        IntervalOption(
+            60,
+            stringResource(R.string.onb_interval_60_title),
+            stringResource(R.string.onb_interval_60_subtitle)
+        ),
+        IntervalOption(
+            120,
+            stringResource(R.string.onb_interval_120_title),
+            stringResource(R.string.onb_interval_120_subtitle)
+        ),
+    )
+
     val isCustomSelected = selectedMinutes !in presetMinutes
     var showCustomSheet by rememberSaveable { mutableStateOf(false) }
 
@@ -56,13 +74,13 @@ internal fun StepInterval(
     OnbShell(
         step = step,
         total = OnboardingSteps.totalSteps,
-        title = "How often should we remind you?",
-        subtitle = "You can change this anytime in Settings.",
+        title = stringResource(R.string.onb_interval_title),
+        subtitle = stringResource(R.string.onb_interval_subtitle),
         art = { OnbArtCircle(icon = DwIcons.Clock) },
         onBack = onBack,
         footer = {
             DwPrimaryButtonAnimated(
-                text = "Continue",
+                text = stringResource(R.string.onb_cta_continue),
                 onClick = onNext,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -79,8 +97,10 @@ internal fun StepInterval(
                 )
             }
             ChoiceCard(
-                title = "I'll choose",
-                subtitle = if (isCustomSelected) formatCustomLabel(selectedMinutes) else "Pick your own interval",
+                title = stringResource(R.string.onb_interval_custom_title),
+                subtitle = if (isCustomSelected) formatCustomLabel(selectedMinutes) else stringResource(
+                    R.string.onb_interval_custom_subtitle
+                ),
                 selected = isCustomSelected,
                 onClick = { showCustomSheet = true },
                 leadingIcon = DwIcons.Settings,

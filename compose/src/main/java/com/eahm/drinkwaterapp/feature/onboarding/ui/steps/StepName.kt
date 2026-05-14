@@ -8,8 +8,10 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -31,13 +33,13 @@ internal fun StepName(
     OnbShell(
         step = step,
         total = OnboardingSteps.totalSteps,
-        title = "What's your name?",
-        subtitle = "We'll use it to greet you on the home screen.",
+        title = stringResource(R.string.onb_name_title),
+        subtitle = stringResource(R.string.onb_name_subtitle),
         art = { OnbArtCircle(icon = OnbIcons.Person) },
         onBack = onBack,
         footer = {
             DwPrimaryButton(
-                text = "Continue",
+                text = stringResource(R.string.onb_cta_continue),
                 onClick = onNext,
                 enabled = name.isNotBlank(),
                 modifier = Modifier.fillMaxWidth(),
@@ -49,7 +51,7 @@ internal fun StepName(
             onValueChange = onNameChange,
             placeholder = {
                 Text(
-                    text = "Your name",
+                    text = stringResource(R.string.onb_name_placeholder),
                     style = MaterialTheme.typography.bodyLarge,
                 )
             },

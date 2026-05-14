@@ -22,9 +22,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.eahm.drinkwaterapp.R
+import com.eahm.drinkwaterapp.core.config.FeatureFlags
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
@@ -72,8 +75,8 @@ private fun RequestLayout(
     OnbShell(
         step = step,
         total = OnboardingSteps.totalSteps,
-        title = "Celebrations, anywhere",
-        subtitle = "The celebration card always appears inside DrinkWater. Allow display over other apps so it also pops up when you drink from a reminder — even with the app closed.",
+        title = stringResource(R.string.onb_overlay_request_title),
+        subtitle = stringResource(R.string.onb_overlay_request_subtitle),
         art = { OnbArtCircle(icon = DwIcons.Star) },
         onBack = onBack,
         footer = {
@@ -82,14 +85,14 @@ private fun RequestLayout(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(
-                    text = "Skip for now",
+                    text = stringResource(R.string.onb_overlay_request_cta_skip),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             Spacer(Modifier.height(8.dp))
             DwPrimaryButton(
-                text = "Allow display over other apps",
+                text = stringResource(R.string.onb_overlay_request_cta_allow),
                 onClick = onAllow,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -112,13 +115,13 @@ private fun GrantedLayout(
     OnbShell(
         step = step,
         total = OnboardingSteps.totalSteps,
-        title = "Goal celebrations are on",
-        subtitle = "A celebration card will appear every time you complete your daily water goal.",
+        title = stringResource(R.string.onb_overlay_granted_title),
+        subtitle = stringResource(R.string.onb_overlay_granted_subtitle),
         art = { OnbArtCircle(icon = OnbIcons.Check) },
         onBack = onBack,
         footer = {
             DwPrimaryButtonAnimated(
-                text = "Continue",
+                text = stringResource(R.string.onb_cta_continue),
                 onClick = onContinue,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -164,13 +167,13 @@ private fun CelebrationCardPreview() {
         }
 
         Text(
-            text = "Daily goal reached!",
+            text = stringResource(R.string.onb_overlay_card_preview_title),
             fontWeight = FontWeight.ExtraBold,
             fontSize = 18.sp,
             color = Color.White,
         )
         Text(
-            text = "You drank your 2.0 L — keep it up",
+            text = stringResource(R.string.onb_overlay_card_preview_body),
             style = MaterialTheme.typography.bodySmall,
             color = Color.White.copy(alpha = 0.80f),
         )
@@ -184,9 +187,21 @@ private fun CelebrationCardPreview() {
                 .padding(vertical = 10.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
-            StatCell(value = "2.0 L", label = "goal")
-            StatCell(value = "8", label = "glasses")
-            StatCell(value = "3", label = "day streak")
+            StatCell(
+                value = "2.0 L",
+                label = stringResource(R.string.onb_overlay_card_preview_stat_goal)
+            )
+            StatCell(
+                value = "8",
+                label = stringResource(R.string.onb_overlay_card_preview_stat_drinks)
+            )
+
+            if (FeatureFlags.streakFeatureEnabled) {
+                StatCell(
+                    value = "3",
+                    label = stringResource(R.string.onb_overlay_card_preview_stat_streak)
+                )
+            }
         }
     }
 }
@@ -213,10 +228,10 @@ private fun StatCell(value: String, label: String) {
 @Composable
 private fun OverlayStepsList() {
     val steps = listOf(
-        "Tap \"Allow display over other apps\" below.",
-        "Find DrinkWater in the list.",
-        "Enable \"Allow display over other apps\".",
-        "Press back — we'll continue automatically.",
+        stringResource(R.string.onb_overlay_step_1),
+        stringResource(R.string.onb_overlay_step_2),
+        stringResource(R.string.onb_overlay_step_3),
+        stringResource(R.string.onb_overlay_step_4),
     )
 
     Column(
@@ -228,7 +243,7 @@ private fun OverlayStepsList() {
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text(
-            text = "How to enable",
+            text = stringResource(R.string.onb_overlay_steps_header),
             style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -284,8 +299,8 @@ private fun GrantedFeatureList() {
             icon = DwIcons.Drop,
             iconBg = DwTintWater,
             iconTint = DwWater,
-            label = "Inside DrinkWater",
-            description = "Log a drink that completes your goal and the celebration card appears in the app.",
+            label = stringResource(R.string.onb_overlay_feature_app_label),
+            description = stringResource(R.string.onb_overlay_feature_app_description),
         )
         Spacer(Modifier.height(12.dp))
         androidx.compose.material3.HorizontalDivider(
@@ -296,8 +311,8 @@ private fun GrantedFeatureList() {
             icon = DwIcons.Bell,
             iconBg = DwTintMagenta,
             iconTint = DwMagenta,
-            label = "From a reminder",
-            description = "Tap \"Drink\" in a notification, reach your goal, and the card floats over whatever app you're using.",
+            label = stringResource(R.string.onb_overlay_feature_reminder_label),
+            description = stringResource(R.string.onb_overlay_feature_reminder_description),
         )
     }
 }

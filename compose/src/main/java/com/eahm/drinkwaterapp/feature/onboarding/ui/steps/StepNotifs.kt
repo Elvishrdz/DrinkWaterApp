@@ -43,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -192,8 +193,8 @@ private fun NotifsPermissionContent(
     OnbShell(
         step = step,
         total = OnboardingSteps.totalSteps,
-        title = "Stay on track",
-        subtitle = "We'll send a gentle reminder every $intervalLabel so you never forget to hydrate.",
+        title = stringResource(R.string.onb_notifs_permission_title),
+        subtitle = stringResource(R.string.onb_notifs_permission_subtitle, intervalLabel),
         art = { OnbArtCircle(icon = DwIcons.Bell) },
         onBack = onBack,
         footer = {
@@ -202,14 +203,14 @@ private fun NotifsPermissionContent(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(
-                    text = "Maybe later",
+                    text = stringResource(R.string.onb_notifs_permission_cta_skip),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             Spacer(Modifier.height(8.dp))
             DwPrimaryButton(
-                text = "Allow notifications",
+                text = stringResource(R.string.onb_notifs_permission_cta_allow),
                 onClick = onAllow,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -240,13 +241,13 @@ private fun PermissionCard() {
         Spacer(Modifier.width(0.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = "\"Drink Water\" would like to send you notifications",
+                text = stringResource(R.string.onb_notifs_permission_card_title),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSurface,
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                text = "Notifications may include alerts, sounds and badges.",
+                text = stringResource(R.string.onb_notifs_permission_card_body),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Start,
@@ -254,8 +255,6 @@ private fun PermissionCard() {
         }
     }
 }
-
-// ── Design 2: Config ─────────────────────────────────────────────────────────
 
 @Composable
 private fun NotifsConfigContent(
@@ -269,13 +268,13 @@ private fun NotifsConfigContent(
     OnbShell(
         step = step,
         total = OnboardingSteps.totalSteps,
-        title = "Notification amount",
-        subtitle = "We'll log this amount each time you tap drink from a reminder.",
+        title = stringResource(R.string.onb_notifs_config_title),
+        subtitle = stringResource(R.string.onb_notifs_config_subtitle),
         art = { OnbArtCircle(icon = DwIcons.Glass) },
         onBack = onBack,
         footer = {
             DwPrimaryButtonAnimated(
-                text = "Continue",
+                text = stringResource(R.string.onb_cta_continue),
                 onClick = onContinue,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -295,7 +294,7 @@ private fun NotifsConfigContent(
             )
             Spacer(Modifier.height(16.dp))
             Text(
-                text = "Amount logged when tapping drink in the notification",
+                text = stringResource(R.string.onb_notifs_config_hint),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -391,7 +390,7 @@ private fun NotifsDeniedDialog(
                 .padding(24.dp),
         ) {
             Text(
-                text = "Notifications disabled",
+                text = stringResource(R.string.onb_notifs_denied_title),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
@@ -399,7 +398,7 @@ private fun NotifsDeniedDialog(
             )
             Spacer(Modifier.height(10.dp))
             Text(
-                text = "To receive drink reminders, please enable notifications for DrinkWater in your phone's Settings.",
+                text = stringResource(R.string.onb_notifs_denied_body),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Normal,
                 fontSize = 14.sp,
@@ -407,13 +406,13 @@ private fun NotifsDeniedDialog(
             )
             Spacer(Modifier.height(24.dp))
             DwPrimaryButton(
-                text = "Open Settings",
+                text = stringResource(R.string.onb_notifs_denied_cta_settings),
                 onClick = onGoToSettings,
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(8.dp))
             DwSecondaryButton(
-                text = "Cancel",
+                text = stringResource(R.string.onb_notifs_denied_cta_cancel),
                 onClick = onDismiss,
                 modifier = Modifier.fillMaxWidth(),
             )

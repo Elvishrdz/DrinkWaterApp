@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -18,6 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
@@ -43,13 +45,13 @@ internal fun StepGoalResult(
     OnbShell(
         step = step,
         total = OnboardingSteps.totalSteps,
-        title = "Your daily goal",
-        subtitle = "Tailored to your weight and activity level.",
+        title = stringResource(R.string.onb_goal_result_title),
+        subtitle = stringResource(R.string.onb_goal_result_subtitle),
         art = { OnbArtCircle(icon = DwIcons.Drop) },
         onBack = onBack,
         footer = {
             DwPrimaryButton(
-                text = "Looks good",
+                text = stringResource(R.string.onb_goal_result_cta),
                 onClick = onNext,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -109,9 +111,9 @@ private fun GoalDisplay(
         // Glasses equivalent
         Text(
             text = buildAnnotatedString {
-                append("That's about ")
+                append(stringResource(R.string.onb_goal_result_glasses_about))
                 withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append("$glasses glasses") }
-                append(" across your day.")
+                append(stringResource(R.string.onb_goal_result_glasses_suffix))
             },
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,

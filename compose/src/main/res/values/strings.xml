@@ -7,4 +7,137 @@
     <string name="skip">Skip</string>
     <string name="notification_drink_amount_formatted">+%1$s%2$s</string>
     <string name="share_app_title">Share DrinkWater app with your friends!</string>
+
+    <!-- Onboarding — shared -->
+    <string name="onb_cta_continue">Continue</string>
+
+    <!-- Onboarding — Intro -->
+    <string name="onb_intro_title">Let\'s build a great habit</string>
+    <string name="onb_intro_subtitle">In the next steps, we\'ll quickly set up your hydration goal and reminders.</string>
+    <string name="onb_intro_cta_text">Get started</string>
+    <string name="onb_intro_card_goal_title">Your daily goal</string>
+    <string name="onb_intro_card_goal_description">Decide exactly how much you want to achieve.</string>
+    <string name="onb_intro_card_reminders_title">Daily reminders</string>
+    <string name="onb_intro_card_reminders_description">Notifications to let you know when is a good time to have a sip.</string>
+    <string name="onb_intro_card_stats_title">History and stats</string>
+    <string name="onb_intro_card_stats_description">Overview to your progress. Build a healthy habit, one day at a time.</string>
+
+    <!-- Onboarding — Set Goal -->
+    <string name="onb_goal_title">Set your daily goal</string>
+    <string name="onb_set_goal_subtitle">Define what you want to achieve per day.</string>
+    <string name="onb_set_goal_cta">Set my goal</string>
+
+    <!-- Onboarding — Name -->
+    <string name="onb_name_title">What\'s your name?</string>
+    <string name="onb_name_subtitle">We\'ll use it to greet you on the home screen.</string>
+    <string name="onb_name_placeholder">Your name</string>
+
+    <!-- Onboarding — Gender -->
+    <string name="onb_gender_title">A bit about you</string>
+    <string name="onb_gender_subtitle">Helps us refine your hydration formula. You can skip this.</string>
+    <string name="onb_gender_option_female">Female</string>
+    <string name="onb_gender_option_male">Male</string>
+    <string name="onb_gender_option_prefer_not_to_say">Prefer not to say</string>
+
+    <!-- Onboarding — Weight -->
+    <string name="onb_weight_title">What\'s your weight?</string>
+    <string name="onb_weight_subtitle">We use this to calculate your daily water goal.</string>
+
+    <!-- Onboarding — Activity -->
+    <string name="onb_activity_title">How active are you?</string>
+    <string name="onb_activity_subtitle">Active days need ~15% more water than rest days.</string>
+    <string name="onb_activity_light_title">Light</string>
+    <string name="onb_activity_light_subtitle">Mostly sitting, little exercise</string>
+    <string name="onb_activity_moderate_title">Moderate</string>
+    <string name="onb_activity_moderate_subtitle">Walks, light workouts 2–3×/week</string>
+    <string name="onb_activity_active_title">Active</string>
+    <string name="onb_activity_active_subtitle">Daily training or active job</string>
+
+    <!-- Onboarding — Goal Result -->
+    <string name="onb_goal_result_title">Your daily goal</string>
+    <string name="onb_goal_result_subtitle">Tailored to your weight and activity level.</string>
+    <string name="onb_goal_result_cta">Looks good</string>
+    <string name="onb_goal_result_glasses_about">That\'s about </string>
+    <string name="onb_goal_result_glasses_suffix"> across your day.</string>
+
+    <!-- Onboarding — Wake -->
+    <string name="onb_wake_title">When do you start your day?</string>
+    <string name="onb_wake_subtitle">This is the time we\'ll start to send you reminders.</string>
+    <string name="onb_wake_same_time_error">The time can\'t be the same as the end time.</string>
+
+    <!-- Onboarding — Sleep -->
+    <string name="onb_sleep_title">And when do you end your day?</string>
+    <string name="onb_sleep_subtitle">Reminders will stop at this time, but you can still drink at any time you want.</string>
+    <string name="onb_sleep_same_time_error">The time can\'t be the same as the start time</string>
+
+    <!-- Onboarding — Interval -->
+    <string name="onb_interval_title">How often should we remind you?</string>
+    <string name="onb_interval_subtitle">The intervals will try to fit this preference, but they can vary. You can change this value anytime in app settings.</string>
+    <string name="onb_interval_30_title">Every 30 minutes</string>
+    <string name="onb_interval_30_subtitle">Most consistent</string>
+    <string name="onb_interval_45_title">Every 45 minutes</string>
+    <string name="onb_interval_45_subtitle">Recommended</string>
+    <string name="onb_interval_60_title">Every hour</string>
+    <string name="onb_interval_60_subtitle">Light touch</string>
+    <string name="onb_interval_120_title">Every 2 hours</string>
+    <string name="onb_interval_120_subtitle">Minimal</string>
+    <string name="onb_interval_custom_title">I\'ll choose</string>
+    <string name="onb_interval_custom_subtitle">Pick your own interval</string>
+
+    <!-- Onboarding — Notifications: Permission -->
+    <string name="onb_notifs_permission_title">Stay on track</string>
+    <string name="onb_notifs_permission_subtitle">We\'ll send you a reminder approximately every %1$s so you never forget to hydrate.</string>
+    <string name="onb_notifs_permission_cta_skip">Maybe later</string>
+    <string name="onb_notifs_permission_cta_allow">Allow notifications</string>
+    <string name="onb_notifs_permission_card_title">Time for a sip!</string>
+    <string name="onb_notifs_permission_card_body">Drink now to stay hydrated.</string>
+    <!-- Onboarding — Notifications: Config -->
+    <string name="onb_notifs_config_title">Quick drink</string>
+    <string name="onb_notifs_config_subtitle">Don\'t want to open the app? Tap this value in the notification and we will quickly save the record for you.</string>
+    <string name="onb_notifs_config_hint">This can be changed anytime in the app settings.</string>
+    <!-- Onboarding — Notifications: Denied dialog -->
+    <string name="onb_notifs_denied_title">Notifications disabled</string>
+    <string name="onb_notifs_denied_body">To receive drink reminders, please enable notifications for DrinkWater in your phone\'s Settings.</string>
+    <string name="onb_notifs_denied_cta_settings">Open Settings</string>
+    <string name="onb_notifs_denied_cta_cancel">Cancel</string>
+
+    <!-- Onboarding — Overlay: Request -->
+    <string name="onb_overlay_request_title">Celebrations, anywhere</string>
+    <string name="onb_overlay_request_subtitle">The celebration card always appears when you reach your daily goal from within the app or a reminder. Allow display over other apps so it pops up on your device.</string>
+    <string name="onb_overlay_request_cta_skip">Skip for now</string>
+    <string name="onb_overlay_request_cta_allow">Allow display over other apps</string>
+
+    <!-- Onboarding — Overlay: Granted -->
+    <string name="onb_overlay_granted_title">Goal celebrations are on</string>
+    <string name="onb_overlay_granted_subtitle">A celebration card will appear every time you complete your daily water goal.</string>
+
+    <!-- Onboarding — Overlay: How-to steps -->
+    <string name="onb_overlay_steps_header">How to enable</string>
+    <string name="onb_overlay_step_1">Tap \"Allow display over other apps\" below.</string>
+    <string name="onb_overlay_step_2">Find DrinkWater app in the list.</string>
+    <string name="onb_overlay_step_3">Enable \"Allow display over other apps\".</string>
+    <string name="onb_overlay_step_4">Press back, we\'ll continue automatically.</string>
+
+    <!-- Onboarding — Overlay: Feature rows -->
+    <string name="onb_overlay_feature_app_label">Inside the app</string>
+    <string name="onb_overlay_feature_app_description">Log a drink that completes your goal and the celebration card will appear.</string>
+    <string name="onb_overlay_feature_reminder_label">From a reminder</string>
+    <string name="onb_overlay_feature_reminder_description">Tap your drink amount in a notification and if you reach your goal, the card floats over whatever app you\'re using.</string>
+    <!-- Onboarding — Overlay: Card preview mockup -->
+    <string name="onb_overlay_card_preview_title">Daily goal reached!</string>
+    <string name="onb_overlay_card_preview_body">You drank your 2.0 L — keep it up</string>
+    <string name="onb_overlay_card_preview_stat_goal">goal</string>
+    <string name="onb_overlay_card_preview_stat_drinks">drinks</string>
+    <string name="onb_overlay_card_preview_stat_streak">day streak</string>
+
+    <!-- Onboarding — Done -->
+    <string name="onb_done_title">You\'re all set!</string>
+    <string name="onb_done_title_with_name">You\'re all set, %1$s</string>
+    <string name="onb_done_subtitle">Here\'s your setup, change any of it later in app settings.</string>
+    <string name="onb_done_cta">Start drinking</string>
+    <string name="onb_done_row_daily_goal">Daily goal</string>
+    <string name="onb_done_row_reminder">Reminder</string>
+    <string name="onb_done_row_start_time">Start time</string>
+    <string name="onb_done_row_end_time">End time</string>
+
 </resources>
