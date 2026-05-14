@@ -29,7 +29,7 @@ android {
         applicationId = "com.eahm.drinkwaterapp"
         minSdk = 24
         targetSdk = 37
-        versionCode = 17
+        versionCode = 18
         versionName = "2.0.0-alpha01"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
