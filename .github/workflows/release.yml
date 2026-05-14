@@ -48,7 +48,7 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: com.eahm.drinkwaterapp
           releaseFiles: compose/build/outputs/bundle/release/*.aab
-          track: ${{ github.event.inputs.track }}
+          tracks: ${{ github.event.inputs.track }}
           whatsNewDirectory: changelogs/
 
       - name: Clean up keystore
