@@ -10,7 +10,7 @@ val streakModule = module {
     if (FeatureFlags.streakFeatureEnabled) {
         singleOf(::StreakRepositoryImpl) bind StreakRepository::class
     } else {
-        singleOf(::StreakRepositoryMock) bind StreakRepository::class
+        singleOf(::StreakRepositoryWithoutStreaks) bind StreakRepository::class
     }
 }
 

@@ -10,7 +10,7 @@ internal sealed interface StreakDevState {
         val currentDrinkStreak: Int,
         val bestGoalStreak: Int?,
         val bestDrinkStreak: Int?,
-        val personalBestMl: Int,
+        val personalBestMl: Float?,
         val storedBestGoalStreak: Int,
         val storedBestDrinkStreak: Int,
         val selectedDate: LocalDate,

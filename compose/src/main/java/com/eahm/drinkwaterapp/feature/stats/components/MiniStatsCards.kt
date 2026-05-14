@@ -19,6 +19,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
+import com.eahm.drinkwaterapp.core.domain.extension.sanitizeZeroDecimals
 
 @Composable
 fun MiniStatsCards(
@@ -26,7 +27,7 @@ fun MiniStatsCards(
     bestDrinkStreakDays: Int?,
     goalStreakDays: Int,
     bestGoalStreakDays: Int?,
-    personalBestMl: Int,
+    personalBestMl: Float?,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -81,18 +82,20 @@ fun MiniStatsCards(
                 }
             }
         }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            MiniCard(
-                icon = DwIcons.Glass,
-                iconBg = DwTintWater,
-                iconTint = DwWater,
-                value = personalBestMl.toString(),
-                label = stringResource(R.string.stats_mini_personal_best),
-                modifier = Modifier.weight(1f),
-            )
+        personalBestMl?.let {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                MiniCard(
+                    icon = DwIcons.Glass,
+                    iconBg = DwTintWater,
+                    iconTint = DwWater,
+                    value = it.sanitizeZeroDecimals(),
+                    label = stringResource(R.string.stats_mini_personal_best),
+                    modifier = Modifier.weight(1f),
+                )
+            }
         }
     }
 }
@@ -106,7 +109,7 @@ private fun NoBestStatsPreview() {
             bestDrinkStreakDays = null,
             goalStreakDays = 4,
             bestGoalStreakDays = null,
-            personalBestMl = 2950,
+            personalBestMl = 2950f,
             modifier = Modifier.padding(16.dp),
         )
     }
@@ -121,7 +124,7 @@ private fun AllStatsPreview() {
             bestDrinkStreakDays = 12,
             goalStreakDays = 4,
             bestGoalStreakDays = 4,
-            personalBestMl = 2950,
+            personalBestMl = 2950f,
             modifier = Modifier.padding(16.dp),
         )
     }

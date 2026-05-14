@@ -35,7 +35,7 @@ class StreakRepositoryImpl(
         val currentGoalStreak: Int,
         val bestDrinkStreak: Int,
         val bestGoalStreak: Int,
-        val personalBestMl: Int,
+        val personalBestMl: Float,
     )
 
     private val computedFromDb: Flow<ComputedStreaks> = dateTimeZoneChangedObserver.currentDateTime
@@ -78,6 +78,7 @@ class StreakRepositoryImpl(
             bestGoalStreakDays = maxOf(computed.bestGoalStreak, bestGoal)
                 .takeIf { it > 0 },
             personalBestMl = computed.personalBestMl,
+            personalBestDate = LocalDate(year = 2026, month = 5, day = 14), // TODO: provide this
         )
     }
 
@@ -145,7 +146,7 @@ class StreakRepositoryImpl(
             prevDate = d
         }
 
-        val personalBestMl = dailyTotals.values.maxOrNull()?.toInt() ?: 0
+        val personalBestMl = dailyTotals.values.maxOrNull() ?: 0f
 
         return ComputedStreaks(
             currentGoalStreak = currentGoalStreak,

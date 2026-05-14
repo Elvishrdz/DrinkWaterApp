@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Update
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.database.entity.Status
+import com.eahm.drinkwaterapp.core.database.model.HighestDrinkDay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.LocalDateTime
 
@@ -55,6 +56,27 @@ interface HistoryDao {
         """
     )
     fun getTotalDrinkAmount(start: LocalDateTime, end: LocalDateTime): Flow<Float>
+
+    /**
+     * Returns the single day with the highest total water intake, or null if there are no records.
+     *
+     * Timestamps are stored as epoch milliseconds (UTC), so dividing by 86400000 converts them
+     * to epoch days, the unit expected by LocalDateConverter. Zero-amount entries (skipped
+     * notifications) are excluded from the aggregation.
+     */
+    @Query(
+        """
+        SELECT
+            (timestamp / 86400000) as day,
+            SUM(drink_amount) as total_drink_amount
+        FROM HistoryEntity
+        WHERE drink_amount > 0
+        GROUP BY (timestamp / 86400000)
+        ORDER BY total_drink_amount DESC
+        LIMIT 1
+        """
+    )
+    fun getHighestDrinkDay(): Flow<HighestDrinkDay?>
 
     @Query("DELETE FROM HistoryEntity")
     suspend fun deleteAll()

@@ -12,7 +12,7 @@ data class StatsState(
     val bestDrinkStreakDays: Int? = null,
     val goalStreakDays: Int = 0,
     val bestGoalStreakDays: Int? = null,
-    val personalBestMl: Int = 0,
+    val personalBestMl: Float? = null,
 )
 
 enum class StatsPeriod(val label: String) {

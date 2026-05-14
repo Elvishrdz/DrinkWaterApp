@@ -24,6 +24,8 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
+import java.text.DateFormatSymbols
+import java.util.Locale
 import kotlin.math.abs
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -269,14 +271,13 @@ internal class StatsViewModel(
         private const val NUM_MONTHS = 6
         private const val NUM_YEARS = 3
 
-        private val DAY_SHORT_LABELS = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
-        private val MONTH_SHORT_LABELS = listOf(
-            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-        )
-        private val MONTH_FULL_LABELS = listOf(
-            "January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December",
-        )
+        private val DAY_SHORT_LABELS: List<String> =
+            DateFormatSymbols(Locale.getDefault()).shortWeekdays.let { dfs ->
+                listOf(dfs[2], dfs[3], dfs[4], dfs[5], dfs[6], dfs[7], dfs[1]) // Mon–Sun
+            }
+        private val MONTH_SHORT_LABELS: List<String> =
+            DateFormatSymbols(Locale.getDefault()).shortMonths.take(12)
+        private val MONTH_FULL_LABELS: List<String> =
+            DateFormatSymbols(Locale.getDefault()).months.take(12)
     }
 }

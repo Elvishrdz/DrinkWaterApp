@@ -256,7 +256,7 @@ private val previewState = StatsState(
     bestGoalStreakDays = 12,
     drinkStreakDays = 7,
     bestDrinkStreakDays = 20,
-    personalBestMl = 2950,
+    personalBestMl = 2950f,
 )
 
 @Preview(showBackground = true)
