@@ -24,10 +24,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.bindings.toEntity
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -176,7 +178,7 @@ internal fun HistoryV2Screen(
             containerColor = DwPaper,
             title = {
                 Text(
-                    text = "Edit drink",
+                    text = stringResource(R.string.history_edit_dialog_title),
                     fontFamily = PlusJakartaSans,
                     fontWeight = FontWeight.Bold,
                     color = DwInk900,
@@ -186,8 +188,8 @@ internal fun HistoryV2Screen(
                 OutlinedTextField(
                     value = editAmountText,
                     onValueChange = { editAmountText = it.filter(Char::isDigit) },
-                    label = { Text("Amount") },
-                    suffix = { Text("mL") },
+                    label = { Text(stringResource(R.string.history_edit_amount_label)) },
+                    suffix = { Text(stringResource(R.string.volume_unit_mililiters)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                 )
@@ -203,7 +205,7 @@ internal fun HistoryV2Screen(
                     },
                 ) {
                     Text(
-                        text = "Save",
+                        text = stringResource(R.string.action_save),
                         color = DwMagenta,
                         fontFamily = PlusJakartaSans,
                         fontWeight = FontWeight.SemiBold,
@@ -213,7 +215,7 @@ internal fun HistoryV2Screen(
             dismissButton = {
                 TextButton(onClick = { editingRecord = null }) {
                     Text(
-                        text = "Cancel",
+                        text = stringResource(R.string.action_cancel),
                         color = DwInk500,
                         fontFamily = PlusJakartaSans,
                     )

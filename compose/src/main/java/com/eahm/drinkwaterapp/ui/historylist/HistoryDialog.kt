@@ -110,7 +110,7 @@ fun HistoryDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 4.dp, vertical = 8.dp),
-                    text = "History",
+                    text = stringResource(R.string.history_title),
                     fontFamily = PlusJakartaSans,
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
@@ -120,7 +120,7 @@ fun HistoryDialog(
                 DateTimePickerButton(
                     selectedDateTime = date,
                     onDateTimeSelected = onDateChanged,
-                    label = "Select a date",
+                    label = stringResource(R.string.history_select_date_label),
                 )
 
                 HistoryTimeline(
@@ -137,7 +137,7 @@ fun HistoryDialog(
                         modifier = Modifier.padding(start = 8.dp),
                         onClick = { onDismiss() }
                     ) {
-                        Text(text = "Close")
+                        Text(text = stringResource(R.string.action_close))
                     }
                 }
             }
@@ -212,7 +212,7 @@ private fun TimelineHourGroup(
             if (isCurrentHour) {
                 Spacer(modifier = Modifier.width(2.dp))
                 Text(
-                    text = "NOW",
+                    text = stringResource(R.string.history_timeline_now),
                     fontFamily = JetBrainsMono,
                     fontWeight = FontWeight.Bold,
                     fontSize = 11.sp,
@@ -290,7 +290,7 @@ private fun TimelineItemCard(
         ) {
             Icon(
                 imageVector = DwIcons.Trash,
-                contentDescription = "Delete",
+                contentDescription = stringResource(R.string.history_action_delete),
                 tint = DwInk300,
                 modifier = Modifier.size(16.dp),
             )

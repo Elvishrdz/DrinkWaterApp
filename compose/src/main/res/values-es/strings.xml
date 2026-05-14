@@ -11,12 +11,15 @@
     <!-- Generic — acciones -->
     <string name="action_cancel">Cancelar</string>
     <string name="action_save">Guardar</string>
+    <string name="action_ok">Aceptar</string>
+    <string name="action_close">Cerrar</string>
     <string name="action_undo">Deshacer</string>
     <string name="action_not_now">Ahora no</string>
     <string name="action_open_settings">Abrir ajustes</string>
     <string name="action_continue_to_settings">Continuar a ajustes</string>
 
     <!-- Generic — etiquetas -->
+    <string name="label_today">Hoy</string>
     <string name="label_daily_goal">Meta diaria</string>
     <string name="label_start_time">Hora de inicio</string>
     <string name="label_end_time">Hora de fin</string>
@@ -218,7 +221,6 @@
     <string name="drink_progress_goal_label">de %1$s mL</string>
 
     <!-- Drink — Sección de registros -->
-    <string name="drink_log_section_title">Hoy</string>
     <string name="drink_log_see_all">VER TODO</string>
     <string name="drink_log_empty_state">Aún no registraste bebidas — toca Agregar agua para empezar.</string>
     <string name="drink_log_entry_amount">%1$s mL</string>
@@ -246,5 +248,89 @@
 
     <!-- Drink — Eliminar preset -->
     <string name="drink_delete_drop_desc">Suelta aquí para eliminar</string>
+
+    <!-- Estadísticas — Pantalla -->
+    <string name="stats_title">Estadísticas</string>
+
+    <!-- Estadísticas — Selector de período -->
+    <string name="stats_period_week">Semana</string>
+    <string name="stats_period_month">Mes</string>
+    <string name="stats_period_year">Año</string>
+
+    <!-- Estadísticas — Etiquetas contextuales del período -->
+    <string name="stats_period_label_week">De esta semana</string>
+    <string name="stats_period_label_month">De este mes</string>
+    <string name="stats_period_label_year">De este año</string>
+
+    <!-- Estadísticas — Tarjeta de resumen -->
+    <string name="stats_summary_avg_label">Prom. %1$s</string>
+    <string name="stats_summary_unit">mL/día</string>
+    <string name="stats_summary_vs_previous">vs período anterior</string>
+
+    <!-- Estadísticas — Gráfico de barras -->
+    <string name="stats_chart_daily_intake">Ingesta diaria</string>
+    <string name="stats_chart_monthly_intake">Ingesta mensual</string>
+    <string name="stats_chart_prev_period_desc">Período anterior</string>
+    <string name="stats_chart_next_period_desc">Período siguiente</string>
+    <string name="stats_chart_goal_met">Meta alcanzada</string>
+    <string name="stats_chart_below_goal">Por debajo de la meta</string>
+    <string name="stats_chart_tooltip_amount">%1$d mL</string>
+    <string name="stats_chart_tooltip_goal">/ %1$d mL</string>
+
+    <!-- Estadísticas — Mini tarjetas -->
+    <string name="stats_mini_drink_streak">Racha de bebidas</string>
+    <string name="stats_mini_best_streak">Mejor racha</string>
+    <string name="stats_mini_goal_streak">Racha de metas</string>
+    <string name="stats_mini_best_goal_streak">Mejor racha de metas</string>
+    <string name="stats_mini_personal_best">Récord personal (mL)</string>
+
+    <!-- Historial — Pantalla -->
+    <string name="history_title">Historial</string>
+    <string name="history_pick_date_desc">Seleccionar fecha</string>
+
+    <!-- Historial — Estado vacío -->
+    <string name="history_empty_title">Sin bebidas registradas</string>
+    <string name="history_empty_body">Elige otro día, o ve a Hoy para agregar uno.</string>
+
+    <!-- Historial — Parte del día -->
+    <string name="history_part_morning">Mañana</string>
+    <string name="history_part_afternoon">Mediodía</string>
+    <string name="history_part_evening">Tarde</string>
+    <string name="history_part_night">Noche</string>
+
+    <!-- Historial — Período del tiempo -->
+    <string name="history_time_am">a.m.</string>
+    <string name="history_time_pm">p.m.</string>
+
+    <!-- Historial — Acciones de registro -->
+    <string name="history_action_edit">Editar</string>
+    <string name="history_action_delete">Eliminar</string>
+
+    <!-- Historial — Navegación de días -->
+    <string name="history_nav_prev_day_desc">Día anterior</string>
+    <string name="history_nav_next_day_desc">Día siguiente</string>
+
+    <!-- Historial — Etiquetas de sección v1 -->
+    <string name="history_section_select_date">SELECCIONAR FECHA</string>
+    <string name="history_select_date_label">Seleccionar fecha</string>
+    <string name="history_section_summary">RESUMEN</string>
+    <string name="history_section_logs">REGISTROS</string>
+
+    <!-- Historial — Chips de resumen v1 -->
+    <string name="history_stat_consumed">Consumido</string>
+    <string name="history_stat_goal">Meta</string>
+
+    <!-- Historial — Línea de tiempo v1 -->
+    <string name="history_timeline_now">AHORA</string>
+
+    <!-- Historial — Diálogo de edición -->
+    <string name="history_edit_dialog_title">Editar bebida</string>
+    <string name="history_edit_amount_label">Cantidad</string>
+
+    <!-- Historial — Tarjeta de resumen (plural) -->
+    <plurals name="history_summary_drink_count">
+        <item quantity="one">%1$d bebida · %2$d%% de la meta</item>
+        <item quantity="other">%1$d bebidas · %2$d%% de la meta</item>
+    </plurals>
 
 </resources>

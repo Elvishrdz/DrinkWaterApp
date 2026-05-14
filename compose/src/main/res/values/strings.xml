@@ -11,12 +11,15 @@
     <!-- Generic — actions -->
     <string name="action_cancel">Cancel</string>
     <string name="action_save">Save</string>
+    <string name="action_ok">OK</string>
+    <string name="action_close">Close</string>
     <string name="action_undo">Undo</string>
     <string name="action_not_now">Not now</string>
     <string name="action_open_settings">Open Settings</string>
     <string name="action_continue_to_settings">Continue to Settings</string>
 
     <!-- Generic — labels -->
+    <string name="label_today">Today</string>
     <string name="label_daily_goal">Daily goal</string>
     <string name="label_start_time">Start time</string>
     <string name="label_end_time">End time</string>
@@ -218,7 +221,6 @@
     <string name="drink_progress_goal_label">of %1$s mL</string>
 
     <!-- Drink — Log section -->
-    <string name="drink_log_section_title">Today</string>
     <string name="drink_log_see_all">SEE ALL</string>
     <string name="drink_log_empty_state">No drinks logged yet — tap Add water to start.</string>
     <string name="drink_log_entry_amount">%1$s mL</string>
@@ -246,5 +248,89 @@
 
     <!-- Drink — Delete preset -->
     <string name="drink_delete_drop_desc">Drop here to delete</string>
+
+    <!-- Stats — Screen -->
+    <string name="stats_title">Stats</string>
+
+    <!-- Stats — Period selector labels (SegmentedControl) -->
+    <string name="stats_period_week">Week</string>
+    <string name="stats_period_month">Month</string>
+    <string name="stats_period_year">Year</string>
+
+    <!-- Stats — Period context labels (SummaryCard header) -->
+    <string name="stats_period_label_week">This week\'s</string>
+    <string name="stats_period_label_month">This month\'s</string>
+    <string name="stats_period_label_year">This year\'s</string>
+
+    <!-- Stats — Summary card -->
+    <string name="stats_summary_avg_label">%1$s avg</string>
+    <string name="stats_summary_unit">mL/day</string>
+    <string name="stats_summary_vs_previous">vs previous period</string>
+
+    <!-- Stats — Bar chart -->
+    <string name="stats_chart_daily_intake">Daily intake</string>
+    <string name="stats_chart_monthly_intake">Monthly intake</string>
+    <string name="stats_chart_prev_period_desc">Previous period</string>
+    <string name="stats_chart_next_period_desc">Next period</string>
+    <string name="stats_chart_goal_met">Goal met</string>
+    <string name="stats_chart_below_goal">Below goal</string>
+    <string name="stats_chart_tooltip_amount">%1$d mL</string>
+    <string name="stats_chart_tooltip_goal">/ %1$d mL</string>
+
+    <!-- Stats — Mini cards -->
+    <string name="stats_mini_drink_streak">Drink streak</string>
+    <string name="stats_mini_best_streak">Best streak</string>
+    <string name="stats_mini_goal_streak">Goal streak</string>
+    <string name="stats_mini_best_goal_streak">Best goal streak</string>
+    <string name="stats_mini_personal_best">Personal best (mL)</string>
+
+    <!-- History — Screen -->
+    <string name="history_title">History</string>
+    <string name="history_pick_date_desc">Pick a date</string>
+
+    <!-- History — Empty state -->
+    <string name="history_empty_title">No drinks logged</string>
+    <string name="history_empty_body">Pick another day, or head to Today to add one.</string>
+
+    <!-- History — Part of day labels -->
+    <string name="history_part_morning">Morning</string>
+    <string name="history_part_afternoon">Afternoon</string>
+    <string name="history_part_evening">Evening</string>
+    <string name="history_part_night">Night</string>
+
+    <!-- History — Time period labels -->
+    <string name="history_time_am">a.m.</string>
+    <string name="history_time_pm">p.m.</string>
+
+    <!-- History — Record actions -->
+    <string name="history_action_edit">Edit</string>
+    <string name="history_action_delete">Delete</string>
+
+    <!-- History — Day navigation -->
+    <string name="history_nav_prev_day_desc">Previous day</string>
+    <string name="history_nav_next_day_desc">Next day</string>
+
+    <!-- History — v1 section labels -->
+    <string name="history_section_select_date">SELECT DATE</string>
+    <string name="history_select_date_label">Select a date</string>
+    <string name="history_section_summary">SUMMARY</string>
+    <string name="history_section_logs">LOGS</string>
+
+    <!-- History — v1 summary chips -->
+    <string name="history_stat_consumed">Consumed</string>
+    <string name="history_stat_goal">Goal</string>
+
+    <!-- History — v1 timeline -->
+    <string name="history_timeline_now">NOW</string>
+
+    <!-- History — Edit dialog -->
+    <string name="history_edit_dialog_title">Edit drink</string>
+    <string name="history_edit_amount_label">Amount</string>
+
+    <!-- History — Summary card (plural handled via plurals resource) -->
+    <plurals name="history_summary_drink_count">
+        <item quantity="one">%1$d drink · %2$d%% of goal</item>
+        <item quantity="other">%1$d drinks · %2$d%% of goal</item>
+    </plurals>
 
 </resources>

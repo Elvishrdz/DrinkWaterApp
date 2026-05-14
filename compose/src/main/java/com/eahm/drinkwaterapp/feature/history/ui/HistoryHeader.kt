@@ -12,10 +12,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk900
@@ -34,7 +36,7 @@ internal fun HistoryHeader() {
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
-            text = "History",
+            text = stringResource(R.string.history_title),
             fontFamily = PlusJakartaSans,
             fontWeight = FontWeight.Bold,
             fontSize = 24.sp,
@@ -43,15 +45,13 @@ internal fun HistoryHeader() {
         IconButton(onClick = {}) {
             Icon(
                 imageVector = DwIcons.History,
-                contentDescription = "Pick a date",
+                contentDescription = stringResource(R.string.history_pick_date_desc),
                 tint = DwMagenta,
                 modifier = Modifier.size(22.dp),
             )
         }
     }
 }
-
-
 
 @Preview(showBackground = true)
 @Composable

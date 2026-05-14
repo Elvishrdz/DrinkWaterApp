@@ -72,7 +72,7 @@ fun TodayLogSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = stringResource(R.string.drink_log_section_title),
+                text = stringResource(R.string.label_today),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp,

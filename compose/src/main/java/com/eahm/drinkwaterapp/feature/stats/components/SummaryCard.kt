@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -22,6 +23,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterDeep
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterLight
@@ -52,7 +54,7 @@ fun SummaryCard(
             .padding(horizontal = 16.dp, vertical = 18.dp)
     ) {
         Text(
-            text = "$periodLabel avg",
+            text = stringResource(R.string.stats_summary_avg_label, periodLabel),
             fontFamily = PlusJakartaSans,
             fontWeight = FontWeight.Normal,
             fontSize = 12.sp,
@@ -61,6 +63,7 @@ fun SummaryCard(
 
         Spacer(modifier = Modifier.height(4.dp))
 
+        val mlDayUnit = stringResource(R.string.stats_summary_unit)
         Text(
             text = buildAnnotatedString {
                 withStyle(
@@ -81,7 +84,7 @@ fun SummaryCard(
                         color = Color.White.copy(alpha = 0.85f)
                     )
                 ) {
-                    append("  mL/day")
+                    append("  $mlDayUnit")
                 }
             }
         )
@@ -91,7 +94,7 @@ fun SummaryCard(
         Row(verticalAlignment = Alignment.CenterVertically) {
             val arrow = if (isTrendPositive) "▲" else "▼"
             val trendColor = if (isTrendPositive) TrendUpColor else TrendDownColor
-            val vsLabel = "vs previous period"
+            val vsLabel = stringResource(R.string.stats_summary_vs_previous)
             Text(
                 text = "$arrow $trendPercent%  $vsLabel",
                 fontFamily = PlusJakartaSans,

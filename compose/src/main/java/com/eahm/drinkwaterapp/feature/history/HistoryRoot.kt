@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.bindings.toEntity
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -110,7 +112,7 @@ private fun Content(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
-                text = "History",
+                text = stringResource(R.string.history_title),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Bold,
                 fontSize = 26.sp,
@@ -123,13 +125,13 @@ private fun Content(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    SectionLabel("SELECT DATE")
+                    SectionLabel(stringResource(R.string.history_section_select_date))
                     if (!isToday) {
                         TextButton(
                             onClick = onGoToToday,
                         ) {
                             Text(
-                                text = "Today",
+                                text = stringResource(R.string.label_today),
                                 fontFamily = PlusJakartaSans,
                                 fontWeight = FontWeight.SemiBold,
                                 fontSize = 13.sp,
@@ -141,12 +143,12 @@ private fun Content(
                 DateTimePickerButton(
                     selectedDateTime = date,
                     onDateTimeSelected = onDateChanged,
-                    label = "Select a date",
+                    label = stringResource(R.string.history_select_date_label),
                 )
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                SectionLabel("SUMMARY")
+                SectionLabel(stringResource(R.string.history_section_summary))
                 DaySummaryRow(consumedMl = consumedMl, goalMl = goalMl)
             }
         }
@@ -154,7 +156,7 @@ private fun Content(
         Spacer(modifier = Modifier.height(16.dp))
 
         SectionLabel(
-            text = "LOGS",
+            text = stringResource(R.string.history_section_logs),
             modifier = Modifier.padding(horizontal = 22.dp),
         )
 
@@ -168,9 +170,9 @@ private fun Content(
             )
         } else {
             val text = if (isToday) {
-                "No drinks logged yet — tap Add water to start."
+                stringResource(R.string.drink_log_empty_state)
             } else {
-                "No drinks logged"
+                stringResource(R.string.history_empty_title)
             }
 
             Text(
@@ -199,13 +201,13 @@ private fun DaySummaryRow(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         StatChip(
-            label = "Consumed",
-            value = "${consumedMl.toInt()} mL",
+            label = stringResource(R.string.history_stat_consumed),
+            value = stringResource(R.string.drink_log_entry_amount, consumedMl.toInt().toString()),
             modifier = Modifier.weight(1f),
         )
         StatChip(
-            label = "Goal",
-            value = "${goalMl.toInt()} mL",
+            label = stringResource(R.string.history_stat_goal),
+            value = stringResource(R.string.drink_log_entry_amount, goalMl.toInt().toString()),
             modifier = Modifier.weight(1f),
         )
     }

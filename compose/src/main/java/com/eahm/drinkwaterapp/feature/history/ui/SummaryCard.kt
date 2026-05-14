@@ -22,10 +22,13 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk900
@@ -69,7 +72,7 @@ internal fun SummaryCard(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "mL",
+                    text = stringResource(R.string.volume_unit_mililiters),
                     fontFamily = PlusJakartaSans,
                     fontWeight = FontWeight.Medium,
                     fontSize = 14.sp,
@@ -78,7 +81,12 @@ internal fun SummaryCard(
                 )
             }
             Text(
-                text = "$drinkCount drink${if (drinkCount == 1) "" else "s"} · $percent% of goal",
+                text = pluralStringResource(
+                    R.plurals.history_summary_drink_count,
+                    drinkCount,
+                    drinkCount,
+                    percent
+                ),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Normal,
                 fontSize = 13.sp,
@@ -130,8 +138,6 @@ internal fun SummaryCard(
         }
     }
 }
-
-
 
 @Preview(showBackground = true)
 @Composable

@@ -27,10 +27,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk200
@@ -76,7 +78,7 @@ internal fun DayStripRow(
         ) {
             Icon(
                 imageVector = DwIcons.ChevronRight,
-                contentDescription = "Previous day",
+                contentDescription = stringResource(R.string.history_nav_prev_day_desc),
                 tint = if (canGoPrev) DwInk500 else DwInk200,
                 modifier = Modifier
                     .size(18.dp)
@@ -106,7 +108,7 @@ internal fun DayStripRow(
         ) {
             Icon(
                 imageVector = DwIcons.ChevronRight,
-                contentDescription = "Next day",
+                contentDescription = stringResource(R.string.history_nav_next_day_desc),
                 tint = if (canGoNext) DwInk500 else DwInk200,
                 modifier = Modifier.size(18.dp),
             )
@@ -163,7 +165,6 @@ internal fun DayChip(
         }
     }
 }
-
 
 
 private val previewDays = listOf(

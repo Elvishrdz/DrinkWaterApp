@@ -26,13 +26,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk100
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk900
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
@@ -141,12 +142,12 @@ private fun DatePickerModal(
                     onDateSelected(date)
                 }
             }) {
-                Text("OK")
+                Text(stringResource(R.string.action_ok))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.action_cancel))
             }
         }
     ) {

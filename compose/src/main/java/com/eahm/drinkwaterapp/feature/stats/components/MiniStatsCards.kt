@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.config.FeatureFlags
 import com.eahm.drinkwaterapp.core.designsystem.component.card.MiniCard
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
@@ -41,7 +43,7 @@ fun MiniStatsCards(
                     iconBg = DwTintWater,
                     iconTint = DwWater,
                     value = drinkStreakDays.toString(),
-                    label = "Drink streak",
+                    label = stringResource(R.string.stats_mini_drink_streak),
                     modifier = Modifier.weight(1f),
                 )
                 bestDrinkStreakDays?.let {
@@ -50,7 +52,7 @@ fun MiniStatsCards(
                         iconBg = DwTintMagenta,
                         iconTint = DwMagenta,
                         value = it.toString(),
-                        label = "Best streak",
+                        label = stringResource(R.string.stats_mini_best_streak),
                         modifier = Modifier.weight(1f),
                     )
                 }
@@ -64,7 +66,7 @@ fun MiniStatsCards(
                     iconBg = DwTintWater,
                     iconTint = DwWater,
                     value = goalStreakDays.toString(),
-                    label = "Goal streak",
+                    label = stringResource(R.string.stats_mini_goal_streak),
                     modifier = Modifier.weight(1f),
                 )
                 bestGoalStreakDays?.let {
@@ -73,7 +75,7 @@ fun MiniStatsCards(
                         iconBg = DwTintMagenta,
                         iconTint = DwMagenta,
                         value = it.toString(),
-                        label = "Best goal streak",
+                        label = stringResource(R.string.stats_mini_best_goal_streak),
                         modifier = Modifier.weight(1f),
                     )
                 }
@@ -88,7 +90,7 @@ fun MiniStatsCards(
                 iconBg = DwTintWater,
                 iconTint = DwWater,
                 value = personalBestMl.toString(),
-                label = "Personal best (mL)",
+                label = stringResource(R.string.stats_mini_personal_best),
                 modifier = Modifier.weight(1f),
             )
         }

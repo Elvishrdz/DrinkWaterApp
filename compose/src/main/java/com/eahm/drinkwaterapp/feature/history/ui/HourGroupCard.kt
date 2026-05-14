@@ -17,10 +17,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk100
@@ -46,6 +48,10 @@ internal fun HourGroupCard(
     onDelete: (HistoryUI) -> Unit,
 ) {
     val groupTotalMl = group.items.sumOf { it.amount.toIntOrNull() ?: 0 }
+    val morning = stringResource(R.string.history_part_morning)
+    val afternoon = stringResource(R.string.history_part_afternoon)
+    val evening = stringResource(R.string.history_part_evening)
+    val night = stringResource(R.string.history_part_night)
 
     Column(
         modifier = Modifier
@@ -62,7 +68,7 @@ internal fun HourGroupCard(
             HourPill(hour = group.hour)
             Spacer(modifier = Modifier.width(10.dp))
             Text(
-                text = partOfDay(group.hour),
+                text = partOfDay(group.hour, morning, afternoon, evening, night),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Medium,
                 fontSize = 13.sp,
@@ -75,7 +81,7 @@ internal fun HourGroupCard(
                 color = DwInk300,
             )
             Text(
-                text = "$groupTotalMl mL",
+                text = stringResource(R.string.drink_log_entry_amount, groupTotalMl.toString()),
                 fontFamily = com.eahm.drinkwaterapp.core.designsystem.theme.Nunito,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 13.sp,
@@ -109,6 +115,8 @@ internal fun HourPill(hour: Int) {
         else -> DwInk100 to DwInk500
     }
     val icon = if (hour in 5..19) DwIcons.Sun else DwIcons.Moon
+    val amLabel = stringResource(R.string.history_time_am)
+    val pmLabel = stringResource(R.string.history_time_pm)
 
     Row(
         modifier = Modifier
@@ -125,7 +133,7 @@ internal fun HourPill(hour: Int) {
             modifier = Modifier.size(14.dp),
         )
         Text(
-            text = hourLabel(hour),
+            text = hourLabel(hour, amLabel, pmLabel),
             fontFamily = JetBrainsMono,
             fontWeight = FontWeight.Medium,
             fontSize = 12.sp,
@@ -134,15 +142,21 @@ internal fun HourPill(hour: Int) {
     }
 }
 
-private fun partOfDay(hour: Int): String = when {
-    hour in 5..11 -> "Morning"
-    hour in 12..16 -> "Afternoon"
-    hour in 17..20 -> "Evening"
-    else -> "Night"
+private fun partOfDay(
+    hour: Int,
+    morning: String,
+    afternoon: String,
+    evening: String,
+    night: String
+): String = when {
+    hour in 5..11 -> morning
+    hour in 12..16 -> afternoon
+    hour in 17..20 -> evening
+    else -> night
 }
 
-private fun hourLabel(hour: Int): String {
-    val period = if (hour < 12) "a.m." else "p.m."
+private fun hourLabel(hour: Int, am: String, pm: String): String {
+    val period = if (hour < 12) am else pm
     val h12 = when {
         hour == 0 -> 12
         hour > 12 -> hour - 12
@@ -150,8 +164,6 @@ private fun hourLabel(hour: Int): String {
     }
     return "$h12 $period"
 }
-
-
 
 private val previewGroup = HourGroup(
     hour = 8,

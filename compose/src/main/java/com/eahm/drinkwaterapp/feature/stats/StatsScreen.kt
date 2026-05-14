@@ -22,16 +22,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk50
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk900
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwPaper
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwPaperWarm
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 import com.eahm.drinkwaterapp.feature.stats.components.MiniStatsCards
 import com.eahm.drinkwaterapp.feature.stats.components.SummaryCard
@@ -79,10 +80,24 @@ internal fun StatsContent(
     onCalendarViewModeToggle: (CalendarViewMode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val periodLabelWeek = stringResource(R.string.stats_period_label_week)
+    val periodLabelMonth = stringResource(R.string.stats_period_label_month)
+    val periodLabelYear = stringResource(R.string.stats_period_label_year)
     val periodLabel = when (state.selectedPeriod) {
-        StatsPeriod.WEEK -> "This week's"
-        StatsPeriod.MONTH -> "This month's"
-        StatsPeriod.YEAR -> "This year's"
+        StatsPeriod.WEEK -> periodLabelWeek
+        StatsPeriod.MONTH -> periodLabelMonth
+        StatsPeriod.YEAR -> periodLabelYear
+    }
+
+    val periodWeek = stringResource(R.string.stats_period_week)
+    val periodMonth = stringResource(R.string.stats_period_month)
+    val periodYear = stringResource(R.string.stats_period_year)
+    val periodOptions = StatsPeriod.entries.map { period ->
+        when (period) {
+            StatsPeriod.WEEK -> periodWeek
+            StatsPeriod.MONTH -> periodMonth
+            StatsPeriod.YEAR -> periodYear
+        }
     }
 
     LazyColumn(
@@ -99,14 +114,14 @@ internal fun StatsContent(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Stats",
+                    text = stringResource(R.string.stats_title),
                     fontFamily = PlusJakartaSans,
                     fontWeight = FontWeight.Bold,
                     fontSize = 26.sp,
                     color = MaterialTheme.colorScheme.onBackground,
                 )
                 SegmentedControl(
-                    options = StatsPeriod.entries.map { it.label },
+                    options = periodOptions,
                     selectedIndex = state.selectedPeriod.ordinal,
                     onSelected = { index -> onPeriodSelected(StatsPeriod.entries[index]) }
                 )

@@ -24,10 +24,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwDanger
@@ -50,6 +52,9 @@ internal fun RecordRow(
     onEdit: () -> Unit,
     onDelete: () -> Unit,
 ) {
+    val amLabel = stringResource(R.string.history_time_am)
+    val pmLabel = stringResource(R.string.history_time_pm)
+
     Column {
         Row(
             modifier = Modifier
@@ -77,14 +82,14 @@ internal fun RecordRow(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "${item.amount} mL",
+                    text = stringResource(R.string.drink_log_entry_amount, item.amount),
                     fontFamily = PlusJakartaSans,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 14.sp,
                     color = DwInk900,
                 )
                 Text(
-                    text = formatTime12h(item.timestamp),
+                    text = formatTime12h(item.timestamp, amLabel, pmLabel),
                     fontFamily = JetBrainsMono,
                     fontWeight = FontWeight.Normal,
                     fontSize = 11.sp,
@@ -124,7 +129,7 @@ internal fun RecordRow(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "Edit",
+                        text = stringResource(R.string.history_action_edit),
                         fontFamily = PlusJakartaSans,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 13.sp,
@@ -146,7 +151,7 @@ internal fun RecordRow(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "Delete",
+                        text = stringResource(R.string.history_action_delete),
                         fontFamily = PlusJakartaSans,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 13.sp,
@@ -157,10 +162,10 @@ internal fun RecordRow(
     }
 }
 
-private fun formatTime12h(dt: LocalDateTime): String {
+private fun formatTime12h(dt: LocalDateTime, amLabel: String, pmLabel: String): String {
     val h = dt.hour
     val m = dt.minute
-    val period = if (h < 12) "a.m." else "p.m."
+    val period = if (h < 12) amLabel else pmLabel
     val h12 = when {
         h == 0 -> 12
         h > 12 -> h - 12
@@ -168,8 +173,6 @@ private fun formatTime12h(dt: LocalDateTime): String {
     }
     return String.format(Locale.getDefault(), "%02d:%02d %s", h12, m, period)
 }
-
-
 
 private val previewItem = HistoryUI(
     id = "1",

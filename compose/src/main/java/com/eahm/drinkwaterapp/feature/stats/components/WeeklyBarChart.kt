@@ -38,12 +38,14 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.component.extension.outlineBorderStyle
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -178,10 +180,12 @@ private fun ChartHeader(
     onNavigateNext: () -> Unit,
 ) {
     val label = when (period) {
-        StatsPeriod.WEEK -> "Daily intake"
-        StatsPeriod.MONTH -> "Daily intake"
-        StatsPeriod.YEAR -> "Monthly intake"
+        StatsPeriod.WEEK, StatsPeriod.MONTH -> stringResource(R.string.stats_chart_daily_intake)
+        StatsPeriod.YEAR -> stringResource(R.string.stats_chart_monthly_intake)
     }
+    val todayLabel = stringResource(R.string.label_today)
+    val prevPeriodDesc = stringResource(R.string.stats_chart_prev_period_desc)
+    val nextPeriodDesc = stringResource(R.string.stats_chart_next_period_desc)
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -197,7 +201,7 @@ private fun ChartHeader(
         )
         if (!isToday) {
             Text(
-                text = "Today",
+                text = todayLabel,
                 fontFamily = JetBrainsMono,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 11.sp,
@@ -224,7 +228,7 @@ private fun ChartHeader(
         ) {
             Icon(
                 imageVector = DwIcons.ChevronRight,
-                contentDescription = "Previous period",
+                contentDescription = prevPeriodDesc,
                 tint = if (pagerState.currentPage > 0) DwInk400 else DwInk100,
                 modifier = Modifier
                     .size(18.dp)
@@ -248,7 +252,7 @@ private fun ChartHeader(
         ) {
             Icon(
                 imageVector = DwIcons.ChevronRight,
-                contentDescription = "Next period",
+                contentDescription = nextPeriodDesc,
                 tint = if (pagerState.currentPage < pagerState.pageCount - 1) DwInk400 else DwInk100,
                 modifier = Modifier.size(18.dp),
             )
@@ -380,14 +384,14 @@ private fun BarTooltip(amountMl: Int, goalMl: Int) {
             .padding(horizontal = 10.dp, vertical = 6.dp),
     ) {
         Text(
-            text = "$amountMl mL",
+            text = stringResource(R.string.stats_chart_tooltip_amount, amountMl),
             fontFamily = PlusJakartaSans,
             fontWeight = FontWeight.Bold,
             fontSize = 12.sp,
             color = Color.White,
         )
         Text(
-            text = "/ $goalMl mL",
+            text = stringResource(R.string.stats_chart_tooltip_goal, goalMl),
             fontFamily = PlusJakartaSans,
             fontWeight = FontWeight.Normal,
             fontSize = 10.sp,
@@ -401,8 +405,8 @@ private fun ChartLegend() {
     Row(
         horizontalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-        LegendItem(brush = goalMetBrush, label = "Goal met")
-        LegendItem(brush = belowGoalBrush, label = "Below goal")
+        LegendItem(brush = goalMetBrush, label = stringResource(R.string.stats_chart_goal_met))
+        LegendItem(brush = belowGoalBrush, label = stringResource(R.string.stats_chart_below_goal))
     }
 }
 
