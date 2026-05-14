@@ -53,6 +53,7 @@ import com.eahm.drinkwaterapp.feature.dev.adaptive.AdaptiveScreen
 import com.eahm.drinkwaterapp.feature.dev.alarmcalculator.AlarmCalculatorRoot
 import com.eahm.drinkwaterapp.feature.dev.alarmintervals.AlarmIntervalsRoot
 import com.eahm.drinkwaterapp.feature.dev.alarms.AlarmsRoot
+import com.eahm.drinkwaterapp.feature.dev.billing.BillingDevRoot
 import com.eahm.drinkwaterapp.feature.dev.celebrations.CelebrationsRoot
 import com.eahm.drinkwaterapp.feature.dev.dailygoal.DailyGoalDevRoot
 import com.eahm.drinkwaterapp.feature.dev.menu.DevMenuRoot
@@ -89,6 +90,7 @@ enum class DevDestination(
     NOTIFICATION("Notification", DwIcons.Bell),
     ONBOARDING("OnBoarding", DwIcons.Sun),
     CELEBRATIONS("Celebrations", DwIcons.Flag),
+    BILLING("Billing", DwIcons.Star),
 }
 
 
@@ -182,6 +184,10 @@ internal fun DevRoot(onBackClicked: () -> Unit) {
             )
 
             DevDestination.CELEBRATIONS -> CelebrationsRoot(
+                onBackClicked = onBackClicked,
+            )
+
+            DevDestination.BILLING -> BillingDevRoot(
                 onBackClicked = onBackClicked,
             )
         }

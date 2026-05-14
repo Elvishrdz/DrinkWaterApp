@@ -2,6 +2,7 @@ package com.eahm.drinkwaterapp.core.billing
 
 import android.app.Activity
 import android.app.Application
+import com.eahm.drinkwaterapp.BuildConfig
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.system.initializer.AppInitializer
 import com.revenuecat.purchases.CustomerInfo
@@ -32,6 +33,8 @@ internal class PurchaseManager(
     val purchaseState: StateFlow<PurchaseState> = _purchaseState.asStateFlow()
 
     override fun initialize() {
+        if (BuildConfig.IS_DEV) return  // skip RevenueCat in dev — use devSetAdFree() to test
+
         val apiKey = application.getString(R.string.revenuecat_api_key)
         Purchases.configure(
             PurchasesConfiguration.Builder(application, apiKey).build()
@@ -40,6 +43,7 @@ internal class PurchaseManager(
     }
 
     fun refreshCustomerInfo() {
+        if (BuildConfig.IS_DEV) return
         Purchases.sharedInstance.getCustomerInfo(object : ReceiveCustomerInfoCallback {
             override fun onReceived(customerInfo: CustomerInfo) {
                 _isAdFree.value = customerInfo.entitlements[ENTITLEMENT_AD_FREE]?.isActive == true
@@ -52,6 +56,10 @@ internal class PurchaseManager(
     }
 
     fun fetchOfferings(onResult: (RcPackage?) -> Unit) {
+        if (BuildConfig.IS_DEV) {
+            onResult(null)  // no price in dev — button shows "Remove Ads" without price
+            return
+        }
         Purchases.sharedInstance.getOfferings(object : ReceiveOfferingsCallback {
             override fun onReceived(offerings: Offerings) {
                 val pkg = offerings["remove_ads"]?.availablePackages?.firstOrNull()
@@ -66,6 +74,12 @@ internal class PurchaseManager(
     }
 
     fun purchase(activity: Activity, pkg: RcPackage) {
+        if (BuildConfig.IS_DEV) {
+            _purchaseState.value = PurchaseState.Loading
+            _isAdFree.value = true
+            _purchaseState.value = PurchaseState.Success
+            return
+        }
         _purchaseState.value = PurchaseState.Loading
         Purchases.sharedInstance.purchase(
             PurchaseParams.Builder(activity, pkg).build(),
@@ -92,6 +106,15 @@ internal class PurchaseManager(
     }
 
     fun restore() {
+        if (BuildConfig.IS_DEV) {
+            _purchaseState.value = PurchaseState.Loading
+            _purchaseState.value = if (_isAdFree.value) {
+                PurchaseState.Success
+            } else {
+                PurchaseState.NothingToRestore
+            }
+            return
+        }
         _purchaseState.value = PurchaseState.Loading
         Purchases.sharedInstance.restorePurchases(object : ReceiveCustomerInfoCallback {
             override fun onReceived(customerInfo: CustomerInfo) {
@@ -107,6 +130,13 @@ internal class PurchaseManager(
                 _purchaseState.value = PurchaseState.Error(error.message)
             }
         })
+    }
+
+    /** Only meaningful in dev/debug builds. Directly sets the ad-free state for testing. */
+    fun devSetAdFree(value: Boolean) {
+        if (!BuildConfig.IS_DEV) return
+        _isAdFree.value = value
+        _purchaseState.value = PurchaseState.Idle
     }
 }
 
