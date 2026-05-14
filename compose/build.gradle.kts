@@ -37,19 +37,20 @@ android {
 
     signingConfigs {
         create("release") {
-            val keystorePath = System.getenv("KEYSTORE_PATH")
-            storeFile = if (!keystorePath.isNullOrBlank()) {
-                file(keystorePath)
-            } else {
-                rootProject.file("builds/androidmobile-keystore.jks")
-            }
-            storePassword = System.getenv("KEYSTORE_PASSWORD") ?: localProps.getProperty(
-                "keystore.password",
-                ""
-            )
-            keyAlias = System.getenv("KEY_ALIAS") ?: localProps.getProperty("key.alias", "")
-            keyPassword =
-                System.getenv("KEY_PASSWORD") ?: localProps.getProperty("key.password", "")
+
+            storeFile = System.getenv("KEYSTORE_PATH")
+                .takeIf { !it.isNullOrBlank() }
+                ?.let { file(it) }
+                ?: rootProject.file("keystore/drink_water_app_keystore.jks")
+
+            storePassword = System.getenv("KEYSTORE_PASSWORD")
+                ?: localProps.getProperty("keystore.password", "")
+
+            keyAlias = System.getenv("KEY_ALIAS")
+                ?: localProps.getProperty("key.alias", "")
+
+            keyPassword = System.getenv("KEY_PASSWORD")
+                ?: localProps.getProperty("key.password", "")
         }
     }
 
