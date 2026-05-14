@@ -3,7 +3,6 @@ package com.eahm.drinkwaterapp.core.billing
 import android.app.Activity
 import android.app.Application
 import com.eahm.drinkwaterapp.BuildConfig
-import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.system.initializer.AppInitializer
 import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.Offerings
@@ -35,9 +34,8 @@ internal class PurchaseManager(
     override fun initialize() {
         if (BuildConfig.IS_DEV) return  // skip RevenueCat in dev — use devSetAdFree() to test
 
-        val apiKey = application.getString(R.string.revenuecat_api_key)
         Purchases.configure(
-            PurchasesConfiguration.Builder(application, apiKey).build()
+            PurchasesConfiguration.Builder(application, BuildConfig.REVENUECAT_API_KEY).build()
         )
         refreshCustomerInfo()
     }

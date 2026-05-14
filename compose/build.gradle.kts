@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("com.android.built-in-kotlin")
@@ -8,6 +10,14 @@ plugins {
     id("com.google.devtools.ksp")
     id("androidx.room")
 }
+
+val localProps = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) load(file.inputStream())
+}
+
+val revenuecatApiKeyDev: String = localProps.getProperty("revenuecat.api.key.dev", "")
+val revenuecatApiKeyProd: String = localProps.getProperty("revenuecat.api.key.prod", "")
 
 android {
     namespace = "com.eahm.drinkwaterapp"
@@ -35,6 +45,8 @@ android {
             buildConfigField("boolean", "LOGS_ENABLED", "true")
             buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "true")
             buildConfigField("boolean", "FEATURE_STREAKS", "false")
+
+            buildConfigField("String", "REVENUECAT_API_KEY", "\"$revenuecatApiKeyDev\"")
         }
 
         // QA / Internal Testing track — beta features on, no dev tools
@@ -47,6 +59,8 @@ android {
             buildConfigField("boolean", "LOGS_ENABLED", "true")
             buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "true")
             buildConfigField("boolean", "FEATURE_STREAKS", "false")
+
+            buildConfigField("String", "REVENUECAT_API_KEY", "\"$revenuecatApiKeyDev\"")
         }
 
         // Closed testing, open testing and production track
@@ -61,6 +75,8 @@ android {
             buildConfigField("boolean", "LOGS_ENABLED", "false")
             buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "false")
             buildConfigField("boolean", "FEATURE_STREAKS", "false")
+
+            buildConfigField("String", "REVENUECAT_API_KEY", "\"$revenuecatApiKeyProd\"")
         }
     }
     compileOptions {
@@ -140,7 +156,7 @@ dependencies {
     implementation(libs.picktime.compose)
 
     // RevenueCat
-    implementation("com.revenuecat.purchases:purchases:9.23.1")
+    implementation("com.revenuecat.purchases:purchases:10.6.0")
 
     // ViewModel
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
