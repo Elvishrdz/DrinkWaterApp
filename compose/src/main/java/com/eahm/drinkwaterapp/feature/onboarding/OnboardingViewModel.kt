@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
+import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
+import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.entity.DailyGoalEntity
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +23,7 @@ import kotlin.time.ExperimentalTime
 internal class OnboardingViewModel(
     private val prefs: PrefsStorage,
     private val database: AppDatabase,
+    private val drinkAlarmManager: DrinkAlarmManager,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(OnboardingFormState())
@@ -89,6 +92,7 @@ internal class OnboardingViewModel(
             upsertGoalForToday(s.computedGoalMl)
             prefs.setAmountPerDrink(s.notifAmountMl)
             prefs.setOnboardingCompleted(true)
+            drinkAlarmManager.determineAction(AlarmSource.OnboardingCompleted)
             onComplete()
         }
     }

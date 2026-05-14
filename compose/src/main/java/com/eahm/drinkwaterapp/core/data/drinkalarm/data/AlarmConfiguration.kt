@@ -6,6 +6,7 @@ data class AlarmConfiguration(
 )
 
 sealed interface AlarmSource {
+    data object OnboardingCompleted : AlarmSource
     data object DrinkAlarmReceived : AlarmSource
     data object DrinkButton : AlarmSource
     data object NotificationDrinkButton : AlarmSource
