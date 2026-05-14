@@ -158,6 +158,7 @@
     <string name="settings_section_hydration">HYDRATION</string>
     <string name="settings_section_reminders">REMINDERS</string>
     <string name="settings_section_overlays">OVERLAYS</string>
+    <string name="settings_section_premium">PREMIUM</string>
     <string name="settings_section_about">ABOUT</string>
 
     <!-- Settings — Row labels -->
@@ -166,6 +167,7 @@
     <string name="settings_row_interval">Interval</string>
     <string name="settings_row_notification_amount">Notification amount</string>
     <string name="settings_row_goal_celebrations">Goal reached celebrations</string>
+    <string name="settings_row_remove_ads">Remove ads</string>
     <string name="settings_row_share">Share with friends</string>
     <string name="settings_row_rate">Rate the app</string>
     <string name="settings_row_request_feature">Request a feature</string>

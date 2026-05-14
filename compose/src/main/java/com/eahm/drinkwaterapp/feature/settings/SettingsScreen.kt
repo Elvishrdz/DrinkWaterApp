@@ -80,6 +80,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagentaDark
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwPaper
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintGold
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
@@ -500,32 +501,17 @@ internal fun SettingsContent(
                 }
             }
 
-            item {
-                SettingsSection(title = "PREMIUM") {
-                    if (!state.isAdFree) {
+            if (!state.isAdFree) {
+                item {
+                    SettingsSection(title = stringResource(R.string.settings_section_premium)) {
                         SettingRow(
                             icon = DwIcons.Star,
-                            iconBg = DwTintMagenta,
-                            iconTint = DwMagenta,
-                            label = "Remove Ads",
+                            iconBg = DwTintGold,
+                            iconTint = Color.White,
+                            label = stringResource(R.string.settings_row_remove_ads),
                             onClick = onRemoveAdsTap,
                         ) {
                             RowChevronTrailing()
-                        }
-                    } else {
-                        SettingRow(
-                            icon = DwIcons.Star,
-                            iconBg = DwTintWater,
-                            iconTint = DwWater,
-                            label = "Remove Ads",
-                        ) {
-                            Text(
-                                text = "Active",
-                                fontFamily = PlusJakartaSans,
-                                fontWeight = FontWeight.SemiBold,
-                                fontSize = 13.sp,
-                                color = DwWater,
-                            )
                         }
                     }
                 }

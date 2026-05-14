@@ -158,6 +158,7 @@
     <string name="settings_section_hydration">HIDRATACIÓN</string>
     <string name="settings_section_reminders">RECORDATORIOS</string>
     <string name="settings_section_overlays">SUPERPOSICIÓN</string>
+    <string name="settings_section_premium">PREMIUM</string>
     <string name="settings_section_about">ACERCA DE</string>
 
     <!-- Ajustes — Etiquetas de filas -->
@@ -166,6 +167,7 @@
     <string name="settings_row_interval">Intervalo</string>
     <string name="settings_row_notification_amount">Cantidad de notificación</string>
     <string name="settings_row_goal_celebrations">Celebraciones al alcanzar la meta</string>
+    <string name="settings_row_remove_ads">Quitar anuncios</string>
     <string name="settings_row_share">Compartir con amigos</string>
     <string name="settings_row_rate">Calificar la app</string>
     <string name="settings_row_request_feature">Solicitar una función</string>

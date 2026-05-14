@@ -36,6 +36,9 @@ val DwDanger = Color(0xFFD14343)
 val DwTintWater = Color(0xFFEAF4F9)
 val DwTintMagenta = Color(0xFFFBEFF6)
 
+// --- Gold ---
+val DwTintGold = Color(0xFFEFBF04)
+
 // --- Color Schemes ---
 internal val DwLightColorScheme = lightColorScheme(
     primary = DwMagenta,
