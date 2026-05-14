@@ -8,6 +8,7 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
+import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons.Settings
 
 object DwIcons {
 
@@ -76,47 +77,57 @@ object DwIcons {
             viewportWidth = 24f,
             viewportHeight = 24f
         ).apply {
+            // 8-tooth gear: outer r=10, inner r=7.5.
+            // Each tooth spans 16° at outer radius; each valley spans 29° at inner radius.
+            // Coordinates computed at tooth-edge angles: ±8° per tooth, ±7.5° spacing at valley.
             path(
                 stroke = SolidColor(Color.Black),
-                strokeLineWidth = 2f,
+                strokeLineWidth = 1.5f,
                 strokeLineCap = StrokeCap.Round,
-                strokeLineJoin = StrokeJoin.Round
+                strokeLineJoin = StrokeJoin.Round,
             ) {
-                moveTo(12f, 3f)
-                lineToRelative(1.6f, 1.6f)
-                horizontalLineToRelative(2.2f)
-                lineToRelative(0.6f, 2.2f)
-                lineToRelative(2.2f, 0.6f)
-                verticalLineToRelative(2.2f)
-                lineToRelative(1.6f, 1.6f)
-                lineToRelative(-1.6f, 1.6f)
-                verticalLineToRelative(2.2f)
-                lineToRelative(-2.2f, 0.6f)
-                lineToRelative(-0.6f, 2.2f)
-                horizontalLineToRelative(-2.2f)
-                lineToRelative(-1.6f, 1.6f)
-                lineToRelative(-1.6f, -1.6f)
-                horizontalLineToRelative(-2.2f)
-                lineToRelative(-0.6f, -2.2f)
-                lineToRelative(-2.2f, -0.6f)
-                verticalLineToRelative(-2.2f)
-                lineToRelative(-1.6f, -1.6f)
-                lineToRelative(1.6f, -1.6f)
-                verticalLineToRelative(-2.2f)
-                lineToRelative(2.2f, -0.6f)
-                lineToRelative(0.6f, -2.2f)
-                horizontalLineToRelative(2.2f)
-                close()
+                moveTo(21.90f, 10.61f)                               // outer −8°  (tooth 0 left)
+                arcTo(10f, 10f, 0f, false, true, 21.90f, 13.39f)    // tooth 0 top  (−8° → +8°)
+                lineTo(19.43f, 13.04f)                               // drop → inner +8°
+                arcTo(7.5f, 7.5f, 0f, false, true, 17.99f, 16.51f) // valley        (+8° → +37°)
+                lineTo(19.99f, 18.02f)                               // rise → outer +37°
+                arcTo(10f, 10f, 0f, false, true, 18.02f, 19.99f)    // tooth 1 top  (+37° → +53°)
+                lineTo(16.51f, 17.99f)                               // drop → inner +53°
+                arcTo(7.5f, 7.5f, 0f, false, true, 13.04f, 19.43f) // valley       (+53° → +82°)
+                lineTo(13.39f, 21.90f)                               // rise → outer +82°
+                arcTo(10f, 10f, 0f, false, true, 10.61f, 21.90f)    // tooth 2 top  (+82° → +98°)
+                lineTo(10.96f, 19.43f)                               // drop → inner +98°
+                arcTo(7.5f, 7.5f, 0f, false, true, 7.49f, 17.99f)  // valley       (+98° → +127°)
+                lineTo(5.98f, 19.99f)                                // rise → outer +127°
+                arcTo(10f, 10f, 0f, false, true, 4.01f, 18.02f)     // tooth 3 top (+127° → +143°)
+                lineTo(6.01f, 16.51f)                                // drop → inner +143°
+                arcTo(7.5f, 7.5f, 0f, false, true, 4.57f, 13.04f)  // valley      (+143° → +172°)
+                lineTo(2.10f, 13.39f)                                // rise → outer +172°
+                arcTo(10f, 10f, 0f, false, true, 2.10f, 10.61f)     // tooth 4 top (+172° → +188°)
+                lineTo(4.57f, 10.96f)                                // drop → inner +188°
+                arcTo(7.5f, 7.5f, 0f, false, true, 6.01f, 7.49f)   // valley      (+188° → +217°)
+                lineTo(4.01f, 5.98f)                                 // rise → outer +217°
+                arcTo(10f, 10f, 0f, false, true, 5.98f, 4.01f)      // tooth 5 top (+217° → +233°)
+                lineTo(7.49f, 6.01f)                                 // drop → inner +233°
+                arcTo(7.5f, 7.5f, 0f, false, true, 10.96f, 4.57f)  // valley      (+233° → +262°)
+                lineTo(10.61f, 2.10f)                                // rise → outer +262°
+                arcTo(10f, 10f, 0f, false, true, 13.39f, 2.10f)     // tooth 6 top (+262° → +278°)
+                lineTo(13.04f, 4.57f)                                // drop → inner +278°
+                arcTo(7.5f, 7.5f, 0f, false, true, 16.51f, 6.01f)  // valley      (+278° → +307°)
+                lineTo(18.02f, 4.01f)                                // rise → outer +307°
+                arcTo(10f, 10f, 0f, false, true, 19.99f, 5.98f)     // tooth 7 top (+307° → +323°)
+                lineTo(17.99f, 7.49f)                                // drop → inner +323°
+                arcTo(7.5f, 7.5f, 0f, false, true, 19.43f, 10.96f) // valley      (+323° → +352°)
+                close()                                              // left face of tooth 0
             }
-            // Inner circle
+            // Center circle
             path(
                 stroke = SolidColor(Color.Black),
-                strokeLineWidth = 2f,
-                strokeLineCap = StrokeCap.Round
+                strokeLineWidth = 1.5f,
             ) {
-                moveTo(15f, 12f)
-                arcTo(3f, 3f, 0f, false, false, 9f, 12f)
-                arcTo(3f, 3f, 0f, false, false, 15f, 12f)
+                moveTo(15.5f, 12f)
+                arcTo(3.5f, 3.5f, 0f, false, false, 8.5f, 12f)
+                arcTo(3.5f, 3.5f, 0f, false, false, 15.5f, 12f)
                 close()
             }
         }.build()
@@ -692,8 +703,8 @@ object DwIcons {
     }
 
     /**
-     * Filled gear with a transparent inner circle cutout — selected-state icon for Settings.
-     * Uses EvenOdd fill rule for the cutout.
+     * Filled gear with a transparent center-hole cutout — selected-state icon for Settings.
+     * Same 8-tooth geometry as [Settings]; uses EvenOdd fill rule for the center cutout.
      */
     val SettingsFilled: ImageVector by lazy {
         ImageVector.Builder(
@@ -705,38 +716,46 @@ object DwIcons {
         ).apply {
             path(
                 fill = SolidColor(Color.Black),
-                pathFillType = PathFillType.EvenOdd
+                pathFillType = PathFillType.EvenOdd,
             ) {
-                // Outer gear (same polygon as Settings outline)
-                moveTo(12f, 3f)
-                lineToRelative(1.6f, 1.6f)
-                horizontalLineToRelative(2.2f)
-                lineToRelative(0.6f, 2.2f)
-                lineToRelative(2.2f, 0.6f)
-                verticalLineToRelative(2.2f)
-                lineToRelative(1.6f, 1.6f)
-                lineToRelative(-1.6f, 1.6f)
-                verticalLineToRelative(2.2f)
-                lineToRelative(-2.2f, 0.6f)
-                lineToRelative(-0.6f, 2.2f)
-                horizontalLineToRelative(-2.2f)
-                lineToRelative(-1.6f, 1.6f)
-                lineToRelative(-1.6f, -1.6f)
-                horizontalLineToRelative(-2.2f)
-                lineToRelative(-0.6f, -2.2f)
-                lineToRelative(-2.2f, -0.6f)
-                verticalLineToRelative(-2.2f)
-                lineToRelative(-1.6f, -1.6f)
-                lineToRelative(1.6f, -1.6f)
-                verticalLineToRelative(-2.2f)
-                lineToRelative(2.2f, -0.6f)
-                lineToRelative(0.6f, -2.2f)
-                horizontalLineToRelative(2.2f)
+                // Gear body — same 8-tooth path as Settings
+                moveTo(21.90f, 10.61f)
+                arcTo(10f, 10f, 0f, false, true, 21.90f, 13.39f)
+                lineTo(19.43f, 13.04f)
+                arcTo(7.5f, 7.5f, 0f, false, true, 17.99f, 16.51f)
+                lineTo(19.99f, 18.02f)
+                arcTo(10f, 10f, 0f, false, true, 18.02f, 19.99f)
+                lineTo(16.51f, 17.99f)
+                arcTo(7.5f, 7.5f, 0f, false, true, 13.04f, 19.43f)
+                lineTo(13.39f, 21.90f)
+                arcTo(10f, 10f, 0f, false, true, 10.61f, 21.90f)
+                lineTo(10.96f, 19.43f)
+                arcTo(7.5f, 7.5f, 0f, false, true, 7.49f, 17.99f)
+                lineTo(5.98f, 19.99f)
+                arcTo(10f, 10f, 0f, false, true, 4.01f, 18.02f)
+                lineTo(6.01f, 16.51f)
+                arcTo(7.5f, 7.5f, 0f, false, true, 4.57f, 13.04f)
+                lineTo(2.10f, 13.39f)
+                arcTo(10f, 10f, 0f, false, true, 2.10f, 10.61f)
+                lineTo(4.57f, 10.96f)
+                arcTo(7.5f, 7.5f, 0f, false, true, 6.01f, 7.49f)
+                lineTo(4.01f, 5.98f)
+                arcTo(10f, 10f, 0f, false, true, 5.98f, 4.01f)
+                lineTo(7.49f, 6.01f)
+                arcTo(7.5f, 7.5f, 0f, false, true, 10.96f, 4.57f)
+                lineTo(10.61f, 2.10f)
+                arcTo(10f, 10f, 0f, false, true, 13.39f, 2.10f)
+                lineTo(13.04f, 4.57f)
+                arcTo(7.5f, 7.5f, 0f, false, true, 16.51f, 6.01f)
+                lineTo(18.02f, 4.01f)
+                arcTo(10f, 10f, 0f, false, true, 19.99f, 5.98f)
+                lineTo(17.99f, 7.49f)
+                arcTo(7.5f, 7.5f, 0f, false, true, 19.43f, 10.96f)
                 close()
-                // Inner circle — EvenOdd cuts this out (r=3, center (12,12))
-                moveTo(15f, 12f)
-                arcToRelative(3f, 3f, 0f, false, false, -6f, 0f)
-                arcToRelative(3f, 3f, 0f, false, false, 6f, 0f)
+                // Center hole — EvenOdd makes this transparent
+                moveTo(15.5f, 12f)
+                arcTo(3.5f, 3.5f, 0f, false, false, 8.5f, 12f)
+                arcTo(3.5f, 3.5f, 0f, false, false, 15.5f, 12f)
                 close()
             }
         }.build()
