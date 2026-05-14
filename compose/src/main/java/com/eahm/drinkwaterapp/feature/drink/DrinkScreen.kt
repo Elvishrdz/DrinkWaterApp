@@ -44,6 +44,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -51,6 +52,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStats
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
@@ -198,7 +200,7 @@ private fun StreakBadge(
         )
         Spacer(modifier = Modifier.width(5.dp))
         Text(
-            text = "$streak-day streak",
+            text = stringResource(R.string.drink_streak_label, streak),
             fontFamily = PlusJakartaSans,
             fontWeight = FontWeight.Bold,
             fontSize = 12.sp,
@@ -275,21 +277,30 @@ private fun RotatingInfoPill(
                 scale.animateTo(1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy))
             }
 
+            val mlUnit = stringResource(R.string.volume_unit_mililiters)
+            val remainingPrefix = stringResource(R.string.drink_remaining_prefix)
+            val remainingSuffix = stringResource(R.string.drink_remaining_suffix)
+            val goalReached = stringResource(R.string.drink_goal_reached)
+            val goalReachedSuffix = stringResource(R.string.drink_goal_reached_suffix)
+            val nextAlarmPrefix = stringResource(R.string.drink_next_alarm_prefix)
+
             when (message) {
                 PillMessage.Remaining -> {
                     if (remaining > 0) {
                         Text(
                             text = buildAnnotatedString {
-                                append("You're ")
+                                append(remainingPrefix)
+                                append(" ")
                                 withStyle(
                                     SpanStyle(
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.secondary,
                                     )
                                 ) {
-                                    append("${remaining.toDigitString()} mL")
+                                    append("${remaining.toDigitString()} $mlUnit")
                                 }
-                                append(" away from today's goal")
+                                append(" ")
+                                append(remainingSuffix)
                             },
                             fontFamily = PlusJakartaSans,
                             fontSize = 13.sp,
@@ -306,9 +317,10 @@ private fun RotatingInfoPill(
                                         color = MaterialTheme.colorScheme.secondary,
                                     )
                                 ) {
-                                    append("Goal reached")
+                                    append(goalReached)
                                 }
-                                append(" — keep sipping to stay ahead")
+                                append(" ")
+                                append(goalReachedSuffix)
                             },
                             fontFamily = PlusJakartaSans,
                             fontSize = 13.sp,
@@ -322,7 +334,8 @@ private fun RotatingInfoPill(
                     val ms = alarmRemainingMs ?: 0L
                     Text(
                         text = buildAnnotatedString {
-                            append("Next alarm in ")
+                            append(nextAlarmPrefix)
+                            append(" ")
                             withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = DwWater)) {
                                 append(formatAlarmCountdown(ms))
                             }

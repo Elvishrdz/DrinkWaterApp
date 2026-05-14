@@ -3,8 +3,10 @@ package com.eahm.drinkwaterapp.feature.drink.alarm
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkSchedule
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.domain.extension.pad
@@ -20,7 +22,10 @@ internal fun SummaryRow(
 ) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         if (schedule != null) {
-            SummaryChip(label = "Drinks", value = "${schedule.count}")
+            SummaryChip(
+                label = stringResource(R.string.drink_alarm_summary_drinks),
+                value = "${schedule.count}"
+            )
 
             val totalMin = interval.hour * 60 + interval.minute
             val h = totalMin / 60
@@ -29,11 +34,17 @@ internal fun SummaryRow(
                 if (h > 0) append("${h}h ")
                 if (m > 0 || h == 0) append("${m}m")
             }.trim()
-            SummaryChip(label = "Every", value = intervalLabel)
+            SummaryChip(
+                label = stringResource(R.string.drink_alarm_summary_every),
+                value = intervalLabel
+            )
         }
 
         nextAlarmSlot?.let { next ->
-            val label = if (isInActiveHours) "Next" else "Starts"
+            val label =
+                if (isInActiveHours) stringResource(R.string.drink_alarm_summary_next) else stringResource(
+                    R.string.drink_alarm_summary_starts
+                )
             SummaryChip(
                 label = label,
                 value = "${next.hour.pad()}:${next.minute.pad()}",

@@ -19,10 +19,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
@@ -67,14 +69,14 @@ internal fun NoPermissionCard(modifier: Modifier = Modifier) {
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = "Notifications disabled",
+                text = stringResource(R.string.notif_disabled_title),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp,
                 color = DwInk900,
             )
             Text(
-                text = "Enable them to receive your drink reminders on time.",
+                text = stringResource(R.string.drink_alarm_no_permission_body),
                 fontFamily = PlusJakartaSans,
                 fontSize = 12.sp,
                 color = DwInk500,

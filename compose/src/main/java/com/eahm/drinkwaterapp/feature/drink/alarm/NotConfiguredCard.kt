@@ -16,10 +16,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk100
@@ -60,14 +62,14 @@ internal fun NotConfiguredCard(
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = "No alarm schedule",
+                text = stringResource(R.string.drink_alarm_not_configured_title),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp,
                 color = DwInk700,
             )
             Text(
-                text = "Configure your active hours in Settings to get reminders.",
+                text = stringResource(R.string.drink_alarm_not_configured_body),
                 fontFamily = PlusJakartaSans,
                 fontSize = 12.sp,
                 color = DwInk500,

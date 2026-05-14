@@ -20,6 +20,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -28,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
@@ -114,6 +116,7 @@ fun ProgressRing(
 
             Spacer(modifier = Modifier.height(2.dp))
 
+            val mlUnit = stringResource(R.string.volume_unit_mililiters)
             Text(
                 text = buildAnnotatedString {
                     withStyle(
@@ -133,7 +136,7 @@ fun ProgressRing(
                             fontSize = 14.sp,
                         )
                     ) {
-                        append(" mL")
+                        append(" $mlUnit")
                     }
                 },
             )
@@ -141,7 +144,10 @@ fun ProgressRing(
             Spacer(modifier = Modifier.height(2.dp))
 
             Text(
-                text = "of ${goal.sanitizeZeroDecimals()} mL",
+                text = stringResource(
+                    R.string.drink_progress_goal_label,
+                    goal.sanitizeZeroDecimals()
+                ),
                 style = MaterialTheme.typography.bodySmall,
                 color = DwInk400
             )

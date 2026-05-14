@@ -11,6 +11,7 @@
     <!-- Generic — acciones -->
     <string name="action_cancel">Cancelar</string>
     <string name="action_save">Guardar</string>
+    <string name="action_undo">Deshacer</string>
     <string name="action_not_now">Ahora no</string>
     <string name="action_open_settings">Abrir ajustes</string>
     <string name="action_continue_to_settings">Continuar a ajustes</string>
@@ -204,5 +205,46 @@
     <string name="settings_unit_metric_sublabel">mL · kg</string>
     <string name="settings_unit_imperial_label">Imperial</string>
     <string name="settings_unit_imperial_sublabel">fl. oz · lbs</string>
+
+    <!-- Drink — Pantalla principal -->
+    <string name="drink_streak_label">Racha de %1$d días</string>
+    <string name="drink_remaining_prefix">Te faltan </string>
+    <string name="drink_remaining_suffix"> para tu meta de hoy</string>
+    <string name="drink_goal_reached">Meta alcanzada</string>
+    <string name="drink_goal_reached_suffix">sigue así para mantener el ritmo</string>
+    <string name="drink_next_alarm_prefix">Próxima alarma en </string>
+
+    <!-- Drink — Anillo de progreso -->
+    <string name="drink_progress_goal_label">de %1$s mL</string>
+
+    <!-- Drink — Sección de registros -->
+    <string name="drink_log_section_title">Hoy</string>
+    <string name="drink_log_see_all">VER TODO</string>
+    <string name="drink_log_empty_state">Aún no registraste bebidas — toca Agregar agua para empezar.</string>
+    <string name="drink_log_entry_amount">%1$s mL</string>
+
+    <!-- Drink — Hoja inferior para agregar bebida -->
+    <string name="drink_add_more_label">Más</string>
+    <string name="drink_suggestions_title">Sugerencias de bebida</string>
+    <string name="drink_suggestions_close_desc">Cerrar</string>
+    <string name="drink_custom_amount_label">Cantidad personalizada</string>
+    <string name="drink_suggestion_removed">Sugerencia eliminada</string>
+    <string name="drink_action_create">Crear</string>
+    <string name="drink_action_drink">Beber</string>
+
+    <!-- Drink — Tarjetas de alarma -->
+    <string name="drink_alarm_reminders_title">Recordatorios</string>
+    <string name="drink_alarm_no_permission_body">Actívalas para recibir tus recordatorios de hidratación a tiempo.</string>
+    <string name="drink_alarm_not_configured_title">Sin horario de alarma</string>
+    <string name="drink_alarm_not_configured_body">Configura tu ventana activa en Ajustes para recibir recordatorios.</string>
+    <string name="drink_alarm_status_active">Horas activas</string>
+    <string name="drink_alarm_status_resting">En descanso</string>
+    <string name="drink_alarm_summary_drinks">Bebidas</string>
+    <string name="drink_alarm_summary_every">Cada</string>
+    <string name="drink_alarm_summary_next">Próxima</string>
+    <string name="drink_alarm_summary_starts">Inicia</string>
+
+    <!-- Drink — Eliminar preset -->
+    <string name="drink_delete_drop_desc">Suelta aquí para eliminar</string>
 
 </resources>

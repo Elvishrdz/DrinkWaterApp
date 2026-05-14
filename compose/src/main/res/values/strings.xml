@@ -11,6 +11,7 @@
     <!-- Generic — actions -->
     <string name="action_cancel">Cancel</string>
     <string name="action_save">Save</string>
+    <string name="action_undo">Undo</string>
     <string name="action_not_now">Not now</string>
     <string name="action_open_settings">Open Settings</string>
     <string name="action_continue_to_settings">Continue to Settings</string>
@@ -204,5 +205,46 @@
     <string name="settings_unit_metric_sublabel">mL · kg</string>
     <string name="settings_unit_imperial_label">Imperial</string>
     <string name="settings_unit_imperial_sublabel">fl. oz · lbs</string>
+
+    <!-- Drink — Home screen -->
+    <string name="drink_streak_label">%1$d-day streak</string>
+    <string name="drink_remaining_prefix">You\'re </string>
+    <string name="drink_remaining_suffix"> away from today\'s goal</string>
+    <string name="drink_goal_reached">Goal reached</string>
+    <string name="drink_goal_reached_suffix">keep sipping to stay ahead</string>
+    <string name="drink_next_alarm_prefix">Next alarm in </string>
+
+    <!-- Drink — Progress ring -->
+    <string name="drink_progress_goal_label">of %1$s mL</string>
+
+    <!-- Drink — Log section -->
+    <string name="drink_log_section_title">Today</string>
+    <string name="drink_log_see_all">SEE ALL</string>
+    <string name="drink_log_empty_state">No drinks logged yet — tap Add water to start.</string>
+    <string name="drink_log_entry_amount">%1$s mL</string>
+
+    <!-- Drink — Add drink bottom sheet -->
+    <string name="drink_add_more_label">More</string>
+    <string name="drink_suggestions_title">Drink Suggestions</string>
+    <string name="drink_suggestions_close_desc">Close</string>
+    <string name="drink_custom_amount_label">Custom Amount</string>
+    <string name="drink_suggestion_removed">Suggestion removed</string>
+    <string name="drink_action_create">Create</string>
+    <string name="drink_action_drink">Drink</string>
+
+    <!-- Drink — Alarm cards -->
+    <string name="drink_alarm_reminders_title">Reminders</string>
+    <string name="drink_alarm_no_permission_body">Enable them to receive your drink reminders on time.</string>
+    <string name="drink_alarm_not_configured_title">No alarm schedule</string>
+    <string name="drink_alarm_not_configured_body">Configure your active hours in Settings to get reminders.</string>
+    <string name="drink_alarm_status_active">Active hours</string>
+    <string name="drink_alarm_status_resting">Resting</string>
+    <string name="drink_alarm_summary_drinks">Drinks</string>
+    <string name="drink_alarm_summary_every">Every</string>
+    <string name="drink_alarm_summary_next">Next</string>
+    <string name="drink_alarm_summary_starts">Starts</string>
+
+    <!-- Drink — Delete preset -->
+    <string name="drink_delete_drop_desc">Drop here to delete</string>
 
 </resources>

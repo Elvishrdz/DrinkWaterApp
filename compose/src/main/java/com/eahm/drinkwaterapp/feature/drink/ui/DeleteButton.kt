@@ -18,8 +18,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk300
 
@@ -90,7 +92,7 @@ fun DeleteButton(
     ) {
         Icon(
             imageVector = DwIcons.Trash,
-            contentDescription = "Drop here to delete",
+            contentDescription = stringResource(R.string.drink_delete_drop_desc),
             tint = iconTint,
             modifier = Modifier
                 .graphicsLayer {

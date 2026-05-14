@@ -36,11 +36,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwSecondaryButton
@@ -74,6 +76,8 @@ internal fun AddDrinkButton(
     )
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+    val suggestionRemovedMsg = stringResource(R.string.drink_suggestion_removed)
+    val undoLabel = stringResource(R.string.action_undo)
 
     var isDragging by remember { mutableStateOf(false) }
     var isOverDeleteZone by remember { mutableStateOf(false) }
@@ -84,7 +88,7 @@ internal fun AddDrinkButton(
 
     ChipButton(
         icon = DwIcons.Plus,
-        text = "More",
+        text = stringResource(R.string.drink_add_more_label),
         onClick = { showBottomSheet = true },
         modifier = modifier,
     )
@@ -130,8 +134,8 @@ internal fun AddDrinkButton(
                             onDelete(preset)
                             scope.launch {
                                 val result = snackbarHostState.showSnackbar(
-                                    message = "Suggestion removed",
-                                    actionLabel = "Undo",
+                                    message = suggestionRemovedMsg,
+                                    actionLabel = undoLabel,
                                     duration = SnackbarDuration.Short,
                                 )
                                 if (result == SnackbarResult.ActionPerformed) {
@@ -203,7 +207,7 @@ fun Header(
         Text(
             modifier = Modifier
                 .weight(1f),
-            text = "Drink Suggestions",
+            text = stringResource(R.string.drink_suggestions_title),
             style = MaterialTheme.typography.titleLarge,
         )
 
@@ -214,7 +218,7 @@ fun Header(
         ) {
             Icon(
                 imageVector = DwIcons.Close,
-                contentDescription = "Close",
+                contentDescription = stringResource(R.string.drink_suggestions_close_desc),
                 tint = DwInk300,
             )
         }
@@ -237,7 +241,7 @@ fun InputFieldArea(
     ) {
         AppInputField(
             modifier = Modifier.fillMaxWidth(),
-            label = "Custom Amount",
+            label = stringResource(R.string.drink_custom_amount_label),
             value = customAmount?.toDigitString().orEmpty(),
             onValueChanged = {
                 customAmount = it.toFloatOrNull()
@@ -254,7 +258,7 @@ fun InputFieldArea(
             horizontalArrangement = Arrangement.Center,
         ) {
             DwSecondaryButton(
-                text = "Create",
+                text = stringResource(R.string.drink_action_create),
                 enabled = !disableButtons && enabled,
                 onClick = {
                     customAmount?.let {
@@ -266,7 +270,7 @@ fun InputFieldArea(
             Spacer(Modifier.width(7.dp))
 
             DwPrimaryButton(
-                text = "Drink",
+                text = stringResource(R.string.drink_action_drink),
                 enabled = !disableButtons && enabled,
                 onClick = {
                     customAmount?.let {

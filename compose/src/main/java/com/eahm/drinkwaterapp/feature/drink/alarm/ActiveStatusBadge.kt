@@ -12,10 +12,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk200
@@ -27,7 +29,8 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 internal fun ActiveStatusBadge(isActive: Boolean) {
     val bgColor = if (isActive) DwSuccess.copy(alpha = 0.12f) else DwInk200
     val fgColor = if (isActive) DwSuccess else DwInk400
-    val label = if (isActive) "Active hours" else "Resting"
+    val label =
+        if (isActive) stringResource(R.string.drink_alarm_status_active) else stringResource(R.string.drink_alarm_status_resting)
     val icon = if (isActive) DwIcons.Sun else DwIcons.Moon
 
     Row(

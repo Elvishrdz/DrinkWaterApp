@@ -29,10 +29,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.component.extension.outlineBorderStyle
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -70,7 +72,7 @@ fun TodayLogSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Today",
+                text = stringResource(R.string.drink_log_section_title),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp,
@@ -84,7 +86,7 @@ fun TodayLogSection(
                 ),
             ) {
                 Text(
-                    text = "SEE ALL",
+                    text = stringResource(R.string.drink_log_see_all),
                     fontFamily = Nunito,
                     fontWeight = FontWeight.Bold,
                     fontSize = 11.sp,
@@ -98,7 +100,7 @@ fun TodayLogSection(
 
         if (items.isEmpty()) {
             Text(
-                text = "No drinks logged yet — tap Add water to start.",
+                text = stringResource(R.string.drink_log_empty_state),
                 fontFamily = PlusJakartaSans,
                 fontSize = 13.sp,
                 color = DwInk400,
@@ -176,7 +178,7 @@ private fun DrinkLogRow(entry: DrinkLogEntry) {
         }
 
         Text(
-            text = "${entry.amount.toDigitString()} mL",
+            text = stringResource(R.string.drink_log_entry_amount, entry.amount.toDigitString()),
             fontFamily = Nunito,
             fontWeight = FontWeight.Bold,
             fontSize = 14.sp,
