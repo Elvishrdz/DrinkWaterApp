@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Drink Water App</string>
+    <string name="channel_description">Recordatorios para tomar agua</string>
+
+    <string name="volume_unit_mililiters">mL</string>
+    <string name="skip">Omitir</string>
+    <string name="notification_drink_amount_formatted">+%1$s%2$s</string>
+    <string name="share_app_title">¡Comparte DrinkWater con tus amigos!</string>
+
+    <!-- Onboarding — compartido -->
+    <string name="onb_cta_continue">Continuar</string>
+
+    <!-- Onboarding — Intro -->
+    <string name="onb_intro_title">Construyamos un gran hábito</string>
+    <string name="onb_intro_subtitle">En los siguientes pasos, configuraremos rápidamente tu meta de hidratación y recordatorios.</string>
+    <string name="onb_intro_cta_text">Empezar</string>
+    <string name="onb_intro_card_goal_title">Tu meta diaria</string>
+    <string name="onb_intro_card_goal_description">Decide exactamente cuánto quieres lograr.</string>
+    <string name="onb_intro_card_reminders_title">Recordatorios diarios</string>
+    <string name="onb_intro_card_reminders_description">Notificaciones para avisarte cuándo es un buen momento para tomar agua.</string>
+    <string name="onb_intro_card_stats_title">Historial y estadísticas</string>
+    <string name="onb_intro_card_stats_description">Mira tu progreso. Crea un hábito saludable, un día a la vez.</string>
+
+    <!-- Onboarding — Establecer meta -->
+    <string name="onb_goal_title">Establece tu meta diaria</string>
+    <string name="onb_set_goal_subtitle">Define cuánto quieres lograr por día.</string>
+    <string name="onb_set_goal_cta">Establecer mi meta</string>
+
+    <!-- Onboarding — Nombre -->
+    <string name="onb_name_title">¿Cómo te llamas?</string>
+    <string name="onb_name_subtitle">Lo usaremos para saludarte en la pantalla de inicio.</string>
+    <string name="onb_name_placeholder">Tu nombre</string>
+
+    <!-- Onboarding — Género -->
+    <string name="onb_gender_title">Un poco sobre ti</string>
+    <string name="onb_gender_subtitle">Nos ayuda a ajustar tu fórmula de hidratación. Puedes omitir esto.</string>
+    <string name="onb_gender_option_female">Femenino</string>
+    <string name="onb_gender_option_male">Masculino</string>
+    <string name="onb_gender_option_prefer_not_to_say">Prefiero no decirlo</string>
+
+    <!-- Onboarding — Peso -->
+    <string name="onb_weight_title">¿Cuánto pesas?</string>
+    <string name="onb_weight_subtitle">Lo usamos para calcular tu meta diaria de agua.</string>
+
+    <!-- Onboarding — Actividad -->
+    <string name="onb_activity_title">¿Qué tan activo/a eres?</string>
+    <string name="onb_activity_subtitle">Los días activos requieren ~15% más agua que los días de descanso.</string>
+    <string name="onb_activity_light_title">Ligera</string>
+    <string name="onb_activity_light_subtitle">Principalmente sentado/a, poco ejercicio</string>
+    <string name="onb_activity_moderate_title">Moderada</string>
+    <string name="onb_activity_moderate_subtitle">Caminatas, ejercicio ligero 2–3×/semana</string>
+    <string name="onb_activity_active_title">Activa</string>
+    <string name="onb_activity_active_subtitle">Entrenamiento diario o trabajo activo</string>
+
+    <!-- Onboarding — Resultado de meta -->
+    <string name="onb_goal_result_title">Tu meta diaria</string>
+    <string name="onb_goal_result_subtitle">Calculada según tu peso y nivel de actividad.</string>
+    <string name="onb_goal_result_cta">Se ve bien</string>
+    <string name="onb_goal_result_glasses_about">Eso equivale a </string>
+    <string name="onb_goal_result_glasses_suffix"> a lo largo de tu día.</string>
+
+    <!-- Onboarding — Hora de inicio -->
+    <string name="onb_wake_title">¿A qué hora empiezas tu día?</string>
+    <string name="onb_wake_subtitle">A partir de esta hora comenzaremos a enviarte recordatorios.</string>
+    <string name="onb_wake_same_time_error">La hora no puede ser igual a la hora de fin.</string>
+
+    <!-- Onboarding — Hora de fin -->
+    <string name="onb_sleep_title">¿Y a qué hora terminas tu día?</string>
+    <string name="onb_sleep_subtitle">Los recordatorios se detendrán a esta hora, aunque puedes tomar agua cuando quieras.</string>
+    <string name="onb_sleep_same_time_error">La hora no puede ser igual a la hora de inicio</string>
+
+    <!-- Onboarding — Intervalo -->
+    <string name="onb_interval_title">¿Con qué frecuencia quieres que te recordemos?</string>
+    <string name="onb_interval_subtitle">Los intervalos intentarán ajustarse a esta preferencia, pero pueden variar. Puedes cambiar este valor en cualquier momento en los ajustes.</string>
+    <string name="onb_interval_30_title">Cada 30 minutos</string>
+    <string name="onb_interval_30_subtitle">Más constante</string>
+    <string name="onb_interval_45_title">Cada 45 minutos</string>
+    <string name="onb_interval_45_subtitle">Recomendado</string>
+    <string name="onb_interval_60_title">Cada hora</string>
+    <string name="onb_interval_60_subtitle">Toque ligero</string>
+    <string name="onb_interval_120_title">Cada 2 horas</string>
+    <string name="onb_interval_120_subtitle">Mínimo</string>
+    <string name="onb_interval_custom_title">Lo elijo yo</string>
+    <string name="onb_interval_custom_subtitle">Elige tu propio intervalo</string>
+
+    <!-- Onboarding — Notificaciones: Permiso -->
+    <string name="onb_notifs_permission_title">Mantente al día</string>
+    <string name="onb_notifs_permission_subtitle">Te enviaremos un recordatorio aproximadamente cada %1$s para que nunca olvides hidratarte.</string>
+    <string name="onb_notifs_permission_cta_skip">Quizás después</string>
+    <string name="onb_notifs_permission_cta_allow">Permitir notificaciones</string>
+    <string name="onb_notifs_permission_card_title">¡Es hora de tomar agua!</string>
+    <string name="onb_notifs_permission_card_body">Bebe ahora para mantenerte hidratado.</string>
+    <!-- Onboarding — Notificaciones: Configuración -->
+    <string name="onb_notifs_config_title">Trago rápido</string>
+    <string name="onb_notifs_config_subtitle">¿No quieres abrir la app? Toca este valor en la notificación y guardaremos el registro por ti.</string>
+    <string name="onb_notifs_config_hint">Puedes cambiar esto en cualquier momento en los ajustes.</string>
+    <!-- Onboarding — Notificaciones: Diálogo denegado -->
+    <string name="onb_notifs_denied_title">Notificaciones desactivadas</string>
+    <string name="onb_notifs_denied_body">Para recibir recordatorios de hidratación, habilita las notificaciones de DrinkWater en los Ajustes de tu teléfono.</string>
+    <string name="onb_notifs_denied_cta_settings">Abrir ajustes</string>
+    <string name="onb_notifs_denied_cta_cancel">Cancelar</string>
+
+    <!-- Onboarding — Overlay: Solicitud -->
+    <string name="onb_overlay_request_title">Celebraciones, en cualquier lugar</string>
+    <string name="onb_overlay_request_subtitle">La tarjeta de celebración aparece cuando alcanzas tu meta diaria desde la app o un recordatorio. Permite mostrar sobre otras apps para que aparezca en tu dispositivo.</string>
+    <string name="onb_overlay_request_cta_skip">Omitir por ahora</string>
+    <string name="onb_overlay_request_cta_allow">Permitir mostrar sobre otras apps</string>
+    <!-- Onboarding — Overlay: Concedido -->
+    <string name="onb_overlay_granted_title">Las celebraciones de meta están activadas</string>
+    <string name="onb_overlay_granted_subtitle">Aparecerá una tarjeta de celebración cada vez que completes tu meta diaria de agua.</string>
+    <!-- Onboarding — Overlay: Pasos -->
+    <string name="onb_overlay_steps_header">Cómo activarlo</string>
+    <string name="onb_overlay_step_1">Toca \"Permitir mostrar sobre otras apps\" abajo.</string>
+    <string name="onb_overlay_step_2">Encuentra DrinkWater en la lista.</string>
+    <string name="onb_overlay_step_3">Activa \"Permitir mostrar sobre otras apps\".</string>
+    <string name="onb_overlay_step_4">Presiona atrás, continuaremos automáticamente.</string>
+    <!-- Onboarding — Overlay: Filas de funciones -->
+    <string name="onb_overlay_feature_app_label">Dentro de la app</string>
+    <string name="onb_overlay_feature_app_description">Registra una bebida que complete tu meta y aparecerá la tarjeta de celebración.</string>
+    <string name="onb_overlay_feature_reminder_label">Desde un recordatorio</string>
+    <string name="onb_overlay_feature_reminder_description">Toca tu cantidad de agua en una notificación y, si alcanzas tu meta, la tarjeta flotará sobre la app que estés usando.</string>
+    <!-- Onboarding — Overlay: Vista previa de la tarjeta -->
+    <string name="onb_overlay_card_preview_title">¡Meta diaria alcanzada!</string>
+    <string name="onb_overlay_card_preview_body">Tomaste tus 2.0 L — ¡sigue así!</string>
+    <string name="onb_overlay_card_preview_stat_goal">meta</string>
+    <string name="onb_overlay_card_preview_stat_drinks">bebidas</string>
+    <string name="onb_overlay_card_preview_stat_streak">días seguidos</string>
+
+    <!-- Onboarding — Listo -->
+    <string name="onb_done_title">¡Todo listo!</string>
+    <string name="onb_done_title_with_name">¡Todo listo, %1$s!</string>
+    <string name="onb_done_subtitle">Aquí está tu configuración, puedes cambiarla cuando quieras en los ajustes.</string>
+    <string name="onb_done_cta">Empezar</string>
+    <string name="onb_done_row_daily_goal">Meta diaria</string>
+    <string name="onb_done_row_reminder">Recordatorio</string>
+    <string name="onb_done_row_start_time">Hora de inicio</string>
+    <string name="onb_done_row_end_time">Hora de fin</string>
+
+</resources>
