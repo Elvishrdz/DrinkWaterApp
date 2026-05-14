@@ -2,6 +2,7 @@ package com.eahm.drinkwaterapp.feature.onboarding
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.eahm.drinkwaterapp.analytics.TrackingService
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
@@ -27,11 +28,19 @@ internal class OnboardingViewModel(
     private val prefs: PrefsStorage,
     private val database: AppDatabase,
     private val drinkAlarmManager: DrinkAlarmManager,
+    private val tracking: TrackingService,
 ) : ViewModel() {
 
     private val dailyGoalDao = database.getDailyGoalDao()
 
     private val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+
+    private var onboardingCompleted = false
+
+    init {
+        tracking.startTrackTimeOnboardingTime()
+        tracking.trackOnboardingStarted()
+    }
 
     private val _state = MutableStateFlow(OnboardingFormState(goalMl = DEFAULT_GOAL_ML))
     val state: StateFlow<OnboardingFormState> = combine(
@@ -98,7 +107,11 @@ internal class OnboardingViewModel(
     fun prevStep() = _state.update { it.copy(step = (it.step - 1).coerceAtLeast(1)) }
 
     fun finishOnboarding(onComplete: () -> Unit) {
+        onboardingCompleted = true
         viewModelScope.launch {
+            tracking.trackOnboardingCompleted()
+            tracking.stopTrackTimeOnboardingTime()
+
             val s = _state.value
             if (s.name.isNotBlank()) prefs.setUsername(s.name.trim())
             prefs.setStartTime(s.wakeTime.toActiveTime())
@@ -109,12 +122,21 @@ internal class OnboardingViewModel(
                     minute = s.intervalMinutes % 60,
                 )
             )
-            upsertGoalForToday(s.goalMl.toFloat())
+            upsertGoalForToday(s.goalMl)
             prefs.setAmountPerDrink(s.notifAmountMl)
             prefs.setOnboardingCompleted(true)
             drinkAlarmManager.determineAction(AlarmSource.OnboardingCompleted)
             onComplete()
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        if (!onboardingCompleted) {
+            val stepName = OnboardingSteps.byStep(_state.value.step)::class.simpleName ?: "Unknown"
+            tracking.trackOnboardingAbandoned(stepName)
+        }
+        tracking.stopTrackTimeOnboardingTime()
     }
 
     private suspend fun upsertGoalForToday(goalMl: Float) {

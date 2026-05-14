@@ -1,5 +1,6 @@
 package com.eahm.drinkwaterapp.di
 
+import com.eahm.drinkwaterapp.analytics.trackingServiceModule
 import com.eahm.drinkwaterapp.core.billing.billingModule
 import com.eahm.drinkwaterapp.core.config.appInfoModule
 import com.eahm.drinkwaterapp.core.data.confetti.confettiModule
@@ -23,4 +24,5 @@ internal val dataModule = module {
     includes(notificationPermissionModule)
     includes(streakModule)
     includes(billingModule)
+    includes(trackingServiceModule)
 }

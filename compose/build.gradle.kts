@@ -78,6 +78,8 @@ room {
 
 dependencies {
     implementation(project(":ads"))
+    implementation(project(":analytics"))
+
     implementation("androidx.core:core-ktx:1.18.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.10.0")
 
