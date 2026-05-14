@@ -76,8 +76,8 @@ internal fun OnboardingScreen(
 
             DailyGoal -> StepSetGoal(
                 step = state.step,
-                goalMl = state.computedGoalMl,
-                onGoalChanged = viewModel::onComputedGoalChange,
+                goalMl = state.goalMl,
+                onGoalChanged = viewModel::onGoalChanged,
                 onNext = { viewModel.nextStep() },
                 onBack = { viewModel.prevStep() },
             )
@@ -106,10 +106,7 @@ internal fun OnboardingScreen(
                 wakeTime = state.wakeTime,
                 sleepTime = state.sleepTime,
                 onSelect = viewModel::onIntervalSelect,
-                onNext = {
-                    viewModel.computeGoal()
-                    viewModel.nextStep()
-                },
+                onNext = viewModel::nextStep,
                 onBack = { viewModel.prevStep() },
             )
 

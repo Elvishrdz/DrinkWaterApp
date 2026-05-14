@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -30,12 +30,12 @@ import com.eahm.drinkwaterapp.feature.settings.ui.GoalStepperRow
 @Composable
 internal fun StepSetGoal(
     step: Int,
-    goalMl: Int,
-    onGoalChanged: (Int) -> Unit,
+    goalMl: Float,
+    onGoalChanged: (Float) -> Unit,
     onNext: () -> Unit,
     onBack: () -> Unit,
 ) {
-    var currentGoal by remember { mutableIntStateOf(goalMl.coerceIn(GOAL_MIN, GOAL_MAX)) }
+    var currentGoal by remember { mutableFloatStateOf(goalMl.coerceIn(GOAL_MIN, GOAL_MAX)) }
 
     OnbShell(
         step = step,
@@ -82,7 +82,7 @@ private fun StepSetGoalPreview() {
     DrinkWaterAppTheme {
         StepSetGoal(
             step = 1,
-            goalMl = 2200,
+            goalMl = 2200f,
             onGoalChanged = {},
             onNext = {},
             onBack = {},

@@ -22,7 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -40,23 +40,24 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
+import com.eahm.drinkwaterapp.core.domain.extension.sanitizeZeroDecimals
 import com.eahm.drinkwaterapp.ui.bottomsheet.AppBottomSheet
 import kotlinx.coroutines.launch
 
-internal const val GOAL_STEP = 100
-internal const val GOAL_MIN = 100
-internal const val GOAL_MAX = 5_000
+internal const val GOAL_STEP = 100f
+internal const val GOAL_MIN = 100f
+internal const val GOAL_MAX = 5_000f
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun GoalBottomSheet(
-    currentGoalMl: Int,
-    onGoalChanged: (Int) -> Unit,
+    goalMl: Float,
+    onGoalChanged: (Float) -> Unit,
     onDismiss: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
-    var value by remember { mutableIntStateOf(currentGoalMl.coerceIn(GOAL_MIN, GOAL_MAX)) }
+    var value by remember { mutableFloatStateOf(goalMl.coerceIn(GOAL_MIN, GOAL_MAX)) }
 
     fun dismissWithAnimation() {
         scope.launch { sheetState.hide() }.invokeOnCompletion { onDismiss() }
@@ -106,7 +107,7 @@ internal fun GoalBottomSheet(
 
 @Composable
 internal fun GoalStepperRow(
-    value: Int,
+    value: Float,
     onDecrement: () -> Unit,
     onIncrement: () -> Unit,
     modifier: Modifier = Modifier,
@@ -130,7 +131,7 @@ internal fun GoalStepperRow(
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "%,d".format(value).replace(",", " "),
+                    text = value.sanitizeZeroDecimals(),
                     fontFamily = Nunito,
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 48.sp,

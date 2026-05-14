@@ -91,7 +91,7 @@ internal class SettingsViewModel(
         .flatMapLatest { today ->
             dao.getGoalForDate(today.date.toEpochDays())
         }
-        .map { (it?.goalMl ?: DEFAULT_GOAL_ML).toInt() }
+        .map { (it?.goalMl ?: DEFAULT_GOAL_ML) }
         .flowOn(Dispatchers.IO)
 
     val state = combine(
@@ -130,9 +130,9 @@ internal class SettingsViewModel(
         }
     }
 
-    fun onGoalChanged(goalMl: Int) {
+    fun onGoalChanged(goalMl: Float) {
         viewModelScope.launch {
-            setGoalFromToday(goalMl.toFloat())
+            setGoalFromToday(goalMl)
         }
     }
 

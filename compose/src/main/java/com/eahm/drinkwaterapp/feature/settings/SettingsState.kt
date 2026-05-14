@@ -1,11 +1,12 @@
 package com.eahm.drinkwaterapp.feature.settings
 
 import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
+import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
 
 data class SettingsState(
     val username: String?,
     val weightKg: Float = 68f,
-    val dailyGoalMl: Int = 2000,
+    val dailyGoalMl: Float = DEFAULT_GOAL_ML,
     val unit: WaterUnit = WaterUnit.ML,
     val weightUnit: WeightUnit = WeightUnit.KG,
     val notificationsEnabled: Boolean,

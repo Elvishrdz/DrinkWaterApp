@@ -7,11 +7,14 @@ import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.database.AppDatabase
+import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
 import com.eahm.drinkwaterapp.core.database.entity.DailyGoalEntity
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
@@ -26,8 +29,23 @@ internal class OnboardingViewModel(
     private val drinkAlarmManager: DrinkAlarmManager,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(OnboardingFormState())
-    val state: StateFlow<OnboardingFormState> = _state.asStateFlow()
+    private val dailyGoalDao = database.getDailyGoalDao()
+
+    private val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+
+    private val _state = MutableStateFlow(OnboardingFormState(goalMl = DEFAULT_GOAL_ML))
+    val state: StateFlow<OnboardingFormState> = combine(
+        _state,
+        dailyGoalDao.getGoalOnDate(today.date.toEpochDays()),
+    ) { state, goal ->
+        state.copy(
+            goalMl = goal?.goalMl ?: DEFAULT_GOAL_ML,
+        )
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.Lazily,
+        _state.value,
+    )
 
     fun onNameChange(name: String) = _state.update { it.copy(name = name) }
     fun onGenderSelect(gender: Gender) = _state.update { it.copy(gender = gender) }
@@ -56,20 +74,22 @@ internal class OnboardingViewModel(
         viewModelScope.launch { prefs.setAmountPerDrink(ml) }
     }
 
-    fun onComputedGoalChange(ml: Int) {
-        _state.update { it.copy(computedGoalMl = ml) }
-        viewModelScope.launch { upsertGoalForToday(ml) }
+    fun onGoalChanged(goalMl: Float) {
+        viewModelScope.launch {
+            upsertGoalForToday(goalMl)
+        }
     }
 
     fun computeGoal() {
+        // TODO: when weight is received.
         val s = _state.value
         _state.update {
             it.copy(
-                computedGoalMl = calcGoalMl(
+                goalMl = calcGoalMl(
                     s.weightValue,
                     s.weightUnit,
                     s.activityLevel
-                )
+                ).toFloat(),
             )
         }
     }
@@ -89,7 +109,7 @@ internal class OnboardingViewModel(
                     minute = s.intervalMinutes % 60,
                 )
             )
-            upsertGoalForToday(s.computedGoalMl)
+            upsertGoalForToday(s.goalMl.toFloat())
             prefs.setAmountPerDrink(s.notifAmountMl)
             prefs.setOnboardingCompleted(true)
             drinkAlarmManager.determineAction(AlarmSource.OnboardingCompleted)
@@ -97,17 +117,12 @@ internal class OnboardingViewModel(
         }
     }
 
-    private suspend fun upsertGoalForToday(ml: Int) {
-        val today = Clock.System.now()
-            .toLocalDateTime(TimeZone.currentSystemDefault())
-            .date
-        val dao = database.getDailyGoalDao()
-        val existing = dao.getGoalOnDate(today.toEpochDays()).first()
-        if (existing != null) {
-            dao.update(existing.copy(goalMl = ml.toFloat()))
-        } else {
-            dao.insert(DailyGoalEntity(effectiveDate = today, goalMl = ml.toFloat()))
-        }
+    private suspend fun upsertGoalForToday(goalMl: Float) {
+        val current = today.date
+        val epochDay = current.toEpochDays()
+        val existing = dailyGoalDao.getGoalOnDate(epochDay).first()
+        if (existing != null) dailyGoalDao.update(existing.copy(goalMl = goalMl))
+        else dailyGoalDao.insert(DailyGoalEntity(effectiveDate = current, goalMl = goalMl))
     }
 
     private fun calcGoalMl(weightValue: String, unit: WeightUnit, activity: ActivityLevel?): Int {

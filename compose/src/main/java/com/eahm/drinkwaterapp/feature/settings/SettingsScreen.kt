@@ -84,6 +84,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.JetBrainsMono
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
+import com.eahm.drinkwaterapp.core.domain.extension.sanitizeZeroDecimals
 import com.eahm.drinkwaterapp.core.presentation.composable.BuildInfoFooter
 import com.eahm.drinkwaterapp.feature.settings.ui.EditButton
 import com.eahm.drinkwaterapp.feature.settings.ui.GoalBottomSheet
@@ -290,7 +291,7 @@ internal fun SettingsContent(
     state: SettingsState,
     onNotificationsToggled: (Boolean) -> Unit,
     onUsernameChanged: (String) -> Unit,
-    onGoalChanged: (Int) -> Unit,
+    onGoalChanged: (Float) -> Unit,
     onUnitChanged: (WaterUnit, WeightUnit) -> Unit,
     onIntervalChanged: (Int) -> Unit,
     onNotificationAmountChanged: (Float) -> Unit,
@@ -555,7 +556,7 @@ internal fun SettingsContent(
     // ── Bottom sheets ─────────────────────────────────────────────────────────
     if (showGoalSheet) {
         GoalBottomSheet(
-            currentGoalMl = state.dailyGoalMl,
+            goalMl = state.dailyGoalMl,
             onGoalChanged = onGoalChanged,
             onDismiss = { showGoalSheet = false },
         )
@@ -1025,10 +1026,10 @@ private fun RowChevronTrailing() {
     )
 }
 
-private fun formatGoal(ml: Int): String {
-    if (ml < 1000) return "$ml mL"
+private fun formatGoal(ml: Float): String {
+    if (ml < 1000) return "${ml.sanitizeZeroDecimals()} mL"
     val litres = ml / 1000f
-    return if (litres % 1f == 0f) "${litres.toInt()} L" else "${"%.1f".format(litres)} L"
+    return if (litres % 1f == 0f) "${litres.toInt()} L" else "${ml.sanitizeZeroDecimals()} L"
 }
 
 private fun formatTime(hour: Int, minute: Int): String {

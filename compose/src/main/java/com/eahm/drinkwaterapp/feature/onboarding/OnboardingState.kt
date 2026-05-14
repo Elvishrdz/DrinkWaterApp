@@ -39,7 +39,7 @@ internal data class OnboardingFormState(
     val wakeTime: OnbTimeSelection = OnbTimeSelection(hour = 6, minute = 0, isPm = false),
     val sleepTime: OnbTimeSelection = OnbTimeSelection(hour = 10, minute = 0, isPm = true),
     val intervalMinutes: Int = 45,
-    val computedGoalMl: Int = 2000,
+    val goalMl: Float,
     val notifAmountMl: Float = 150f,
 )
 

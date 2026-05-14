@@ -62,7 +62,7 @@ internal fun StepDone(
     } else {
         stringResource(R.string.onb_done_title_with_name, state.name)
     }
-    val liters = "%.2f".format(state.computedGoalMl / 1000.0)
+    val liters = "%.2f".format(state.goalMl / 1000.0)
 
     OnbShell(
         step = step,
@@ -225,7 +225,7 @@ private fun StepDonePreview() {
             state = OnboardingFormState(
                 name = "Alex",
                 intervalMinutes = 45,
-                computedGoalMl = 2200,
+                goalMl = 2200f,
             ),
             onStart = {},
             onBack = {},
@@ -242,7 +242,7 @@ private fun StepDoneNoNamePreview() {
             state = OnboardingFormState(
                 name = "",
                 intervalMinutes = 45,
-                computedGoalMl = 2200,
+                goalMl = 2200f,
             ),
             onStart = {},
             onBack = {},
