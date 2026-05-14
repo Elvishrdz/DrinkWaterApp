@@ -3,7 +3,7 @@ Development
 In-App final setup
 Proximos pasos:
 1. Crear en Google Play Console un producto Non-consumable con ID remove_ads_lifetime
-2. En RevenueCat dashboard: crear entitlement ad_free, producto, y offering remove_ads (tipo Lifetime)
+2. En RevenueCat dashboard: crear entitlement ads_free, producto, y offering remove_ads (tipo Lifetime)
 3. Reemplazar REVENUECAT_API_KEY_PLACEHOLDER en untranslated.xml con tu API key de RevenueCat
 
 To fix (prio)

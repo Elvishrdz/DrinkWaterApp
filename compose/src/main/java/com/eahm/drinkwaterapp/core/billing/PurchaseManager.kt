@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import com.revenuecat.purchases.Package as RcPackage
 
-private const val ENTITLEMENT_AD_FREE = "ad_free"
+private const val ENTITLEMENT_ADS_FREE = "ads_free"
 
 internal class PurchaseManager(
     private val application: Application,
@@ -32,19 +32,16 @@ internal class PurchaseManager(
     val purchaseState: StateFlow<PurchaseState> = _purchaseState.asStateFlow()
 
     override fun initialize() {
-        if (BuildConfig.IS_DEV) return  // skip RevenueCat in dev — use devSetAdFree() to test
+        val config = PurchasesConfiguration.Builder(application, BuildConfig.REVENUECAT_API_KEY)
 
-        Purchases.configure(
-            PurchasesConfiguration.Builder(application, BuildConfig.REVENUECAT_API_KEY).build()
-        )
+        Purchases.configure(config.build())
         refreshCustomerInfo()
     }
 
     fun refreshCustomerInfo() {
-        if (BuildConfig.IS_DEV) return
         Purchases.sharedInstance.getCustomerInfo(object : ReceiveCustomerInfoCallback {
             override fun onReceived(customerInfo: CustomerInfo) {
-                _isAdFree.value = customerInfo.entitlements[ENTITLEMENT_AD_FREE]?.isActive == true
+                _isAdFree.value = customerInfo.entitlements[ENTITLEMENT_ADS_FREE]?.isActive == true
             }
 
             override fun onError(error: PurchasesError) {
@@ -54,10 +51,6 @@ internal class PurchaseManager(
     }
 
     fun fetchOfferings(onResult: (RcPackage?) -> Unit) {
-        if (BuildConfig.IS_DEV) {
-            onResult(null)  // no price in dev — button shows "Remove Ads" without price
-            return
-        }
         Purchases.sharedInstance.getOfferings(object : ReceiveOfferingsCallback {
             override fun onReceived(offerings: Offerings) {
                 val pkg = offerings["remove_ads"]?.availablePackages?.firstOrNull()
@@ -72,12 +65,6 @@ internal class PurchaseManager(
     }
 
     fun purchase(activity: Activity, pkg: RcPackage) {
-        if (BuildConfig.IS_DEV) {
-            _purchaseState.value = PurchaseState.Loading
-            _isAdFree.value = true
-            _purchaseState.value = PurchaseState.Success
-            return
-        }
         _purchaseState.value = PurchaseState.Loading
         Purchases.sharedInstance.purchase(
             PurchaseParams.Builder(activity, pkg).build(),
@@ -87,7 +74,7 @@ internal class PurchaseManager(
                     customerInfo: CustomerInfo
                 ) {
                     _isAdFree.value =
-                        customerInfo.entitlements[ENTITLEMENT_AD_FREE]?.isActive == true
+                        customerInfo.entitlements[ENTITLEMENT_ADS_FREE]?.isActive == true
                     _purchaseState.value =
                         if (_isAdFree.value) PurchaseState.Success else PurchaseState.Idle
                 }
@@ -104,19 +91,10 @@ internal class PurchaseManager(
     }
 
     fun restore() {
-        if (BuildConfig.IS_DEV) {
-            _purchaseState.value = PurchaseState.Loading
-            _purchaseState.value = if (_isAdFree.value) {
-                PurchaseState.Success
-            } else {
-                PurchaseState.NothingToRestore
-            }
-            return
-        }
         _purchaseState.value = PurchaseState.Loading
         Purchases.sharedInstance.restorePurchases(object : ReceiveCustomerInfoCallback {
             override fun onReceived(customerInfo: CustomerInfo) {
-                _isAdFree.value = customerInfo.entitlements[ENTITLEMENT_AD_FREE]?.isActive == true
+                _isAdFree.value = customerInfo.entitlements[ENTITLEMENT_ADS_FREE]?.isActive == true
                 _purchaseState.value = if (_isAdFree.value) {
                     PurchaseState.Success
                 } else {
@@ -132,7 +110,6 @@ internal class PurchaseManager(
 
     /** Only meaningful in dev/debug builds. Directly sets the ad-free state for testing. */
     fun devSetAdFree(value: Boolean) {
-        if (!BuildConfig.IS_DEV) return
         _isAdFree.value = value
         _purchaseState.value = PurchaseState.Idle
     }
