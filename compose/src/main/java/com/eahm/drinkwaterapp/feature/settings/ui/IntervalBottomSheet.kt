@@ -29,9 +29,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
@@ -83,7 +85,7 @@ internal fun IntervalBottomSheet(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "Reminder interval",
+                text = stringResource(R.string.settings_interval_sheet_title),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
@@ -146,7 +148,11 @@ internal fun IntervalBottomSheet(
             Spacer(Modifier.height(12.dp))
 
             Text(
-                text = "Active window: ${formatWindowHint(windowMinutes)} · Max: ${maxMinutes}m",
+                text = stringResource(
+                    R.string.settings_interval_window_hint,
+                    formatWindowHint(windowMinutes),
+                    maxMinutes
+                ),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Normal,
                 fontSize = 12.sp,
@@ -156,7 +162,7 @@ internal fun IntervalBottomSheet(
             Spacer(Modifier.height(32.dp))
 
             DwPrimaryButton(
-                text = "Save",
+                text = stringResource(R.string.action_save),
                 onClick = {
                     onIntervalChanged(value)
                     dismissWithAnimation()

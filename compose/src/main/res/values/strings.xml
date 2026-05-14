@@ -8,6 +8,25 @@
     <string name="notification_drink_amount_formatted">+%1$s%2$s</string>
     <string name="share_app_title">Share DrinkWater app with your friends!</string>
 
+    <!-- Generic — actions -->
+    <string name="action_cancel">Cancel</string>
+    <string name="action_save">Save</string>
+    <string name="action_not_now">Not now</string>
+    <string name="action_open_settings">Open Settings</string>
+    <string name="action_continue_to_settings">Continue to Settings</string>
+
+    <!-- Generic — labels -->
+    <string name="label_daily_goal">Daily goal</string>
+    <string name="label_start_time">Start time</string>
+    <string name="label_end_time">End time</string>
+
+    <!-- Generic — notifications permission -->
+    <string name="notif_disabled_title">Notifications disabled</string>
+    <string name="notif_disabled_body">To receive drink reminders, please enable notifications for DrinkWater in your phone\'s Settings.</string>
+
+    <!-- Generic — overlay permission -->
+    <string name="overlay_allow_over_other_apps">Allow display over other apps</string>
+
     <!-- Onboarding — shared -->
     <string name="onb_cta_continue">Continue</string>
 
@@ -95,18 +114,11 @@
     <string name="onb_notifs_config_title">Quick drink</string>
     <string name="onb_notifs_config_subtitle">Don\'t want to open the app? Tap this value in the notification and we will quickly save the record for you.</string>
     <string name="onb_notifs_config_hint">This can be changed anytime in the app settings.</string>
-    <!-- Onboarding — Notifications: Denied dialog -->
-    <string name="onb_notifs_denied_title">Notifications disabled</string>
-    <string name="onb_notifs_denied_body">To receive drink reminders, please enable notifications for DrinkWater in your phone\'s Settings.</string>
-    <string name="onb_notifs_denied_cta_settings">Open Settings</string>
-    <string name="onb_notifs_denied_cta_cancel">Cancel</string>
 
     <!-- Onboarding — Overlay: Request -->
     <string name="onb_overlay_request_title">Celebrations, anywhere</string>
     <string name="onb_overlay_request_subtitle">The celebration card always appears when you reach your daily goal from within the app or a reminder. Allow display over other apps so it pops up on your device.</string>
     <string name="onb_overlay_request_cta_skip">Skip for now</string>
-    <string name="onb_overlay_request_cta_allow">Allow display over other apps</string>
-
     <!-- Onboarding — Overlay: Granted -->
     <string name="onb_overlay_granted_title">Goal celebrations are on</string>
     <string name="onb_overlay_granted_subtitle">A celebration card will appear every time you complete your daily water goal.</string>
@@ -135,9 +147,62 @@
     <string name="onb_done_title_with_name">You\'re all set, %1$s</string>
     <string name="onb_done_subtitle">Here\'s your setup, change any of it later in app settings.</string>
     <string name="onb_done_cta">Start drinking</string>
-    <string name="onb_done_row_daily_goal">Daily goal</string>
     <string name="onb_done_row_reminder">Reminder</string>
-    <string name="onb_done_row_start_time">Start time</string>
-    <string name="onb_done_row_end_time">End time</string>
+
+    <!-- Settings — Screen -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_section_hydration">HYDRATION</string>
+    <string name="settings_section_reminders">REMINDERS</string>
+    <string name="settings_section_overlays">OVERLAYS</string>
+    <string name="settings_section_about">ABOUT</string>
+
+    <!-- Settings — Row labels -->
+    <string name="settings_row_units">Units</string>
+    <string name="settings_row_notifications">Notifications</string>
+    <string name="settings_row_interval">Interval</string>
+    <string name="settings_row_notification_amount">Notification amount</string>
+    <string name="settings_row_goal_celebrations">Goal reached celebrations</string>
+    <string name="settings_row_share">Share with friends</string>
+    <string name="settings_row_rate">Rate the app</string>
+    <string name="settings_row_request_feature">Request a feature</string>
+    <string name="settings_row_report_problem">Report a problem</string>
+    <string name="settings_row_reset_data">Reset all data</string>
+
+    <!-- Settings — Row trailing values -->
+    <string name="settings_interval_value">every %1$d min</string>
+    <string name="settings_notification_amount_value">+%1$d mL</string>
+
+    <!-- Settings — Share -->
+    <string name="settings_share_text">Stay hydrated! I use DrinkWater to track my daily water intake. Check it out!</string>
+
+    <!-- Settings — Reset data dialog -->
+    <string name="settings_clear_data_body">This will permanently delete all your drink history, daily goals, and settings. The app will restart afterwards.\n\nThis action cannot be undone.</string>
+    <string name="settings_clear_data_cta_countdown">DELETE ALL DATA (%1$d)</string>
+    <string name="settings_clear_data_cta_confirm">DELETE ALL DATA NOW</string>
+
+    <!-- Settings — Disable notifications dialog -->
+    <string name="settings_notif_disable_title">Disable notifications</string>
+    <string name="settings_notif_disable_body">To turn off drink reminders, disable notifications for DrinkWater in your phone\'s Settings.\n\n1. Tap \"Continue to Settings\" below.\n2. Disable notifications for this app.\n3. Press back to return.</string>
+
+    <!-- Settings — Overlay instructions dialog -->
+    <string name="settings_overlay_disable_title">Disable display over other apps</string>
+    <string name="settings_overlay_allow_instructions">To show goal reached celebration, we need permission to display over other apps.\n\n1. Find the app in the list of apps when continuing to the settings.\n2. Finalize by enabling \"Allow display over other apps\".\n\nThen press back and return to the app.</string>
+    <string name="settings_overlay_disable_instructions">To disable the goal reached celebration, you need to remove the permission explicitly.\n\n1. Find the app in the list of apps when continuing to the settings.\n2. Disable \"Allow display over other apps\".\n\nPress back and return to the app.</string>
+
+    <!-- Settings — Goal sheet -->
+    <string name="settings_goal_range">Min %1$d mL · Max %2$d mL</string>
+
+    <!-- Settings — Interval sheet -->
+    <string name="settings_interval_sheet_title">Reminder interval</string>
+    <string name="settings_interval_window_hint">Active window: %1$s · Max: %2$dm</string>
+
+    <!-- Settings — Notification amount sheet -->
+    <string name="settings_notif_amount_hint">Amount logged when tapping drink in the notification</string>
+
+    <!-- Settings — Units sheet -->
+    <string name="settings_unit_metric_label">Milliliters</string>
+    <string name="settings_unit_metric_sublabel">mL · kg</string>
+    <string name="settings_unit_imperial_label">Imperial</string>
+    <string name="settings_unit_imperial_sublabel">fl. oz · lbs</string>
 
 </resources>

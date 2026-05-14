@@ -94,7 +94,7 @@ private fun SummaryCard(
             icon = DwIcons.Drop,
             iconBg = DwTintWater,
             iconTint = DwWater,
-            label = stringResource(R.string.onb_done_row_daily_goal),
+            label = stringResource(R.string.label_daily_goal),
             value = "$liters L",
         ),
         SummaryRowData(
@@ -108,14 +108,14 @@ private fun SummaryCard(
             icon = DwIcons.Sun,
             iconBg = DwTintWater,
             iconTint = DwWater,
-            label = stringResource(R.string.onb_done_row_start_time),
+            label = stringResource(R.string.label_start_time),
             value = state.wakeTime.label(),
         ),
         SummaryRowData(
             icon = DwIcons.Moon,
             iconBg = DwTintMagenta,
             iconTint = DwMagenta,
-            label = stringResource(R.string.onb_done_row_end_time),
+            label = stringResource(R.string.label_end_time),
             value = state.sleepTime.label(),
         ),
     )

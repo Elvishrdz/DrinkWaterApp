@@ -8,6 +8,25 @@
     <string name="notification_drink_amount_formatted">+%1$s%2$s</string>
     <string name="share_app_title">¡Comparte DrinkWater con tus amigos!</string>
 
+    <!-- Generic — acciones -->
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_save">Guardar</string>
+    <string name="action_not_now">Ahora no</string>
+    <string name="action_open_settings">Abrir ajustes</string>
+    <string name="action_continue_to_settings">Continuar a ajustes</string>
+
+    <!-- Generic — etiquetas -->
+    <string name="label_daily_goal">Meta diaria</string>
+    <string name="label_start_time">Hora de inicio</string>
+    <string name="label_end_time">Hora de fin</string>
+
+    <!-- Generic — permiso de notificaciones -->
+    <string name="notif_disabled_title">Notificaciones desactivadas</string>
+    <string name="notif_disabled_body">Para recibir recordatorios de hidratación, habilita las notificaciones de DrinkWater en los Ajustes de tu teléfono.</string>
+
+    <!-- Generic — permiso de superposición -->
+    <string name="overlay_allow_over_other_apps">Permitir mostrar sobre otras apps</string>
+
     <!-- Onboarding — compartido -->
     <string name="onb_cta_continue">Continuar</string>
 
@@ -95,26 +114,22 @@
     <string name="onb_notifs_config_title">Trago rápido</string>
     <string name="onb_notifs_config_subtitle">¿No quieres abrir la app? Toca este valor en la notificación y guardaremos el registro por ti.</string>
     <string name="onb_notifs_config_hint">Puedes cambiar esto en cualquier momento en los ajustes.</string>
-    <!-- Onboarding — Notificaciones: Diálogo denegado -->
-    <string name="onb_notifs_denied_title">Notificaciones desactivadas</string>
-    <string name="onb_notifs_denied_body">Para recibir recordatorios de hidratación, habilita las notificaciones de DrinkWater en los Ajustes de tu teléfono.</string>
-    <string name="onb_notifs_denied_cta_settings">Abrir ajustes</string>
-    <string name="onb_notifs_denied_cta_cancel">Cancelar</string>
 
     <!-- Onboarding — Overlay: Solicitud -->
     <string name="onb_overlay_request_title">Celebraciones, en cualquier lugar</string>
     <string name="onb_overlay_request_subtitle">La tarjeta de celebración aparece cuando alcanzas tu meta diaria desde la app o un recordatorio. Permite mostrar sobre otras apps para que aparezca en tu dispositivo.</string>
     <string name="onb_overlay_request_cta_skip">Omitir por ahora</string>
-    <string name="onb_overlay_request_cta_allow">Permitir mostrar sobre otras apps</string>
     <!-- Onboarding — Overlay: Concedido -->
     <string name="onb_overlay_granted_title">Las celebraciones de meta están activadas</string>
     <string name="onb_overlay_granted_subtitle">Aparecerá una tarjeta de celebración cada vez que completes tu meta diaria de agua.</string>
+
     <!-- Onboarding — Overlay: Pasos -->
     <string name="onb_overlay_steps_header">Cómo activarlo</string>
     <string name="onb_overlay_step_1">Toca \"Permitir mostrar sobre otras apps\" abajo.</string>
     <string name="onb_overlay_step_2">Encuentra DrinkWater en la lista.</string>
     <string name="onb_overlay_step_3">Activa \"Permitir mostrar sobre otras apps\".</string>
     <string name="onb_overlay_step_4">Presiona atrás, continuaremos automáticamente.</string>
+
     <!-- Onboarding — Overlay: Filas de funciones -->
     <string name="onb_overlay_feature_app_label">Dentro de la app</string>
     <string name="onb_overlay_feature_app_description">Registra una bebida que complete tu meta y aparecerá la tarjeta de celebración.</string>
@@ -132,9 +147,62 @@
     <string name="onb_done_title_with_name">¡Todo listo, %1$s!</string>
     <string name="onb_done_subtitle">Aquí está tu configuración, puedes cambiarla cuando quieras en los ajustes.</string>
     <string name="onb_done_cta">Empezar</string>
-    <string name="onb_done_row_daily_goal">Meta diaria</string>
     <string name="onb_done_row_reminder">Recordatorio</string>
-    <string name="onb_done_row_start_time">Hora de inicio</string>
-    <string name="onb_done_row_end_time">Hora de fin</string>
+
+    <!-- Ajustes — Pantalla -->
+    <string name="settings_title">Ajustes</string>
+    <string name="settings_section_hydration">HIDRATACIÓN</string>
+    <string name="settings_section_reminders">RECORDATORIOS</string>
+    <string name="settings_section_overlays">SUPERPOSICIÓN</string>
+    <string name="settings_section_about">ACERCA DE</string>
+
+    <!-- Ajustes — Etiquetas de filas -->
+    <string name="settings_row_units">Unidades</string>
+    <string name="settings_row_notifications">Notificaciones</string>
+    <string name="settings_row_interval">Intervalo</string>
+    <string name="settings_row_notification_amount">Cantidad de notificación</string>
+    <string name="settings_row_goal_celebrations">Celebraciones al alcanzar la meta</string>
+    <string name="settings_row_share">Compartir con amigos</string>
+    <string name="settings_row_rate">Calificar la app</string>
+    <string name="settings_row_request_feature">Solicitar una función</string>
+    <string name="settings_row_report_problem">Reportar un problema</string>
+    <string name="settings_row_reset_data">Restablecer todos los datos</string>
+
+    <!-- Ajustes — Valores de filas -->
+    <string name="settings_interval_value">cada %1$d min</string>
+    <string name="settings_notification_amount_value">+%1$d mL</string>
+
+    <!-- Ajustes — Compartir -->
+    <string name="settings_share_text">¡Mantente hidratado/a! Uso DrinkWater para registrar mi consumo diario de agua. ¡Descárgala!</string>
+
+    <!-- Ajustes — Diálogo de restablecer datos -->
+    <string name="settings_clear_data_body">Esto eliminará permanentemente todo tu historial de bebidas, metas diarias y ajustes. La app se reiniciará después.\n\nEsta acción no se puede deshacer.</string>
+    <string name="settings_clear_data_cta_countdown">ELIMINAR TODOS LOS DATOS (%1$d)</string>
+    <string name="settings_clear_data_cta_confirm">ELIMINAR TODOS LOS DATOS AHORA</string>
+
+    <!-- Ajustes — Diálogo de desactivar notificaciones -->
+    <string name="settings_notif_disable_title">Desactivar notificaciones</string>
+    <string name="settings_notif_disable_body">Para desactivar los recordatorios, deshabilita las notificaciones de DrinkWater en los Ajustes de tu teléfono.\n\n1. Toca \"Continuar a ajustes\" abajo.\n2. Deshabilita las notificaciones para esta app.\n3. Presiona atrás para volver.</string>
+
+    <!-- Ajustes — Diálogo de superposición -->
+    <string name="settings_overlay_disable_title">Desactivar mostrar sobre otras apps</string>
+    <string name="settings_overlay_allow_instructions">Para mostrar la celebración cuando alcanzas tu meta, necesitamos permiso para mostrar sobre otras apps.\n\n1. Encuentra la app en la lista al continuar a los ajustes.\n2. Finaliza activando \"Permitir mostrar sobre otras apps\".\n\nLuego presiona atrás y regresa a la app.</string>
+    <string name="settings_overlay_disable_instructions">Para desactivar la celebración al alcanzar la meta, debes retirar el permiso manualmente.\n\n1. Encuentra la app en la lista al continuar a los ajustes.\n2. Desactiva \"Permitir mostrar sobre otras apps\".\n\nPresiona atrás y regresa a la app.</string>
+
+    <!-- Ajustes — Sheet de meta -->
+    <string name="settings_goal_range">Mín %1$d mL · Máx %2$d mL</string>
+
+    <!-- Ajustes — Sheet de intervalo -->
+    <string name="settings_interval_sheet_title">Intervalo de recordatorio</string>
+    <string name="settings_interval_window_hint">Ventana activa: %1$s · Máx: %2$dm</string>
+
+    <!-- Ajustes — Sheet de cantidad de notificación -->
+    <string name="settings_notif_amount_hint">Cantidad registrada al tocar bebida en la notificación</string>
+
+    <!-- Ajustes — Sheet de unidades -->
+    <string name="settings_unit_metric_label">Mililitros</string>
+    <string name="settings_unit_metric_sublabel">mL · kg</string>
+    <string name="settings_unit_imperial_label">Imperial</string>
+    <string name="settings_unit_imperial_sublabel">fl. oz · lbs</string>
 
 </resources>

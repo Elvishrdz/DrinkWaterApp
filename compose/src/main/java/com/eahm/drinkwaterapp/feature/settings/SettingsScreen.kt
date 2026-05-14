@@ -55,6 +55,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
@@ -178,7 +179,7 @@ internal fun SettingsScreen(
             Intent(Intent.ACTION_SEND).apply {
                 putExtra(
                     Intent.EXTRA_TEXT,
-                    "Stay hydrated! I use DrinkWater to track my daily water intake. Check it out!"
+                    context.getString(R.string.settings_share_text)
                 )
                 type = "text/plain"
             },
@@ -330,7 +331,7 @@ internal fun SettingsContent(
         ) {
             item {
                 Text(
-                    text = "Settings",
+                    text = stringResource(R.string.settings_title),
                     fontFamily = PlusJakartaSans,
                     fontWeight = FontWeight.Bold,
                     fontSize = 26.sp,
@@ -346,12 +347,12 @@ internal fun SettingsContent(
 //            }
 
             item {
-                SettingsSection(title = "HYDRATION") {
+                SettingsSection(title = stringResource(R.string.settings_section_hydration)) {
                     SettingRow(
                         icon = DwIcons.Drop,
                         iconBg = DwTintWater,
                         iconTint = DwWater,
-                        label = "Daily goal",
+                        label = stringResource(R.string.label_daily_goal),
                         onClick = { showGoalSheet = true },
                     ) {
                         RowValueTrailing(value = formatGoal(state.dailyGoalMl))
@@ -363,7 +364,7 @@ internal fun SettingsContent(
                             icon = DwIcons.Ruler,
                             iconBg = DwTintMagenta,
                             iconTint = DwMagenta,
-                            label = "Units",
+                            label = stringResource(R.string.settings_row_units),
                             onClick = { showUnitsSheet = true },
                         ) {
                             RowValueTrailing(value = "${state.unit.label} · ${state.weightUnit.label}")
@@ -373,12 +374,12 @@ internal fun SettingsContent(
             }
 
             item {
-                SettingsSection(title = "REMINDERS") {
+                SettingsSection(title = stringResource(R.string.settings_section_reminders)) {
                     SettingRow(
                         icon = DwIcons.Bell,
                         iconBg = DwTintMagenta,
                         iconTint = DwMagenta,
-                        label = "Notifications",
+                        label = stringResource(R.string.settings_row_notifications),
                     ) {
                         Switch(
                             checked = state.notificationsEnabled,
@@ -397,10 +398,15 @@ internal fun SettingsContent(
                         icon = DwIcons.Clock,
                         iconBg = DwTintWater,
                         iconTint = DwWater,
-                        label = "Interval",
+                        label = stringResource(R.string.settings_row_interval),
                         onClick = { showIntervalSheet = true },
                     ) {
-                        RowValueTrailing(value = "every ${state.intervalMinutes} min")
+                        RowValueTrailing(
+                            value = stringResource(
+                                R.string.settings_interval_value,
+                                state.intervalMinutes
+                            )
+                        )
                     }
                     HorizontalDivider(color = DwInk100)
                     SettingRowTimeSelector(
@@ -408,7 +414,7 @@ internal fun SettingsContent(
                         icon = DwIcons.Sun,
                         iconBg = DwTintWater,
                         iconTint = DwWater,
-                        label = "Start time",
+                        label = stringResource(R.string.label_start_time),
                         onStartTimeTap = onStartTimeChanged,
                     )
                     HorizontalDivider(color = DwInk100)
@@ -417,7 +423,7 @@ internal fun SettingsContent(
                         icon = DwIcons.Moon,
                         iconBg = DwTintMagenta,
                         iconTint = DwMagenta,
-                        label = "End time",
+                        label = stringResource(R.string.label_end_time),
                         onStartTimeTap = onEndTimeChanged,
                     )
                     HorizontalDivider(color = DwInk100)
@@ -425,21 +431,26 @@ internal fun SettingsContent(
                         icon = DwIcons.Glass,
                         iconBg = DwTintWater,
                         iconTint = DwWater,
-                        label = "Notification amount",
+                        label = stringResource(R.string.settings_row_notification_amount),
                         onClick = { showNotificationAmountSheet = true },
                     ) {
-                        RowValueTrailing(value = "+${state.notificationAmountMl.toInt()} ml")
+                        RowValueTrailing(
+                            value = stringResource(
+                                R.string.settings_notification_amount_value,
+                                state.notificationAmountMl.toInt()
+                            )
+                        )
                     }
                 }
             }
 
             item {
-                SettingsSection(title = "OVERLAYS") {
+                SettingsSection(title = stringResource(R.string.settings_section_overlays)) {
                     SettingRow(
                         icon = DwIcons.Bell,
                         iconBg = DwTintMagenta,
                         iconTint = DwMagenta,
-                        label = "Goal reached celebrations",
+                        label = stringResource(R.string.settings_row_goal_celebrations),
                     ) {
                         Switch(
                             checked = state.goalReachedCelebrationsEnabled,
@@ -457,12 +468,12 @@ internal fun SettingsContent(
             }
 
             item {
-                SettingsSection(title = "ABOUT") {
+                SettingsSection(title = stringResource(R.string.settings_section_about)) {
                     SettingRow(
                         icon = DwIcons.Share,
                         iconBg = DwInk100,
                         iconTint = DwInk500,
-                        label = "Share with friends",
+                        label = stringResource(R.string.settings_row_share),
                         onClick = onShareTap,
                     ) {
                         RowChevronTrailing()
@@ -472,7 +483,7 @@ internal fun SettingsContent(
                         icon = DwIcons.Star,
                         iconBg = DwInk100,
                         iconTint = DwInk500,
-                        label = "Rate the app",
+                        label = stringResource(R.string.settings_row_rate),
                         onClick = onRateTap,
                     ) {
                         RowChevronTrailing()
@@ -483,7 +494,7 @@ internal fun SettingsContent(
                             icon = DwIcons.Lightbulb,
                             iconBg = DwInk100,
                             iconTint = DwInk500,
-                            label = "Request a feature",
+                            label = stringResource(R.string.settings_row_request_feature),
                             onClick = onRequestFeatureTap,
                         ) {
                             RowChevronTrailing()
@@ -494,7 +505,7 @@ internal fun SettingsContent(
                         icon = DwIcons.Flag,
                         iconBg = DwInk100,
                         iconTint = DwInk500,
-                        label = "Report a problem",
+                        label = stringResource(R.string.settings_row_report_problem),
                         onClick = onReportProblemTap,
                     ) {
                         RowChevronTrailing()
@@ -528,7 +539,7 @@ internal fun SettingsContent(
                         )
                     }
                     Text(
-                        text = "Reset all data",
+                        text = stringResource(R.string.settings_row_reset_data),
                         fontFamily = PlusJakartaSans,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 14.sp,
@@ -610,7 +621,7 @@ private fun ClearAllDataDialog(
                 .padding(24.dp),
         ) {
             Text(
-                text = "Reset all data",
+                text = stringResource(R.string.settings_row_reset_data),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
@@ -618,7 +629,7 @@ private fun ClearAllDataDialog(
             )
             Spacer(Modifier.height(10.dp))
             Text(
-                text = "This will permanently delete all your drink history, daily goals, and settings. The app will restart afterwards.\n\nThis action cannot be undone.",
+                text = stringResource(R.string.settings_clear_data_body),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Normal,
                 fontSize = 14.sp,
@@ -640,7 +651,10 @@ private fun ClearAllDataDialog(
                 ),
             ) {
                 Text(
-                    text = if (countdown > 0) "DELETE ALL DATA ($countdown)" else "DELETE ALL DATA NOW",
+                    text = if (countdown > 0) stringResource(
+                        R.string.settings_clear_data_cta_countdown,
+                        countdown
+                    ) else stringResource(R.string.settings_clear_data_cta_confirm),
                     fontFamily = PlusJakartaSans,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 14.sp,
@@ -648,7 +662,7 @@ private fun ClearAllDataDialog(
             }
             Spacer(Modifier.height(8.dp))
             DwSecondaryButton(
-                text = "Cancel",
+                text = stringResource(R.string.action_cancel),
                 onClick = onDismiss,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -672,7 +686,7 @@ private fun NotificationPermissionDeniedDialog(
                 .padding(24.dp),
         ) {
             Text(
-                text = "Notifications disabled",
+                text = stringResource(R.string.notif_disabled_title),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
@@ -680,7 +694,7 @@ private fun NotificationPermissionDeniedDialog(
             )
             Spacer(Modifier.height(10.dp))
             Text(
-                text = "To receive drink reminders, please enable notifications for DrinkWater in your phone's Settings.",
+                text = stringResource(R.string.notif_disabled_body),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Normal,
                 fontSize = 14.sp,
@@ -688,13 +702,13 @@ private fun NotificationPermissionDeniedDialog(
             )
             Spacer(Modifier.height(24.dp))
             DwPrimaryButton(
-                text = "Open Settings",
+                text = stringResource(R.string.action_open_settings),
                 onClick = onGoToSettings,
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(8.dp))
             DwSecondaryButton(
-                text = "Not now",
+                text = stringResource(R.string.action_not_now),
                 onClick = onDismiss,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -716,7 +730,7 @@ private fun DisableNotificationsDialog(
                 .padding(24.dp),
         ) {
             Text(
-                text = "Disable notifications",
+                text = stringResource(R.string.settings_notif_disable_title),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
@@ -724,7 +738,7 @@ private fun DisableNotificationsDialog(
             )
             Spacer(Modifier.height(10.dp))
             Text(
-                text = "To turn off drink reminders, disable notifications for DrinkWater in your phone's Settings.\n\n1. Tap \"Continue to Settings\" below.\n2. Disable notifications for this app.\n3. Press back to return.",
+                text = stringResource(R.string.settings_notif_disable_body),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Normal,
                 fontSize = 14.sp,
@@ -732,13 +746,13 @@ private fun DisableNotificationsDialog(
             )
             Spacer(Modifier.height(24.dp))
             DwPrimaryButton(
-                text = "Continue to Settings",
+                text = stringResource(R.string.action_continue_to_settings),
                 onClick = onGoToSettings,
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(8.dp))
             DwSecondaryButton(
-                text = "Not now",
+                text = stringResource(R.string.action_not_now),
                 onClick = onDismiss,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -757,27 +771,15 @@ private fun DrawOverlayInstructionsDialog(
     val context = LocalContext.current
 
     val title = if (!Settings.canDrawOverlays(context)) {
-        "Allow display over other apps"
+        stringResource(R.string.overlay_allow_over_other_apps)
     } else {
-        "Disable display over other apps"
+        stringResource(R.string.settings_overlay_disable_title)
     }
 
     val instructions = if (!Settings.canDrawOverlays(context)) {
-        """
-To show goal reached celebration, we need permission to display over other apps.
-            
-1. Find the app in the list of apps when continuing to the settings.
-2. Finalize by enabling "Allow display over other apps".
-            Then press back and return to the app.
-        """
+        stringResource(R.string.settings_overlay_allow_instructions)
     } else {
-        """
-To disable the goal reached celebration, you need to remove the permission explicitly.
-
-1. Find the app in the list of apps when continuing to the settings.
-2. Disable "Allow display over other apps".
-Then press back and return to the app.
-        """
+        stringResource(R.string.settings_overlay_disable_instructions)
     }
 
     BasicAlertDialog(onDismissRequest = onDismiss) {
@@ -804,13 +806,13 @@ Then press back and return to the app.
             )
             Spacer(Modifier.height(24.dp))
             DwPrimaryButton(
-                text = "Continue to Settings",
+                text = stringResource(R.string.action_continue_to_settings),
                 onClick = onGoToSettings,
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(8.dp))
             DwSecondaryButton(
-                text = "Not now",
+                text = stringResource(R.string.action_not_now),
                 onClick = onDismiss,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -1026,11 +1028,7 @@ private fun RowChevronTrailing() {
     )
 }
 
-private fun formatGoal(ml: Float): String {
-    if (ml < 1000) return "${ml.sanitizeZeroDecimals()} mL"
-    val litres = ml / 1000f
-    return if (litres % 1f == 0f) "${litres.toInt()} L" else "${ml.sanitizeZeroDecimals()} L"
-}
+private fun formatGoal(ml: Float): String = "${ml.sanitizeZeroDecimals()} mL"
 
 private fun formatTime(hour: Int, minute: Int): String {
     val ampm = if (hour < 12) "a.m." else "p.m."

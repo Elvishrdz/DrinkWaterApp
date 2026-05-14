@@ -21,9 +21,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk100
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk700
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
@@ -55,7 +57,7 @@ internal fun UnitsBottomSheet(
                 .navigationBarsPadding(),
         ) {
             Text(
-                text = "Units",
+                text = stringResource(R.string.settings_row_units),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
@@ -69,8 +71,8 @@ internal fun UnitsBottomSheet(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 UnitOption(
-                    label = "Milliliters",
-                    sublabel = "mL · kg",
+                    label = stringResource(R.string.settings_unit_metric_label),
+                    sublabel = stringResource(R.string.settings_unit_metric_sublabel),
                     selected = currentUnit == WaterUnit.ML,
                     onClick = {
                         onUnitChanged(WaterUnit.ML, WaterUnit.ML.pairedWeightUnit())
@@ -79,8 +81,8 @@ internal fun UnitsBottomSheet(
                     modifier = Modifier.weight(1f),
                 )
                 UnitOption(
-                    label = "Imperial",
-                    sublabel = "fl. oz · lbs",
+                    label = stringResource(R.string.settings_unit_imperial_label),
+                    sublabel = stringResource(R.string.settings_unit_imperial_sublabel),
                     selected = currentUnit == WaterUnit.FL_OZ,
                     onClick = {
                         onUnitChanged(WaterUnit.FL_OZ, WaterUnit.FL_OZ.pairedWeightUnit())

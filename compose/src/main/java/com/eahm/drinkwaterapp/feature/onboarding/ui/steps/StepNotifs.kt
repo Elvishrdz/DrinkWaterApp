@@ -390,7 +390,7 @@ private fun NotifsDeniedDialog(
                 .padding(24.dp),
         ) {
             Text(
-                text = stringResource(R.string.onb_notifs_denied_title),
+                text = stringResource(R.string.notif_disabled_title),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
@@ -398,7 +398,7 @@ private fun NotifsDeniedDialog(
             )
             Spacer(Modifier.height(10.dp))
             Text(
-                text = stringResource(R.string.onb_notifs_denied_body),
+                text = stringResource(R.string.notif_disabled_body),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Normal,
                 fontSize = 14.sp,
@@ -406,13 +406,13 @@ private fun NotifsDeniedDialog(
             )
             Spacer(Modifier.height(24.dp))
             DwPrimaryButton(
-                text = stringResource(R.string.onb_notifs_denied_cta_settings),
+                text = stringResource(R.string.action_open_settings),
                 onClick = onGoToSettings,
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(8.dp))
             DwSecondaryButton(
-                text = stringResource(R.string.onb_notifs_denied_cta_cancel),
+                text = stringResource(R.string.action_cancel),
                 onClick = onDismiss,
                 modifier = Modifier.fillMaxWidth(),
             )

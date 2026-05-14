@@ -29,9 +29,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
@@ -76,7 +78,7 @@ internal fun GoalBottomSheet(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "Daily goal",
+                text = stringResource(R.string.label_daily_goal),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
@@ -94,7 +96,7 @@ internal fun GoalBottomSheet(
             Spacer(Modifier.height(32.dp))
 
             DwPrimaryButton(
-                text = "Save",
+                text = stringResource(R.string.action_save),
                 onClick = {
                     onGoalChanged(value)
                     dismissWithAnimation()
@@ -138,7 +140,7 @@ internal fun GoalStepperRow(
                     color = MaterialTheme.colorScheme.onBackground,
                 )
                 Text(
-                    text = "mL",
+                    text = stringResource(R.string.volume_unit_mililiters),
                     fontFamily = PlusJakartaSans,
                     fontWeight = FontWeight.Normal,
                     fontSize = 16.sp,
@@ -165,7 +167,7 @@ internal fun GoalStepperRow(
         Spacer(Modifier.height(8.dp))
 
         Text(
-            text = "Min $GOAL_MIN mL · Max $GOAL_MAX mL",
+            text = stringResource(R.string.settings_goal_range, GOAL_MIN.toInt(), GOAL_MAX.toInt()),
             fontFamily = PlusJakartaSans,
             fontWeight = FontWeight.Normal,
             fontSize = 12.sp,

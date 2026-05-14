@@ -92,7 +92,7 @@ private fun RequestLayout(
             }
             Spacer(Modifier.height(8.dp))
             DwPrimaryButton(
-                text = stringResource(R.string.onb_overlay_request_cta_allow),
+                text = stringResource(R.string.overlay_allow_over_other_apps),
                 onClick = onAllow,
                 modifier = Modifier.fillMaxWidth(),
             )
