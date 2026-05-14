@@ -17,7 +17,8 @@ To Complete
 - [x] Adjust notification messages 
 - [x] onboarding
 - [x] Adjust celebration
-- [] translations.
+- [x] translations.
+- [] privacy policy and tracking request.
 - adaptive layouts
 - analytics
 - ads
