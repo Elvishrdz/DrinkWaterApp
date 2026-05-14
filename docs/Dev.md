@@ -9,7 +9,6 @@ Proximos pasos:
 To fix (prio)
 limit amount of presets
 hide vs preivous period if we dont have a previous period to compare.
-always set the personal best value
 error de calculo cuando ajustamos horas y el valor queda antes, la siguiente hora se programa hasta el dia siguiente (ejemplo de 6 a 17 a las 10:3 
 recibi alarma y el valor no cambio, la siguiente alarma es a las 10:3 del dia siguiente.) revisar calculo y si la alarma llega antes, de la hora no
 usar hora actual, sino que calcule un poco mas a la siguiente hora.

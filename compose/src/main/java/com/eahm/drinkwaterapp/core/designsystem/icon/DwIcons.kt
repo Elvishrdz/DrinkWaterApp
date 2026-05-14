@@ -1,6 +1,7 @@
 package com.eahm.drinkwaterapp.core.designsystem.icon
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
@@ -590,6 +591,153 @@ object DwIcons {
                 moveTo(7.5f, 10.5f); lineTo(10f, 8f)
                 moveTo(10.5f, 13.5f); lineTo(13f, 11f)
                 moveTo(13.5f, 16.5f); lineTo(16f, 14f)
+            }
+        }.build()
+    }
+
+    // ── Filled nav variants ───────────────────────────────────────────────────
+
+    /** Filled water drop — used as the selected-state icon for the Today nav item. */
+    val DropFilled: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "DwDropFilled",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).apply {
+            path(fill = SolidColor(Color.Black)) {
+                moveTo(12f, 3f)
+                curveToRelative(-4f, 5f, -7f, 9f, -7f, 12f)
+                arcToRelative(7f, 7f, 0f, false, false, 14f, 0f)
+                curveToRelative(0f, -3f, -3f, -7f, -7f, -12f)
+                close()
+            }
+        }.build()
+    }
+
+    /**
+     * Bold wave — used as the selected-state icon for the Stats nav item.
+     * Both wave lines are drawn at full alpha with a heavier stroke weight.
+     */
+    val WaveFilled: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "DwWaveFilled",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).apply {
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 3f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(3f, 17f)
+                quadToRelative(3f, -4f, 6f, 0f)
+                reflectiveQuadToRelative(6f, 0f)
+                reflectiveQuadToRelative(6f, 0f)
+            }
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 3f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round,
+                strokeAlpha = 0.6f
+            ) {
+                moveTo(3f, 12f)
+                quadToRelative(3f, -4f, 6f, 0f)
+                reflectiveQuadToRelative(6f, 0f)
+                reflectiveQuadToRelative(6f, 0f)
+            }
+        }.build()
+    }
+
+    /**
+     * Filled clock face with cutout clock hands — selected-state icon for History.
+     * Uses EvenOdd fill rule so the hand cutouts are transparent against any background.
+     */
+    val HistoryFilled: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "DwHistoryFilled",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).apply {
+            path(
+                fill = SolidColor(Color.Black),
+                pathFillType = PathFillType.EvenOdd
+            ) {
+                // Full circle (r=10, center (12,12)): right half then left half, both CW
+                moveTo(12f, 2f)
+                arcToRelative(10f, 10f, 0f, false, true, 0f, 20f)
+                arcToRelative(10f, 10f, 0f, false, true, 0f, -20f)
+                close()
+                // Vertical hand (12 o'clock → center): thin filled rectangle cutout
+                moveTo(11.3f, 6.5f)
+                lineTo(12.7f, 6.5f)
+                lineTo(12.7f, 12.8f)
+                lineTo(11.3f, 12.8f)
+                close()
+                // Diagonal hand (center → ~2 o'clock): rotated rectangle cutout
+                moveTo(11.71f, 12.58f)
+                lineTo(12.29f, 11.42f)
+                lineTo(16.29f, 13.42f)
+                lineTo(15.71f, 14.58f)
+                close()
+            }
+        }.build()
+    }
+
+    /**
+     * Filled gear with a transparent inner circle cutout — selected-state icon for Settings.
+     * Uses EvenOdd fill rule for the cutout.
+     */
+    val SettingsFilled: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "DwSettingsFilled",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).apply {
+            path(
+                fill = SolidColor(Color.Black),
+                pathFillType = PathFillType.EvenOdd
+            ) {
+                // Outer gear (same polygon as Settings outline)
+                moveTo(12f, 3f)
+                lineToRelative(1.6f, 1.6f)
+                horizontalLineToRelative(2.2f)
+                lineToRelative(0.6f, 2.2f)
+                lineToRelative(2.2f, 0.6f)
+                verticalLineToRelative(2.2f)
+                lineToRelative(1.6f, 1.6f)
+                lineToRelative(-1.6f, 1.6f)
+                verticalLineToRelative(2.2f)
+                lineToRelative(-2.2f, 0.6f)
+                lineToRelative(-0.6f, 2.2f)
+                horizontalLineToRelative(-2.2f)
+                lineToRelative(-1.6f, 1.6f)
+                lineToRelative(-1.6f, -1.6f)
+                horizontalLineToRelative(-2.2f)
+                lineToRelative(-0.6f, -2.2f)
+                lineToRelative(-2.2f, -0.6f)
+                verticalLineToRelative(-2.2f)
+                lineToRelative(-1.6f, -1.6f)
+                lineToRelative(1.6f, -1.6f)
+                verticalLineToRelative(-2.2f)
+                lineToRelative(2.2f, -0.6f)
+                lineToRelative(0.6f, -2.2f)
+                horizontalLineToRelative(2.2f)
+                close()
+                // Inner circle — EvenOdd cuts this out (r=3, center (12,12))
+                moveTo(15f, 12f)
+                arcToRelative(3f, 3f, 0f, false, false, -6f, 0f)
+                arcToRelative(3f, 3f, 0f, false, false, 6f, 0f)
+                close()
             }
         }.build()
     }

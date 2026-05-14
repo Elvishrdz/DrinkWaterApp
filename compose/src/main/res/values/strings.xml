@@ -20,6 +20,7 @@
 
     <!-- Generic — labels -->
     <string name="label_today">Today</string>
+    <string name="dev_title">Dev</string>
     <string name="label_daily_goal">Daily goal</string>
     <string name="label_start_time">Start time</string>
     <string name="label_end_time">End time</string>

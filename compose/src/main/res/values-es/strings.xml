@@ -20,6 +20,7 @@
 
     <!-- Generic — etiquetas -->
     <string name="label_today">Hoy</string>
+    <string name="dev_title">Dev</string>
     <string name="label_daily_goal">Meta diaria</string>
     <string name="label_start_time">Hora de inicio</string>
     <string name="label_end_time">Hora de fin</string>

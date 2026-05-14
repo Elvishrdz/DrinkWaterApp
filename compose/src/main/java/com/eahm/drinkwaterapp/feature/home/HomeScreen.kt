@@ -1,11 +1,16 @@
 package com.eahm.drinkwaterapp.feature.home
 
+import androidx.annotation.StringRes
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
@@ -15,10 +20,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.ads.banner.DrinkWaterBannerAd
 import com.eahm.drinkwaterapp.core.billing.PurchaseManager
 import com.eahm.drinkwaterapp.core.config.BuildEnvironment
@@ -36,14 +45,15 @@ import com.eahm.drinkwaterapp.ui.confetti.ConfettiOverlay
 import org.koin.compose.koinInject
 
 enum class HomeDestination(
-    val label: String,
+    @StringRes val labelResId: Int,
     val icon: ImageVector,
+    val selectedIcon: ImageVector,
 ) {
-    TODAY("Today", DwIcons.Drop),
-    HISTORY("History", DwIcons.History),
-    STATS("Stats", DwIcons.Wave),
-    SETTINGS("Settings", DwIcons.Settings),
-    DEV("Development", DwIcons.Ruler),
+    TODAY(R.string.label_today, DwIcons.Drop, DwIcons.DropFilled),
+    HISTORY(R.string.history_title, DwIcons.History, DwIcons.HistoryFilled),
+    STATS(R.string.stats_title, DwIcons.Wave, DwIcons.WaveFilled),
+    SETTINGS(R.string.settings_title, DwIcons.Settings, DwIcons.SettingsFilled),
+    DEV(R.string.dev_title, DwIcons.Ruler, DwIcons.Ruler),
 }
 
 @PreviewScreenSizes
@@ -55,39 +65,62 @@ internal fun HomeScreen() {
     val isAdFree by purchaseManager.isAdFree.collectAsStateWithLifecycle()
     var currentDestination by rememberSaveable { mutableStateOf(HomeDestination.TODAY) }
 
+    val menus = if (BuildEnvironment.isProduction) {
+        HomeDestination.entries.filterNot { it == HomeDestination.DEV }
+    } else {
+        HomeDestination.entries
+    }
+
     val itemColors = NavigationSuiteDefaults.itemColors(
         navigationBarItemColors = NavigationBarItemDefaults.colors(
             selectedIconColor = MaterialTheme.colorScheme.primary,
             selectedTextColor = MaterialTheme.colorScheme.primary,
+            // No pill indicator — the filled icon is the visual cue
+            indicatorColor = Color.Transparent,
+            unselectedIconColor = DwInk400,
+            unselectedTextColor = DwInk400,
+        ),
+        navigationRailItemColors = NavigationRailItemDefaults.colors(
+            selectedIconColor = MaterialTheme.colorScheme.primary,
+            selectedTextColor = MaterialTheme.colorScheme.primary,
+            // Keep a subtle indicator on the rail for larger screens
             indicatorColor = MaterialTheme.colorScheme.primaryContainer,
             unselectedIconColor = DwInk400,
             unselectedTextColor = DwInk400,
-        )
+        ),
     )
 
     val suiteColors = NavigationSuiteDefaults.colors(
         navigationBarContainerColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.96f),
+        navigationRailContainerColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.96f),
     )
 
     NavigationSuiteScaffold(
         navigationSuiteColors = suiteColors,
         navigationSuiteItems = {
-            val menus = if (BuildEnvironment.isProduction) {
-                HomeDestination.entries.filterNot { it == HomeDestination.DEV }
-            } else {
-                HomeDestination.entries
-            }
-
             menus.forEach { destination ->
+                val selected = destination == currentDestination
                 item(
                     icon = {
+                        val scale by animateFloatAsState(
+                            targetValue = if (selected) 1.15f else 1f,
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessMedium,
+                            ),
+                            label = "scale_${destination.name}",
+                        )
                         Icon(
-                            imageVector = destination.icon,
-                            contentDescription = destination.label
+                            imageVector = if (selected) destination.selectedIcon else destination.icon,
+                            contentDescription = stringResource(destination.labelResId),
+                            modifier = Modifier.graphicsLayer {
+                                scaleX = scale
+                                scaleY = scale
+                            },
                         )
                     },
-                    label = { Text(destination.label) },
-                    selected = destination == currentDestination,
+                    label = { Text(stringResource(destination.labelResId)) },
+                    selected = selected,
                     onClick = { currentDestination = destination },
                     colors = itemColors,
                 )
@@ -119,7 +152,6 @@ internal fun HomeScreen() {
                 )
             }
         }
-
     }
 
     ConfettiOverlay(
