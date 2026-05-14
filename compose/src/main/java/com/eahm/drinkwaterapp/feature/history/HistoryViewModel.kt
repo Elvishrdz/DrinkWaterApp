@@ -11,6 +11,7 @@ import com.eahm.drinkwaterapp.core.domain.extension.toEndOfDayTime
 import com.eahm.drinkwaterapp.core.domain.extension.toStartOfDayTime
 import com.eahm.drinkwaterapp.ui.historylist.DayGroup
 import com.eahm.drinkwaterapp.ui.historylist.HourGroup
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -105,6 +106,7 @@ internal class HistoryViewModel(
                 )
             }
             .sortedByDescending { it.hour }
+            .toImmutableList()
 
         val isToday = date.date == today.date
 

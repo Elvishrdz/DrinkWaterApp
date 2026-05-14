@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -38,6 +40,8 @@ import com.eahm.drinkwaterapp.core.domain.mock.localDateTimeMock
 import com.eahm.drinkwaterapp.ui.historylist.DateTimePickerButton
 import com.eahm.drinkwaterapp.ui.historylist.HistoryTimeline
 import com.eahm.drinkwaterapp.ui.historylist.HourGroup
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.datetime.LocalDateTime
 
 @Composable
@@ -53,7 +57,8 @@ internal fun HistoryScreen(
         Content(
             modifier = Modifier
                 .padding(innerPadding)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
             date = state.date,
             historyRecords = state.historyRecords,
             goalMl = state.goalMl,
@@ -69,7 +74,7 @@ internal fun HistoryScreen(
 @Composable
 private fun Content(
     date: LocalDateTime,
-    historyRecords: List<HourGroup>,
+    historyRecords: ImmutableList<HourGroup>,
     goalMl: Float,
     consumedMl: Float,
     isToday: Boolean,
@@ -141,7 +146,6 @@ private fun Content(
             HistoryTimeline(
                 historyRecords = historyRecords,
                 onDelete = { onDelete(it.toEntity()) },
-                modifier = Modifier.weight(1f),
             )
         } else {
             val text = if (isToday) {
@@ -239,7 +243,7 @@ private fun HistoryScreenPreview() {
     DrinkWaterAppTheme {
         Content(
             date = Mock.localDateTimeMock,
-            historyRecords = Mock.hourGroupMock,
+            historyRecords = Mock.hourGroupMock.toImmutableList(),
             goalMl = 2000f,
             consumedMl = 750f,
             isToday = false,

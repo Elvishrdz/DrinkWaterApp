@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,8 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
@@ -25,6 +22,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,6 +50,8 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 import com.eahm.drinkwaterapp.core.domain.mock.Mock
 import com.eahm.drinkwaterapp.core.domain.mock.hourGroupMock
 import com.eahm.drinkwaterapp.core.domain.mock.localDateTimeMock
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.datetime.LocalDateTime
 import java.util.Locale
 import kotlin.time.ExperimentalTime
@@ -70,6 +70,7 @@ data class DayGroup(
     val year: Int,
 )
 
+@Immutable
 data class HourGroup(
     val hour: Int,
     val isCurrentHour: Boolean,
@@ -82,7 +83,7 @@ private val iconBoxShape = RoundedCornerShape(9.dp)
 @Composable
 fun HistoryDialog(
     date: LocalDateTime,
-    historyRecords: List<HourGroup>,
+    historyRecords: ImmutableList<HourGroup>,
     onDelete: (HistoryUI) -> Unit,
     onDateChanged: (LocalDateTime) -> Unit,
     onDismiss: () -> Unit,
@@ -150,7 +151,7 @@ fun HistoryDialog(
 private fun HistoryDialogPreview() {
     HistoryDialog(
         date = Mock.localDateTimeMock,
-        historyRecords = Mock.hourGroupMock,
+        historyRecords = Mock.hourGroupMock.toImmutableList(),
         onDismiss = {},
         onDelete = {},
         onDateChanged = {},
@@ -160,25 +161,25 @@ private fun HistoryDialogPreview() {
 @OptIn(ExperimentalTime::class)
 @Composable
 fun HistoryTimeline(
-    historyRecords: List<HourGroup>,
+    historyRecords: ImmutableList<HourGroup>,
     onDelete: (HistoryUI) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(
-            start = 18.dp,
-            end = 18.dp,
-            bottom = 18.dp
-        ),
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(
+                start = 18.dp,
+                end = 18.dp,
+                bottom = 18.dp
+            ),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        items(historyRecords) { hourGroup ->
+        historyRecords.forEach { hourGroup ->
             TimelineHourGroup(
                 hourGroup = hourGroup,
                 isCurrentHour = hourGroup.isCurrentHour,
                 onDelete = onDelete,
-                modifier = Modifier.animateItem(),
             )
         }
     }

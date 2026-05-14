@@ -12,6 +12,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.eahm.drinkwaterapp.core.domain.mock.Mock
 import com.eahm.drinkwaterapp.core.domain.mock.hourGroupMock
 import com.eahm.drinkwaterapp.core.domain.mock.localDateTimeMock
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.datetime.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -19,7 +21,7 @@ import kotlinx.datetime.LocalDateTime
 fun HistoryButton(
     text: String,
     date: LocalDateTime,
-    historyRecords: List<HourGroup>,
+    historyRecords: ImmutableList<HourGroup>,
     onDateChanged: (LocalDateTime) -> Unit,
     onDelete: (HistoryUI) -> Unit,
 ) {
@@ -48,7 +50,7 @@ private fun HistoryButtonPreview() {
     HistoryButton(
         text = "Time",
         date = Mock.localDateTimeMock,
-        historyRecords = Mock.hourGroupMock,
+        historyRecords = Mock.hourGroupMock.toImmutableList(),
         onDateChanged = {},
         onDelete = {},
     )

@@ -72,6 +72,7 @@ import com.eahm.drinkwaterapp.ui.inputfield.toDigitString
 import com.eahm.drinkwaterapp.ui.timepicker.AppTimePickerButton
 import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorButton
 import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.datetime.LocalDateTime
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -409,7 +410,7 @@ private fun Content(
             HistoryButton(
                 text = "History",
                 date = date,
-                historyRecords = historyRecords,
+                historyRecords = historyRecords.toImmutableList(),
                 onDelete = { onDelete(it.toEntity()) },
                 onDateChanged = onDateChanged,
             )

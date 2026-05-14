@@ -132,6 +132,9 @@ dependencies {
     // Kotlin DateTime
     implementation(libs.kotlinx.datetime)
 
+    // Kotlin Collections
+    implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.5.0-beta01")
+
     implementation(libs.picktime.compose)
 
     // RevenueCat
