@@ -8,4 +8,6 @@
     <string name="fb_login_protocol_scheme" translatable="false">fb820671868961883</string>
     <string name="facebook_client_token" translatable="false">5d47dfc20796159d3bed258b7ab8b53f</string>
     <string name="default_notification_channel_id" translatable="false">DRINK_WATER_APP_NOTIFICATIONS</string>
+    <!-- RevenueCat — replace with your Google Play API key from the RevenueCat dashboard -->
+    <string name="revenuecat_api_key" translatable="false">REVENUECAT_API_KEY_PLACEHOLDER</string>
 </resources>

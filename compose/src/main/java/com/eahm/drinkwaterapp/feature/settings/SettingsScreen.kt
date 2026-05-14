@@ -1,6 +1,7 @@
 package com.eahm.drinkwaterapp.feature.settings
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -91,11 +92,13 @@ import com.eahm.drinkwaterapp.feature.settings.ui.EditButton
 import com.eahm.drinkwaterapp.feature.settings.ui.GoalBottomSheet
 import com.eahm.drinkwaterapp.feature.settings.ui.IntervalBottomSheet
 import com.eahm.drinkwaterapp.feature.settings.ui.NotificationAmountBottomSheet
+import com.eahm.drinkwaterapp.feature.settings.ui.RemoveAdsBottomSheet
 import com.eahm.drinkwaterapp.feature.settings.ui.UnitsBottomSheet
 import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorDialog
 import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
 import kotlinx.coroutines.delay
 import org.koin.compose.viewmodel.koinViewModel
+import com.revenuecat.purchases.Package as RcPackage
 
 private val gradientMagentaHero = Brush.verticalGradient(
     colors = listOf(Color(0xFFB83A95), DwMagentaDark)
@@ -110,6 +113,20 @@ internal fun SettingsScreen(
     val context = LocalContext.current
 
     var showClearDataDialog by rememberSaveable { mutableStateOf(false) }
+
+    // ── Remove Ads purchase sheet ─────────────────────────────────────────────
+    var showRemoveAdsSheet by rememberSaveable { mutableStateOf(false) }
+    var rcPackage by remember { mutableStateOf<RcPackage?>(null) }
+    var rcPriceString by remember { mutableStateOf<String?>(null) }
+    val activity = context as Activity
+
+    fun handleRemoveAdsTap() {
+        viewModel.onFetchOfferings { pkg ->
+            rcPackage = pkg
+            rcPriceString = pkg?.product?.price?.formatted
+            showRemoveAdsSheet = true
+        }
+    }
 
     // ── Notification permission ───────────────────────────────────────────────
     var showPermissionDeniedDialog by rememberSaveable { mutableStateOf(false) }
@@ -209,6 +226,7 @@ internal fun SettingsScreen(
         onReportProblemTap = ::handleReportProblem,
         onGoalCelebrationsToggled = { handleDrawOverlayToggle() },
         onClearDataTap = { showClearDataDialog = true },
+        onRemoveAdsTap = ::handleRemoveAdsTap,
         modifier = modifier,
     )
 
@@ -283,6 +301,20 @@ internal fun SettingsScreen(
             },
         )
     }
+
+    // ── Remove Ads bottom sheet ───────────────────────────────────────────────
+    if (showRemoveAdsSheet) {
+        RemoveAdsBottomSheet(
+            priceString = rcPriceString,
+            purchaseState = state.purchaseState,
+            onPurchase = {
+                val pkg = rcPackage
+                if (pkg != null) viewModel.onPurchase(activity, pkg)
+            },
+            onRestore = viewModel::onRestorePurchase,
+            onDismiss = { showRemoveAdsSheet = false },
+        )
+    }
 }
 
 // ── Content composable ────────────────────────────────────────────────────────
@@ -304,6 +336,7 @@ internal fun SettingsContent(
     onReportProblemTap: () -> Unit,
     onGoalCelebrationsToggled: (Boolean) -> Unit,
     onClearDataTap: () -> Unit,
+    onRemoveAdsTap: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     // Window duration used to cap the reminder interval
@@ -463,6 +496,37 @@ internal fun SettingsContent(
                                 uncheckedBorderColor = DwInk200,
                             ),
                         )
+                    }
+                }
+            }
+
+            item {
+                SettingsSection(title = "PREMIUM") {
+                    if (!state.isAdFree) {
+                        SettingRow(
+                            icon = DwIcons.Star,
+                            iconBg = DwTintMagenta,
+                            iconTint = DwMagenta,
+                            label = "Remove Ads",
+                            onClick = onRemoveAdsTap,
+                        ) {
+                            RowChevronTrailing()
+                        }
+                    } else {
+                        SettingRow(
+                            icon = DwIcons.Star,
+                            iconBg = DwTintWater,
+                            iconTint = DwWater,
+                            label = "Remove Ads",
+                        ) {
+                            Text(
+                                text = "Active",
+                                fontFamily = PlusJakartaSans,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 13.sp,
+                                color = DwWater,
+                            )
+                        }
                     }
                 }
             }
@@ -1062,6 +1126,7 @@ private fun SettingsScreenPreview() {
             onReportProblemTap = {},
             onGoalCelebrationsToggled = {},
             onClearDataTap = {},
+            onRemoveAdsTap = {},
         )
     }
 }

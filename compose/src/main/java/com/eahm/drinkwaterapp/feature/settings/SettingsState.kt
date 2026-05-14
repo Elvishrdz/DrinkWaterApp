@@ -1,5 +1,6 @@
 package com.eahm.drinkwaterapp.feature.settings
 
+import com.eahm.drinkwaterapp.core.billing.PurchaseState
 import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
 import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
 
@@ -18,6 +19,8 @@ data class SettingsState(
     val notificationAmountMl: Float = 150f,
     val appVersion: String,
     val buildVariant: String,
+    val isAdFree: Boolean = false,
+    val purchaseState: PurchaseState = PurchaseState.Idle,
 )
 
 enum class WaterUnit(val label: String) {

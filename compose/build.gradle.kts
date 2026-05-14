@@ -134,6 +134,9 @@ dependencies {
 
     implementation(libs.picktime.compose)
 
+    // RevenueCat
+    implementation("com.revenuecat.purchases:purchases:9.23.1")
+
     // ViewModel
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)

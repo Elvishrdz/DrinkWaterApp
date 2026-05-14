@@ -1,10 +1,12 @@
 package com.eahm.drinkwaterapp.feature.settings
 
+import android.app.Activity
 import android.app.Application
 import android.content.Intent
 import android.provider.Settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.eahm.drinkwaterapp.core.billing.PurchaseManager
 import com.eahm.drinkwaterapp.core.config.AppInfoService
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
@@ -31,6 +33,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.time.ExperimentalTime
+import com.revenuecat.purchases.Package as RcPackage
 
 @OptIn(ExperimentalTime::class)
 internal class SettingsViewModel(
@@ -41,6 +44,7 @@ internal class SettingsViewModel(
     dateTimeZoneChangedObserver: DateTimeZoneChangedObserver,
     notificationPermissionObserver: NotificationPermissionObserver,
     appInfoService: AppInfoService,
+    private val purchaseManager: PurchaseManager,
 ) : ViewModel() {
 
     private val dao = database.getDailyGoalDao()
@@ -110,11 +114,18 @@ internal class SettingsViewModel(
             endTime = reminderInfo?.first?.end,
             notificationAmountMl = reminderInfo?.third ?: 150f,
         )
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Lazily,
-        initialValue = _state.value,
-    )
+    }
+        .combine(purchaseManager.isAdFree) { state, isAdFree ->
+            state.copy(isAdFree = isAdFree)
+        }
+        .combine(purchaseManager.purchaseState) { state, purchaseState ->
+            state.copy(purchaseState = purchaseState)
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Lazily,
+            initialValue = _state.value,
+        )
 
     fun onNotificationsToggled(enabled: Boolean) {
         viewModelScope.launch {
@@ -211,6 +222,18 @@ internal class SettingsViewModel(
                     Runtime.getRuntime().exit(0)
                 }
         }
+    }
+
+    fun onFetchOfferings(onResult: (RcPackage?) -> Unit) {
+        purchaseManager.fetchOfferings(onResult)
+    }
+
+    fun onPurchase(activity: Activity, pkg: RcPackage) {
+        purchaseManager.purchase(activity, pkg)
+    }
+
+    fun onRestorePurchase() {
+        purchaseManager.restore()
     }
 
     private suspend fun setGoalFromToday(goalMl: Float) {

@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.eahm.drinkwaterapp.ads.banner.DrinkWaterBannerAd
+import com.eahm.drinkwaterapp.core.billing.PurchaseManager
 import com.eahm.drinkwaterapp.core.config.BuildEnvironment
 import com.eahm.drinkwaterapp.core.data.confetti.ConfettiController
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
@@ -49,7 +50,9 @@ enum class HomeDestination(
 @Composable
 internal fun HomeScreen() {
     val confettiController = koinInject<ConfettiController>()
+    val purchaseManager = koinInject<PurchaseManager>()
     val state by confettiController.state.collectAsStateWithLifecycle()
+    val isAdFree by purchaseManager.isAdFree.collectAsStateWithLifecycle()
     var currentDestination by rememberSaveable { mutableStateOf(HomeDestination.TODAY) }
 
     val itemColors = NavigationSuiteDefaults.itemColors(
@@ -92,9 +95,11 @@ internal fun HomeScreen() {
         }
     ) {
         Column(Modifier.fillMaxSize()) {
-            Column(Modifier
-                .fillMaxSize()
-                .weight(1f)) {
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .weight(1f)
+            ) {
                 when (currentDestination) {
                     HomeDestination.TODAY -> DrinkRoot(
                         onNavigateToHistory = { currentDestination = HomeDestination.HISTORY },
@@ -108,10 +113,11 @@ internal fun HomeScreen() {
                 }
             }
 
-            //TODO: set banner together with the bottom navigation instead
-            DrinkWaterBannerAd(
-                modifier = Modifier.fillMaxWidth()
-            )
+            if (!isAdFree) {
+                DrinkWaterBannerAd(
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
 
     }
