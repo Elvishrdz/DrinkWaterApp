@@ -54,7 +54,7 @@ fun Context.startTextSendIntent(
     }
     val chooser = Intent.createChooser(
         fallbackIntent,
-        getString(R.string.text_share_title),
+        getString(R.string.share_app_title),
     )
         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
@@ -74,7 +74,7 @@ fun Context.startImageSendIntent(
 
     val chooser = Intent.createChooser(
         shareIntent,
-        getString(R.string.text_share_title),
+        getString(R.string.share_app_title),
     )
         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 

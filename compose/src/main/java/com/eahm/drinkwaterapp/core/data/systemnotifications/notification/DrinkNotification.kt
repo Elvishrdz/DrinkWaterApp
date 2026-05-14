@@ -19,6 +19,7 @@ import com.eahm.drinkwaterapp.core.data.systemnotifications.model.NotificationCo
 import com.eahm.drinkwaterapp.core.data.systemnotifications.model.NotificationRemoved
 import com.eahm.drinkwaterapp.core.data.systemnotifications.model.SkipDrink
 import com.eahm.drinkwaterapp.core.domain.extension.canShowNotifications
+import com.eahm.drinkwaterapp.core.domain.extension.sanitizeZeroDecimals
 import com.eahm.drinkwaterapp.system.broadcast.AlarmReceiver
 import kotlin.random.Random
 
@@ -61,13 +62,16 @@ internal object DrinkNotification {
             .setContentIntent(contentIntent)
             .addAction(
                 0,
-                context.resources.getString(R.string.text_skip),
+                context.resources.getString(R.string.skip).uppercase(),
                 skipIntent,
             ) //R.drawable.icon_skip
             .addAction(
                 0,
-                // TODO:context.resources.getString(R.string.text_drink),
-                "+$amountPerDrinkMl",
+                context.resources.getString(
+                    R.string.notification_drink_amount_formatted,
+                    amountPerDrinkMl.sanitizeZeroDecimals(),
+                    context.resources.getString(R.string.volume_unit_mililiters),
+                ),
                 drinkIntent
             ) //R.drawable.icon_drink
             //.setCategory(NotificationCompat.CATEGORY_REMINDER)

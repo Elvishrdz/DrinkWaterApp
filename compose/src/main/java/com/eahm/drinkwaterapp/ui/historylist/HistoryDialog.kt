@@ -267,7 +267,7 @@ private fun TimelineItemCard(
         }
 
         Column(modifier = Modifier.weight(1f)) {
-            val unit = stringResource(R.string.text_vol_unit_mililiters)
+            val unit = stringResource(R.string.volume_unit_mililiters)
             Text(
                 text = "${item.amount}$unit",
                 fontFamily = PlusJakartaSans,
