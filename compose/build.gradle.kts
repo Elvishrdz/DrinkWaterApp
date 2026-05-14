@@ -29,10 +29,28 @@ android {
         applicationId = "com.eahm.drinkwaterapp"
         minSdk = 24
         targetSdk = 37
-        versionCode = 18
-        versionName = "1.1.4"
+        versionCode = 17
+        versionName = "2.0.0-alpha01"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        create("release") {
+            val keystorePath = System.getenv("KEYSTORE_PATH")
+            storeFile = if (!keystorePath.isNullOrBlank()) {
+                file(keystorePath)
+            } else {
+                rootProject.file("builds/androidmobile-keystore.jks")
+            }
+            storePassword = System.getenv("KEYSTORE_PASSWORD") ?: localProps.getProperty(
+                "keystore.password",
+                ""
+            )
+            keyAlias = System.getenv("KEY_ALIAS") ?: localProps.getProperty("key.alias", "")
+            keyPassword =
+                System.getenv("KEY_PASSWORD") ?: localProps.getProperty("key.password", "")
+        }
     }
 
     buildTypes {
@@ -65,6 +83,7 @@ android {
 
         // Closed testing, open testing and production track
         release {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
