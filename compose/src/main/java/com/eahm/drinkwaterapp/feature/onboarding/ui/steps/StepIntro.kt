@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
@@ -45,7 +46,7 @@ internal fun StepIntro(
         step = step,
         total = OnboardingSteps.totalSteps,
         title = "Let's build a great habit",
-        subtitle = "In a few quick steps, we'll set up your hydration goal and reminders.",
+        subtitle = "In the next steps, we'll quickly set up your hydration goal and reminders.",
         art = { OnbArtCircle(icon = DwIcons.Drop) },
         footer = {
             DwPrimaryButtonAnimated(
@@ -73,21 +74,21 @@ private fun IntroFeatureCards() {
             cardBackground = DwTintWater,
             iconBackground = DwWater,
             title = "Your daily goal",
-            description = "Tailored to your body and lifestyle.",
+            description = "Decide exactly how much you want to achieve.",
         )
         IntroFeatureCard(
             icon = DwIcons.Bell,
             cardBackground = DwTintMagenta,
             iconBackground = DwMagenta,
-            title = "Smart reminders",
-            description = "Gentle nudges so you never miss a sip.",
+            title = "Daily reminders",
+            description = "Notifications to let you know when is a good time to have a sip.",
         )
         IntroFeatureCard(
             icon = DwIcons.Wave,
             cardBackground = DwTintWater,
             iconBackground = DwWaterDeep,
-            title = "Track your streak",
-            description = "Build a healthy habit, one day at a time.",
+            title = "History and stats",
+            description = "Overview to your progress. Build a healthy habit, one day at a time.",
         )
     }
 }
@@ -127,13 +128,13 @@ private fun IntroFeatureCard(
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = Color.Black,
             )
             Spacer(Modifier.height(2.dp))
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = DwInk500,
             )
         }
     }

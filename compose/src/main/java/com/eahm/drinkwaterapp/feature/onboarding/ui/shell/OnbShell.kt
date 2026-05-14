@@ -102,36 +102,32 @@ internal fun OnbShell(
                         .padding(horizontal = 24.dp, vertical = 32.dp),
                 ) {
                     // header
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         art?.let { content ->
                             Box(
                                 modifier = Modifier
-                                    .align(Alignment.Top)
-                                    .padding(end = 7.dp),
+                                    .padding(bottom = 12.dp),
                                 contentAlignment = Alignment.Center,
                                 content = { content() },
                             )
                         }
-
-                        Column(
-                            modifier = Modifier.weight(1f),
-                        ) {
+                        Text(
+                            text = title,
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        if (subtitle != null) {
+                            Spacer(Modifier.height(8.dp))
                             Text(
-                                text = title,
-                                style = MaterialTheme.typography.headlineSmall,
-                                color = MaterialTheme.colorScheme.onSurface,
+                                text = subtitle,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
-                            if (subtitle != null) {
-                                Spacer(Modifier.height(8.dp))
-                                Text(
-                                    text = subtitle,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
                         }
+
                     }
 
                     Spacer(Modifier.height(12.dp))
