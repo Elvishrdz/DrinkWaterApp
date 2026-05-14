@@ -55,4 +55,7 @@ interface HistoryDao {
         """
     )
     fun getTotalDrinkAmount(start: LocalDateTime, end: LocalDateTime): Flow<Float>
+
+    @Query("DELETE FROM HistoryEntity")
+    suspend fun deleteAll()
 }

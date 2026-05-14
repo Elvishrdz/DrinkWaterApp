@@ -8,6 +8,7 @@ import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,18 +27,22 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -65,6 +70,7 @@ import com.eahm.drinkwaterapp.core.designsystem.component.button.DwSecondaryButt
 import com.eahm.drinkwaterapp.core.designsystem.component.extension.outlineBorderStyle
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwDanger
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk100
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk200
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
@@ -86,6 +92,7 @@ import com.eahm.drinkwaterapp.feature.settings.ui.NotificationAmountBottomSheet
 import com.eahm.drinkwaterapp.feature.settings.ui.UnitsBottomSheet
 import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorDialog
 import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
+import kotlinx.coroutines.delay
 import org.koin.compose.viewmodel.koinViewModel
 
 private val gradientMagentaHero = Brush.verticalGradient(
@@ -99,6 +106,8 @@ internal fun SettingsScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
+
+    var showClearDataDialog by rememberSaveable { mutableStateOf(false) }
 
     // ── Notification permission ───────────────────────────────────────────────
     var showPermissionDeniedDialog by rememberSaveable { mutableStateOf(false) }
@@ -197,6 +206,7 @@ internal fun SettingsScreen(
         onRequestFeatureTap = ::handleRequestFeature,
         onReportProblemTap = ::handleReportProblem,
         onGoalCelebrationsToggled = { handleDrawOverlayToggle() },
+        onClearDataTap = { showClearDataDialog = true },
         modifier = modifier,
     )
 
@@ -246,6 +256,17 @@ internal fun SettingsScreen(
         )
     }
 
+    // ── Clear all data dialog ─────────────────────────────────────────────────
+    if (showClearDataDialog) {
+        ClearAllDataDialog(
+            onDismiss = { showClearDataDialog = false },
+            onConfirm = {
+                showClearDataDialog = false
+                viewModel.clearAllData()
+            },
+        )
+    }
+
     // ── Draw-overlay instructions dialog ─────────────────────────────────────
     if (showOverlayInstructionsDialog) {
         DrawOverlayInstructionsDialog(
@@ -280,6 +301,7 @@ internal fun SettingsContent(
     onRequestFeatureTap: () -> Unit,
     onReportProblemTap: () -> Unit,
     onGoalCelebrationsToggled: (Boolean) -> Unit,
+    onClearDataTap: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     // Window duration used to cap the reminder interval
@@ -480,6 +502,48 @@ internal fun SettingsContent(
             }
 
             item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(DwDanger.copy(alpha = 0.06f))
+                        .clickable(onClick = onClearDataTap)
+                        .padding(horizontal = 14.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(RoundedCornerShape(9.dp))
+                            .background(DwDanger.copy(alpha = 0.12f)),
+                    ) {
+                        Icon(
+                            imageVector = DwIcons.Trash,
+                            contentDescription = null,
+                            tint = DwDanger,
+                            modifier = Modifier.size(18.dp),
+                        )
+                    }
+                    Text(
+                        text = "Reset all data",
+                        fontFamily = PlusJakartaSans,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 14.sp,
+                        color = DwDanger,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Icon(
+                        imageVector = DwIcons.ChevronRight,
+                        contentDescription = null,
+                        tint = DwDanger.copy(alpha = 0.6f),
+                        modifier = Modifier.size(16.dp),
+                    )
+                }
+            }
+
+            item {
                 BuildInfoFooter(
                     appVersion = state.appVersion,
                     buildVariant = state.buildVariant,
@@ -520,6 +584,74 @@ internal fun SettingsContent(
             onAmountChanged = onNotificationAmountChanged,
             onDismiss = { showNotificationAmountSheet = false },
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ClearAllDataDialog(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+) {
+    var countdown by remember { mutableIntStateOf(5) }
+    LaunchedEffect(Unit) {
+        while (countdown > 0) {
+            delay(1000L)
+            countdown--
+        }
+    }
+
+    BasicAlertDialog(onDismissRequest = onDismiss) {
+        Column(
+            modifier = Modifier
+                .clip(RoundedCornerShape(20.dp))
+                .background(color = MaterialTheme.colorScheme.background)
+                .padding(24.dp),
+        ) {
+            Text(
+                text = "Reset all data",
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                color = DwDanger,
+            )
+            Spacer(Modifier.height(10.dp))
+            Text(
+                text = "This will permanently delete all your drink history, daily goals, and settings. The app will restart afterwards.\n\nThis action cannot be undone.",
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp,
+                color = DwInk500,
+            )
+            Spacer(Modifier.height(24.dp))
+            OutlinedButton(
+                onClick = onConfirm,
+                enabled = countdown == 0,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(999.dp),
+                border = BorderStroke(
+                    width = 1.5.dp,
+                    color = if (countdown == 0) DwDanger else DwInk200,
+                ),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = DwDanger,
+                    disabledContentColor = DwInk400,
+                ),
+            ) {
+                Text(
+                    text = if (countdown > 0) "DELETE ALL DATA ($countdown)" else "DELETE ALL DATA NOW",
+                    fontFamily = PlusJakartaSans,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 14.sp,
+                )
+            }
+            Spacer(Modifier.height(8.dp))
+            DwSecondaryButton(
+                text = "Cancel",
+                onClick = onDismiss,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
     }
 }
 
@@ -930,6 +1062,7 @@ private fun SettingsScreenPreview() {
             onRequestFeatureTap = {},
             onReportProblemTap = {},
             onGoalCelebrationsToggled = {},
+            onClearDataTap = {},
         )
     }
 }

@@ -11,6 +11,7 @@ import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.WhatToDoNow
 import com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.WhatToDoService
 import com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.getNextAlarmSlot
+import com.eahm.drinkwaterapp.core.data.systemnotifications.NotificationService
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
 import com.eahm.drinkwaterapp.core.domain.extension.canScheduleExactAlarms
@@ -229,6 +230,11 @@ class DrinkAlarmManager(
                 update()
             }
         }
+    }
+
+    fun clear() {
+        stopAlarm()
+        NotificationService.cancelDrinkNotification(application)
     }
 
     fun stopAlarm() {

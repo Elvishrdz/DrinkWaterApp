@@ -1,6 +1,7 @@
 package com.eahm.drinkwaterapp.feature.settings
 
 import android.app.Application
+import android.content.Intent
 import android.provider.Settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -189,6 +190,27 @@ internal class SettingsViewModel(
 
     fun onDrawOverlayPermissionResult() {
         _state.update { it.copy(goalReachedCelebrationsEnabled = canDrawOverlay) }
+    }
+
+    fun clearAllData() {
+        viewModelScope.launch(Dispatchers.IO) {
+            database.getHistoryDao().deleteAll()
+            database.getDailyGoalDao().deleteAll()
+            prefsStorage.clear()
+            drinkAlarmManager.clear()
+
+            // restart application after cleanup
+            application.packageManager
+                .getLaunchIntentForPackage(application.packageName)
+                ?.apply {
+                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                ?.let {
+                    val mainIntent = Intent.makeRestartActivityTask(it.component)
+                    application.startActivity(mainIntent)
+                    Runtime.getRuntime().exit(0)
+                }
+        }
     }
 
     private suspend fun setGoalFromToday(goalMl: Float) {

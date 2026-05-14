@@ -93,6 +93,11 @@ internal object DrinkNotification {
             .notify(notificationId, builder.build())
     }
 
+    fun cancelNotification(context: Context) {
+        NotificationManagerCompat.from(context)
+            .cancel(NOTIFICATION_ID)
+    }
+
     private fun getNotificationConfig(context: Context): NotificationConfig {
         val goalReached = false  // TODO: if (SettingsClass().isGoalReached())
         val code = Random(7).nextInt(1, 5)

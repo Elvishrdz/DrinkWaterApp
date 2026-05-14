@@ -103,6 +103,10 @@ object NotificationService {
         )
     }
 
+    fun cancelDrinkNotification(context: Context) {
+        DrinkNotification.cancelNotification(context)
+    }
+
     @OptIn(ExperimentalTime::class)
     fun showReportNotification(
         CHANNEL_ID: String,
