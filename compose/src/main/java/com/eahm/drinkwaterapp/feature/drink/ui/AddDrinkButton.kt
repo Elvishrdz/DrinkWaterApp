@@ -61,11 +61,13 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun AddDrinkButton(
     presets: List<DrinkSuggestion>,
-    onDrink: (Float) -> Unit,
+    onDrinkSuggestion: (Float) -> Unit,
+    onDrinkCustom: (Float) -> Unit,
     onCreatePreset: (Float) -> Unit,
     onReorder: (List<DrinkSuggestion>, Boolean) -> Unit,
     onDelete: (DrinkSuggestion) -> Unit,
     onRestorePreset: (DrinkSuggestion) -> Unit,
+    onBottomSheetOpened: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var showBottomSheet by rememberSaveable { mutableStateOf(false) }
@@ -89,7 +91,10 @@ internal fun AddDrinkButton(
     ChipButton(
         icon = DwIcons.Plus,
         text = stringResource(R.string.drink_add_more_label),
-        onClick = { showBottomSheet = true },
+        onClick = {
+            showBottomSheet = true
+            onBottomSheetOpened(presets.size)
+        },
         modifier = modifier,
     )
 
@@ -126,7 +131,7 @@ internal fun AddDrinkButton(
                             .zIndex(1f),
                         presets = presets,
                         onDrink = { amount ->
-                            onDrink(amount)
+                            onDrinkSuggestion(amount)
                             dismissBottomSheet()
                         },
                         onReorder = { onReorder(it, false) },
@@ -161,7 +166,7 @@ internal fun AddDrinkButton(
                                 onDrink = { amount ->
                                     // disable inputs when dragging is active
                                     if (!isDragging) {
-                                        onDrink(amount)
+                                        onDrinkCustom(amount)
                                         dismissBottomSheet()
                                     }
                                 },
@@ -320,10 +325,12 @@ internal fun ChipButton(
 private fun AddDrinkButtonPreview() {
     AddDrinkButton(
         presets = drinkSuggestionsMocks,
-        onDrink = {},
+        onDrinkSuggestion = {},
+        onDrinkCustom = {},
         onCreatePreset = {},
         onReorder = { _, _ -> },
         onDelete = {},
         onRestorePreset = {},
+        onBottomSheetOpened = {},
     )
 }

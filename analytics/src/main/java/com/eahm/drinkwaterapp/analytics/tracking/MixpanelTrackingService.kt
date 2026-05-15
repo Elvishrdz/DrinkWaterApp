@@ -2,6 +2,9 @@ package com.eahm.drinkwaterapp.analytics.tracking
 
 import android.app.Application
 import com.eahm.drinkwaterapp.analytics.BuildConfig
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingDrink.Companion.EVENT_DRINK_RECORDED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingDrink.Companion.EVENT_PRESET_BOTTOM_SHEET_OPENED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingDrink.Companion.EVENT_PRESET_CREATED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_ABANDONED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_COMPLETED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_STARTED
@@ -16,7 +19,6 @@ internal class MixpanelTrackingService(
     private val token = BuildConfig.MIXPANEL_TOKEN
     private val trackAutomaticEvents = false
     private val optOutTrackingDefault = true
-
 
     private val mixpanel = MixpanelAPI.getInstance(
         application,
@@ -58,6 +60,29 @@ internal class MixpanelTrackingService(
 
     override fun trackOnboardingCompleted() {
         mixpanel.track(TRACK_EVENT_ONBOARDING_COMPLETED)
+    }
+
+    override fun trackDrinkRecorded(source: String, amountMl: Float) {
+        val props = JSONObject().apply {
+            put("source", source)
+            put("amount_ml", amountMl)
+        }
+        mixpanel.track(EVENT_DRINK_RECORDED, props)
+    }
+
+    override fun trackPresetCreated(amountMl: Float, totalPresets: Int) {
+        val props = JSONObject().apply {
+            put("amount_ml", amountMl)
+            put("total_presets", totalPresets)
+        }
+        mixpanel.track(EVENT_PRESET_CREATED, props)
+    }
+
+    override fun trackPresetBottomSheetOpened(presetCount: Int) {
+        val props = JSONObject().apply {
+            put("preset_count", presetCount)
+        }
+        mixpanel.track(EVENT_PRESET_BOTTOM_SHEET_OPENED, props)
     }
 
     override fun clear() {

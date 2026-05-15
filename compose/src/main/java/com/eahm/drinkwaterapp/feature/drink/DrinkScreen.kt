@@ -74,11 +74,12 @@ import kotlin.random.Random
 @Composable
 internal fun DrinkScreen(
     state: DrinkState.Data,
-    onDrink: (Float) -> Unit,
+    onDrink: (Float, DrinkSource) -> Unit,
     onReorderPresets: (List<DrinkSuggestion>, Boolean) -> Unit,
     onCreatePreset: (Float) -> Unit,
     onDeletePreset: (DrinkSuggestion) -> Unit,
     onRestorePreset: (DrinkSuggestion) -> Unit,
+    onBottomSheetOpened: (Int) -> Unit,
     onNavigateToHistory: () -> Unit,
     onNavigateToSettings: () -> Unit,
     modifier: Modifier = Modifier,
@@ -132,6 +133,7 @@ internal fun DrinkScreen(
                 onReorder = onReorderPresets,
                 onDelete = onDeletePreset,
                 onRestorePreset = onRestorePreset,
+                onBottomSheetOpened = onBottomSheetOpened,
                 modifier = Modifier.padding(horizontal = 20.dp)
             )
 
@@ -368,11 +370,12 @@ private fun DrinkScreenPreview() {
     DrinkWaterAppTheme {
         DrinkScreen(
             state = stateMock,
-            onDrink = {},
+            onDrink = { _, _ -> },
             onReorderPresets = { _, _ -> },
             onCreatePreset = {},
             onDeletePreset = {},
             onRestorePreset = {},
+            onBottomSheetOpened = {},
             onNavigateToHistory = {},
             onNavigateToSettings = {},
         )
@@ -385,11 +388,12 @@ private fun DrinkScreenEmptyPreview() {
     DrinkWaterAppTheme {
         DrinkScreen(
             state = stateMock,
-            onDrink = {},
+            onDrink = { _, _ -> },
             onReorderPresets = { _, _ -> },
             onCreatePreset = {},
             onDeletePreset = {},
             onRestorePreset = {},
+            onBottomSheetOpened = {},
             onNavigateToHistory = {},
             onNavigateToSettings = {},
         )
@@ -402,11 +406,12 @@ private fun DrinkScreenGoalReachedPreview() {
     DrinkWaterAppTheme {
         DrinkScreen(
             state = stateMock,
-            onDrink = {},
+            onDrink = { _, _ -> },
             onReorderPresets = { _, _ -> },
             onCreatePreset = {},
             onDeletePreset = {},
             onRestorePreset = {},
+            onBottomSheetOpened = {},
             onNavigateToHistory = {},
             onNavigateToSettings = {},
         )

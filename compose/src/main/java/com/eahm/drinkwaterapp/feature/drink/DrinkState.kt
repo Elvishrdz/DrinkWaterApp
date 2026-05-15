@@ -25,3 +25,14 @@ data class DrinkExtras(
     val quickDrinkSuggestions: List<DrinkSuggestion>,
     val allDrinkSuggestions: List<DrinkSuggestion>,
 )
+
+enum class DrinkSource {
+    /** Quick-preset chip on the main drink screen. */
+    QUICK_SUGGESTION,
+
+    /** Preset chip tapped inside the bottom sheet grid. */
+    BOTTOM_SHEET_SUGGESTION,
+
+    /** Custom amount entered and confirmed via the bottom sheet's "Drink" button. */
+    BOTTOM_SHEET_CUSTOM,
+}

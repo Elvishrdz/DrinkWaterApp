@@ -4,6 +4,8 @@ import android.app.Application
 import android.provider.Settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingDrink
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
 import com.eahm.drinkwaterapp.core.data.confetti.ConfettiController
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
@@ -48,6 +50,7 @@ internal class DrinkViewModel(
     val dateTimeZoneChangedObserver: DateTimeZoneChangedObserver,
     val drinkStatsObserver: DrinkStatsObserver,
     val streakRepository: StreakRepository,
+    val trackingService: TrackingService,
 ) : ViewModel() {
 
     private val dao = database.getHistoryDao()
@@ -164,7 +167,14 @@ internal class DrinkViewModel(
         initialValue = DrinkState.Loading,
     )
 
-    fun onDrink(amount: Float) {
+    fun onDrink(amount: Float, source: DrinkSource) {
+        val sourceKey = when (source) {
+            DrinkSource.QUICK_SUGGESTION -> TrackingDrink.SOURCE_QUICK_SUGGESTION
+            DrinkSource.BOTTOM_SHEET_SUGGESTION -> TrackingDrink.SOURCE_BOTTOM_SHEET_SUGGESTION
+            DrinkSource.BOTTOM_SHEET_CUSTOM -> TrackingDrink.SOURCE_BOTTOM_SHEET_CUSTOM
+        }
+        trackingService.trackDrinkRecorded(sourceKey, amount)
+
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val record = HistoryEntity(
@@ -177,6 +187,10 @@ internal class DrinkViewModel(
                 drinkAlarmManager.setupAlarm(AlarmSource.DrinkButton)
             }
         }
+    }
+
+    fun onBottomSheetOpened(presetCount: Int) {
+        trackingService.trackPresetBottomSheetOpened(presetCount)
     }
 
     fun onCreatePreset(amount: Float) {
@@ -197,6 +211,7 @@ internal class DrinkViewModel(
                         .toSet()
 
                     prefsStorage.setDrinkSuggestions(updated)
+                    trackingService.trackPresetCreated(amount, updated.size)
                 }
             }
         }

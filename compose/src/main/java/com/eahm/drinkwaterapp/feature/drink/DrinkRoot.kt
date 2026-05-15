@@ -21,11 +21,12 @@ internal fun DrinkRoot(
         is DrinkState.Data -> {
             DrinkScreen(
                 state = data,
-                onDrink = viewModel::onDrink,
+                onDrink = { amount, source -> viewModel.onDrink(amount, source) },
                 onReorderPresets = viewModel::onPresetsReordered,
                 onCreatePreset = viewModel::onCreatePreset,
                 onDeletePreset = viewModel::onDeletePreset,
                 onRestorePreset = viewModel::onRestorePreset,
+                onBottomSheetOpened = viewModel::onBottomSheetOpened,
                 onNavigateToHistory = onNavigateToHistory,
                 onNavigateToSettings = onNavigateToSettings,
             )
