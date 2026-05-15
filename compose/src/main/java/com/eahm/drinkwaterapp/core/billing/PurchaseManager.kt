@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import com.revenuecat.purchases.Package as RcPackage
 
 private const val ENTITLEMENT_ADS_FREE = "ads_free"
+private const val OFFERING_REMOVE_ADS = "remove_ads"
 
 internal class PurchaseManager(
     private val application: Application,
@@ -53,7 +54,7 @@ internal class PurchaseManager(
     fun fetchOfferings(onResult: (RcPackage?) -> Unit) {
         Purchases.sharedInstance.getOfferings(object : ReceiveOfferingsCallback {
             override fun onReceived(offerings: Offerings) {
-                val pkg = offerings["remove_ads"]?.availablePackages?.firstOrNull()
+                val pkg = offerings[OFFERING_REMOVE_ADS]?.availablePackages?.firstOrNull()
                     ?: offerings.current?.availablePackages?.firstOrNull()
                 onResult(pkg)
             }
