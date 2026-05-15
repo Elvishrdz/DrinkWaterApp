@@ -1,6 +1,7 @@
 package com.eahm.drinkwaterapp.analytics.tracking
 
 import android.app.Application
+import android.content.Context
 import com.eahm.drinkwaterapp.analytics.BuildConfig
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingDrink.Companion.EVENT_DRINK_RECORDED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingDrink.Companion.EVENT_PRESET_BOTTOM_SHEET_OPENED
@@ -20,98 +21,96 @@ internal class MixpanelTrackingService(
 
     private val token = BuildConfig.MIXPANEL_TOKEN
     private val trackAutomaticEvents = false
-    private val optOutTrackingDefault = true
 
+    // App-level consent flag — persisted across sessions. Defaults to true so tracking
+    // is active from the very first launch and we can observe whether users opt out.
+    private val prefs = application.getSharedPreferences("analytics_prefs", Context.MODE_PRIVATE)
+    private var consentGranted: Boolean
+        get() = prefs.getBoolean("tracking_consent", true)
+        set(value) {
+            prefs.edit().putBoolean("tracking_consent", value).apply()
+        }
+
+    // Mixpanel SDK is always opted-in at the SDK level.
+    // Consent is enforced by our own sendEvent() wrapper so we never lose the
+    // tracking_opted_out event that fires just before the flag is revoked.
     private val mixpanel = MixpanelAPI.getInstance(
         application,
         token,
-        optOutTrackingDefault,
+        false,
         trackAutomaticEvents,
     ).apply {
-        // By default, Mixpanel will flush events immediately if a batch reaches 50 events
         flushBatchSize = 70
+        setServerURL("https://api-eu.mixpanel.com")
+    }
+
+    // All events must route through here. Returns early when consent is not granted.
+    private fun sendEvent(event: String, props: JSONObject? = null) {
+        if (!consentGranted) return
+        if (props != null) mixpanel.track(event, props) else mixpanel.track(event)
     }
 
     override fun startTracking() {
-        // set the Mixpanel instance to send data using Mixpanel's EU domain
-        mixpanel.setServerURL("https://api-eu.mixpanel.com");
-
-        // opt user back into tracking
-        mixpanel.optInTracking()
+        consentGranted = true
     }
 
     override fun stopTracking(source: OptOutSource) {
-        // Record the opt-out intent before it takes effect so the event is included
-        // in the final flush batch and reaches the server.
-        val props = JSONObject().apply {
-            put("source", source)
-        }
+        // Send the opt-out event directly — intentional bypass of sendEvent so this
+        // last event is always delivered regardless of the current consent state.
+        val props = JSONObject().apply { put("source", source.name) }
         mixpanel.track(EVENT_TRACKING_OPTED_OUT, props)
-
-        // Flush first so pending events (including the one above) reach the server
-        // before the queue is wiped. Both calls post to the same background HandlerThread
-        // (AnalyticsWorker) in FIFO order, so FLUSH_QUEUE executes before EMPTY_QUEUES.
         mixpanel.flush()
-        mixpanel.optOutTracking()
+        consentGranted = false
     }
 
-    override fun isTracking(): Boolean = !mixpanel.hasOptedOutTracking()
+    override fun isTracking(): Boolean = consentGranted
 
     override fun trackTestEvent(parameter: String) {
-        val props = JSONObject().apply {
-            put("parameter", parameter)
-        }
-        mixpanel.track("test_event", props)
+        sendEvent("test_event", JSONObject().apply { put("parameter", parameter) })
     }
 
     override fun startTrackTimeOnboardingTime() {
+        if (!consentGranted) return
         mixpanel.timeEvent(TRACK_EVENT_ONBOARDING_TIME)
     }
 
     override fun stopTrackTimeOnboardingTime() {
-        mixpanel.track(TRACK_EVENT_ONBOARDING_TIME)
+        sendEvent(TRACK_EVENT_ONBOARDING_TIME)
     }
 
     override fun trackOnboardingStarted() {
-        mixpanel.track(TRACK_EVENT_ONBOARDING_STARTED)
+        sendEvent(TRACK_EVENT_ONBOARDING_STARTED)
     }
 
     override fun trackOnboardingAbandoned(stepName: String) {
-        //Create event properties object
-        val props = JSONObject().apply {
-            put("step", stepName)
-        }
-        mixpanel.track(TRACK_EVENT_ONBOARDING_ABANDONED, props)
+        sendEvent(TRACK_EVENT_ONBOARDING_ABANDONED, JSONObject().apply { put("step", stepName) })
     }
 
     override fun trackOnboardingCompleted() {
-        mixpanel.track(TRACK_EVENT_ONBOARDING_COMPLETED)
+        sendEvent(TRACK_EVENT_ONBOARDING_COMPLETED)
     }
 
     override fun trackDrinkRecorded(source: String, amountMl: Float) {
-        val props = JSONObject().apply {
+        sendEvent(EVENT_DRINK_RECORDED, JSONObject().apply {
             put("source", source)
             put("amount_ml", amountMl)
-        }
-        mixpanel.track(EVENT_DRINK_RECORDED, props)
+        })
     }
 
     override fun trackPresetCreated(amountMl: Float, totalPresets: Int) {
-        val props = JSONObject().apply {
+        sendEvent(EVENT_PRESET_CREATED, JSONObject().apply {
             put("amount_ml", amountMl)
             put("total_presets", totalPresets)
-        }
-        mixpanel.track(EVENT_PRESET_CREATED, props)
+        })
     }
 
     override fun trackPresetBottomSheetOpened(presetCount: Int) {
-        val props = JSONObject().apply {
+        sendEvent(EVENT_PRESET_BOTTOM_SHEET_OPENED, JSONObject().apply {
             put("preset_count", presetCount)
-        }
-        mixpanel.track(EVENT_PRESET_BOTTOM_SHEET_OPENED, props)
+        })
     }
 
     override fun clear() {
-        mixpanel?.flush()
+        mixpanel.flush()
     }
 }
