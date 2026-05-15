@@ -3,6 +3,7 @@ package com.eahm.drinkwaterapp.feature.dev.tracking
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingService.Companion.OptOutSource
 import com.eahm.drinkwaterapp.core.config.AppInfoService
 import com.eahm.drinkwaterapp.core.config.BuildEnvironment
 import kotlinx.coroutines.delay
@@ -47,7 +48,8 @@ internal class TrackingDevViewModel(
         viewModelScope.launch {
             // Simulate the async opt-in/opt-out latency a real consent flow would have.
             delay(700)
-            if (enabled) trackingService.startTracking() else trackingService.stopTracking()
+            if (enabled) trackingService.startTracking()
+            else trackingService.stopTracking(OptOutSource.DevMenu)
             _state.update { state ->
                 (state as? TrackingDevState.Data)?.copy(
                     isUpdatingTracking = false,

@@ -9,6 +9,8 @@ import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TR
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_COMPLETED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_STARTED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_TIME
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingService.Companion.EVENT_TRACKING_OPTED_OUT
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingService.Companion.OptOutSource
 import com.mixpanel.android.mpmetrics.MixpanelAPI
 import org.json.JSONObject
 
@@ -38,7 +40,18 @@ internal class MixpanelTrackingService(
         mixpanel.optInTracking()
     }
 
-    override fun stopTracking() {
+    override fun stopTracking(source: OptOutSource) {
+        // Record the opt-out intent before it takes effect so the event is included
+        // in the final flush batch and reaches the server.
+        val props = JSONObject().apply {
+            put("source", source)
+        }
+        mixpanel.track(EVENT_TRACKING_OPTED_OUT, props)
+
+        // Flush first so pending events (including the one above) reach the server
+        // before the queue is wiped. Both calls post to the same background HandlerThread
+        // (AnalyticsWorker) in FIFO order, so FLUSH_QUEUE executes before EMPTY_QUEUES.
+        mixpanel.flush()
         mixpanel.optOutTracking()
     }
 

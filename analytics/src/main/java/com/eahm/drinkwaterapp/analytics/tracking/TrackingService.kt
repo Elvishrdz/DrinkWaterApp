@@ -6,13 +6,24 @@ interface TrackingService
 
     fun startTracking()
 
-    fun stopTracking()
+    fun stopTracking(source: OptOutSource)
 
     fun isTracking(): Boolean
 
     fun trackTestEvent(parameter: String)
 
     fun clear()
+
+    companion object {
+
+        enum class OptOutSource {
+            Welcome,
+            Settings,
+            DevMenu,
+        }
+
+        const val EVENT_TRACKING_OPTED_OUT = "tracking_opted_out"
+    }
 }
 
 interface TrackingOnboarding {
