@@ -201,6 +201,25 @@ private fun TrackingContent(
 
         Spacer(Modifier.weight(1f))
 
+        HorizontalDivider()
+        Spacer(Modifier.height(8.dp))
+
+        // ── Force flush ───────────────────────────────────────────────
+        Text("Force flush", style = MaterialTheme.typography.titleMedium)
+        Text(
+            text = "Push all queued events to the Mixpanel server immediately, " +
+                    "without waiting for the SDK's next automatic flush.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(4.dp))
+        DwPrimaryButton(
+            text = "Flush Events Now",
+            onClick = { onAction(TrackingDevAction.FlushEvents) },
+        )
+
+        Spacer(Modifier.height(8.dp))
+
         Text(
             text = "Build: ${state.buildVariant}",
             style = MaterialTheme.typography.bodySmall,

@@ -110,7 +110,7 @@ internal class MixpanelTrackingService(
         })
     }
 
-    override fun clear() {
+    override fun flush() {
         mixpanel.flush()
     }
 }

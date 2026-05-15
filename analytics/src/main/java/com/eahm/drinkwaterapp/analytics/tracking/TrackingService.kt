@@ -12,7 +12,7 @@ interface TrackingService
 
     fun trackTestEvent(parameter: String)
 
-    fun clear()
+    fun flush()
 
     companion object {
 

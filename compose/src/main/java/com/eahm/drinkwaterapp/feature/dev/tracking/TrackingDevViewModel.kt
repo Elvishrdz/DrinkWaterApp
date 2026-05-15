@@ -38,6 +38,7 @@ internal class TrackingDevViewModel(
             is TrackingDevAction.SetTrackingEnabled -> toggleTracking(action.enabled)
             is TrackingDevAction.SetTestEventParam -> updateTestParam(action.param)
             TrackingDevAction.SendTestEvent -> sendTestEvent()
+            TrackingDevAction.FlushEvents -> trackingService.flush()
         }
     }
 

@@ -26,4 +26,5 @@ internal sealed interface TrackingDevAction {
     data class SetTrackingEnabled(val enabled: Boolean) : TrackingDevAction
     data class SetTestEventParam(val param: String) : TrackingDevAction
     data object SendTestEvent : TrackingDevAction
+    data object FlushEvents : TrackingDevAction
 }
