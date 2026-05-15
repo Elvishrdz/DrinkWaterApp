@@ -53,10 +53,11 @@ import com.eahm.drinkwaterapp.feature.dev.adaptive.AdaptiveScreen
 import com.eahm.drinkwaterapp.feature.dev.alarmcalculator.AlarmCalculatorRoot
 import com.eahm.drinkwaterapp.feature.dev.alarmintervals.AlarmIntervalsRoot
 import com.eahm.drinkwaterapp.feature.dev.alarms.AlarmsRoot
+import com.eahm.drinkwaterapp.feature.dev.analytics.AnalyticsRoot
 import com.eahm.drinkwaterapp.feature.dev.billing.BillingDevRoot
-import com.eahm.drinkwaterapp.feature.dev.exactalarm.ExactAlarmDevRoot
 import com.eahm.drinkwaterapp.feature.dev.celebrations.CelebrationsRoot
 import com.eahm.drinkwaterapp.feature.dev.dailygoal.DailyGoalDevRoot
+import com.eahm.drinkwaterapp.feature.dev.exactalarm.ExactAlarmDevRoot
 import com.eahm.drinkwaterapp.feature.dev.menu.DevMenuRoot
 import com.eahm.drinkwaterapp.feature.dev.notifications.NotificationsRoot
 import com.eahm.drinkwaterapp.feature.dev.onboarding.OnboardingDevRoot
@@ -94,6 +95,7 @@ enum class DevDestination(
     CELEBRATIONS("Celebrations", DwIcons.Flag),
     BILLING("Billing", DwIcons.Star),
     EXACT_ALARM("Exact Alarm", DwIcons.Bell),
+    ANALYTICS("Analytics", DwIcons.History),
 }
 
 
@@ -195,6 +197,10 @@ internal fun DevRoot(onBackClicked: () -> Unit) {
             )
 
             DevDestination.EXACT_ALARM -> ExactAlarmDevRoot(
+                onBackClicked = onBackClicked,
+            )
+
+            DevDestination.ANALYTICS -> AnalyticsRoot(
                 onBackClicked = onBackClicked,
             )
         }

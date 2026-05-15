@@ -1,0 +1,50 @@
+{
+  "project_info": {
+    "project_number": "633043745524",
+    "firebase_url": "https://drink-water-app-869b5.firebaseio.com",
+    "project_id": "drink-water-app-869b5",
+    "storage_bucket": "drink-water-app-869b5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:633043745524:android:fbb4546193c72078",
+        "android_client_info": {
+          "package_name": "com.eahm.drinkwaterapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkCqLgtf4lbI-s4eVxE-xLNJQxKBk6YS0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      },
+      "admob_app_id": "ca-app-pub-9403893294190125~4239664850"
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:633043745524:android:d60faa79669626706afca1",
+        "android_client_info": {
+          "package_name": "com.eahm.drinkwaterapp.qa"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkCqLgtf4lbI-s4eVxE-xLNJQxKBk6YS0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

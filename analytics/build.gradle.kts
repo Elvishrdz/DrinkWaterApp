@@ -2,7 +2,6 @@ import java.util.Properties
 
 plugins {
     id("com.android.library")
-
 }
 
 val localProps = Properties().apply {

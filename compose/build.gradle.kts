@@ -9,6 +9,10 @@ plugins {
     // Room
     id("com.google.devtools.ksp")
     id("androidx.room")
+
+    // Crashlytics
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 val localProps = Properties().apply {
@@ -209,4 +213,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.service)
     implementation(libs.androidx.lifecycle.process)
     testImplementation(libs.androidx.lifecycle.runtime.testing)
+
+    // Firebase Crashlytics
+    implementation(platform("com.google.firebase:firebase-bom:34.13.0"))
+    implementation("com.google.firebase:firebase-crashlytics")
 }
