@@ -19,8 +19,27 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    buildTypes {
+        release {
+            val bannerId = "ca-app-pub-9403893294190125/8776486293"
+            buildConfigField("String", "ADS_BANNER_UNIT_ID", "\"$bannerId\"")
+        }
+        create("staging") {
+            val bannerId = "ca-app-pub-3940256099942544/9214589741"
+            buildConfigField("String", "ADS_BANNER_UNIT_ID", "\"$bannerId\"")
+        }
+        create("qa") {
+            val bannerId = "ca-app-pub-3940256099942544/9214589741"
+            buildConfigField("String", "ADS_BANNER_UNIT_ID", "\"$bannerId\"")
+        }
+        debug {
+            val bannerId = "ca-app-pub-3940256099942544/9214589741"
+            buildConfigField("String", "ADS_BANNER_UNIT_ID", "\"$bannerId\"")
+        }
+    }
 
     buildFeatures.compose = true
+    buildFeatures.buildConfig = true
 }
 
 dependencies {
