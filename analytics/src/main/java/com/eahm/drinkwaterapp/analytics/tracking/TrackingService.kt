@@ -1,4 +1,4 @@
-package com.eahm.drinkwaterapp.analytics
+package com.eahm.drinkwaterapp.analytics.tracking
 
 interface TrackingService
     : TrackingOnboarding {

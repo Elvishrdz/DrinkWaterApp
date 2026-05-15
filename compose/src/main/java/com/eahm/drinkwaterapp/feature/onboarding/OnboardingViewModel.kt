@@ -2,7 +2,7 @@ package com.eahm.drinkwaterapp.feature.onboarding
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.eahm.drinkwaterapp.analytics.TrackingService
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager

@@ -1,10 +1,10 @@
-package com.eahm.drinkwaterapp.analytics
+package com.eahm.drinkwaterapp.analytics.tracking
 
 import android.app.Application
-import com.eahm.drinkwaterapp.analytics.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_ABANDONED
-import com.eahm.drinkwaterapp.analytics.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_COMPLETED
-import com.eahm.drinkwaterapp.analytics.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_STARTED
-import com.eahm.drinkwaterapp.analytics.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_TIME
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_ABANDONED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_COMPLETED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_STARTED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_TIME
 import com.mixpanel.android.mpmetrics.MixpanelAPI
 import org.json.JSONObject
 
