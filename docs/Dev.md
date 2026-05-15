@@ -24,10 +24,13 @@ To Complete
 - [x] Adjust celebration
 - [x] translations.
 - [x] paid version
-- [] crashlytics
-- [] privacy policy and tracking request.
-- ads
+- [x] crashlytics
+- [] ads
 - analytics
+- privacy policy and tracking request.
+- new alarm design (exact and inexact)
+- new alarm design (exact and inexact) - onboarding/settings integration
+- fix alarm bug
 - adaptive layouts
 
 Next release priorities
