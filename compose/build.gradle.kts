@@ -56,12 +56,13 @@ android {
     }
 
     buildTypes {
-        // Local development — all features on, debug tools visible
+        // Local development only — all dev tools visible, never uploaded.
         debug {
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
             buildConfigField("boolean", "IS_DEV", "true")
             buildConfigField("boolean", "IS_STAGING", "false")
+            buildConfigField("boolean", "IS_QA", "false")
             buildConfigField("boolean", "LOGS_ENABLED", "true")
             buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "true")
             buildConfigField("boolean", "FEATURE_STREAKS", "false")
@@ -69,13 +70,15 @@ android {
             buildConfigField("String", "REVENUECAT_API_KEY", "\"$revenuecatApiKeyDev\"")
         }
 
-        // QA / Internal Testing track — beta features on, no dev tools
+        // Internal / Open Testing track — beta features on, NO dev tools.
         create("staging") {
             initWith(getByName("release"))
+            matchingFallbacks += listOf("release")
             applicationIdSuffix = ".staging"
             versionNameSuffix = "-staging"
             buildConfigField("boolean", "IS_DEV", "false")
             buildConfigField("boolean", "IS_STAGING", "true")
+            buildConfigField("boolean", "IS_QA", "false")
             buildConfigField("boolean", "LOGS_ENABLED", "true")
             buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "true")
             buildConfigField("boolean", "FEATURE_STREAKS", "false")
@@ -83,7 +86,24 @@ android {
             buildConfigField("String", "REVENUECAT_API_KEY", "\"$revenuecatApiKeyDev\"")
         }
 
-        // Closed testing, open testing and production track
+        // Internal QA — semi-production build with dev tooling visible.
+        create("qa") {
+            initWith(getByName("debug"))
+            matchingFallbacks += listOf("debug")
+            signingConfig = signingConfigs.getByName("debug")
+            applicationIdSuffix = ".qa"
+            versionNameSuffix = "-qa"
+            buildConfigField("boolean", "IS_DEV", "false")
+            buildConfigField("boolean", "IS_STAGING", "false")
+            buildConfigField("boolean", "IS_QA", "true")
+            buildConfigField("boolean", "LOGS_ENABLED", "true")
+            buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "true")
+            buildConfigField("boolean", "FEATURE_STREAKS", "false")
+
+            // TODO: Uses prod key. QA validates the full purchase flow. Testers must use prod test accounts to avoid real charges.
+            buildConfigField("String", "REVENUECAT_API_KEY", "\"$revenuecatApiKeyDev\"")
+        }
+
         release {
             signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
@@ -93,6 +113,7 @@ android {
             )
             buildConfigField("boolean", "IS_DEV", "false")
             buildConfigField("boolean", "IS_STAGING", "false")
+            buildConfigField("boolean", "IS_QA", "false")
             buildConfigField("boolean", "LOGS_ENABLED", "false")
             buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "false")
             buildConfigField("boolean", "FEATURE_STREAKS", "false")

@@ -40,6 +40,9 @@ android {
         create("staging") {
             buildConfigField("String", "MIXPANEL_TOKEN", "\"$mixpanelTokenDev\"")
         }
+        create("qa") {
+            buildConfigField("String", "MIXPANEL_TOKEN", "\"$mixpanelTokenDev\"")
+        }
     }
 
     buildFeatures.buildConfig = true

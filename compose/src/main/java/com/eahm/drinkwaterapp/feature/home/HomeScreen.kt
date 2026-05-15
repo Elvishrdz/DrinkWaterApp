@@ -65,10 +65,13 @@ internal fun HomeScreen() {
     val isAdFree by purchaseManager.isAdFree.collectAsStateWithLifecycle()
     var currentDestination by rememberSaveable { mutableStateOf(HomeDestination.TODAY) }
 
-    val menus = if (BuildEnvironment.isProduction) {
-        HomeDestination.entries.filterNot { it == HomeDestination.DEV }
-    } else {
+    // Show the DEV tab only in environments where dev tooling is intentional.
+    // staging hides it (testers see the same UI as end users);
+    // qa shows it (internal team validates dev tooling alongside features).
+    val menus = if (BuildEnvironment.isDev || BuildEnvironment.isQa) {
         HomeDestination.entries
+    } else {
+        HomeDestination.entries.filterNot { it == HomeDestination.DEV }
     }
 
     val itemColors = NavigationSuiteDefaults.itemColors(
