@@ -1,7 +1,7 @@
 [versions]
 composeCompilerGradlePlugin = "2.2.10"
-googleServices = "4.3.14"
-firebaseCrashlyticsGradle = "2.9.2"
+googleServices = "4.4.2"
+firebaseCrashlyticsGradle = "3.0.3"
 gradle = "9.1.1"
 gradleKotlin = "9.1.1"
 koin = "4.2.1"
