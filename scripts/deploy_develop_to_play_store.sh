@@ -19,8 +19,17 @@ fi
 TRACK="${TRACKS[$((choice - 1))]}"
 
 echo ""
-echo "Triggering release workflow → track: $TRACK"
-gh workflow run release.yml --field "track=$TRACK"
+read -rp "Update Play Store listing? (y/n) [default: n]: " listing_choice
+listing_choice=${listing_choice:-n}
+
+UPDATE_LISTING="false"
+if [[ "$listing_choice" =~ ^[Yy]$ ]]; then
+  UPDATE_LISTING="true"
+fi
+
+echo ""
+echo "Triggering release workflow → track: $TRACK, update_listing: $UPDATE_LISTING"
+gh workflow run release.yml --field "track=$TRACK" --field "update_listing=$UPDATE_LISTING"
 
 echo ""
 echo "Workflow triggered. Monitor progress at:"

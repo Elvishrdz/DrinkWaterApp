@@ -1,0 +1,10 @@
+Drink Water te ayuda a desarrollar un hábito saludable de hidratación con recordatorios personalizados y seguimiento sencillo.
+
+Funciones:
+• Establece metas diarias de consumo de agua adaptadas a tu cuerpo y estilo de vida
+• Recibe recordatorios inteligentes durante el día para no olvidar hidratarte
+• Registra cada bebida con un solo toque
+• Consulta tu historial de hidratación y rachas
+• Interfaz hermosa y minimalista diseñada para el uso diario
+
+Mantente sano. Mantente hidratado.

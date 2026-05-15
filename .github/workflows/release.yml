@@ -13,6 +13,11 @@ on:
           - alpha
           - beta
           - production
+      update_listing:
+        description: "Update Play Store listing assets"
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   release:
@@ -57,3 +62,10 @@ jobs:
       - name: Clean up keystore
         if: always()
         run: rm -f $RUNNER_TEMP/release.jks
+
+  update-listing:
+    name: Update Store Listing
+    needs: release
+    if: ${{ github.event.inputs.update_listing == 'true' }}
+    uses: ./.github/workflows/listing.yml
+    secrets: inherit
