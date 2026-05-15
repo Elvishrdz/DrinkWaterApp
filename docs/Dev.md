@@ -2,30 +2,36 @@ Development
 
 In-App final setup
 Proximos pasos:
+
 1. Crear en Google Play Console un producto Non-consumable con ID remove_ads_lifetime
-2. En RevenueCat dashboard: crear entitlement ads_free, producto, y offering remove_ads (tipo Lifetime)
+2. En RevenueCat dashboard: crear entitlement ads_free, producto, y offering remove_ads (tipo
+   Lifetime)
 3. Reemplazar REVENUECAT_API_KEY_PLACEHOLDER en untranslated.xml con tu API key de RevenueCat
 
 To fix (prio)
 limit amount of presets
 hide vs preivous period if we dont have a previous period to compare.
-error de calculo cuando ajustamos horas y el valor queda antes, la siguiente hora se programa hasta el dia siguiente (ejemplo de 6 a 17 a las 10:3 
-recibi alarma y el valor no cambio, la siguiente alarma es a las 10:3 del dia siguiente.) revisar calculo y si la alarma llega antes, de la hora no
+error de calculo cuando ajustamos horas y el valor queda antes, la siguiente hora se programa hasta
+el dia siguiente (ejemplo de 6 a 17 a las 10:3
+recibi alarma y el valor no cambio, la siguiente alarma es a las 10:3 del dia siguiente.) revisar
+calculo y si la alarma llega antes, de la hora no
 usar hora actual, sino que calcule un poco mas a la siguiente hora.
 
 To Complete
-- [x] Adjust notification messages 
+
+- [x] Adjust notification messages
 - [x] onboarding
 - [x] Adjust celebration
 - [x] translations.
+- [x] paid version
+- [] crashlytics
 - [] privacy policy and tracking request.
-- adaptive layouts
-- analytics
 - ads
-- paid version
-
+- analytics
+- adaptive layouts
 
 Next release priorities
+
 - Drink water
 - Drink suggestions drag and drop.
 - Stats: graph
@@ -33,22 +39,23 @@ Next release priorities
 - Goal reached one celebration.
 
 Analytics
+
 - Track feature usage for improvements
 - Crashlytics
 
 Out of scope
+
 - Stats: streaks
 - History: V2
 - Settings: User profile
 - Settings: Change units
 - Goal reached more celebrations.
 
-
 Priorities
+
 - recalculate when drinking water. notification alarm should be rescheduled.
 - Store drink amount and provide it to all drink calculations.
 - organize drink alarm package and all shared code.
-
 
 Next steps
 [] fix admob
@@ -60,10 +67,14 @@ Next steps
 [] migrate to compose
 
 Fixes
-- despues de tomar agua y una alarma existe, hay que cambiar la hora de la proxima alarma, no quiero beber 10 segundos antes y 
+
+- despues de tomar agua y una alarma existe, hay que cambiar la hora de la proxima alarma, no quiero
+  beber 10 segundos antes y
 - aun recibir la notification.
-- use Instant instead of LocalDateTime (good for timezone conversion) for dates, then parse to localdate time if needed.
-- goal reached widget deberia estar centrado cuando aparezca y mas enfatizado, para que se vea bien con el confetti.
+- use Instant instead of LocalDateTime (good for timezone conversion) for dates, then parse to
+  localdate time if needed.
+- goal reached widget deberia estar centrado cuando aparezca y mas enfatizado, para que se vea bien
+  con el confetti.
 - detectar cambios de hora en el telefono (receiver) y ajustarse para reprogramar alarmas.
 - Insets en la politica de privacidad inicial. Sobrepasan la barra de estatus y navegacion.
 - Insets en el onboarding tambien falla
@@ -74,11 +85,16 @@ Fixes
   redireccionar al usuario.
 
 Features
-- los mensajes de cuanto me falta para alcanzar la meta, deberian ser motivadores cuando hay chances de lograrlo, pero si ya estamos cerca
-- de la hora de finalizar horas activas, los mensajes deberian ser mas neutrales, no forzar al usuario a beber agua solo para alcanzar la meta, puede
+
+- los mensajes de cuanto me falta para alcanzar la meta, deberian ser motivadores cuando hay chances
+  de lograrlo, pero si ya estamos cerca
+- de la hora de finalizar horas activas, los mensajes deberian ser mas neutrales, no forzar al
+  usuario a beber agua solo para alcanzar la meta, puede
 - que solo beber agua sea suficiente (en caso que no estemos ni a la mitad del progreso.)
-- calendario, mostrar un circulo sobre los dias que bebi agua, pero el circulo sobre las fechas debe estar llenado de igual forma que
-- la cantidad de agua de ese dia. si complete mi gol un dia, ese dia aparece con circulo azul completo indicando que se llego a la meta. puede 
+- calendario, mostrar un circulo sobre los dias que bebi agua, pero el circulo sobre las fechas debe
+  estar llenado de igual forma que
+- la cantidad de agua de ese dia. si complete mi gol un dia, ese dia aparece con circulo azul
+  completo indicando que se llego a la meta. puede
 - ser un progress bar sobre el circulo tambien si es que queda mejor.
 - agregar UNDO al beber agua, en caso de haber fallado algo, revertir el error.
 - grafico de consumo de agua al dia, semana, mes y año.
@@ -90,7 +106,9 @@ Features
 - tambien marcar con circulo los dias que hay regisstro de consumo de agua para encotrar rapido dias
   con registros.
 
-
 Projects:
-we need to keep some stats, each day the user has a daily goal, but this goal can be changed any day, after active hours (endtime) is considered that the next starttime will be a new day. track the goal of
-each day and the amount of drink of that day, to display those values in the daily intake graph in the stats screen.   
+we need to keep some stats, each day the user has a daily goal, but this goal can be changed any
+day, after active hours (endtime) is considered that the next starttime will be a new day. track the
+goal of
+each day and the amount of drink of that day, to display those values in the daily intake graph in
+the stats screen.   
