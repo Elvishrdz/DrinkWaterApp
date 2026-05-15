@@ -58,6 +58,7 @@ jobs:
           mappingFile: compose/build/outputs/mapping/release/mapping.txt
           tracks: ${{ github.event.inputs.track }}
           whatsNewDirectory: changelogs/
+          changesNotSentForReview: ${{ github.event.inputs.track == 'production' }}
 
       - name: Clean up keystore
         if: always()
