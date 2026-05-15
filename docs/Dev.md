@@ -26,8 +26,8 @@ To Complete
 - [x] paid version
 - [x] crashlytics
 - [x] ads
-- analytics
-- privacy policy and tracking request.
+- [x] analytics
+- [] privacy policy and tracking request.
 - new alarm design (exact and inexact)
 - new alarm design (exact and inexact) - onboarding/settings integration
 - fix alarm bug
