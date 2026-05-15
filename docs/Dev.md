@@ -25,12 +25,13 @@ To Complete
 - [x] translations.
 - [x] paid version
 - [x] crashlytics
-- [] ads
+- [x] ads
 - analytics
 - privacy policy and tracking request.
 - new alarm design (exact and inexact)
 - new alarm design (exact and inexact) - onboarding/settings integration
 - fix alarm bug
+- fix remove ads bottom sheet on rotation bug
 - adaptive layouts
 
 Next release priorities
