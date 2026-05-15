@@ -11,6 +11,10 @@ import com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.whatToDoServiceModul
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.drinkStatsObserverModule
 import com.eahm.drinkwaterapp.core.data.notificationpermission.notificationPermissionModule
 import com.eahm.drinkwaterapp.core.data.streak.streakModule
+import com.eahm.drinkwaterapp.system.initializer.AppInitializer
+import com.eahm.drinkwaterapp.system.initializer.TrackingFlushInitializer
+import org.koin.core.module.dsl.singleOf
+import org.koin.dsl.bind
 import org.koin.dsl.module
 
 internal val dataModule = module {
@@ -25,4 +29,5 @@ internal val dataModule = module {
     includes(streakModule)
     includes(billingModule)
     includes(trackingServiceModule)
+    singleOf(::TrackingFlushInitializer) bind AppInitializer::class
 }

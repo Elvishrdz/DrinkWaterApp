@@ -51,6 +51,9 @@ dependencies {
     // Mixpanel
     implementation("com.mixpanel.android:mixpanel-android:8.7.0")
 
+    // Lifecycle
+    implementation(libs.androidx.lifecycle.process)
+
     // Koin
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.android)
