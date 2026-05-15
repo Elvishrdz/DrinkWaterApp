@@ -11,7 +11,8 @@ val localProps = Properties().apply {
 }
 
 val mixpanelTokenDev: String = localProps.getProperty("mixpanel.token.dev", "")
-val mixpanelTokenProd: String = localProps.getProperty("mixpanel.token.prod", "")
+val mixpanelTokenProd: String = System.getenv("MIXPANEL_TOKEN")
+    ?: localProps.getProperty("mixpanel.token.prod", "")
 
 android {
     namespace = "com.eahm.drinkwaterapp.analytics"

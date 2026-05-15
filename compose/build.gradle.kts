@@ -17,7 +17,8 @@ val localProps = Properties().apply {
 }
 
 val revenuecatApiKeyDev: String = localProps.getProperty("revenuecat.api.key.dev", "")
-val revenuecatApiKeyProd: String = localProps.getProperty("revenuecat.api.key.prod", "")
+val revenuecatApiKeyProd: String = System.getenv("REVENUECAT_API_KEY")
+    ?: localProps.getProperty("revenuecat.api.key.prod", "")
 
 android {
     namespace = "com.eahm.drinkwaterapp"
