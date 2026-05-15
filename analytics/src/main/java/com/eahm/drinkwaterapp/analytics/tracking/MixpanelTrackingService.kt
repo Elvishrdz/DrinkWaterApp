@@ -38,6 +38,19 @@ internal class MixpanelTrackingService(
         mixpanel.optInTracking()
     }
 
+    override fun stopTracking() {
+        mixpanel.optOutTracking()
+    }
+
+    override fun isTracking(): Boolean = !mixpanel.hasOptedOutTracking()
+
+    override fun trackTestEvent(parameter: String) {
+        val props = JSONObject().apply {
+            put("parameter", parameter)
+        }
+        mixpanel.track("test_event", props)
+    }
+
     override fun startTrackTimeOnboardingTime() {
         mixpanel.timeEvent(TRACK_EVENT_ONBOARDING_TIME)
     }

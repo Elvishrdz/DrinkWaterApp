@@ -5,6 +5,13 @@ interface TrackingService
     TrackingDrink {
 
     fun startTracking()
+
+    fun stopTracking()
+
+    fun isTracking(): Boolean
+
+    fun trackTestEvent(parameter: String)
+
     fun clear()
 }
 
