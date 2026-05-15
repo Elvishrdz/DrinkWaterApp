@@ -65,13 +65,16 @@ object AlarmScheduler {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        alarmManager.setExactAndAllowWhileIdle(
-            AlarmManager.ELAPSED_REALTIME_WAKEUP,
-            triggerAtMillis,
-            pendingIntent
-        )
+        // TODO: handle fallback app behaviour
+        if (ExactAlarmPermission.isGranted(context)) {
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                triggerAtMillis,
+                pendingIntent
+            )
 
-        saveAlarmToStorage(context, alarmId, millisToTriggerFromNow, triggerAtMillis)
+            saveAlarmToStorage(context, alarmId, millisToTriggerFromNow, triggerAtMillis)
+        }
     }
 
     fun getAlarmIntent(

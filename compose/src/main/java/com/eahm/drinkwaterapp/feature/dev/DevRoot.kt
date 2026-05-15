@@ -54,6 +54,7 @@ import com.eahm.drinkwaterapp.feature.dev.alarmcalculator.AlarmCalculatorRoot
 import com.eahm.drinkwaterapp.feature.dev.alarmintervals.AlarmIntervalsRoot
 import com.eahm.drinkwaterapp.feature.dev.alarms.AlarmsRoot
 import com.eahm.drinkwaterapp.feature.dev.billing.BillingDevRoot
+import com.eahm.drinkwaterapp.feature.dev.exactalarm.ExactAlarmDevRoot
 import com.eahm.drinkwaterapp.feature.dev.celebrations.CelebrationsRoot
 import com.eahm.drinkwaterapp.feature.dev.dailygoal.DailyGoalDevRoot
 import com.eahm.drinkwaterapp.feature.dev.menu.DevMenuRoot
@@ -92,6 +93,7 @@ enum class DevDestination(
     ONBOARDING("OnBoarding", DwIcons.Sun),
     CELEBRATIONS("Celebrations", DwIcons.Flag),
     BILLING("Billing", DwIcons.Star),
+    EXACT_ALARM("Exact Alarm", DwIcons.Bell),
 }
 
 
@@ -189,6 +191,10 @@ internal fun DevRoot(onBackClicked: () -> Unit) {
             )
 
             DevDestination.BILLING -> BillingDevRoot(
+                onBackClicked = onBackClicked,
+            )
+
+            DevDestination.EXACT_ALARM -> ExactAlarmDevRoot(
                 onBackClicked = onBackClicked,
             )
         }
