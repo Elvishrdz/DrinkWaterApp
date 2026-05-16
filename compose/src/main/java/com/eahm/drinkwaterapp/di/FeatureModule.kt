@@ -18,6 +18,7 @@ import com.eahm.drinkwaterapp.feature.drink.DrinkViewModel
 import com.eahm.drinkwaterapp.feature.drink.alarm.HomeAlarmViewModel
 import com.eahm.drinkwaterapp.feature.history.HistoryViewModel
 import com.eahm.drinkwaterapp.feature.history.v2.HistoryV2ViewModel
+import com.eahm.drinkwaterapp.feature.consent.LegalViewModel
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingViewModel
 import com.eahm.drinkwaterapp.feature.settings.SettingsViewModel
 import com.eahm.drinkwaterapp.feature.stats.CalendarViewModel
@@ -27,6 +28,7 @@ import org.koin.dsl.module
 
 internal val featureModule = module {
     viewModelOf(::MainViewModel)
+    viewModelOf(::LegalViewModel)
     viewModelOf(::OnboardingViewModel)
 
     viewModelOf(::DrinkViewModel)
