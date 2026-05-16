@@ -27,7 +27,8 @@ To Complete
 - [x] crashlytics
 - [x] ads
 - [x] analytics
-- [] privacy policy and tracking request.
+- [x] setup listing workflow (to upload listing assets)
+- [x] privacy policy and tracking request.
 - new alarm design (exact and inexact)
 - new alarm design (exact and inexact) - onboarding/settings integration
 - fix alarm bug
