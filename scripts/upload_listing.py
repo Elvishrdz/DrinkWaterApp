@@ -247,9 +247,25 @@ def main():
         service.edits().delete(editId=edit_id, packageName=PACKAGE_NAME).execute()
         print("\nEdit deleted (rolled back) due to failures above.")
         sys.exit(1)
-    else:
+
+    try:
         service.edits().commit(editId=edit_id, packageName=PACKAGE_NAME).execute()
         print("\nEdit committed successfully.")
+    except Exception as e:
+        error_str = str(e)
+        print(f"\n✗ Commit failed: {error_str}")
+        if "403" in error_str or "does not have permission" in error_str.lower():
+            print("""
+──────────────────────────────────────────────────────────────
+  PERMISSION ERROR — HOW TO FIX
+──────────────────────────────────────────────────────────────
+  The service account could open and upload the edit but does
+  not have permission to commit it. Set the right permission for
+  your service account in the Play Console user management
+  configuration.
+──────────────────────────────────────────────────────────────
+""")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
