@@ -69,11 +69,9 @@ jobs:
       - name: Summary
         if: success()
         run: |
-          MODE="${{ inputs.mode || 'all' }}"
-          LOCALE="${{ inputs.locale }}"
           echo "### Play Store listing updated" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Field  | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Mode   | \`$MODE\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Locale | ${LOCALE:-all} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Mode   | \`${{ inputs.mode || 'all' }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Locale | ${{ inputs.locale || 'all' }} |" >> $GITHUB_STEP_SUMMARY
