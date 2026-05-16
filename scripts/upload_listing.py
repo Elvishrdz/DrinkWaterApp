@@ -56,6 +56,34 @@ if UPLOAD_MODE not in {"all", "text", "images"}:
 
 UPLOAD_LOCALE = os.environ.get("UPLOAD_LOCALE", "").strip()
 
+# ── Result tracking ────────────────────────────────────────────────────────────
+
+# Each entry: {"locale": str, "asset": str, "ok": bool, "error": str}
+_results: list[dict] = []
+
+
+def _record(locale: str, asset: str, ok: bool, error: str = ""):
+    _results.append({"locale": locale, "asset": asset, "ok": ok, "error": error})
+
+
+def _print_summary():
+    sep = "─" * 62
+    print(f"\n{sep}")
+    print("  UPLOAD SUMMARY")
+    print(sep)
+    for r in _results:
+        icon = "✓" if r["ok"] else "✗"
+        print(f"  {icon}  [{r['locale']}]  {r['asset']}")
+        if not r["ok"]:
+            print(f"       {r['error']}")
+    failures = sum(1 for r in _results if not r["ok"])
+    total = len(_results)
+    print(sep)
+    print(f"  {total - failures}/{total} operations succeeded"
+          + (f"  —  {failures} failed" if failures else ""))
+    print(sep)
+
+
 # ── Google Play client ─────────────────────────────────────────────────────────
 
 
@@ -117,13 +145,18 @@ def upload_text(service, edit_id, locale, locale_dir):
         print("  No text files found, skipping text upload.")
         return
 
-    service.edits().listings().patch(
-        editId=edit_id,
-        packageName=PACKAGE_NAME,
-        language=locale,
-        body=body,
-    ).execute()
-    print(f"  ✓ Text listing updated for {locale}.")
+    try:
+        service.edits().listings().patch(
+            editId=edit_id,
+            packageName=PACKAGE_NAME,
+            language=locale,
+            body=body,
+        ).execute()
+        print(f"  ✓ Text listing updated for {locale}.")
+        _record(locale, "text", ok=True)
+    except Exception as e:
+        print(f"  ✗ Text listing failed for {locale}: {e}")
+        _record(locale, "text", ok=False, error=str(e))
 
 
 def upload_images(service, edit_id, locale, locale_dir):
@@ -143,8 +176,6 @@ def upload_images(service, edit_id, locale, locale_dir):
             continue
 
         def _sort_key(p: Path):
-            # Sort numerically when the stem is a number (1, 2, 10…),
-            # fall back to alphabetical for non-numeric names.
             try:
                 return (0, int(p.stem), "")
             except ValueError:
@@ -163,27 +194,33 @@ def upload_images(service, edit_id, locale, locale_dir):
         for i, f in enumerate(image_files, 1):
             print(f"    {i}. {f.name}")
 
-        # Clear existing images before uploading replacements
-        service.edits().images().deleteall(
-            editId=edit_id,
-            packageName=PACKAGE_NAME,
-            language=locale,
-            imageType=image_type,
-        ).execute()
-
-        for image_file in image_files:
-            mime_type, _ = mimetypes.guess_type(str(image_file))
-            if not mime_type:
-                mime_type = "image/png"
-            media = MediaFileUpload(str(image_file), mimetype=mime_type)
-            service.edits().images().upload(
+        try:
+            service.edits().images().deleteall(
                 editId=edit_id,
                 packageName=PACKAGE_NAME,
                 language=locale,
                 imageType=image_type,
-                media_body=media,
             ).execute()
-            print(f"    ✓ {image_file.name}")
+
+            for image_file in image_files:
+                mime_type, _ = mimetypes.guess_type(str(image_file))
+                if not mime_type:
+                    mime_type = "image/png"
+                media = MediaFileUpload(str(image_file), mimetype=mime_type)
+                service.edits().images().upload(
+                    editId=edit_id,
+                    packageName=PACKAGE_NAME,
+                    language=locale,
+                    imageType=image_type,
+                    media_body=media,
+                ).execute()
+                print(f"    ✓ {image_file.name}")
+
+            _record(locale, image_type, ok=True)
+
+        except Exception as e:
+            print(f"  ✗ {image_type} failed: {e}")
+            _record(locale, image_type, ok=False, error=str(e))
 
     if not found_any:
         print(f"  No image files found for {locale}, skipping images.")
@@ -202,15 +239,18 @@ def main():
     edit_id = edit["id"]
     print(f"\nOpened edit: {edit_id}")
 
-    try:
-        upload_listing(service, edit_id)
+    upload_listing(service, edit_id)
+
+    _print_summary()
+
+    has_failures = any(not r["ok"] for r in _results)
+    if has_failures:
+        service.edits().delete(editId=edit_id, packageName=PACKAGE_NAME).execute()
+        print("\nEdit deleted (rolled back) due to failures above.")
+        sys.exit(1)
+    else:
         service.edits().commit(editId=edit_id, packageName=PACKAGE_NAME).execute()
         print("\nEdit committed successfully.")
-    except Exception as e:
-        print(f"\nError: {e}")
-        service.edits().delete(editId=edit_id, packageName=PACKAGE_NAME).execute()
-        print("Edit deleted (rolled back).")
-        raise
 
 
 if __name__ == "__main__":
