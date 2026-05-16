@@ -15,7 +15,7 @@ Environment variables
 ---------------------
 GOOGLE_PLAY_SERVICE_ACCOUNT_JSON  (required) – service-account JSON string
 UPLOAD_MODE                        all | text | images  (default: all)
-UPLOAD_LOCALE                      e.g. es-ES  (default: empty → all locales)
+UPLOAD_LOCALE                      e.g. en-US  (default: empty → all locales)
 """
 
 import json
@@ -31,6 +31,10 @@ from googleapiclient.http import MediaFileUpload
 PACKAGE_NAME = "com.eahm.drinkwaterapp"
 LISTING_DIR = Path(__file__).parent.parent / "listing"
 SCOPES = ["https://www.googleapis.com/auth/androidpublisher"]
+
+# Default locale in Google Play Console. Must be uploaded before any other
+# locale. The Play API rejects secondary locales if the default is missing.
+DEFAULT_LOCALE = "en-US"
 
 # Maps human-readable folder names → Play Developer API imageType identifiers
 FOLDER_TO_IMAGE_TYPE = {
@@ -81,6 +85,10 @@ def upload_listing(service, edit_id):
         locale_dirs = [d for d in locale_dirs if d.name == UPLOAD_LOCALE]
         if not locale_dirs:
             sys.exit(f"Locale '{UPLOAD_LOCALE}' not found in listing/")
+    else:
+        # Always upload the default locale first so secondary locales don't
+        # get rejected by the Play API when the default listing is absent.
+        locale_dirs.sort(key=lambda d: (0 if d.name == DEFAULT_LOCALE else 1, d.name))
 
     for locale_dir in locale_dirs:
         locale = locale_dir.name

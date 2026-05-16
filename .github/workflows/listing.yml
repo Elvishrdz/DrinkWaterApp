@@ -2,11 +2,42 @@ name: Update Play Store Listing
 
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        description: "Assets to upload"
+        required: true
+        default: "all"
+        type: choice
+        options:
+          - all        # title + descriptions + app-icon + screenshots
+          - text       # title + descriptions only
+          - images     # app-icon + screenshots only
+      locale:
+        description: "Locale to update, e.g. en-US or es-ES (leave empty to update all locales)"
+        required: false
+        default: ""
+        type: string
+
+  # Callable from release.yml or other workflows
   workflow_call:
+    inputs:
+      mode:
+        description: "Assets to upload"
+        required: false
+        default: "all"
+        type: string
+      locale:
+        description: "Locale to update, e.g. en-US (leave empty for all)"
+        required: false
+        default: ""
+        type: string
+    secrets:
+      GOOGLE_PLAY_SERVICE_ACCOUNT_JSON:
+        required: true
 
 jobs:
   update-listing:
-    name: Upload Store Listing
+    name: "Upload listing (${{ inputs.mode }}${{ inputs.locale != '' && format(' · {0}', inputs.locale) || '' }})"
     runs-on: ubuntu-latest
 
     steps:
@@ -17,11 +48,32 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: "pip"
+          cache-dependency-path: "scripts/requirements.txt"
 
       - name: Install dependencies
-        run: pip install google-api-python-client google-auth
+        run: pip install -r scripts/requirements.txt
 
-      - name: Upload listing
+      - name: Show listing contents
+        run: |
+          echo "=== listing/ tree ==="
+          find listing -not -name ".DS_Store" | sort
+
+      - name: Upload listing assets
         env:
           GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          UPLOAD_MODE: ${{ inputs.mode || 'all' }}
+          UPLOAD_LOCALE: ${{ inputs.locale }}
         run: python scripts/upload_listing.py
+
+      - name: Summary
+        if: success()
+        run: |
+          MODE="${{ inputs.mode || 'all' }}"
+          LOCALE="${{ inputs.locale }}"
+          echo "### Play Store listing updated" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Field  | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Mode   | \`$MODE\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Locale | ${LOCALE:-all} |" >> $GITHUB_STEP_SUMMARY

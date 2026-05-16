@@ -69,4 +69,7 @@ jobs:
     needs: release
     if: ${{ github.event.inputs.update_listing == 'true' }}
     uses: ./.github/workflows/listing.yml
+    with:
+      mode: "all"
+      locale: ""
     secrets: inherit
