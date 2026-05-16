@@ -1,5 +1,15 @@
 package com.eahm.drinkwaterapp.core.designsystem.icon
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
@@ -7,8 +17,11 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons.Settings
+import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 
 object DwIcons {
 
@@ -761,6 +774,87 @@ object DwIcons {
         }.build()
     }
 
+    val ShieldCheck: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "DwShieldCheck",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 32f,
+            viewportHeight = 32f,
+        ).apply {
+            // Shield body — 10 % fill so the tint colour shows as a subtle glow
+            path(
+                fill = SolidColor(Color.Black),
+                fillAlpha = 0.10f,
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2.2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round,
+            ) {
+                moveTo(16f, 4f)
+                lineTo(26f, 8f)
+                verticalLineTo(16f)
+                curveTo(26f, 22f, 21.5f, 26.5f, 16f, 28f)
+                curveTo(10.5f, 26.5f, 6f, 22f, 6f, 16f)
+                verticalLineTo(8f)
+                close()
+            }
+            // Checkmark
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2.2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round,
+            ) {
+                moveTo(12f, 16f)
+                lineTo(15f, 19f)
+                lineTo(21f, 13f)
+            }
+        }.build()
+    }
+
+    val PulseHeart: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "DwPulseHeart",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 32f,
+            viewportHeight = 32f,
+        ).apply {
+            // Heart body — 10 % fill
+            path(
+                fill = SolidColor(Color.Black),
+                fillAlpha = 0.10f,
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2.2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round,
+            ) {
+                moveTo(16f, 27f)
+                curveTo(8f, 21f, 4f, 16f, 7f, 11f)
+                curveTo(10f, 6f, 15f, 7f, 16f, 11f)
+                curveTo(17f, 7f, 22f, 6f, 25f, 11f)
+                curveTo(28f, 16f, 24f, 21f, 16f, 27f)
+                close()
+            }
+            // EKG / pulse line
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2.2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round,
+            ) {
+                moveTo(7f, 16f)
+                horizontalLineTo(11f)
+                lineTo(13f, 12f)
+                lineTo(16f, 20f)
+                lineTo(18f, 14f)
+                lineTo(20f, 16f)
+                horizontalLineTo(25f)
+            }
+        }.build()
+    }
+
     val Close: ImageVector by lazy {
         ImageVector.Builder(
             name = "DwClose",
@@ -779,5 +873,30 @@ object DwIcons {
                 moveTo(6f, 6f); lineTo(18f, 18f)
             }
         }.build()
+    }
+}
+
+@Preview(name = "DwIcon", showBackground = true, backgroundColor = 0xFFF2F6F9)
+@Composable
+private fun DwIconsPreview(
+    @PreviewParameter(DwIconsPreviewProvider::class) item: DwIconSample,
+) {
+    DrinkWaterAppTheme {
+        Surface {
+            Column(
+                modifier = Modifier.padding(12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Icon(
+                    imageVector = item.vector,
+                    contentDescription = null,
+                    modifier = Modifier.size(32.dp),
+                )
+                Text(
+                    text = item.name,
+                    style = MaterialTheme.typography.labelSmall,
+                )
+            }
+        }
     }
 }
