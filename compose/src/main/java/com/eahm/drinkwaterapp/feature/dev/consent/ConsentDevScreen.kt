@@ -14,9 +14,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.eahm.drinkwaterapp.core.designsystem.component.button.DwTertiaryButton
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -29,7 +31,7 @@ internal fun ConsentDevScreen(
     onResetPrivacyPolicy: () -> Unit,
     onResetTrackingConsentDecided: () -> Unit,
     onResetAll: () -> Unit,
-    onSimulateReturnAtTrackingStep: () -> Unit,
+    setPrivacyPolicyAcceptedNow: () -> Unit,
     onLaunchConsent: () -> Unit,
     onBackClicked: () -> Unit,
 ) {
@@ -61,6 +63,7 @@ internal fun ConsentDevScreen(
             item {
                 Text(
                     text = "Privacy Policy accepted at: $ppTimestamp",
+                    fontWeight = FontWeight.Medium,
                     fontSize = 13.sp,
                 )
             }
@@ -68,6 +71,7 @@ internal fun ConsentDevScreen(
             item {
                 Text(
                     text = "Tracking consent decided: $trackingConsentDecided",
+                    fontWeight = FontWeight.Medium,
                     fontSize = 13.sp,
                 )
             }
@@ -79,10 +83,20 @@ internal fun ConsentDevScreen(
                 )
             }
 
+            item { Spacer(Modifier.height(7.dp)) }
+
             item {
                 HorizontalDivider()
                 Spacer(Modifier.height(4.dp))
                 Text("Actions", fontWeight = FontWeight.SemiBold)
+            }
+
+            item {
+                DwTertiaryButton(
+                    text = "Accept privacy policy now",
+                    onClick = setPrivacyPolicyAcceptedNow,
+                    modifier = Modifier.fillMaxWidth(),
+                )
             }
 
             item {
@@ -112,13 +126,17 @@ internal fun ConsentDevScreen(
                 }
             }
 
+            item { Spacer(Modifier.height(7.dp)) }
+
             item {
-                OutlinedButton(
-                    onClick = onSimulateReturnAtTrackingStep,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text("Simulate return at tracking step (PP accepted, tracking undecided)")
-                }
+                HorizontalDivider()
+                Spacer(Modifier.height(4.dp))
+                Text("Launch", fontWeight = FontWeight.SemiBold)
+                Text(
+                    text = "REMEMBER: state cache will replay when launching from dev menu. Wait the given SharingStarted.WhileSubscribed({Time-HERE}}) to start with a fresh state.",
+                    fontStyle = FontStyle.Italic,
+                    fontSize = 12.sp,
+                )
             }
 
             item {

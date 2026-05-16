@@ -1,5 +1,6 @@
 package com.eahm.drinkwaterapp.feature.consent.ui
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -96,24 +97,30 @@ internal fun TrackRequestScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (!isTrackingEnabled) {
-                DwTertiaryButton(
-                    text = "Not now",
-                    onClick = onDecline,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                DwPrimaryButton(
-                    text = "Allow sharing usage data",
-                    onClick = onAllow,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            } else {
-                Text(text = "Tracking is active, you can disable it in app settings")
-                DwTertiaryButton(
-                    text = "Continue",
-                    onClick = onAllow,
-                    modifier = Modifier.fillMaxWidth(),
-                )
+            AnimatedContent(
+                targetState = isTrackingEnabled,
+            ) { state ->
+                Column {
+                    if (state) {
+                        Text(text = "Tracking is active, you can disable it in app settings")
+                        DwPrimaryButton(
+                            text = "Continue",
+                            onClick = onAllow,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    } else {
+                        DwTertiaryButton(
+                            text = "Not now",
+                            onClick = onDecline,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        DwPrimaryButton(
+                            text = "Allow sharing usage data",
+                            onClick = onAllow,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                }
             }
         }
     }

@@ -20,7 +20,6 @@ internal enum class ConsentStep { PRIVACY_POLICY, TRACKING }
 internal fun ConsentScreen(
     state: ConsentState,
     onAction: (ConsentAction) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     when (state) {
         ConsentState.Loading -> {
@@ -30,7 +29,6 @@ internal fun ConsentScreen(
         is ConsentState.Data -> {
             AnimatedContent(
                 targetState = state.step,
-                modifier = modifier,
             ) { step ->
                 when (step) {
                     ConsentStep.PRIVACY_POLICY -> PrivacyPolicyScreen(

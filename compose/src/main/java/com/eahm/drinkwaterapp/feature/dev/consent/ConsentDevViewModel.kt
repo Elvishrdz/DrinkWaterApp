@@ -41,15 +41,8 @@ internal class ConsentDevViewModel(
         }
     }
 
-
-    /**
-     * Sets the privacy policy timestamp to now and clears the tracking decision.
-     * Simulates the "app killed after step 1" scenario: consent screen will open
-     * directly at the tracking step (no step counter shown).
-     */
-    fun simulateReturnAtTrackingStep() {
+    fun setPrivacyPolicyAcceptedNow() {
         viewModelScope.launch {
-            prefs.clearTrackingConsentDecided()
             prefs.setPrivacyPolicyAccepted(System.currentTimeMillis())
         }
     }

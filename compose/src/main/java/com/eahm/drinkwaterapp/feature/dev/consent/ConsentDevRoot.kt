@@ -37,7 +37,7 @@ internal fun ConsentDevRoot(
                 onResetPrivacyPolicy = viewModel::resetPrivacyPolicy,
                 onResetTrackingConsentDecided = viewModel::resetTrackingConsentDecided,
                 onResetAll = viewModel::resetAll,
-                onSimulateReturnAtTrackingStep = viewModel::simulateReturnAtTrackingStep,
+                setPrivacyPolicyAcceptedNow = viewModel::setPrivacyPolicyAcceptedNow,
                 onLaunchConsent = { showConsent = true },
                 onBackClicked = onBackClicked,
             )
