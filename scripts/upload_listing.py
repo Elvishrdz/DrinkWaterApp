@@ -91,9 +91,15 @@ def build_service():
     raw = os.environ.get("GOOGLE_PLAY_SERVICE_ACCOUNT_JSON")
     if not raw:
         sys.exit("GOOGLE_PLAY_SERVICE_ACCOUNT_JSON env var is not set")
-    info = json.loads(raw)
-    creds = service_account.Credentials.from_service_account_info(info, scopes=SCOPES)
-    return build("androidpublisher", "v3", credentials=creds)
+    try:
+        info = json.loads(raw)
+    except json.JSONDecodeError as e:
+        sys.exit(f"GOOGLE_PLAY_SERVICE_ACCOUNT_JSON is not valid JSON: {e.msg} at line {e.lineno}")
+    try:
+        creds = service_account.Credentials.from_service_account_info(info, scopes=SCOPES)
+        return build("androidpublisher", "v3", credentials=creds)
+    except Exception as e:
+        sys.exit(f"Failed to build Google Play service: {type(e).__name__}")
 
 
 # ── Upload helpers ─────────────────────────────────────────────────────────────
