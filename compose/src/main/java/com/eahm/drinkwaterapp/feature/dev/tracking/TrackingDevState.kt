@@ -18,6 +18,8 @@ internal sealed interface TrackingDevState {
         /** Brief true pulse after a test event is successfully dispatched. */
         val testEventSentFeedback: Boolean,
         val buildVariant: String,
+        /** Mixpanel distinct ID, or null when not yet available. */
+        val distinctId: String?,
     ) : TrackingDevState
 }
 

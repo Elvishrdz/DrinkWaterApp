@@ -133,6 +133,28 @@ private fun TrackingContent(
             }
         }
 
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+                Text(
+                    text = "Distinct ID",
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+                Text(
+                    text = state.distinctId ?: "not available",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (state.distinctId != null)
+                        MaterialTheme.colorScheme.primary
+                    else
+                        MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+
         Spacer(Modifier.height(8.dp))
         HorizontalDivider()
         Spacer(Modifier.height(8.dp))
@@ -240,6 +262,7 @@ private fun TrackingContentPreview() {
                 canSendTestEvent = true,
                 testEventSentFeedback = false,
                 buildVariant = "qa",
+                distinctId = "abc-123-preview",
             ),
             onAction = {},
         )
@@ -258,6 +281,7 @@ private fun TrackingContentUpdatingPreview() {
                 canSendTestEvent = true,
                 testEventSentFeedback = false,
                 buildVariant = "debug",
+                distinctId = null,
             ),
             onAction = {},
         )

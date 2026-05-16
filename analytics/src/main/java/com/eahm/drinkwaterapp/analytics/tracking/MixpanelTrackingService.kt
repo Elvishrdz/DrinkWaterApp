@@ -44,12 +44,6 @@ internal class MixpanelTrackingService(
         setServerURL("https://api-eu.mixpanel.com")
     }
 
-    // All events must route through here. Returns early when consent is not granted.
-    private fun sendEvent(event: String, props: JSONObject? = null) {
-        if (!consentGranted) return
-        if (props != null) mixpanel.track(event, props) else mixpanel.track(event)
-    }
-
     override fun startTracking() {
         consentGranted = true
     }
@@ -57,21 +51,41 @@ internal class MixpanelTrackingService(
     override fun stopTracking(source: OptOutSource) {
         // Send the opt-out event directly — intentional bypass of sendEvent so this
         // last event is always delivered regardless of the current consent state.
-        val props = JSONObject().apply { put("source", source.name) }
-        mixpanel.track(EVENT_TRACKING_OPTED_OUT, props)
+        mixpanel.track(EVENT_TRACKING_OPTED_OUT, JSONObject().apply {
+            put("source", source.name)
+        })
         mixpanel.flush()
         consentGranted = false
     }
 
     override fun isTracking(): Boolean = consentGranted
 
+    override fun flush() {
+        mixpanel.flush()
+    }
+
+    override fun getDistinctId(): String? = mixpanel.distinctId?.takeIf { it.isNotBlank() }
+
+    // All events must route through here. Returns early when consent is not granted.
+    private fun sendEvent(event: String, props: JSONObject? = null) {
+        if (!consentGranted) return
+        if (props != null) mixpanel.track(event, props) else mixpanel.track(event)
+    }
+
+    private fun sendTimeEvent(event: String) {
+        if (!consentGranted) return
+        mixpanel.timeEvent(event)
+    }
+
+
     override fun trackTestEvent(parameter: String) {
-        sendEvent("test_event", JSONObject().apply { put("parameter", parameter) })
+        sendEvent("test_event", JSONObject().apply {
+            put("parameter", parameter)
+        })
     }
 
     override fun startTrackTimeOnboardingTime() {
-        if (!consentGranted) return
-        mixpanel.timeEvent(TRACK_EVENT_ONBOARDING_TIME)
+        sendTimeEvent(TRACK_EVENT_ONBOARDING_TIME)
     }
 
     override fun stopTrackTimeOnboardingTime() {
@@ -108,9 +122,5 @@ internal class MixpanelTrackingService(
         sendEvent(EVENT_PRESET_BOTTOM_SHEET_OPENED, JSONObject().apply {
             put("preset_count", presetCount)
         })
-    }
-
-    override fun flush() {
-        mixpanel.flush()
     }
 }

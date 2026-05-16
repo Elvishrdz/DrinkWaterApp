@@ -29,6 +29,7 @@ internal class TrackingDevViewModel(
                 canSendTestEvent = !BuildEnvironment.isProduction,
                 testEventSentFeedback = false,
                 buildVariant = appInfoService.buildVariant,
+                distinctId = trackingService.getDistinctId(),
             )
         }
     }

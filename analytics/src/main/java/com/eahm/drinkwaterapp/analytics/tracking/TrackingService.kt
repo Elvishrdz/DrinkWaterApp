@@ -10,9 +10,11 @@ interface TrackingService
 
     fun isTracking(): Boolean
 
-    fun trackTestEvent(parameter: String)
-
     fun flush()
+
+    fun getDistinctId(): String?
+
+    fun trackTestEvent(parameter: String)
 
     companion object {
 
