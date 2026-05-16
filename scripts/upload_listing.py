@@ -1,5 +1,22 @@
 #!/usr/bin/env python3
-"""Upload Play Store listing (text + images) from the listing/ directory."""
+"""Upload Play Store listing (text + images) from the listing/ directory.
+
+Folder structure under listing/<locale>/images/:
+  app-icon/          → icon
+  feature-graphics/  → featureGraphic
+  screenshots-phone/ → phoneScreenshots
+  screenshots-7in/   → sevenInchScreenshots
+  screenshots-10in/  → tenInchScreenshots
+  screenshots-tv/    → tvScreenshots
+  screenshots-wear/  → wearScreenshots
+  banner-tv/         → tvBanner
+
+Environment variables
+---------------------
+GOOGLE_PLAY_SERVICE_ACCOUNT_JSON  (required) – service-account JSON string
+UPLOAD_MODE                        all | text | images  (default: all)
+UPLOAD_LOCALE                      e.g. es-ES  (default: empty → all locales)
+"""
 
 import json
 import mimetypes
@@ -15,16 +32,27 @@ PACKAGE_NAME = "com.eahm.drinkwaterapp"
 LISTING_DIR = Path(__file__).parent.parent / "listing"
 SCOPES = ["https://www.googleapis.com/auth/androidpublisher"]
 
-IMAGE_TYPES = {
-    "phoneScreenshots",
-    "sevenInchScreenshots",
-    "tenInchScreenshots",
-    "tvScreenshots",
-    "wearScreenshots",
-    "icon",
-    "featureGraphic",
-    "tvBanner",
+# Maps human-readable folder names → Play Developer API imageType identifiers
+FOLDER_TO_IMAGE_TYPE = {
+    "app-icon":           "icon",
+    "feature-graphics":   "featureGraphic",
+    "screenshots-phone":  "phoneScreenshots",
+    "screenshots-7in":    "sevenInchScreenshots",
+    "screenshots-10in":   "tenInchScreenshots",
+    "screenshots-tv":     "tvScreenshots",
+    "screenshots-wear":   "wearScreenshots",
+    "banner-tv":          "tvBanner",
 }
+
+# ── Config from env ────────────────────────────────────────────────────────────
+
+UPLOAD_MODE = os.environ.get("UPLOAD_MODE", "all").strip().lower()
+if UPLOAD_MODE not in {"all", "text", "images"}:
+    sys.exit(f"Invalid UPLOAD_MODE '{UPLOAD_MODE}'. Must be: all | text | images")
+
+UPLOAD_LOCALE = os.environ.get("UPLOAD_LOCALE", "").strip()
+
+# ── Google Play client ─────────────────────────────────────────────────────────
 
 
 def build_service():
@@ -36,28 +64,38 @@ def build_service():
     return build("androidpublisher", "v3", credentials=creds)
 
 
+# ── Upload helpers ─────────────────────────────────────────────────────────────
+
+
 def upload_listing(service, edit_id):
     if not LISTING_DIR.is_dir():
         print(f"listing/ directory not found at {LISTING_DIR}, skipping.")
         return
 
-    locales = [d for d in LISTING_DIR.iterdir() if d.is_dir()]
-    if not locales:
+    locale_dirs = sorted(d for d in LISTING_DIR.iterdir() if d.is_dir())
+    if not locale_dirs:
         print("No locale directories found under listing/, skipping.")
         return
 
-    for locale_dir in sorted(locales):
+    if UPLOAD_LOCALE:
+        locale_dirs = [d for d in locale_dirs if d.name == UPLOAD_LOCALE]
+        if not locale_dirs:
+            sys.exit(f"Locale '{UPLOAD_LOCALE}' not found in listing/")
+
+    for locale_dir in locale_dirs:
         locale = locale_dir.name
         print(f"\n--- Locale: {locale} ---")
-        upload_text(service, edit_id, locale, locale_dir)
-        upload_images(service, edit_id, locale, locale_dir)
+        if UPLOAD_MODE in {"all", "text"}:
+            upload_text(service, edit_id, locale, locale_dir)
+        if UPLOAD_MODE in {"all", "images"}:
+            upload_images(service, edit_id, locale, locale_dir)
 
 
 def upload_text(service, edit_id, locale, locale_dir):
     fields = {
-        "title": locale_dir / "title.txt",
+        "title":            locale_dir / "title.txt",
         "shortDescription": locale_dir / "short_description.txt",
-        "fullDescription": locale_dir / "full_description.txt",
+        "fullDescription":  locale_dir / "full_description.txt",
     }
 
     body = {}
@@ -77,32 +115,47 @@ def upload_text(service, edit_id, locale, locale_dir):
         language=locale,
         body=body,
     ).execute()
-    print(f"  Text listing updated for {locale}.")
+    print(f"  ✓ Text listing updated for {locale}.")
 
 
 def upload_images(service, edit_id, locale, locale_dir):
     images_dir = locale_dir / "images"
     if not images_dir.is_dir():
+        print(f"  No images/ directory found for {locale}, skipping images.")
         return
 
-    for image_type_dir in sorted(images_dir.iterdir()):
-        if not image_type_dir.is_dir():
-            continue
-        image_type = image_type_dir.name
-        if image_type not in IMAGE_TYPES:
-            print(f"  Skipping unknown image type: {image_type}")
+    found_any = False
+    for folder in sorted(images_dir.iterdir()):
+        if not folder.is_dir():
             continue
 
+        image_type = FOLDER_TO_IMAGE_TYPE.get(folder.name)
+        if not image_type:
+            print(f"  Skipping unrecognised folder: {folder.name}")
+            continue
+
+        def _sort_key(p: Path):
+            # Sort numerically when the stem is a number (1, 2, 10…),
+            # fall back to alphabetical for non-numeric names.
+            try:
+                return (0, int(p.stem), "")
+            except ValueError:
+                return (1, 0, p.name.lower())
+
         image_files = sorted(
-            f for f in image_type_dir.iterdir()
-            if f.is_file() and f.suffix.lower() in {".png", ".jpg", ".jpeg"}
+            (f for f in folder.iterdir()
+             if f.is_file() and f.suffix.lower() in {".png", ".jpg", ".jpeg"}),
+            key=_sort_key,
         )
         if not image_files:
             continue
 
-        print(f"  Uploading {len(image_files)} image(s) for {image_type}...")
+        found_any = True
+        print(f"  [{folder.name} → {image_type}] {len(image_files)} file(s) — upload order:")
+        for i, f in enumerate(image_files, 1):
+            print(f"    {i}. {f.name}")
 
-        # Delete existing images before uploading new ones
+        # Clear existing images before uploading replacements
         service.edits().images().deleteall(
             editId=edit_id,
             packageName=PACKAGE_NAME,
@@ -122,21 +175,33 @@ def upload_images(service, edit_id, locale, locale_dir):
                 imageType=image_type,
                 media_body=media,
             ).execute()
-            print(f"    Uploaded: {image_file.name}")
+            print(f"    ✓ {image_file.name}")
+
+    if not found_any:
+        print(f"  No image files found for {locale}, skipping images.")
+
+
+# ── Entry point ────────────────────────────────────────────────────────────────
 
 
 def main():
+    print(f"Mode     : {UPLOAD_MODE}")
+    print(f"Locale   : {UPLOAD_LOCALE or '(all)'}")
+    print(f"Package  : {PACKAGE_NAME}")
+
     service = build_service()
     edit = service.edits().insert(packageName=PACKAGE_NAME, body={}).execute()
     edit_id = edit["id"]
-    print(f"Opened edit: {edit_id}")
+    print(f"\nOpened edit: {edit_id}")
 
     try:
         upload_listing(service, edit_id)
         service.edits().commit(editId=edit_id, packageName=PACKAGE_NAME).execute()
         print("\nEdit committed successfully.")
-    except Exception:
+    except Exception as e:
+        print(f"\nError: {e}")
         service.edits().delete(editId=edit_id, packageName=PACKAGE_NAME).execute()
+        print("Edit deleted (rolled back).")
         raise
 
 
