@@ -255,6 +255,13 @@
     <string name="drink_suggestion_removed">Sugerencia eliminada</string>
     <string name="drink_action_create">Crear</string>
     <string name="drink_action_drink">Beber</string>
+    <string name="drink_suggestions_info_desc">Cómo funciona</string>
+    <string name="drink_suggestions_info_title">Cómo funcionan las sugerencias</string>
+    <string name="drink_suggestions_info_quick_presets">Las primeras 3 sugerencias aparecen como botones de acceso rápido en la pantalla principal.</string>
+    <string name="drink_suggestions_info_reorder">Mantén presionado y arrastra una sugerencia para reordenarlas.</string>
+    <string name="drink_suggestions_info_delete">Arrastra una sugerencia hacia la papelera para eliminarla.</string>
+    <string name="drink_suggestions_info_add">Usa el campo de texto y los botones de abajo para agregar nuevos presets o directamente beber una cantidad personalizada sin crear una sugerencia nueva.</string>
+    <string name="drink_suggestions_info_ok">Entendido</string>
 
     <!-- Drink — Tarjetas de alarma -->
     <string name="drink_alarm_reminders_title">Recordatorios</string>

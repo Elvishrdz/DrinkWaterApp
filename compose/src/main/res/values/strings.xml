@@ -258,6 +258,13 @@
     <string name="drink_suggestion_removed">Suggestion removed</string>
     <string name="drink_action_create">Create</string>
     <string name="drink_action_drink">Drink</string>
+    <string name="drink_suggestions_info_desc">How it works</string>
+    <string name="drink_suggestions_info_title">How Suggestions Work</string>
+    <string name="drink_suggestions_info_quick_presets">The first 3 suggestions appear as quick access buttons on your main screen.</string>
+    <string name="drink_suggestions_info_reorder">Hold and drag a suggestion to reorder them.</string>
+    <string name="drink_suggestions_info_delete">Drag a suggestion down to the trash area to delete it.</string>
+    <string name="drink_suggestions_info_add">Use the input field and buttons below to add new suggestions or directly drink a custom amount without saving it.</string>
+    <string name="drink_suggestions_info_ok">Got it</string>
 
     <!-- Drink — Alarm cards -->
     <string name="drink_alarm_reminders_title">Reminders</string>

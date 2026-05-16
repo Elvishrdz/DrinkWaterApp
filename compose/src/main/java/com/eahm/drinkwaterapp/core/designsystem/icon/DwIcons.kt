@@ -855,6 +855,49 @@ object DwIcons {
         }.build()
     }
 
+    val Info: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "DwInfo",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).apply {
+            // Outer circle
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(12f, 2f)
+                curveToRelative(5.523f, 0f, 10f, 4.477f, 10f, 10f)
+                curveToRelative(0f, 5.523f, -4.477f, 10f, -10f, 10f)
+                curveToRelative(-5.523f, 0f, -10f, -4.477f, -10f, -10f)
+                curveToRelative(0f, -5.523f, 4.477f, -10f, 10f, -10f)
+                close()
+            }
+            // "i" stem
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round
+            ) {
+                moveTo(12f, 11f)
+                lineTo(12f, 17f)
+            }
+            // "i" dot
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2.5f,
+                strokeLineCap = StrokeCap.Round
+            ) {
+                moveTo(12f, 7.5f)
+                lineTo(12f, 7.5f)
+            }
+        }.build()
+    }
+
     val Close: ImageVector by lazy {
         ImageVector.Builder(
             name = "DwClose",

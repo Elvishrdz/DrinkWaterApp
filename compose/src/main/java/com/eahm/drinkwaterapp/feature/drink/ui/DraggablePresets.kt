@@ -19,7 +19,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -33,6 +36,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterLight
 
 private const val DRAG_SCALE = 1.3f
 private const val DRAG_ELEVATION = 0f // FIXME: elevation cutout
@@ -407,9 +411,31 @@ fun DraggablePresetGrid(
             },
         verticalArrangement = Arrangement.spacedBy(gridSpacing),
     ) {
+        val quickPresetBorderColor = DwWaterLight.copy(alpha = 0.5f)
+
         for (rowIdx in 0 until rowCount) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(
+                        if (rowIdx == 0) {
+                            Modifier.drawWithContent {
+                                val radius = CornerRadius(14.dp.toPx())
+                                drawRoundRect(
+                                    color = quickPresetBorderColor.copy(alpha = 0.3f),
+                                    cornerRadius = radius,
+                                )
+                                drawContent()
+                                drawRoundRect(
+                                    color = quickPresetBorderColor,
+                                    cornerRadius = radius,
+                                    style = Stroke(width = 2.dp.toPx()),
+                                )
+                            }
+                        } else {
+                            Modifier
+                        }
+                    ),
                 horizontalArrangement = Arrangement.spacedBy(gridSpacing),
             ) {
                 for (colIdx in 0 until columns) {

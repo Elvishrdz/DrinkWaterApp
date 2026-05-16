@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,6 +25,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -71,6 +73,7 @@ internal fun AddDrinkButton(
     modifier: Modifier = Modifier,
 ) {
     var showBottomSheet by rememberSaveable { mutableStateOf(false) }
+    var showInfoDialog by remember { mutableStateOf(false) }
     var canDismissBottomSheet by rememberSaveable { mutableStateOf(true) }
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true,
@@ -112,22 +115,21 @@ internal fun AddDrinkButton(
                 ) {
                     Column {
                         Header(
-                            onCloseClicked = {
-                                scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                    if (!sheetState.isVisible) {
-                                        dismissBottomSheet()
-                                    }
-                                }
-                            },
+                            onInfoClicked = { showInfoDialog = true },
                         )
 
                         Spacer(Modifier.height(24.dp))
                     }
 
+                    if (showInfoDialog) {
+                        SuggestionsInfoDialog(
+                            onDismiss = { showInfoDialog = false },
+                        )
+                    }
+
                     DraggablePresetGrid(
                         modifier = Modifier
                             .wrapContentHeight()
-                            //.verticalScroll(rememberScrollState()) ,
                             .zIndex(1f),
                         presets = presets,
                         onDrink = { amount ->
@@ -201,7 +203,7 @@ internal fun AddDrinkButton(
 
 @Composable
 fun Header(
-    onCloseClicked: () -> Unit,
+    onInfoClicked: () -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -219,14 +221,51 @@ fun Header(
         IconButton(
             modifier = Modifier
                 .size(48.dp),
-            onClick = onCloseClicked,
+            onClick = onInfoClicked,
         ) {
             Icon(
-                imageVector = DwIcons.Close,
-                contentDescription = stringResource(R.string.drink_suggestions_close_desc),
+                imageVector = DwIcons.Info,
+                contentDescription = stringResource(R.string.drink_suggestions_info_desc),
                 tint = DwInk300,
             )
         }
+    }
+}
+
+@Composable
+private fun SuggestionsInfoDialog(
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.drink_suggestions_info_title)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                InfoBullet(stringResource(R.string.drink_suggestions_info_quick_presets))
+                InfoBullet(stringResource(R.string.drink_suggestions_info_reorder))
+                InfoBullet(stringResource(R.string.drink_suggestions_info_delete))
+                InfoBullet(stringResource(R.string.drink_suggestions_info_add))
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.drink_suggestions_info_ok))
+            }
+        },
+    )
+}
+
+@Composable
+private fun InfoBullet(text: String) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            text = "\u2022",
+            style = MaterialTheme.typography.bodyMedium,
+        )
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
+        )
     }
 }
 
