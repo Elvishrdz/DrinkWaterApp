@@ -8,6 +8,9 @@
     <string name="notification_drink_amount_formatted">+%1$s%2$s</string>
     <string name="share_app_title">Share DrinkWater app with your friends!</string>
 
+    <!-- Consent — Privacy policy -->
+    <string name="privacy_policy_local_content">DrinkWater collects only the data necessary to provide and improve the app experience. We do not sell your personal information to third parties.\n\nInformation we collect:\n• Usage data you provide (water intake logs, daily goals, reminders)\n• Device information (OS version, app version) for compatibility\n• Anonymous analytics events when you opt in\n\nHow we use your data:\n• To deliver core app functionality (tracking, reminders, statistics)\n• To improve app features based on aggregated, anonymous usage patterns\n• To send local notifications you have scheduled\n\nData retention:\nYour drink logs and settings are stored locally on your device. Anonymous analytics data is retained for up to 24 months.\n\nYour rights:\nYou may delete all locally stored data at any time via Settings → Reset all data. You may opt out of analytics at any time via Settings.\n\nContact:\nFor any privacy-related questions, please reach out to us at drinkwater.app.</string>
+
     <!-- Generic — actions -->
     <string name="action_cancel">Cancel</string>
     <string name="action_save">Save</string>

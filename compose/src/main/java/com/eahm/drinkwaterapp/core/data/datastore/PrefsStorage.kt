@@ -6,6 +6,12 @@ import kotlinx.coroutines.flow.Flow
 
 interface PrefsStorage {
 
+    fun getPrivacyPolicyAcceptedAt(): Flow<Long?>
+    suspend fun setPrivacyPolicyAccepted(acceptedAt: Long)
+
+    fun getTrackingConsentDecided(): Flow<Boolean>
+    suspend fun setTrackingConsentDecided()
+
     fun getOnboardingCompleted(): Flow<Boolean>
     suspend fun setOnboardingCompleted(value: Boolean)
 

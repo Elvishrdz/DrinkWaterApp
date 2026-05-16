@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
 import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
@@ -37,6 +38,8 @@ private class DataStorePrefsStorage(
         DrinkSuggestion(6, 250f),
     )
 
+    private val privacyPolicyAcceptedAtKey = longPreferencesKey("PRIVACY_POLICY_ACCEPTED_AT")
+    private val trackingConsentDecidedKey = booleanPreferencesKey("TRACKING_CONSENT_DECIDED")
     private val onboardingCompletedKey = booleanPreferencesKey("ONBOARDING_COMPLETED")
     private val usernameKey = stringPreferencesKey("USERNAME")
     private val drinkSuggestionsKey = stringPreferencesKey("DRINKS_SUGGESTIONS")
@@ -49,6 +52,32 @@ private class DataStorePrefsStorage(
 
     private val json = Json {
         ignoreUnknownKeys = true
+    }
+
+    override fun getPrivacyPolicyAcceptedAt(): Flow<Long?> {
+        return dataStore.data.map { preferences ->
+            preferences[privacyPolicyAcceptedAtKey]
+        }
+    }
+
+    override suspend fun setPrivacyPolicyAccepted(acceptedAt: Long) {
+        dataStore.updateData { preferences ->
+            preferences.toMutablePreferences()
+                .also { it[privacyPolicyAcceptedAtKey] = acceptedAt }
+        }
+    }
+
+    override fun getTrackingConsentDecided(): Flow<Boolean> {
+        return dataStore.data.map { preferences ->
+            preferences[trackingConsentDecidedKey] ?: false
+        }
+    }
+
+    override suspend fun setTrackingConsentDecided() {
+        dataStore.updateData { preferences ->
+            preferences.toMutablePreferences()
+                .also { it[trackingConsentDecidedKey] = true }
+        }
     }
 
     override fun getOnboardingCompleted(): Flow<Boolean> {
@@ -204,6 +233,8 @@ private class DataStorePrefsStorage(
 
     override suspend fun clear() {
         dataStore.edit {
+            it.remove(privacyPolicyAcceptedAtKey)
+            it.remove(trackingConsentDecidedKey)
             it.remove(onboardingCompletedKey)
             it.remove(usernameKey)
             it.remove(drinkSuggestionsKey)

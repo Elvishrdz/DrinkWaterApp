@@ -11,6 +11,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.eahm.drinkwaterapp.core.data.systemnotifications.handleNotificationIntentOnCreate
 import com.eahm.drinkwaterapp.core.data.systemnotifications.handleNotificationIntentOnNewIntent
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
+import com.eahm.drinkwaterapp.feature.consent.ConsentRoot
 import com.eahm.drinkwaterapp.feature.home.HomeScreen
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingScreen
 import org.koin.core.context.GlobalContext
@@ -31,14 +32,16 @@ class MainActivity : ComponentActivity() {
 
                 when (val data = state) {
                     MainState.Startup -> {}
-                    is MainState.Ready -> {
-                        if (data.onboardingCompleted) {
-                            HomeScreen()
-                        } else {
-                            OnboardingScreen(
-                                onComplete = viewModel::onOnboardingCompleted,
-                            )
-                        }
+                    is MainState.Ready -> when {
+                        !data.consentCompleted -> ConsentRoot(
+                            onConsentCompleted = viewModel::onConsentCompleted,
+                        )
+
+                        !data.onboardingCompleted -> OnboardingScreen(
+                            onComplete = viewModel::onOnboardingCompleted,
+                        )
+
+                        else -> HomeScreen()
                     }
                 }
             }

@@ -30,10 +30,16 @@ class MainViewModel(
         updateState()
     }
 
+    fun onConsentCompleted() {
+        updateState()
+    }
+
     private fun updateState() {
         viewModelScope.launch {
             state.update {
                 MainState.Ready(
+                    consentCompleted = prefsStorage.getTrackingConsentDecided().firstOrNull()
+                        ?: false,
                     onboardingCompleted = prefsStorage.getOnboardingCompleted().firstOrNull()
                         ?: false,
                 )
