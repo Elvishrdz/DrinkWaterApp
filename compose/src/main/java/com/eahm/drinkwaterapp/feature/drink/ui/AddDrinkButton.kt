@@ -59,6 +59,9 @@ import com.eahm.drinkwaterapp.ui.inputfield.AppInputField
 import com.eahm.drinkwaterapp.ui.inputfield.toDigitString
 import kotlinx.coroutines.launch
 
+/** Maximum number of suggestions the user can save. */
+private const val MAX_SUGGESTIONS = 15
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun AddDrinkButton(
@@ -86,6 +89,12 @@ internal fun AddDrinkButton(
 
     var isDragging by remember { mutableStateOf(false) }
     var isOverDeleteZone by remember { mutableStateOf(false) }
+
+    // If the user somehow has MORE than MAX_SUGGESTIONS (legacy data) we display
+    // that count as the cap so the counter never shows "17/15". Once they delete
+    // down to below MAX_SUGGESTIONS they can create presets again.
+    val effectiveMax = maxOf(presets.size, MAX_SUGGESTIONS)
+    val canCreatePreset = presets.size < MAX_SUGGESTIONS
 
     val dismissBottomSheet: () -> Unit = {
         showBottomSheet = false
@@ -118,7 +127,17 @@ internal fun AddDrinkButton(
                             onInfoClicked = { showInfoDialog = true },
                         )
 
-                        Spacer(Modifier.height(24.dp))
+                        Spacer(Modifier.height(12.dp))
+
+                        PresetCounter(
+                            current = presets.size,
+                            max = effectiveMax,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight(Alignment.CenterVertically),
+                        )
+
+                        Spacer(Modifier.height(12.dp))
                     }
 
                     if (showInfoDialog) {
@@ -159,6 +178,8 @@ internal fun AddDrinkButton(
 
                         Box {
                             InputFieldArea(
+                                modifier = Modifier
+                                    .imePadding(),
                                 onCreatePreset = {
                                     // disable inputs when dragging is active
                                     if (!isDragging) {
@@ -172,6 +193,7 @@ internal fun AddDrinkButton(
                                         dismissBottomSheet()
                                     }
                                 },
+                                canCreatePreset = canCreatePreset,
                             )
                             if (isDragging) {
                                 Box(
@@ -275,6 +297,7 @@ fun InputFieldArea(
     onDrink: (Float) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    canCreatePreset: Boolean = true,
 ) {
     var customAmount by rememberSaveable { mutableStateOf<Float?>(null) }
     var disableButtons by rememberSaveable { mutableStateOf(false) }
@@ -284,7 +307,8 @@ fun InputFieldArea(
         verticalArrangement = Arrangement.spacedBy(7.dp),
     ) {
         AppInputField(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth(),
             label = stringResource(R.string.drink_custom_amount_label),
             value = customAmount?.toDigitString().orEmpty(),
             onValueChanged = {
@@ -303,7 +327,7 @@ fun InputFieldArea(
         ) {
             DwSecondaryButton(
                 text = stringResource(R.string.drink_action_create),
-                enabled = !disableButtons && enabled,
+                enabled = !disableButtons && enabled && canCreatePreset,
                 onClick = {
                     customAmount?.let {
                         onCreatePreset(it)
@@ -324,6 +348,20 @@ fun InputFieldArea(
             )
         }
     }
+}
+
+@Composable
+private fun PresetCounter(
+    current: Int,
+    max: Int,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = "$current / $max",
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+        modifier = modifier,
+    )
 }
 
 @Composable

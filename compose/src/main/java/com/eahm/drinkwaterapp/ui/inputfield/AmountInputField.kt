@@ -89,7 +89,7 @@ fun validateAmountInput(value: String): ValidationResult {
     val amount = trimmed.toFloatOrNull()
         ?: return ValidationResult(false, "Provide a valid number")
 
-    return validateAmount(amount)
+    return validateAmount(amount, maxValue = 99999f)
 }
 
 fun validateAmount(
