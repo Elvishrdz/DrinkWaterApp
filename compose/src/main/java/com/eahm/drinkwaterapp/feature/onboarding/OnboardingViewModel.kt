@@ -26,7 +26,7 @@ import kotlin.time.ExperimentalTime
 @OptIn(ExperimentalTime::class)
 internal class OnboardingViewModel(
     private val prefs: PrefsStorage,
-    private val database: AppDatabase,
+    database: AppDatabase,
     private val drinkAlarmManager: DrinkAlarmManager,
     private val tracking: TrackingService,
 ) : ViewModel() {
@@ -111,19 +111,6 @@ internal class OnboardingViewModel(
         viewModelScope.launch {
             tracking.trackOnboardingCompleted()
             tracking.stopTrackTimeOnboardingTime()
-
-            val s = _state.value
-            if (s.name.isNotBlank()) prefs.setUsername(s.name.trim())
-            prefs.setStartTime(s.wakeTime.toActiveTime())
-            prefs.setEndTime(s.sleepTime.toActiveTime())
-            prefs.setInterval(
-                ActiveTime(
-                    hour = s.intervalMinutes / 60,
-                    minute = s.intervalMinutes % 60,
-                )
-            )
-            upsertGoalForToday(s.goalMl)
-            prefs.setAmountPerDrink(s.notifAmountMl)
             prefs.setOnboardingCompleted(true)
             drinkAlarmManager.determineAction(AlarmSource.OnboardingCompleted)
             onComplete()
