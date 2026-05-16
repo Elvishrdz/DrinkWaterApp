@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Drink Water — Minimal Today (reminders)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link rel="stylesheet" href="../../colors_and_type.css"/>
+<link rel="stylesheet" href="../mobile/components.css"/>
+<link rel="stylesheet" href="../mobile/screens.css"/>
+<link rel="stylesheet" href="today-minimal.css"/>
+<style>
+  body {
+    background: var(--md-sys-color-background);
+    padding: 32px 24px 96px 24px; min-height: 100vh;
+    font-family: var(--font-body);
+  }
+  .page-head { max-width: 980px; margin: 0 auto 28px auto; text-align: center; }
+  .page-head .eyebrow {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--md-sys-color-primary);
+    letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px;
+  }
+  .page-head h1 {
+    font-family: var(--font-display); font-weight: 700; font-size: 28px;
+    color: var(--md-sys-color-on-background);
+    margin: 0 0 8px 0; letter-spacing: -0.01em;
+  }
+  .page-head p {
+    font-size: 14px; color: var(--md-sys-color-on-surface-variant);
+    margin: 0 auto; line-height: 1.5; max-width: 640px;
+  }
+
+  /* Section heads above each frame row */
+  .section-title {
+    max-width: 1320px; margin: 40px auto 16px auto;
+    display: flex; align-items: baseline; gap: 14px;
+    border-bottom: 1px solid var(--md-sys-color-outline-variant);
+    padding-bottom: 10px;
+  }
+  .section-title .num {
+    font-family: var(--font-mono); font-size: 12px;
+    color: var(--md-sys-color-primary);
+    letter-spacing: 0.14em;
+  }
+  .section-title h2 {
+    font-family: var(--font-display); font-weight: 700; font-size: 18px;
+    color: var(--md-sys-color-on-background); margin: 0;
+    letter-spacing: -0.005em;
+  }
+  .section-title p {
+    font-size: 13px; color: var(--md-sys-color-on-surface-variant);
+    margin: 0 0 0 auto; max-width: 480px; text-align: right;
+  }
+
+  .stage {
+    display: flex; flex-wrap: wrap; gap: 36px 28px;
+    justify-content: center; max-width: 1320px; margin: 0 auto;
+  }
+  .frame-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .frame-label {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--md-sys-color-on-surface-variant);
+    letter-spacing: 0.10em; text-transform: uppercase;
+    max-width: 320px; text-align: center; line-height: 1.4;
+  }
+  .frame-label .num {
+    color: var(--md-sys-color-primary); font-weight: 700; margin-right: 6px;
+  }
+  .frame-label .tone {
+    display: block; color: var(--md-sys-color-on-surface);
+    margin-top: 2px; font-size: 10px; opacity: 0.7; letter-spacing: 0.06em;
+  }
+</style>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="../mobile/android-frame.jsx"></script>
+<script type="text/babel" src="../mobile/Components.jsx"></script>
+<script type="text/babel" src="../mobile/Screens.jsx"></script>
+<script type="text/babel" src="TodayMinimal.jsx"></script>
+</head>
+
+<body>
+
+<div class="page-head">
+  <div class="eyebrow">New variant · Drink Water</div>
+  <h1>Minimal Today — reminder-first</h1>
+  <p>
+    Stripped-back home: no greeting, no name, no streak. The day starts at
+    zero. A <b>reminder timeline</b> sits between the quick-add row and the
+    drink log — a slim rail with a single floating <b>now</b> callout, so the
+    design holds up when system fonts scale up.
+  </p>
+</div>
+
+<!-- Section 1 — schedule states -->
+<div class="section-title">
+  <span class="num">01</span>
+  <h2>Schedule states</h2>
+  <p>How the timeline reads across the day, including before and after the active window.</p>
+</div>
+
+<div id="root-schedule"></div>
+
+<!-- Section 2 — header alternatives -->
+<div class="section-title">
+  <span class="num">02</span>
+  <h2>Header alternatives</h2>
+  <p>The header slot can carry the current day, or swap to a live clock when the time-of-day matters more.</p>
+</div>
+
+<div id="root-headers"></div>
+
+<script type="text/babel">
+const { useState } = React;
+
+/* ---------- schedule (every 90 min, 7am – 10pm) ---------- */
+const intervalMin = 90;
+const schedule = buildSchedule(7, 22, intervalMin);
+const goal = 2200;
+
+/* canned states */
+const STATES = {
+  morning: {
+    label: "Morning · 0 mL",
+    tone: "Day just opened. Empty log. First reminder ahead.",
+    nowMin: 7 * 60 + 12,
+    log: [],
+    headerVariant: "date",
+  },
+  midday: {
+    label: "Midday · in progress",
+    tone: "Now-pin between two slots; running total in the chip.",
+    nowMin: 13 * 60 + 20,
+    log: [
+      { time: "07:30 a.m.", amount: 250 },
+      { time: "09:05 a.m.", amount: 200 },
+      { time: "11:00 a.m.", amount: 150 },
+      { time: "12:45 p.m.", amount: 150 },
+    ],
+    headerVariant: "date",
+  },
+  evening: {
+    label: "Evening · catching up",
+    tone: "Most slots passed; goal nearly reached.",
+    nowMin: 18 * 60 + 5,
+    log: [
+      { time: "07:30 a.m.", amount: 250 },
+      { time: "09:05 a.m.", amount: 200 },
+      { time: "11:00 a.m.", amount: 150 },
+      { time: "12:45 p.m.", amount: 250 },
+      { time: "02:10 p.m.", amount: 300 },
+      { time: "03:50 p.m.", amount: 200 },
+      { time: "05:25 p.m.", amount: 150 },
+    ],
+    headerVariant: "date",
+  },
+  quiet: {
+    label: "Out of active hours",
+    tone: "11:40 p.m. — past the window. Rail goes dormant; chip says when reminders resume.",
+    nowMin: 23 * 60 + 40,
+    log: [
+      { time: "07:30 a.m.", amount: 250 },
+      { time: "09:05 a.m.", amount: 200 },
+      { time: "11:00 a.m.", amount: 150 },
+      { time: "12:45 p.m.", amount: 250 },
+      { time: "02:10 p.m.", amount: 300 },
+      { time: "03:50 p.m.", amount: 200 },
+      { time: "05:25 p.m.", amount: 150 },
+      { time: "07:40 p.m.", amount: 250 },
+      { time: "09:15 p.m.", amount: 200 },
+    ],
+    headerVariant: "date",
+  },
+};
+
+function Frame({ idx, label, tone, children }) {
+  return (
+    <div className="frame-wrap">
+      <AndroidDevice width={390} height={780}>{children}</AndroidDevice>
+      <div className="frame-label">
+        <span><span className="num">{String(idx).padStart(2, "0")}</span>{label}</span>
+        <span className="tone">{tone}</span>
+      </div>
+    </div>
+  );
+}
+
+function MinimalFrame({ stateKey, idx, headerVariant, headerDate, headerTime }) {
+  const data = STATES[stateKey];
+  const current = data.log.reduce((s, x) => s + x.amount, 0);
+  return (
+    <Frame idx={idx} label={data.label} tone={data.tone}>
+      <div className="tab-host" style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+        <TodayMinimalScreen
+          current={current}
+          goal={goal}
+          log={data.log}
+          schedule={schedule}
+          intervalMin={intervalMin}
+          nowMin={data.nowMin}
+          headerVariant={headerVariant || data.headerVariant}
+          headerDate={headerDate || "Tue, May 12"}
+          headerTime={headerTime}
+          onAdd={() => {}}
+          onCustom={() => {}}
+          onSeeAll={() => {}}
+          onEditSchedule={() => {}}
+        />
+        <TabBar active="today" onChange={() => {}}/>
+      </div>
+    </Frame>
+  );
+}
+
+function ScheduleStates() {
+  return (
+    <div className="stage">
+      <MinimalFrame stateKey="morning" idx={1}/>
+      <MinimalFrame stateKey="midday"  idx={2}/>
+      <MinimalFrame stateKey="evening" idx={3}/>
+      <MinimalFrame stateKey="quiet"   idx={4}/>
+    </div>
+  );
+}
+
+function HeaderAlternatives() {
+  return (
+    <div className="stage">
+      <MinimalFrame
+        stateKey="midday" idx={5}
+        headerVariant="date"
+        headerDate="Tue, May 12"
+      />
+      <MinimalFrame
+        stateKey="midday" idx={6}
+        headerVariant="clock"
+        headerDate="Tue, May 12"
+        headerTime="1:20 p.m."
+      />
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root-schedule")).render(<ScheduleStates/>);
+ReactDOM.createRoot(document.getElementById("root-headers")).render(<HeaderAlternatives/>);
+</script>
+</body>
+</html>

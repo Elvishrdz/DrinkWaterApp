@@ -12,7 +12,15 @@ To fix (prio)
 limit amount of presets
 hide vs preivous period if we dont have a previous period to compare.
 error de calculo cuando ajustamos horas y el valor queda antes, la siguiente hora se programa hasta
-el dia siguiente (ejemplo de 6 a 17 a las 10:3
+el dia siguiente (ejemplo de 6 a 17 a las 10:3[assets](../../../Downloads/Drink%20Water%20Design%20System%20%281%29/assets)
+[colors_and_type.css](../../../Downloads/Drink%20Water%20Design%20System%20%281%29/colors_and_type.css)
+[Drink Water - Mobile UI Kit.html](../../../Downloads/Drink%20Water%20Design%20System%20%281%29/Drink%20Water%20-%20Mobile%20UI%20Kit.html)
+[preview](../../../Downloads/Drink%20Water%20Design%20System%20%281%29/preview)
+[README.md](../../../Downloads/Drink%20Water%20Design%20System%20%281%29/README.md)
+[scraps](../../../Downloads/Drink%20Water%20Design%20System%20%281%29/scraps)
+[SKILL.md](../../../Downloads/Drink%20Water%20Design%20System%20%281%29/SKILL.md)
+[ui_kits](../../../Downloads/Drink%20Water%20Design%20System%20%281%29/ui_kits)
+[uploads](../../../Downloads/Drink%20Water%20Design%20System%20%281%29/uploads)
 recibi alarma y el valor no cambio, la siguiente alarma es a las 10:3 del dia siguiente.) revisar
 calculo y si la alarma llega antes, de la hora no
 usar hora actual, sino que calcule un poco mas a la siguiente hora.

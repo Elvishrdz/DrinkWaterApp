@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Drink Water — First-launch consent (v3 + v2)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link rel="stylesheet" href="../../colors_and_type.css"/>
+<link rel="stylesheet" href="../mobile/components.css"/>
+<link rel="stylesheet" href="../mobile/screens.css"/>
+<link rel="stylesheet" href="consent.css"/>
+<style>
+  body {
+    background: var(--md-sys-color-background);
+    padding: 32px 24px 96px 24px; min-height: 100vh;
+    font-family: var(--font-body);
+  }
+  .page-head { max-width: 980px; margin: 0 auto 28px auto; text-align: center; }
+  .page-head .eyebrow {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--md-sys-color-primary);
+    letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px;
+  }
+  .page-head h1 {
+    font-family: var(--font-display); font-weight: 700; font-size: 28px;
+    color: var(--md-sys-color-on-background);
+    margin: 0 0 8px 0; letter-spacing: -0.01em;
+  }
+  .page-head p {
+    font-size: 14px; color: var(--md-sys-color-on-surface-variant);
+    margin: 0 auto; line-height: 1.5; max-width: 640px;
+  }
+
+  /* theme bands */
+  .band {
+    max-width: 1700px; margin: 32px auto 0 auto;
+    padding: 24px 24px 28px 24px;
+    border-radius: var(--r-xl);
+    border: 1px solid var(--md-sys-color-outline-variant);
+    background: var(--md-sys-color-surface);
+    box-shadow: var(--shadow-1);
+  }
+  .band.dark {
+    background: #0B1418;
+    border-color: rgba(255,255,255,0.08);
+  }
+  .band-head {
+    display: flex; align-items: baseline; gap: 14px;
+    margin-bottom: 22px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  }
+  .band.dark .band-head { border-bottom-color: rgba(255,255,255,0.08); }
+  .band-head .pill {
+    font-family: var(--font-rounded); font-weight: 800; font-size: 11px;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 5px 12px; border-radius: var(--r-pill);
+    background: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+  }
+  .band.dark .band-head .pill { background: #7CC9E8; color: #003449; }
+  .band-head h2 {
+    font-family: var(--font-display); font-weight: 700; font-size: 20px;
+    margin: 0; letter-spacing: -0.01em;
+    color: var(--md-sys-color-on-surface);
+  }
+  .band.dark .band-head h2 { color: #E2EBF0; }
+  .band-head p {
+    font-size: 13px; margin: 0 0 0 auto; max-width: 480px; text-align: right;
+    color: var(--md-sys-color-on-surface-variant);
+  }
+  .band.dark .band-head p { color: #A6B8C2; }
+
+  .row {
+    display: flex; gap: 28px; flex-wrap: wrap; justify-content: center;
+  }
+  .group {
+    display: flex; flex-direction: column; gap: 14px; align-items: center;
+    padding: 6px 6px;
+  }
+  .group-title {
+    font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--md-sys-color-on-surface-variant);
+    padding: 4px 12px; border-radius: var(--r-pill);
+    background: var(--md-sys-color-surface-container);
+    border: 1px solid var(--md-sys-color-outline-variant);
+  }
+  .band.dark .group-title {
+    color: #A6B8C2;
+    background: #182530;
+    border-color: rgba(255,255,255,0.08);
+  }
+  .group-frames { display: flex; gap: 22px; flex-wrap: wrap; justify-content: center; }
+  .frame-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .frame-label {
+    font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: 0.10em; text-transform: uppercase;
+    color: var(--md-sys-color-on-surface-variant);
+  }
+  .band.dark .frame-label { color: #A6B8C2; }
+  .frame-label .num {
+    color: var(--md-sys-color-primary); font-weight: 700; margin-right: 6px;
+  }
+  .band.dark .frame-label .num { color: #7CC9E8; }
+</style>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="../mobile/android-frame.jsx"></script>
+<script type="text/babel" src="../mobile/Components.jsx"></script>
+<script type="text/babel" src="../mobile/Screens.jsx"></script>
+<script type="text/babel" src="Consent.jsx"></script>
+</head>
+
+<body>
+
+<div class="page-head">
+  <div class="eyebrow">Drink Water · First-launch consent</div>
+  <h1>Two directions, side by side</h1>
+  <p>
+    Direction A keeps the wave compact and lets the white sheet overlap it,
+    surfacing the policy front and centre. Direction B uses a taller wave
+    with a back arrow and a centred medallion, in line with the onboarding
+    screenshots. Both render in light and dark from the same Material 3
+    tokens.
+  </p>
+</div>
+
+<div class="band">
+  <div class="band-head">
+    <span class="pill">Light</span>
+    <h2>Light theme</h2>
+    <p>Same components, M3 light scheme. Per-screen colour kept — water-blue for privacy, magenta for tracking.</p>
+  </div>
+
+  <div class="row" id="root-light"></div>
+</div>
+
+<div class="band dark">
+  <div class="band-head">
+    <span class="pill">Dark</span>
+    <h2>Dark theme</h2>
+    <p>Theme flipped via <code style="font-family:var(--font-mono);font-size:11px;color:#7CC9E8">data-theme="dark"</code>. Component code is untouched.</p>
+  </div>
+
+  <div class="row" id="root-dark"></div>
+</div>
+
+<script type="text/babel">
+function FrameCard({ idx, label, children }) {
+  return (
+    <div className="frame-wrap">
+      <AndroidDevice width={390} height={780}>{children}</AndroidDevice>
+      <div className="frame-label">
+        <span className="num">{String(idx).padStart(2,"0")}</span>{label}
+      </div>
+    </div>
+  );
+}
+
+function Flow() {
+  return (
+    <>
+      <div className="group">
+        <div className="group-title">Direction A · Overlap sheet</div>
+        <div className="group-frames">
+          <FrameCard idx={1} label="Privacy policy">
+            <PrivacyPolicyScreenAlt onAccept={() => {}} onOpenWeb={() => {}}/>
+          </FrameCard>
+          <FrameCard idx={2} label="Anonymous usage">
+            <AnalyticsConsentScreenAlt onDecide={() => {}}/>
+          </FrameCard>
+        </div>
+      </div>
+
+      <div className="group">
+        <div className="group-title">Direction B · Tall wave + medallion</div>
+        <div className="group-frames">
+          <FrameCard idx={3} label="Privacy policy">
+            <PrivacyPolicyScreen onAccept={() => {}} onOpenWeb={() => {}} onBack={() => {}}/>
+          </FrameCard>
+          <FrameCard idx={4} label="Anonymous usage">
+            <AnalyticsConsentScreen onDecide={() => {}} onBack={() => {}}/>
+          </FrameCard>
+        </div>
+      </div>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root-light")).render(<Flow/>);
+
+function DarkFlow() {
+  return (
+    <div data-theme="dark" style={{ display: "contents" }}>
+      <Flow/>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root-dark")).render(<DarkFlow/>);
+</script>
+</body>
+</html>

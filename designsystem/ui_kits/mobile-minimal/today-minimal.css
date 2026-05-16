@@ -1,0 +1,314 @@
+/* Drink Water — Minimal Today (Reminder-first) screen styles
+   Rail is intentionally label-light: only endpoints + the active now-pin
+   carry text, so the design holds up under bigger system font sizes. */
+
+.dw-screen-today--minimal {
+  gap: 14px;
+  padding: 16px 16px 12px 16px;
+}
+
+/* ============================================================
+   COMPACT HEADER
+   ============================================================ */
+.dw-min-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.dw-min-eyebrow {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--md-sys-color-on-surface-variant);
+}
+.dw-min-date {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--md-sys-color-on-surface);
+  margin: 2px 0 0 0;
+  letter-spacing: -0.01em;
+}
+.dw-min-subtle {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--md-sys-color-on-surface-variant);
+  margin-top: 2px;
+}
+.dw-min-goalpill {
+  font-family: var(--font-rounded);
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--md-sys-color-on-primary-container);
+  background: var(--md-sys-color-primary-container);
+  border-radius: var(--r-pill);
+  padding: 7px 13px;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  white-space: nowrap;
+}
+
+/* ============================================================
+   REMINDER CARD
+   ============================================================ */
+.dw-reminder-card {
+  background: var(--md-sys-color-surface);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--r-lg);
+  padding: 16px 16px 14px 16px;
+  box-shadow: var(--shadow-1);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.dw-reminder-card.is-quiet {
+  background: var(--md-sys-color-surface-container-low);
+  border-style: dashed;
+}
+
+.dw-reminder-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.dw-reminder-head > div:first-child {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.dw-reminder-eyebrow {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--md-sys-color-on-surface-variant);
+}
+.dw-reminder-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--md-sys-color-on-surface);
+  margin: 2px 0 0 0;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dw-reminder-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  color: var(--md-sys-color-on-surface-variant);
+  font-family: var(--font-rounded);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 6px 10px;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: all 160ms var(--ease-out);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.dw-reminder-edit:hover {
+  color: var(--md-sys-color-secondary);
+  border-color: var(--md-sys-color-secondary);
+}
+
+/* ============================================================
+   NEXT-REMINDER CHIP
+   ============================================================ */
+.dw-reminder-next {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--md-sys-color-secondary-container);
+  border-radius: var(--r-md);
+  color: var(--md-sys-color-on-secondary-container);
+}
+.dw-reminder-next .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--md-sys-color-secondary);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--md-sys-color-secondary) 22%, transparent);
+  flex-shrink: 0;
+  animation: dw-pulse 2s ease-in-out infinite;
+}
+@keyframes dw-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(1.15); opacity: 0.7; }
+}
+.dw-reminder-next-meta { display: flex; flex-direction: column; line-height: 1.2; }
+.dw-reminder-next-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.dw-reminder-next-time {
+  font-family: var(--font-rounded);
+  font-weight: 800;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.dw-reminder-next--upcoming {
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+.dw-reminder-next--upcoming .dot { background: var(--md-sys-color-primary);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--md-sys-color-primary) 22%, transparent); }
+.dw-reminder-next--quiet {
+  background: var(--md-sys-color-surface-container);
+  color: var(--md-sys-color-on-surface-variant);
+}
+.dw-reminder-next--quiet .dot {
+  background: var(--md-sys-color-outline);
+  animation: none;
+  box-shadow: none;
+}
+
+/* ============================================================
+   RAIL — slim, label-light
+   ============================================================ */
+.dw-rail-wrap {
+  position: relative;
+  padding: 28px 8px 6px 8px;
+}
+.dw-rail-track {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 4px;
+  border-radius: 4px;
+  background: var(--md-sys-color-surface-container-high);
+  overflow: hidden;
+}
+.dw-rail-fill {
+  height: 100%;
+  background: linear-gradient(90deg,
+    var(--md-sys-color-primary) 0%,
+    var(--md-sys-color-secondary) 100%);
+  border-radius: 4px;
+  transition: width 400ms var(--ease-out);
+}
+
+/* dot row sits over the track */
+.dw-rail-dots {
+  position: relative;
+  height: 24px;
+}
+.dw-rail-dot {
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--md-sys-color-surface);
+  border: 2px solid var(--md-sys-color-outline);
+  box-shadow: 0 0 0 3px var(--md-sys-color-surface);
+  transform: translate(-50%, -50%);
+  transition: all 200ms var(--ease-out);
+}
+.dw-rail-dot.is-passed {
+  background: var(--md-sys-color-primary);
+  border-color: var(--md-sys-color-primary);
+}
+.dw-rail-dot.is-next {
+  background: var(--md-sys-color-secondary);
+  border-color: var(--md-sys-color-secondary);
+  width: 14px;
+  height: 14px;
+  box-shadow: 0 0 0 3px var(--md-sys-color-surface),
+              0 0 0 6px color-mix(in oklab, var(--md-sys-color-secondary) 25%, transparent);
+}
+
+/* quiet-mode rail goes flat / dotted-out */
+.is-quiet .dw-rail-fill {
+  background: var(--md-sys-color-outline-variant);
+}
+.is-quiet .dw-rail-dot {
+  background: var(--md-sys-color-surface-container-low);
+  border-color: var(--md-sys-color-outline-variant);
+  box-shadow: 0 0 0 3px var(--md-sys-color-surface-container-low);
+}
+
+/* the now pin — single floating callout above the active position */
+.dw-rail-now {
+  position: absolute;
+  top: 50%;
+  width: 2px;
+  height: 24px;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+  pointer-events: none;
+}
+.dw-rail-now-pin {
+  position: absolute;
+  inset: 0;
+  background: var(--md-sys-color-accent-pop);
+  border-radius: 2px;
+}
+.dw-rail-now-label {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: var(--md-sys-color-accent-pop);
+  color: #fff;
+  font-family: var(--font-rounded);
+  font-weight: 800;
+  padding: 4px 8px 4px 8px;
+  border-radius: var(--r-pill);
+  box-shadow: 0 4px 12px color-mix(in oklab, var(--md-sys-color-accent-pop) 35%, transparent);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.dw-rail-now-label::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -3px;
+  width: 6px;
+  height: 6px;
+  background: var(--md-sys-color-accent-pop);
+  transform: translateX(-50%) rotate(45deg);
+}
+.dw-rail-now-time {
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+.dw-rail-now-total {
+  font-size: 11px;
+  opacity: 0.85;
+  padding-left: 6px;
+  border-left: 1px solid rgba(255,255,255,0.4);
+}
+
+/* endpoint anchors (start / end of window) */
+.dw-rail-anchors {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 2px 0 2px;
+  font-family: var(--font-rounded);
+  font-weight: 700;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--md-sys-color-on-surface-variant);
+  letter-spacing: 0.02em;
+}

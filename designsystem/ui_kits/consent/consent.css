@@ -1,0 +1,510 @@
+/* Drink Water — First-launch consent screens (v3)
+   Onboarding-style chrome: tall coloured wave + clean white sheet beneath. */
+
+.dw-cv2-screen {
+  background: var(--md-sys-color-surface);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ============================================================
+   WAVE HEADER
+   ============================================================ */
+.dw-cv2-wave {
+  position: relative;
+  flex-shrink: 0;
+  height: 168px;
+  padding: 14px 18px 0 18px;
+  overflow: hidden;
+  border-bottom-left-radius: 36px;
+  border-bottom-right-radius: 36px;
+  color: #fff;
+}
+.dw-cv2-wave.is-water    { background: var(--grad-water-hero); }
+.dw-cv2-wave.is-magenta  { background: var(--grad-magenta); }
+
+.dw-cv2-bubble {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  pointer-events: none;
+}
+.dw-cv2-bubble.b1 { width: 220px; height: 220px; right: -90px; top: -70px; }
+.dw-cv2-bubble.b2 { width: 160px; height: 160px; left: -80px;  top: -30px;
+                    background: rgba(255, 255, 255, 0.10); }
+.dw-cv2-bubble.b3 { width: 90px;  height: 90px;  right: 30px;  bottom: 30px;
+                    background: rgba(255, 255, 255, 0.12); }
+
+.dw-cv2-wave-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 4px 0 4px;
+}
+.dw-cv2-back {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: transparent;
+  border: 0;
+  color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background 160ms var(--ease-out);
+}
+.dw-cv2-back:hover { background: rgba(255, 255, 255, 0.18); }
+
+.dw-cv2-count {
+  font-family: var(--font-rounded);
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: #fff;
+}
+
+.dw-cv2-progress {
+  position: absolute;
+  left: 0; right: 0; bottom: 28px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.22);
+}
+.dw-cv2-progress-fill {
+  height: 100%;
+  background: #fff;
+  transition: width 320ms var(--ease-out);
+}
+
+/* ============================================================
+   SHEET (white surface — butts up to wave, no overlap)
+   ============================================================ */
+.dw-cv2-sheet {
+  flex: 1;
+  background: var(--md-sys-color-surface);
+  padding: 22px 22px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+
+/* ============================================================
+   MEDALLION (centred coloured circle with white glyph)
+   ============================================================ */
+.dw-cv2-medallion {
+  align-self: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 8px 22px color-mix(in oklab, var(--md-sys-color-shadow) 70%, transparent);
+  margin: -4px 0 6px 0;
+}
+.dw-cv2-medallion.is-water   { background: linear-gradient(180deg, #2DA0CC, var(--md-sys-color-primary)); }
+.dw-cv2-medallion.is-magenta { background: var(--grad-magenta); }
+
+/* ============================================================
+   TITLE + SUB
+   ============================================================ */
+.dw-cv2-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 1.18;
+  color: var(--md-sys-color-on-surface);
+  margin: 0;
+  letter-spacing: -0.012em;
+  text-align: center;
+  text-wrap: balance;
+}
+.dw-cv2-sub {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--md-sys-color-on-surface-variant);
+  margin: 0;
+  text-align: center;
+  text-wrap: pretty;
+  padding: 0 4px;
+}
+
+/* "Last updated · Read on web" row */
+.dw-cv2-updated-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 4px 0 4px;
+  margin-top: 4px;
+}
+.dw-cv2-updated-row > span {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--md-sys-color-on-surface-variant);
+  letter-spacing: 0.04em;
+}
+.dw-cv2-weblink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: 0;
+  padding: 4px 0;
+  cursor: pointer;
+  font-family: var(--font-rounded);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--md-sys-color-primary);
+}
+.dw-cv2-weblink:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* ============================================================
+   POLICY — soft-grey rounded card with scrollable text inside
+   ============================================================ */
+.dw-cv2-policy {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 14px 14px;
+  background: var(--md-sys-color-surface-container-low);
+  border-radius: var(--r-md);
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--md-sys-color-on-surface-variant);
+  scrollbar-width: thin;
+  scrollbar-color: var(--md-sys-color-outline) transparent;
+}
+.dw-cv2-policy::-webkit-scrollbar { width: 6px; }
+.dw-cv2-policy::-webkit-scrollbar-thumb {
+  background: var(--md-sys-color-outline);
+  border-radius: 3px;
+}
+.dw-cv2-policy p { margin: 0 0 10px 0; text-wrap: pretty; }
+.dw-cv2-policy p:last-child { margin-bottom: 0; }
+.dw-cv2-policy h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--md-sys-color-on-surface);
+  margin: 12px 0 6px 0;
+  letter-spacing: -0.005em;
+}
+.dw-cv2-policy h3:first-of-type { margin-top: 6px; }
+.dw-cv2-policy ul { padding-left: 18px; margin: 0 0 10px 0; }
+.dw-cv2-policy li { margin-bottom: 4px; }
+.dw-cv2-policy b  { color: var(--md-sys-color-on-surface); font-weight: 700; }
+.dw-cv2-policy a {
+  color: var(--md-sys-color-primary); font-weight: 600;
+  text-decoration: none;
+}
+.dw-cv2-policy a:hover { text-decoration: underline; }
+.dw-cv2-policy-lede {
+  background: var(--md-sys-color-surface);
+  border-radius: var(--r-sm);
+  padding: 10px 12px;
+  margin: 0 0 12px 0 !important;
+}
+.dw-cv2-policy-trailing {
+  border-top: 1px dashed var(--md-sys-color-outline-variant);
+  padding-top: 10px;
+  margin-top: 12px !important;
+  font-size: 11.5px;
+}
+
+/* ============================================================
+   AGREE CHECKBOX
+   ============================================================ */
+.dw-cv2-check {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--r-md);
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+  cursor: pointer;
+  user-select: none;
+  font-size: 13px;
+  line-height: 1.4;
+  font-weight: 500;
+}
+.dw-cv2-checkbox {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 2px solid var(--md-sys-color-primary);
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--md-sys-color-on-primary);
+  padding: 0;
+  flex-shrink: 0;
+  transition: all 160ms var(--ease-out);
+}
+.dw-cv2-checkbox.is-checked {
+  background: var(--md-sys-color-primary);
+  border-color: var(--md-sys-color-primary);
+}
+
+/* ============================================================
+   ANALYTICS — soft-grey card with three rows
+   ============================================================ */
+.dw-cv2-card {
+  background: var(--md-sys-color-surface-container-low);
+  border-radius: var(--r-md);
+  padding: 4px 4px;
+  margin-top: 6px;
+}
+.dw-cv2-card-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 12px;
+}
+.dw-cv2-card-row + .dw-cv2-card-row {
+  border-top: 1px solid var(--md-sys-color-outline-variant);
+}
+.dw-cv2-card-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.dw-cv2-card-icon.is-water {
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+.dw-cv2-card-icon.is-magenta {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+.dw-cv2-card-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--md-sys-color-on-surface);
+  line-height: 1.3;
+}
+.dw-cv2-card-sub {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--md-sys-color-on-surface-variant);
+  line-height: 1.4;
+  margin-top: 1px;
+}
+
+/* ============================================================
+   ACTIONS — pinned-to-bottom block of buttons
+   ============================================================ */
+.dw-cv2-actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding-top: 8px;
+}
+.dw-cv2-textlink {
+  background: transparent;
+  border: 0;
+  padding: 8px 10px;
+  cursor: pointer;
+  font-family: var(--font-rounded);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--md-sys-color-on-surface-variant);
+}
+.dw-cv2-textlink:hover { color: var(--md-sys-color-on-surface); }
+
+/* ============================================================
+   ALT (overlap-sheet) variant — previous direction
+   ============================================================ */
+.dw-cv-alt {
+  background: var(--md-sys-color-background);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+.dw-cv-alt-wave {
+  position: relative;
+  flex-shrink: 0;
+  padding: 32px 22px 40px 22px;
+  border-bottom-left-radius: 36px;
+  border-bottom-right-radius: 36px;
+  overflow: hidden;
+  color: #fff;
+}
+.dw-cv-alt-wave.is-water   { background: var(--grad-water-hero); }
+.dw-cv-alt-wave.is-magenta { background: var(--grad-magenta); }
+.dw-cv-alt-bubble {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  pointer-events: none;
+}
+.dw-cv-alt-bubble.b1 { width: 140px; height: 140px; right: -30px; top: -20px; }
+.dw-cv-alt-bubble.b2 { width:  90px; height:  90px; left:   8px; top:  60px;
+                       background: rgba(255, 255, 255, 0.09); }
+.dw-cv-alt-bubble.b3 { width:  60px; height:  60px; right:  60px; bottom: -10px;
+                       background: rgba(255, 255, 255, 0.12); }
+.dw-cv-alt-wave-mark {
+  position: relative;
+  width: 64px; height: 64px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.30);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 16px;
+}
+.dw-cv-alt-progress {
+  display: flex; gap: 6px; align-items: center;
+  margin-bottom: 10px;
+}
+.dw-cv-alt-progress span {
+  width: 22px; height: 5px; border-radius: 3px;
+  background: rgba(255, 255, 255, 0.30);
+}
+.dw-cv-alt-progress span.is-active { background: #fff; width: 30px; }
+.dw-cv-alt-progress span.is-done   { background: rgba(255, 255, 255, 0.65); }
+.dw-cv-alt-step {
+  font-family: var(--font-body);
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 6px;
+}
+.dw-cv-alt-title {
+  font-family: var(--font-display);
+  font-weight: 700; font-size: 26px; line-height: 1.18;
+  color: #fff; margin: 0; letter-spacing: -0.012em;
+}
+.dw-cv-alt-updated {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.80);
+  margin-top: 8px;
+  letter-spacing: 0.04em;
+}
+
+/* sheet overlaps the wave by ~22px */
+.dw-cv-alt-sheet {
+  flex: 1;
+  background: var(--md-sys-color-surface);
+  border-top-left-radius: 28px;
+  border-top-right-radius: 28px;
+  margin-top: -22px;
+  padding: 22px 22px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+  box-shadow: 0 -8px 24px color-mix(in oklab, var(--md-sys-color-shadow) 80%, transparent);
+}
+
+.dw-cv-alt-policy {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px;
+  background: var(--md-sys-color-surface-container-low);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--r-md);
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--md-sys-color-on-surface-variant);
+  scrollbar-width: thin;
+  scrollbar-color: var(--md-sys-color-outline) transparent;
+}
+.dw-cv-alt-policy::-webkit-scrollbar { width: 6px; }
+.dw-cv-alt-policy::-webkit-scrollbar-thumb {
+  background: var(--md-sys-color-outline); border-radius: 3px;
+}
+.dw-cv-alt-policy p  { margin: 0 0 10px 0; }
+.dw-cv-alt-policy p:last-child { margin-bottom: 0; }
+.dw-cv-alt-policy h3 {
+  font-family: var(--font-display);
+  font-weight: 700; font-size: 13px;
+  color: var(--md-sys-color-on-surface);
+  margin: 14px 0 6px 0; letter-spacing: -0.005em;
+}
+.dw-cv-alt-policy h3:first-of-type { margin-top: 8px; }
+.dw-cv-alt-policy ul { padding-left: 18px; margin: 0 0 10px 0; }
+.dw-cv-alt-policy li { margin-bottom: 4px; }
+.dw-cv-alt-policy b  { color: var(--md-sys-color-on-surface); font-weight: 700; }
+.dw-cv-alt-policy a  { color: var(--md-sys-color-primary); font-weight: 600; text-decoration: none; }
+.dw-cv-alt-policy a:hover { text-decoration: underline; }
+.dw-cv-alt-policy-lede {
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+  border-radius: var(--r-sm);
+  padding: 10px 12px;
+  margin: 0 0 12px 0 !important;
+  font-size: 12px;
+}
+.dw-cv-alt-policy-trailing {
+  border-top: 1px dashed var(--md-sys-color-outline-variant);
+  padding-top: 10px; margin-top: 12px !important; font-size: 11.5px;
+}
+.dw-cv-alt-weblink {
+  align-self: center;
+  display: inline-flex; align-items: center; gap: 6px;
+  background: transparent; border: 0; padding: 4px 2px;
+  cursor: pointer;
+  font-family: var(--font-rounded); font-weight: 700; font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--md-sys-color-primary);
+}
+.dw-cv-alt-weblink:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* alt analytics body */
+.dw-cv-alt-lede {
+  font-family: var(--font-body);
+  font-size: 14px; line-height: 1.55;
+  color: var(--md-sys-color-on-surface-variant);
+  margin: 4px 0 4px 0;
+  text-wrap: pretty;
+}
+.dw-cv-alt-lede b { color: var(--md-sys-color-on-surface); font-weight: 700; }
+.dw-cv-alt-preview {
+  background: var(--md-sys-color-surface-container-low);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--r-md);
+  padding: 14px 14px 12px 14px;
+  margin-top: 4px;
+}
+.dw-cv-alt-preview-eyebrow {
+  font-family: var(--font-body);
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--md-sys-color-on-surface-variant);
+  margin-bottom: 8px;
+}
+.dw-cv-alt-preview-rows { display: flex; flex-direction: column; gap: 6px; }
+.dw-cv-alt-preview-rows > div { display: flex; align-items: center; gap: 8px; }
+.dw-cv-alt-preview-rows .pill {
+  font-family: var(--font-body);
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 2px 6px; border-radius: var(--r-pill);
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+.dw-cv-alt-preview-rows code {
+  font-family: var(--font-mono); font-size: 12px;
+  color: var(--md-sys-color-on-surface); font-weight: 500;
+}
+.dw-cv-alt-preview-foot {
+  margin-top: 10px; padding-top: 8px;
+  border-top: 1px dashed var(--md-sys-color-outline-variant);
+  font-family: var(--font-body); font-size: 11px;
+  color: var(--md-sys-color-on-surface-variant);
+}
