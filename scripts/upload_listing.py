@@ -159,38 +159,40 @@ def upload_text(service, edit_id, locale, locale_dir):
         _record(locale, "text", ok=False, error=str(e))
 
 
+def _image_sort_key(p: Path):
+    """Numeric sort for filenames like 1.png, 2.png, 10.png; alphabetical fallback."""
+    try:
+        return (0, int(p.stem), "")
+    except ValueError:
+        return (1, 0, p.name.lower())
+
+
 def upload_images(service, edit_id, locale, locale_dir):
     images_dir = locale_dir / "images"
     if not images_dir.is_dir():
-        print(f"  No images/ directory found for {locale}, skipping images.")
+        print(f"  No images/ directory — skipping all image types for {locale}.")
         return
 
-    found_any = False
-    for folder in sorted(images_dir.iterdir()):
+    for folder_name, image_type in FOLDER_TO_IMAGE_TYPE.items():
+        folder = images_dir / folder_name
+
+        # Folder absent → skip silently, not a failure
         if not folder.is_dir():
             continue
-
-        image_type = FOLDER_TO_IMAGE_TYPE.get(folder.name)
-        if not image_type:
-            print(f"  Skipping unrecognised folder: {folder.name}")
-            continue
-
-        def _sort_key(p: Path):
-            try:
-                return (0, int(p.stem), "")
-            except ValueError:
-                return (1, 0, p.name.lower())
 
         image_files = sorted(
             (f for f in folder.iterdir()
              if f.is_file() and f.suffix.lower() in {".png", ".jpg", ".jpeg"}),
-            key=_sort_key,
+            key=_image_sort_key,
         )
+
+        # Folder present but empty → skip silently, not a failure
         if not image_files:
+            print(f"  [{folder_name}] empty — skipped.")
             continue
 
-        found_any = True
-        print(f"  [{folder.name} → {image_type}] {len(image_files)} file(s) — upload order:")
+        # Folder present and has content → attempt upload
+        print(f"  [{folder_name} → {image_type}] {len(image_files)} file(s) — upload order:")
         for i, f in enumerate(image_files, 1):
             print(f"    {i}. {f.name}")
 
@@ -221,9 +223,6 @@ def upload_images(service, edit_id, locale, locale_dir):
         except Exception as e:
             print(f"  ✗ {image_type} failed: {e}")
             _record(locale, image_type, ok=False, error=str(e))
-
-    if not found_any:
-        print(f"  No image files found for {locale}, skipping images.")
 
 
 # ── Entry point ────────────────────────────────────────────────────────────────
