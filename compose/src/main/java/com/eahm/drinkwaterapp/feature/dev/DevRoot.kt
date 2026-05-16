@@ -56,6 +56,7 @@ import com.eahm.drinkwaterapp.feature.dev.alarms.AlarmsRoot
 import com.eahm.drinkwaterapp.feature.dev.analytics.AnalyticsRoot
 import com.eahm.drinkwaterapp.feature.dev.billing.BillingDevRoot
 import com.eahm.drinkwaterapp.feature.dev.celebrations.CelebrationsRoot
+import com.eahm.drinkwaterapp.feature.dev.consent.ConsentDevRoot
 import com.eahm.drinkwaterapp.feature.dev.dailygoal.DailyGoalDevRoot
 import com.eahm.drinkwaterapp.feature.dev.exactalarm.ExactAlarmDevRoot
 import com.eahm.drinkwaterapp.feature.dev.menu.DevMenuRoot
@@ -92,6 +93,7 @@ enum class DevDestination(
     DAILY_GOAL("Daily Goal", DwIcons.Drop),
     STREAK("Streak", DwIcons.Star),
     NOTIFICATION("Notification", DwIcons.Bell),
+    CONSENT("Consent", DwIcons.Flag),
     ONBOARDING("OnBoarding", DwIcons.Sun),
     CELEBRATIONS("Celebrations", DwIcons.Flag),
     BILLING("Billing", DwIcons.Star),
@@ -183,6 +185,10 @@ internal fun DevRoot(onBackClicked: () -> Unit) {
             )
 
             DevDestination.NOTIFICATION -> NotificationsRoot(
+                onBackClicked = onBackClicked,
+            )
+
+            DevDestination.CONSENT -> ConsentDevRoot(
                 onBackClicked = onBackClicked,
             )
 

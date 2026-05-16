@@ -67,6 +67,10 @@ private class DataStorePrefsStorage(
         }
     }
 
+    override suspend fun clearPrivacyPolicyAccepted() {
+        dataStore.edit { it.remove(privacyPolicyAcceptedAtKey) }
+    }
+
     override fun getTrackingConsentDecided(): Flow<Boolean> {
         return dataStore.data.map { preferences ->
             preferences[trackingConsentDecidedKey] ?: false
@@ -78,6 +82,10 @@ private class DataStorePrefsStorage(
             preferences.toMutablePreferences()
                 .also { it[trackingConsentDecidedKey] = true }
         }
+    }
+
+    override suspend fun clearTrackingConsentDecided() {
+        dataStore.edit { it.remove(trackingConsentDecidedKey) }
     }
 
     override fun getOnboardingCompleted(): Flow<Boolean> {
@@ -232,9 +240,9 @@ private class DataStorePrefsStorage(
     }
 
     override suspend fun clear() {
+        clearPrivacyPolicyAccepted()
+        clearTrackingConsentDecided()
         dataStore.edit {
-            it.remove(privacyPolicyAcceptedAtKey)
-            it.remove(trackingConsentDecidedKey)
             it.remove(onboardingCompletedKey)
             it.remove(usernameKey)
             it.remove(drinkSuggestionsKey)

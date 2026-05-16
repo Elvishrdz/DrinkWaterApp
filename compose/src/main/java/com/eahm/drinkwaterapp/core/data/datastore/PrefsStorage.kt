@@ -8,9 +8,11 @@ interface PrefsStorage {
 
     fun getPrivacyPolicyAcceptedAt(): Flow<Long?>
     suspend fun setPrivacyPolicyAccepted(acceptedAt: Long)
+    suspend fun clearPrivacyPolicyAccepted()
 
     fun getTrackingConsentDecided(): Flow<Boolean>
     suspend fun setTrackingConsentDecided()
+    suspend fun clearTrackingConsentDecided()
 
     fun getOnboardingCompleted(): Flow<Boolean>
     suspend fun setOnboardingCompleted(value: Boolean)
