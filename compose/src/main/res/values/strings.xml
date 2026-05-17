@@ -153,6 +153,28 @@
     <string name="onb_overlay_card_preview_stat_drinks">drinks</string>
     <string name="onb_overlay_card_preview_stat_streak">day streak</string>
 
+    <!-- Onboarding — Exact Alarm: Request -->
+    <string name="onb_exact_alarm_title">Alarms that arrive on time</string>
+    <string name="onb_exact_alarm_subtitle">Allow the app to schedule precise alarms so your reminders fire exactly when you expect them.</string>
+    <string name="onb_exact_alarm_cta_allow">Allow exact alarms</string>
+    <string name="onb_exact_alarm_cta_skip">Skip, use approximate timing</string>
+    <!-- Onboarding — Exact Alarm: Granted -->
+    <string name="onb_exact_alarm_granted_title">Exact alarms are on</string>
+    <string name="onb_exact_alarm_granted_subtitle">Your reminders will fire precisely on schedule, every time.</string>
+    <!-- Onboarding — Exact Alarm: How-to steps -->
+    <string name="onb_exact_alarm_steps_header">How to enable</string>
+    <string name="onb_exact_alarm_step_1">Tap \"Allow exact alarms\" below.</string>
+    <string name="onb_exact_alarm_step_2">Find DrinkWater in the list.</string>
+    <string name="onb_exact_alarm_step_3">Toggle \"Alarms &amp; reminders\" on.</string>
+    <string name="onb_exact_alarm_step_4">Press back, we\'ll continue automatically.</string>
+    <!-- Onboarding — Exact Alarm: Benefits -->
+    <string name="onb_exact_alarm_benefit_timing_label">Fires at the right moment</string>
+    <string name="onb_exact_alarm_benefit_timing_description">Reminders arrive exactly when scheduled, not delayed by the system.</string>
+    <string name="onb_exact_alarm_benefit_reliable_label">Battery-safe and reliable</string>
+    <string name="onb_exact_alarm_benefit_reliable_description">Works even with battery optimization, so you never miss a reminder.</string>
+    <string name="onb_exact_alarm_benefit_habit_label">Builds a consistent habit</string>
+    <string name="onb_exact_alarm_benefit_habit_description">Steady timing makes it easier to remember and track your hydration throughout the day.</string>
+
     <!-- Onboarding — Done -->
     <string name="onb_done_title">You\'re all set!</string>
     <string name="onb_done_title_with_name">You\'re all set, %1$s</string>

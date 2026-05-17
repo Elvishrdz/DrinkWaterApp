@@ -1,5 +1,7 @@
 package com.eahm.drinkwaterapp.feature.onboarding
 
+import android.app.AlarmManager
+import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -22,6 +24,7 @@ import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps.Summary
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.LocalOnboardingProgress
 import com.eahm.drinkwaterapp.feature.onboarding.ui.steps.StepActivity
 import com.eahm.drinkwaterapp.feature.onboarding.ui.steps.StepDone
+import com.eahm.drinkwaterapp.feature.onboarding.ui.steps.StepExactAlarm
 import com.eahm.drinkwaterapp.feature.onboarding.ui.steps.StepGender
 import com.eahm.drinkwaterapp.feature.onboarding.ui.steps.StepInterval
 import com.eahm.drinkwaterapp.feature.onboarding.ui.steps.StepIntro
@@ -60,6 +63,34 @@ internal fun OnboardingScreen(
             )
         )
     }
+
+    // Exact alarm permission launcher (Android 12+).
+    // Auto-advances when the user grants the permission and returns to the app.
+    val exactAlarmLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+    ) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val alarmManager = context.getSystemService(AlarmManager::class.java)
+            if (alarmManager?.canScheduleExactAlarms() == true) {
+                viewModel.nextStep()
+            }
+        }
+    }
+
+    fun requestExactAlarmPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            exactAlarmLauncher.launch(
+                android.content.Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+            )
+        }
+    }
+
+    fun canScheduleExactAlarms(): Boolean =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            context.getSystemService(AlarmManager::class.java)?.canScheduleExactAlarms() == true
+        } else {
+            true
+        }
 
     val animatedProgress by animateFloatAsState(
         targetValue = state.step.toFloat() / OnboardingSteps.totalSteps.toFloat(),
@@ -111,13 +142,22 @@ internal fun OnboardingScreen(
             )
 
             // Permission check + amount config are handled inside StepNotifs.
-            // onNext and onSkip both advance to Summary (step 7).
+            // onNext and onSkip both advance to ExactAlarm (step 7).
             RemindersSteps.Notification -> StepNotifs(
                 step = state.step,
                 intervalMinutes = state.intervalMinutes,
                 notifAmountMl = state.notifAmountMl,
                 onAmountChange = viewModel::onNotifAmountChange,
                 onNext = { viewModel.nextStep() },
+                onSkip = { viewModel.nextStep() },
+                onBack = { viewModel.prevStep() },
+            )
+
+            RemindersSteps.ExactAlarm -> StepExactAlarm(
+                step = state.step,
+                exactAlarmGranted = canScheduleExactAlarms(),
+                onAllow = { requestExactAlarmPermission() },
+                onContinue = { viewModel.nextStep() },
                 onSkip = { viewModel.nextStep() },
                 onBack = { viewModel.prevStep() },
             )

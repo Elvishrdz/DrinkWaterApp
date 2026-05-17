@@ -53,6 +53,7 @@ sealed interface OnboardingSteps {
         data object EndTime : RemindersSteps
         data object Interval : RemindersSteps
         data object Notification : RemindersSteps
+        data object ExactAlarm : RemindersSteps
     }
 
     data object Celebrations : OnboardingSteps
@@ -63,7 +64,7 @@ sealed interface OnboardingSteps {
 }
 
 
-internal val OnboardingSteps.Companion.totalSteps: Int get() = 8
+internal val OnboardingSteps.Companion.totalSteps: Int get() = 9
 
 fun OnboardingSteps.Companion.byStep(step: Int) = when (step) {
     1 -> OnboardingSteps.Intro
@@ -73,7 +74,8 @@ fun OnboardingSteps.Companion.byStep(step: Int) = when (step) {
     4 -> OnboardingSteps.RemindersSteps.EndTime
     5 -> OnboardingSteps.RemindersSteps.Interval
     6 -> OnboardingSteps.RemindersSteps.Notification
-    7 -> OnboardingSteps.Celebrations
+    7 -> OnboardingSteps.RemindersSteps.ExactAlarm
+    8 -> OnboardingSteps.Celebrations
 
     totalSteps -> OnboardingSteps.Summary
     else -> OnboardingSteps.Intro

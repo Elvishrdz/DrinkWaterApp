@@ -150,6 +150,28 @@
     <string name="onb_overlay_card_preview_stat_drinks">bebidas</string>
     <string name="onb_overlay_card_preview_stat_streak">días seguidos</string>
 
+    <!-- Onboarding — Alarma exacta: Solicitud -->
+    <string name="onb_exact_alarm_title">Alarmas que llegan a tiempo</string>
+    <string name="onb_exact_alarm_subtitle">Permite que la app programe alarmas precisas para que tus recordatorios suenen exactamente cuando los esperas.</string>
+    <string name="onb_exact_alarm_cta_allow">Permitir alarmas exactas</string>
+    <string name="onb_exact_alarm_cta_skip">Omitir, usar tiempo aproximado</string>
+    <!-- Onboarding — Alarma exacta: Concedido -->
+    <string name="onb_exact_alarm_granted_title">Alarmas exactas activadas</string>
+    <string name="onb_exact_alarm_granted_subtitle">Tus recordatorios sonarán con precisión en el horario programado, siempre.</string>
+    <!-- Onboarding — Alarma exacta: Pasos -->
+    <string name="onb_exact_alarm_steps_header">Cómo activarlo</string>
+    <string name="onb_exact_alarm_step_1">Toca \"Permitir alarmas exactas\" abajo.</string>
+    <string name="onb_exact_alarm_step_2">Encuentra DrinkWater en la lista.</string>
+    <string name="onb_exact_alarm_step_3">Activa \"Alarmas y recordatorios\".</string>
+    <string name="onb_exact_alarm_step_4">Presiona atrás, continuaremos automáticamente.</string>
+    <!-- Onboarding — Alarma exacta: Beneficios -->
+    <string name="onb_exact_alarm_benefit_timing_label">Suena en el momento exacto</string>
+    <string name="onb_exact_alarm_benefit_timing_description">Los recordatorios llegan exactamente cuando se programan, sin retrasos del sistema.</string>
+    <string name="onb_exact_alarm_benefit_reliable_label">Confiable y sin gastar batería</string>
+    <string name="onb_exact_alarm_benefit_reliable_description">Funciona incluso con la optimización de batería activa, para que nunca te pierdas un recordatorio.</string>
+    <string name="onb_exact_alarm_benefit_habit_label">Construye un hábito constante</string>
+    <string name="onb_exact_alarm_benefit_habit_description">Un horario estable hace más fácil recordar y registrar tu hidratación durante el día.</string>
+
     <!-- Onboarding — Listo -->
     <string name="onb_done_title">¡Todo listo!</string>
     <string name="onb_done_title_with_name">¡Todo listo, %1$s!</string>
