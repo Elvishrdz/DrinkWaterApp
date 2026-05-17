@@ -6,6 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -21,6 +23,10 @@ internal fun AlarmsRoot(onBackClicked: () -> Unit) {
                 AlarmsEvent.OnResumeCalled -> snackbarHostState.showSnackbar("On resume call completed")
             }
         }
+    }
+
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        viewModel.onAction(AlarmsAction.RefreshPermissionState)
     }
 
     BackHandler(onBack = onBackClicked)

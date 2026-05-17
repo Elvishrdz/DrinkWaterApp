@@ -16,8 +16,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -48,6 +51,8 @@ import com.eahm.drinkwaterapp.feature.dev.alarms.countdown.AlarmCountdown
 import com.eahm.drinkwaterapp.feature.dev.alarms.countdown.CountdownConfig
 import com.eahm.drinkwaterapp.feature.dev.alarms.countdown.CountdownUnit
 import com.eahm.drinkwaterapp.system.alarm.AlarmStorageInfo
+import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorButton
+import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -87,6 +92,7 @@ private fun DataContent(state: AlarmsState.Data, onAction: (AlarmsAction) -> Uni
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp, vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -185,12 +191,23 @@ private fun DataContent(state: AlarmsState.Data, onAction: (AlarmsAction) -> Uni
             text = "Call on resume now",
             onClick = { onAction(AlarmsAction.OnResumeCalled) },
         )
+
+        Spacer(Modifier.height(8.dp))
+        HorizontalDivider()
+        Spacer(Modifier.height(8.dp))
+
+        Text(
+            text = "Exact Alarm Dev",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+        )
+
+        ExactAlarmSection(state, onAction)
     }
 }
 
 @Composable
 private fun RequestScheduleExactAlarmsAuthorizationButton() {
-    // TODO: onResume check scheduleExactAlarms state again
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return
 
     val context = LocalContext.current
@@ -201,7 +218,6 @@ private fun RequestScheduleExactAlarmsAuthorizationButton() {
             val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
             }
-
             context.startActivity(intent)
         },
     )
@@ -220,12 +236,7 @@ private fun RequestNotificationPermissionButton(
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
-        if (isGranted) {
-            onGranted()
-
-        } else {
-            goToSettings = true
-        }
+        if (isGranted) onGranted() else goToSettings = true
     }
 
     val requestPermission: () -> Unit = {
@@ -233,28 +244,15 @@ private fun RequestNotificationPermissionButton(
             context,
             Manifest.permission.POST_NOTIFICATIONS
         )
-
         when (PackageManager.PERMISSION_GRANTED) {
-            status -> {
-                onGranted()
-            }
-
-            else -> {
-                // Display permission request
-                launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
-            }
+            status -> onGranted()
+            else -> launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
 
     DwTertiaryButton(
         text = if (goToSettings) "Grant permission in app settings" else "Request Permission",
-        onClick = {
-            if (goToSettings) {
-                onOpenSettings()
-            } else {
-                requestPermission()
-            }
-        },
+        onClick = { if (goToSettings) onOpenSettings() else requestPermission() },
     )
 }
 
@@ -284,18 +282,123 @@ private fun AlarmCountdownContent(
                 hideLeadingZeroUnits = true,
             ),
         )
-
         DwPrimaryButton(
             text = "Stop alarm",
             onClick = { onAction(AlarmsAction.StopAlarm) },
         )
-
     } else {
         Text(
             text = "No active alarm",
             fontFamily = PlusJakartaSans,
             color = DwInk500,
         )
+    }
+}
+
+@Composable
+private fun ExactAlarmSection(state: AlarmsState.Data, onAction: (AlarmsAction) -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+
+        // --- Alarm type info ---
+        Text("Alarm type", style = MaterialTheme.typography.titleSmall)
+        Text(
+            "Scheduled as: ${
+                if (state.canScheduleExactAlarms) "EXACT (setExactAndAllowWhileIdle)"
+                else "INEXACT (setAndAllowWhileIdle)"
+            }"
+        )
+
+        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+
+        // --- AlarmSchedulerV2 test ---
+        Text("AlarmSchedulerV2 test", style = MaterialTheme.typography.titleSmall)
+
+        AppTimeSelectorButton(
+            text = "Alarm time: %02d:%02d".format(
+                state.selectedTime.hour,
+                state.selectedTime.minute,
+            ),
+            time = state.selectedTime,
+            onTimeSelected = { onAction(AlarmsAction.OnTestAlarmTimeSelected(it)) },
+        )
+
+        state.scheduledAsExact?.let { wasExact ->
+            Text("Scheduled as: ${if (wasExact) "EXACT" else "INEXACT"}")
+        }
+
+        ExactAlarmCountdownDisplay(
+            countdownMs = state.countdownMs,
+            scheduledAsExact = state.scheduledAsExact,
+        )
+
+        Spacer(Modifier.height(4.dp))
+
+        if (!state.isTestAlarmActive) {
+            DwPrimaryButton(
+                text = "Schedule test alarm",
+                onClick = { onAction(AlarmsAction.ScheduleTestAlarm) },
+            )
+        } else {
+            DwPrimaryButton(
+                text = "Cancel test alarm",
+                onClick = { onAction(AlarmsAction.CancelTestAlarm) },
+            )
+        }
+
+        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+
+        // --- Permission ---
+        Text("Permission", style = MaterialTheme.typography.titleSmall)
+        Text("SCHEDULE_EXACT_ALARM granted: ${state.canScheduleExactAlarms}")
+
+        state.lastPermissionEvent?.let {
+            Text(
+                text = "Last broadcast event: $it",
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+
+        Spacer(Modifier.height(4.dp))
+
+        DwPrimaryButton(
+            text = "Open Permission Settings",
+            onClick = { onAction(AlarmsAction.OpenExactAlarmPermissionSettings) },
+        )
+
+        DwPrimaryButton(
+            text = "Refresh permission state",
+            onClick = { onAction(AlarmsAction.RefreshPermissionState) },
+        )
+    }
+}
+
+@Composable
+private fun ExactAlarmCountdownDisplay(
+    countdownMs: Long?,
+    scheduledAsExact: Boolean?,
+) {
+    if (countdownMs == null) return
+
+    val isExact = scheduledAsExact == true
+    val text = when {
+        countdownMs <= 0 && isExact -> "Alarm will arrive soon"
+        countdownMs <= 0 -> "Alarm will arrive at any moment now"
+        !isExact && countdownMs <= INEXACT_THRESHOLD_MS -> "Alarm will arrive at any moment now"
+        else -> "Fires in ${formatExactAlarmCountdown(countdownMs)}${if (!isExact) " (approximate)" else ""}"
+    }
+
+    Text(text = text, style = MaterialTheme.typography.bodyLarge)
+}
+
+private fun formatExactAlarmCountdown(ms: Long): String {
+    val totalSeconds = ms / 1000
+    val hours = totalSeconds / 3600
+    val minutes = (totalSeconds % 3600) / 60
+    val seconds = totalSeconds % 60
+    return if (hours > 0) {
+        "%02d:%02d:%02d".format(hours, minutes, seconds)
+    } else {
+        "%02d:%02d".format(minutes, seconds)
     }
 }
 
@@ -315,6 +418,11 @@ private fun ActiveAlarmPreview() {
                 alarmTriggerAt = TimeResult(15, 30, 1, 0),
             ),
             inActiveHours = false,
+            isTestAlarmActive = false,
+            scheduledAsExact = null,
+            countdownMs = null,
+            selectedTime = TimeSelected(14, 30),
+            lastPermissionEvent = null,
         ),
         onAction = {},
         onBackClicked = {},
@@ -331,6 +439,11 @@ private fun NoActiveAlarmPreview() {
             isAlarmActive = false,
             alarmStorageInfo = null,
             inActiveHours = false,
+            isTestAlarmActive = true,
+            scheduledAsExact = true,
+            countdownMs = 47_000,
+            selectedTime = TimeSelected(14, 30),
+            lastPermissionEvent = "GRANTED — alarm rescheduled inexact → exact",
         ),
         onAction = {},
         onBackClicked = {},

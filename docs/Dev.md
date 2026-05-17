@@ -33,6 +33,8 @@ To Complete
 - [x] privacy policy and tracking request.
 - [x] fix remove ads bottom sheet on rotation bug
 - [] new alarm design (exact and inexact)
+  - 1. obtener permiso del usuario (onboarding/dev menu)
+  - 2. 
 - new alarm design (exact and inexact) - onboarding/settings integration
 - fix alarm bug
 - adaptive layouts

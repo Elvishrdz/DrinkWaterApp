@@ -58,7 +58,6 @@ import com.eahm.drinkwaterapp.feature.dev.billing.BillingDevRoot
 import com.eahm.drinkwaterapp.feature.dev.celebrations.CelebrationsRoot
 import com.eahm.drinkwaterapp.feature.dev.consent.ConsentDevRoot
 import com.eahm.drinkwaterapp.feature.dev.dailygoal.DailyGoalDevRoot
-import com.eahm.drinkwaterapp.feature.dev.exactalarm.ExactAlarmDevRoot
 import com.eahm.drinkwaterapp.feature.dev.menu.DevMenuRoot
 import com.eahm.drinkwaterapp.feature.dev.notifications.NotificationsRoot
 import com.eahm.drinkwaterapp.feature.dev.onboarding.OnboardingDevRoot
@@ -89,7 +88,6 @@ enum class DevDestination(
     ADAPTIVE("Adaptive", DwIcons.Wave),
     ALARM_CALCULATOR("Calculator", DwIcons.Clock),
     ALARM_INTERVALS("Intervals", DwIcons.Clock),
-    ALARMS("Alarms", DwIcons.Bell),
     DAILY_GOAL("Daily Goal", DwIcons.Drop),
     STREAK("Streak", DwIcons.Star),
     NOTIFICATION("Notification", DwIcons.Bell),
@@ -97,9 +95,9 @@ enum class DevDestination(
     ONBOARDING("OnBoarding", DwIcons.Sun),
     CELEBRATIONS("Celebrations", DwIcons.Flag),
     BILLING("Billing", DwIcons.Star),
-    EXACT_ALARM("Exact Alarm", DwIcons.Bell),
     ANALYTICS("Analytics", DwIcons.History),
     TRACKING("Tracking", DwIcons.Wave),
+    ALARMS("Alarms", DwIcons.Bell),
 }
 
 
@@ -172,10 +170,6 @@ internal fun DevRoot(onBackClicked: () -> Unit) {
                 onBackClicked = onBackClicked,
             )
 
-            DevDestination.ALARMS -> AlarmsRoot(
-                onBackClicked = onBackClicked,
-            )
-
             DevDestination.DAILY_GOAL -> DailyGoalDevRoot(
                 onBackClicked = onBackClicked,
             )
@@ -204,15 +198,15 @@ internal fun DevRoot(onBackClicked: () -> Unit) {
                 onBackClicked = onBackClicked,
             )
 
-            DevDestination.EXACT_ALARM -> ExactAlarmDevRoot(
-                onBackClicked = onBackClicked,
-            )
-
             DevDestination.ANALYTICS -> AnalyticsRoot(
                 onBackClicked = onBackClicked,
             )
 
             DevDestination.TRACKING -> TrackingDevRoot(
+                onBackClicked = onBackClicked,
+            )
+
+            DevDestination.ALARMS -> AlarmsRoot(
                 onBackClicked = onBackClicked,
             )
         }
