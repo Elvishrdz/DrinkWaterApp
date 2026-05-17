@@ -31,10 +31,10 @@ To Complete
 - [x] analytics
 - [x] setup listing workflow (to upload listing assets)
 - [x] privacy policy and tracking request.
-- new alarm design (exact and inexact)
+- [x] fix remove ads bottom sheet on rotation bug
+- [] new alarm design (exact and inexact)
 - new alarm design (exact and inexact) - onboarding/settings integration
 - fix alarm bug
-- fix remove ads bottom sheet on rotation bug
 - adaptive layouts
 
 Next release priorities
