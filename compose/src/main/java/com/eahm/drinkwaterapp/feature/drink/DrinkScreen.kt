@@ -16,15 +16,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -84,81 +81,109 @@ internal fun DrinkScreen(
     onNavigateToSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Scaffold {
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(bottom = 16.dp)
-        ) {
-            Spacer(Modifier.height(it.calculateTopPadding()))
-
-            TodayHeader(
-                streak = state.drinkStreakDays,
-                showStreak = state.showStreakBadge,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 20.dp, end = 20.dp, top = 20.dp)
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
-            ) {
-                ProgressRing(
-                    current = state.drinkStats?.drinkAmount ?: 0f,
-                    goal = state.drinkStats?.goalAmount ?: 0f,
-                    displayZeroPercentage = false,
-                    onClick = {},
+    Scaffold { innerPadding ->
+        DrinkLayout(
+            innerPadding = innerPadding,
+            modifier = modifier,
+            ringSection = {
+                RingSection(state = state)
+            },
+            actionsSection = {
+                ActionsSection(
+                    state = state,
+                    onDrink = onDrink,
+                    onReorderPresets = onReorderPresets,
+                    onCreatePreset = onCreatePreset,
+                    onDeletePreset = onDeletePreset,
+                    onRestorePreset = onRestorePreset,
+                    onBottomSheetOpened = onBottomSheetOpened,
                 )
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                RotatingInfoPill(
-                    remaining = state.drinkStats?.remainingAmount ?: 0f,
-                    alarmTriggerAtMs = state.alarmTriggerAtMs,
-                )
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            QuickAddRow(
-                quickPresets = state.quickDrinkSuggestions,
-                allPresets = state.allDrinkSuggestions,
-                onDrink = onDrink,
-                onCreatePreset = onCreatePreset,
-                onReorder = onReorderPresets,
-                onDelete = onDeletePreset,
-                onRestorePreset = onRestorePreset,
-                onBottomSheetOpened = onBottomSheetOpened,
-                modifier = Modifier.padding(horizontal = 20.dp)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            val isPreview = LocalInspectionMode.current
-            if (!isPreview) {
-                HomeAlarmCard(
-                    modifier = Modifier.padding(horizontal = 20.dp),
+            },
+            infoSection = {
+                InfoSection(
+                    state = state,
+                    onNavigateToHistory = onNavigateToHistory,
                     onNavigateToSettings = onNavigateToSettings,
                 )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            TodayLogSection(
-                items = state.todayLogs,
-                onSeeAll = onNavigateToHistory,
-                modifier = Modifier.padding(horizontal = 20.dp)
-            )
-
-            Spacer(Modifier.height(it.calculateBottomPadding()))
-        }
+            },
+        )
     }
+}
+
+@Composable
+private fun RingSection(state: DrinkState.Data) {
+    TodayHeader(
+        streak = state.drinkStreakDays,
+        showStreak = state.showStreakBadge,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 20.dp, end = 20.dp, top = 20.dp),
+    )
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp, vertical = 4.dp),
+    ) {
+        ProgressRing(
+            current = state.drinkStats?.drinkAmount ?: 0f,
+            goal = state.drinkStats?.goalAmount ?: 0f,
+            displayZeroPercentage = false,
+            onClick = {},
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        RotatingInfoPill(
+            remaining = state.drinkStats?.remainingAmount ?: 0f,
+            alarmTriggerAtMs = state.alarmTriggerAtMs,
+        )
+    }
+}
+
+@Composable
+private fun ActionsSection(
+    state: DrinkState.Data,
+    onDrink: (Float, DrinkSource) -> Unit,
+    onReorderPresets: (List<DrinkSuggestion>, Boolean) -> Unit,
+    onCreatePreset: (Float) -> Unit,
+    onDeletePreset: (DrinkSuggestion) -> Unit,
+    onRestorePreset: (DrinkSuggestion) -> Unit,
+    onBottomSheetOpened: (Int) -> Unit,
+) {
+    QuickAddRow(
+        quickPresets = state.quickDrinkSuggestions,
+        allPresets = state.allDrinkSuggestions,
+        onDrink = onDrink,
+        onCreatePreset = onCreatePreset,
+        onReorder = onReorderPresets,
+        onDelete = onDeletePreset,
+        onRestorePreset = onRestorePreset,
+        onBottomSheetOpened = onBottomSheetOpened,
+        modifier = Modifier.padding(horizontal = 20.dp),
+    )
+}
+
+@Composable
+private fun InfoSection(
+    state: DrinkState.Data,
+    onNavigateToHistory: () -> Unit,
+    onNavigateToSettings: () -> Unit,
+) {
+    val isPreview = LocalInspectionMode.current
+    if (!isPreview) {
+        HomeAlarmCard(
+            modifier = Modifier.padding(horizontal = 20.dp),
+            onNavigateToSettings = onNavigateToSettings,
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+    TodayLogSection(
+        items = state.todayLogs,
+        onSeeAll = onNavigateToHistory,
+        modifier = Modifier.padding(horizontal = 20.dp),
+    )
 }
 
 @Composable
@@ -170,7 +195,7 @@ private fun TodayHeader(
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.End,
-        verticalAlignment = Alignment.Top
+        verticalAlignment = Alignment.Top,
     ) {
         StreakBadge(streak = streak, visible = showStreak)
     }
@@ -365,7 +390,7 @@ private fun formatAlarmCountdown(ms: Long): String {
     }
 }
 
-@Preview
+@Preview(name = "Portrait")
 @Composable
 private fun DrinkScreenPreview() {
     DrinkWaterAppTheme {
@@ -383,9 +408,9 @@ private fun DrinkScreenPreview() {
     }
 }
 
-@Preview
+@Preview(name = "Landscape", widthDp = 900, heightDp = 420)
 @Composable
-private fun DrinkScreenEmptyPreview() {
+private fun DrinkScreenLandscapePreview() {
     DrinkWaterAppTheme {
         DrinkScreen(
             state = stateMock,
@@ -401,12 +426,38 @@ private fun DrinkScreenEmptyPreview() {
     }
 }
 
-@Preview
+@Preview(name = "Tablet", widthDp = 1200, heightDp = 800)
+@Composable
+private fun DrinkScreenTabletPreview() {
+    DrinkWaterAppTheme {
+        DrinkScreen(
+            state = stateMock,
+            onDrink = { _, _ -> },
+            onReorderPresets = { _, _ -> },
+            onCreatePreset = {},
+            onDeletePreset = {},
+            onRestorePreset = {},
+            onBottomSheetOpened = {},
+            onNavigateToHistory = {},
+            onNavigateToSettings = {},
+        )
+    }
+}
+
+@Preview(name = "Goal reached")
 @Composable
 private fun DrinkScreenGoalReachedPreview() {
     DrinkWaterAppTheme {
         DrinkScreen(
-            state = stateMock,
+            state = stateMock.copy(
+                drinkStats = DrinkStats(
+                    goalAmount = 2400f,
+                    drinkAmount = 2400f,
+                    goalReached = true
+                ),
+                drinkStreakDays = 7,
+                showStreakBadge = true,
+            ),
             onDrink = { _, _ -> },
             onReorderPresets = { _, _ -> },
             onCreatePreset = {},
