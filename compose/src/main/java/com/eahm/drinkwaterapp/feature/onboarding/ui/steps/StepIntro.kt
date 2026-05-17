@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
@@ -50,6 +51,7 @@ internal fun StepIntro(
         title = stringResource(R.string.onb_intro_title),
         subtitle = stringResource(R.string.onb_intro_subtitle),
         art = { OnbArtCircle(icon = DwIcons.Drop) },
+        useAdaptiveLayout = true,
         footer = {
             DwPrimaryButtonAnimated(
                 text = stringResource(R.string.onb_intro_cta_text),
@@ -145,6 +147,28 @@ private fun IntroFeatureCard(
 @DwPreview
 @Composable
 private fun StepIntroPreview() {
+    DrinkWaterAppTheme {
+        StepIntro(
+            step = 1,
+            onNext = {},
+        )
+    }
+}
+
+@Preview(name = "Landscape", widthDp = 900, heightDp = 420)
+@Composable
+private fun StepIntroLandscapePreview() {
+    DrinkWaterAppTheme {
+        StepIntro(
+            step = 1,
+            onNext = {},
+        )
+    }
+}
+
+@Preview(name = "Tablet", widthDp = 1200, heightDp = 800)
+@Composable
+private fun StepIntroTabletPreview() {
     DrinkWaterAppTheme {
         StepIntro(
             step = 1,

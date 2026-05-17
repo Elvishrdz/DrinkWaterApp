@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -34,6 +35,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
@@ -41,6 +43,8 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterDeep
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterLight
+import com.eahm.drinkwaterapp.core.presentation.LayoutType
+import com.eahm.drinkwaterapp.core.presentation.getLayoutType
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps
 import com.eahm.drinkwaterapp.feature.onboarding.totalSteps
 import com.eahm.drinkwaterapp.feature.onboarding.ui.icons.OnbIcons
@@ -57,6 +61,9 @@ private val BodyCornerRadius = 32.dp
 
 /**
  * Shared onboarding shell used by all 11 steps.
+ *
+ * When [useAdaptiveLayout] is `true`, the shell switches between portrait,
+ * landscape, and table-top arrangements based on the current [LayoutType].
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,7 +75,46 @@ internal fun OnbShell(
     subtitle: String? = null,
     art: (@Composable () -> Unit)? = null,
     onBack: (() -> Unit)? = null,
+    useAdaptiveLayout: Boolean = false,
     footer: @Composable ColumnScope.() -> Unit = {},
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    if (useAdaptiveLayout) {
+        when (getLayoutType()) {
+            LayoutType.LANDSCAPE, LayoutType.FOLDABLE_EXPANDED -> OnbShellLandscape(
+                step = step, total = total, title = title, subtitle = subtitle,
+                art = art, onBack = onBack, modifier = modifier, footer = footer, content = content,
+            )
+
+            LayoutType.TABLE_TOP -> OnbShellTableTop(
+                step = step, total = total, title = title, subtitle = subtitle,
+                art = art, onBack = onBack, modifier = modifier, footer = footer, content = content,
+            )
+
+            LayoutType.PORTRAIT -> OnbShellPortrait(
+                step = step, total = total, title = title, subtitle = subtitle,
+                art = art, onBack = onBack, modifier = modifier, footer = footer, content = content,
+            )
+        }
+    } else {
+        OnbShellPortrait(
+            step = step, total = total, title = title, subtitle = subtitle,
+            art = art, onBack = onBack, modifier = modifier, footer = footer, content = content,
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun OnbShellPortrait(
+    step: Int,
+    total: Int,
+    title: String,
+    subtitle: String?,
+    art: (@Composable () -> Unit)?,
+    onBack: (() -> Unit)?,
+    modifier: Modifier = Modifier,
+    footer: @Composable ColumnScope.() -> Unit,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -80,7 +126,7 @@ internal fun OnbShell(
                 onBack = onBack,
                 step = step,
                 total = total,
-                modifier = modifier
+                modifier = Modifier
                     .statusBarsPadding()
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp, vertical = 8.dp),
@@ -106,12 +152,11 @@ internal fun OnbShell(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        art?.let { content ->
+                        art?.let { artContent ->
                             Box(
-                                modifier = Modifier
-                                    .padding(bottom = 12.dp),
+                                modifier = Modifier.padding(bottom = 12.dp),
                                 contentAlignment = Alignment.Center,
-                                content = { content() },
+                                content = { artContent() },
                             )
                         }
                         Text(
@@ -127,7 +172,6 @@ internal fun OnbShell(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
-
                     }
 
                     Spacer(Modifier.height(12.dp))
@@ -141,6 +185,214 @@ internal fun OnbShell(
                     Spacer(Modifier.height(12.dp))
                     footer()
                 }
+            }
+        }
+    }
+}
+
+/**
+ * Landscape / foldable-expanded layout.
+ * Gradient panel on the left (top bar + header art/text), white surface panel on the right (content + footer).
+ */
+@Composable
+private fun OnbShellLandscape(
+    step: Int,
+    total: Int,
+    title: String,
+    subtitle: String?,
+    art: (@Composable () -> Unit)?,
+    onBack: (() -> Unit)?,
+    modifier: Modifier = Modifier,
+    footer: @Composable ColumnScope.() -> Unit,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxSize()
+            .background(color = MaterialTheme.colorScheme.surface)
+    ) {
+        // Left: gradient branding panel
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
+        ) {
+            GradientBackground()
+            OnbBubbles()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .statusBarsPadding()
+                    .padding(horizontal = 8.dp, vertical = 8.dp),
+            ) {
+                OnbTopAppBar(
+                    step = step,
+                    total = total,
+                    onBack = onBack,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp),
+                    ) {
+                        art?.let { artContent ->
+                            Box(
+                                modifier = Modifier.padding(bottom = 12.dp),
+                                contentAlignment = Alignment.Center,
+                                content = { artContent() },
+                            )
+                        }
+                        Text(
+                            text = title,
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = Color.White,
+                            textAlign = TextAlign.Center,
+                        )
+                        if (subtitle != null) {
+                            Spacer(Modifier.height(8.dp))
+                            Text(
+                                text = subtitle,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color.White.copy(alpha = 0.80f),
+                                textAlign = TextAlign.Center,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        // Right: white surface content panel
+        Surface(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
+            shape = RoundedCornerShape(topStart = BodyCornerRadius, bottomStart = BodyCornerRadius),
+            color = MaterialTheme.colorScheme.surface,
+            shadowElevation = 0.dp,
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 24.dp, vertical = 32.dp),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .verticalScroll(rememberScrollState())
+                        .weight(1f),
+                ) {
+                    content()
+                }
+                Spacer(Modifier.height(12.dp))
+                footer()
+            }
+        }
+    }
+}
+
+/**
+ * Table-top layout.
+ * Gradient panel on the top half (top bar + header art/text), white surface panel on the bottom half (content + footer).
+ */
+@Composable
+private fun OnbShellTableTop(
+    step: Int,
+    total: Int,
+    title: String,
+    subtitle: String?,
+    art: (@Composable () -> Unit)?,
+    onBack: (() -> Unit)?,
+    modifier: Modifier = Modifier,
+    footer: @Composable ColumnScope.() -> Unit,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    Column(modifier = modifier.fillMaxSize()) {
+        // Top: gradient branding panel
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+        ) {
+            GradientBackground()
+            OnbBubbles()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .statusBarsPadding()
+                    .padding(horizontal = 8.dp, vertical = 8.dp),
+            ) {
+                OnbTopAppBar(
+                    step = step,
+                    total = total,
+                    onBack = onBack,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp),
+                    ) {
+                        art?.let { artContent ->
+                            Box(
+                                modifier = Modifier.padding(bottom = 12.dp),
+                                contentAlignment = Alignment.Center,
+                                content = { artContent() },
+                            )
+                        }
+                        Text(
+                            text = title,
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = Color.White,
+                            textAlign = TextAlign.Center,
+                        )
+                        if (subtitle != null) {
+                            Spacer(Modifier.height(8.dp))
+                            Text(
+                                text = subtitle,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color.White.copy(alpha = 0.80f),
+                                textAlign = TextAlign.Center,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        // Bottom: white surface content panel
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            shape = RoundedCornerShape(topStart = BodyCornerRadius, topEnd = BodyCornerRadius),
+            color = MaterialTheme.colorScheme.surface,
+            shadowElevation = 0.dp,
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 24.dp, vertical = 24.dp),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .verticalScroll(rememberScrollState())
+                        .weight(1f),
+                ) {
+                    content()
+                }
+                Spacer(Modifier.height(12.dp))
+                footer()
             }
         }
     }
@@ -269,20 +521,88 @@ internal fun OnbArtCircle(
 }
 
 
+/** First step — no back button. */
 @DwPreview
 @Composable
-private fun OnbShellPreview() {
+private fun OnbShellPortraitFirstStepPreview() {
     DrinkWaterAppTheme {
-        OnbShell(
-            step = 3,
+        OnbShellPortrait(
+            step = 1,
             total = OnboardingSteps.totalSteps,
-            title = "What's your name?",
-            subtitle = "We'll use it to greet you on the home screen.",
-            art = { OnbArtCircle(icon = OnbIcons.Person) },
+            title = "Let's build a great habit",
+            subtitle = "In the next steps we'll quickly set up your hydration goal and reminders.",
+            art = null,
+            onBack = null,
+            footer = {
+                DwPrimaryButton(
+                    text = "Get started",
+                    onClick = {},
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            },
+        ) { /* content placeholder */ }
+    }
+}
+
+/** Mid-step with back button and art circle. */
+@DwPreview
+@Composable
+private fun OnbShellPortraitMidStepPreview() {
+    DrinkWaterAppTheme {
+        OnbShellPortrait(
+            step = 7,
+            total = OnboardingSteps.totalSteps,
+            title = "Alarms that arrive on time",
+            subtitle = "Allow the app to schedule precise alarms so your reminders fire exactly when you expect them.",
+            art = { OnbArtCircle(icon = OnbIcons.Check) },
             onBack = {},
             footer = {
                 DwPrimaryButton(
-                    text = "Continue",
+                    text = "Allow exact alarms",
+                    onClick = {},
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            },
+        ) { /* content placeholder */ }
+    }
+}
+
+@DwPreview
+@Composable
+private fun OnbShellLandscapePreview() {
+    DrinkWaterAppTheme {
+        OnbShellLandscape(
+            step = 7,
+            total = OnboardingSteps.totalSteps,
+            title = "Alarms that arrive on time",
+            subtitle = "Allow the app to schedule precise alarms so your reminders fire exactly when you expect them.",
+            art = { OnbArtCircle(icon = OnbIcons.Check) },
+            onBack = {},
+            footer = {
+                DwPrimaryButton(
+                    text = "Allow exact alarms",
+                    onClick = {},
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            },
+        ) { /* content placeholder */ }
+    }
+}
+
+@DwPreview
+@Composable
+private fun OnbShellTableTopPreview() {
+    DrinkWaterAppTheme {
+        OnbShellTableTop(
+            step = 7,
+            total = OnboardingSteps.totalSteps,
+            title = "Alarms that arrive on time",
+            subtitle = "Allow the app to schedule precise alarms so your reminders fire exactly when you expect them.",
+            art = { OnbArtCircle(icon = OnbIcons.Check) },
+            onBack = {},
+            footer = {
+                DwPrimaryButton(
+                    text = "Allow exact alarms",
                     onClick = {},
                     modifier = Modifier.fillMaxWidth(),
                 )
