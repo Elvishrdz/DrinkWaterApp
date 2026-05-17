@@ -1,5 +1,47 @@
 ## Logica de las alarmas
 
+Debido a restricciones de android, programar alarmas exactas sera decision del usuario.
+Por lo tanto, tenemos que incluir un fallback para cuando este permiso no es otorgado.
+
+Alarm types:
+1. Exact
+  Alarmas llegan a la hora que la app indica.
+
+2. Inexact
+  Alarmas llegaran a la hora que el sistema encuentre apropiado.
+
+
+La aplicacion debe obtener este permiso desde el onboarding, explicando al usuario las diferencias
+entre ambos tipos y permitiendo enviar al usuario a app settings para otorgar el permiso.
+Si el usuario omite este paso, el tipo de alarma sera el predeterminado: Inexact.
+
+Tambien se puede modificar este permiso en cualquier momento, por lo cual debemos estar a la 
+escucha de cambios para reajustar alarmas existentes y tambien la UI de la app.
+
+Dev menu es otro entry point para modificar el tipo de alarma, aunque solo disponible en debug builds.
+
+-------------
+
+# Cambios en la app
+1. Componente Recordatorios en DrinkScreen. Mostrara solo el progreso de la hora de inicio, la hora
+de fin y la hora cuando programamos la alarma inexacta. abajo deben decir "aproximadamente"
+Ademas, el total de bebidas y el intervalo y la hora de la proxima alarma, deben mostrarse como 
+tiempos aproximados.
+2. Settings screen debe permitir cambiar el tipo de alarma. Mostraremos el valor actual, y al presionar
+el row mostrar otro dialogo explicando como cambiar el tipo de alarma (similar a goal reached celebration
+row). esta opcion envia al usuario a ajustes del telefono: alarmas y recordatorios.
+
+# Cambios en logica
+1. Si es alarma inexact, debemos registrar la hora en que la alarma llego, asi podemos mostrar
+al usuario las fechas de cada alarma pasada en la UI del componente de recordatorios.
+2. Si es exact, la logica actual esta bien.
+3. si es inexact, debemos enviar la notificacion en el broadcast receiver, tambien programar la proxima
+alarma. Si cambia el tipo de alarma, reprogramar alarma:
+a) si es inexact, basado en la hora de la ultima notificacion recibida programar la siguiente alarma
+b) si es exact, usar la logica actual para programar la alarma.
+
+
+
 # Requerimientos
 
 - hora de inicio
@@ -33,7 +75,6 @@ intervalo de bebida = 40mins
 
 2000ml/780mins
 
-
 yo bebo 30ml, como beber 2 litros en 13 horas?
 
 30ml+30ml+... = 2000ml
@@ -60,12 +101,11 @@ rendondeado es 12
 
 alarma cada 11,64179104 minutos (698,5074624 segundos)
 
-
 graphic to display when notification will show up.
 
-1  2     3               4               5       6
-|  |     |               |               |       |
-|  |     |               |               |       |
-|  |     |               |               |       |
+1 2 3 4 5 6
+| | | | | |
+| | | | | |
+| | | | | |
 6:00 - 7:00 - 8:00 - 9:00 - 10:00 - 11:00 - 12:00
 
