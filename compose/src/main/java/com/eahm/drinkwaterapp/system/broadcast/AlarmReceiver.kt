@@ -1,8 +1,10 @@
 package com.eahm.drinkwaterapp.system.broadcast
 
+import android.app.AlarmManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.provider.Settings
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
@@ -54,6 +56,22 @@ class AlarmReceiver : BroadcastReceiver() {
                 println("DrinkWaterApp: restore alarms with received intent: ${intent.action}")
                 // this is called multiple times depending on the intent action
                 drinkAlarmManager.restoreAlarm(source = intent.action.toString())
+            }
+
+            AlarmManager.ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED -> {
+                // when granted this is invoked immediately.
+                // always check if granted because it could be revoked immediately
+                val granted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    val alarmManager =
+                        context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                    alarmManager.canScheduleExactAlarms()
+                } else {
+                    true
+                }
+                Log.i(
+                    "AlarmReceiverLogs",
+                    "SCHEDULE_EXACT_ALARM permission changed — granted=$granted"
+                )
             }
 
             ALARM_ACTION -> {
