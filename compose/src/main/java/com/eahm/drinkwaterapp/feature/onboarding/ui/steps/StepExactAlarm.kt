@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
@@ -74,6 +75,7 @@ private fun RequestLayout(
         subtitle = stringResource(R.string.onb_exact_alarm_subtitle),
         art = { OnbArtCircle(icon = DwIcons.Clock) },
         onBack = onBack,
+        useAdaptiveLayout = true,
         footer = {
             TextButton(
                 onClick = onSkip,
@@ -114,6 +116,7 @@ private fun GrantedLayout(
         subtitle = stringResource(R.string.onb_exact_alarm_granted_subtitle),
         art = { OnbArtCircle(icon = OnbIcons.Check) },
         onBack = onBack,
+        useAdaptiveLayout = true,
         footer = {
             DwPrimaryButtonAnimated(
                 text = stringResource(R.string.onb_cta_continue),
@@ -294,6 +297,36 @@ private fun StepExactAlarmGrantedPreview() {
         StepExactAlarm(
             step = 7,
             exactAlarmGranted = true,
+            onAllow = {},
+            onContinue = {},
+            onSkip = {},
+            onBack = {},
+        )
+    }
+}
+
+@Preview(name = "Landscape", widthDp = 900, heightDp = 420)
+@Composable
+private fun StepExactAlarmLandscapePreview() {
+    DrinkWaterAppTheme {
+        StepExactAlarm(
+            step = 7,
+            exactAlarmGranted = false,
+            onAllow = {},
+            onContinue = {},
+            onSkip = {},
+            onBack = {},
+        )
+    }
+}
+
+@Preview(name = "Tablet", widthDp = 1200, heightDp = 800)
+@Composable
+private fun StepExactAlarmTabletPreview() {
+    DrinkWaterAppTheme {
+        StepExactAlarm(
+            step = 7,
+            exactAlarmGranted = false,
             onAllow = {},
             onContinue = {},
             onSkip = {},

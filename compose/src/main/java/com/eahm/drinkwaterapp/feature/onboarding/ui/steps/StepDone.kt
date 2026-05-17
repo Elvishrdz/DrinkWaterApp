@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
@@ -70,6 +71,7 @@ internal fun StepDone(
         title = title,
         subtitle = stringResource(R.string.onb_done_subtitle),
         onBack = onBack,
+        useAdaptiveLayout = true,
         footer = {
             DwPrimaryButtonAnimated(
                 text = stringResource(R.string.onb_done_cta),
@@ -244,6 +246,32 @@ private fun StepDoneNoNamePreview() {
                 intervalMinutes = 45,
                 goalMl = 2200f,
             ),
+            onStart = {},
+            onBack = {},
+        )
+    }
+}
+
+@Preview(name = "Landscape", widthDp = 900, heightDp = 420)
+@Composable
+private fun StepDoneLandscapePreview() {
+    DrinkWaterAppTheme {
+        StepDone(
+            step = 9,
+            state = OnboardingFormState(name = "Alex", intervalMinutes = 45, goalMl = 2200f),
+            onStart = {},
+            onBack = {},
+        )
+    }
+}
+
+@Preview(name = "Tablet", widthDp = 1200, heightDp = 800)
+@Composable
+private fun StepDoneTabletPreview() {
+    DrinkWaterAppTheme {
+        StepDone(
+            step = 9,
+            state = OnboardingFormState(name = "Alex", intervalMinutes = 45, goalMl = 2200f),
             onStart = {},
             onBack = {},
         )

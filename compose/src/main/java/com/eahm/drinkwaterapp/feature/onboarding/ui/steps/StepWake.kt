@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
@@ -41,6 +42,7 @@ internal fun StepWake(
         subtitle = stringResource(R.string.onb_wake_subtitle),
         art = { OnbArtCircle(icon = DwIcons.Sun) },
         onBack = onBack,
+        useAdaptiveLayout = true,
         footer = {
             if (isSameTime) {
                 Text(
@@ -77,6 +79,36 @@ private fun StepWakePreview() {
     DrinkWaterAppTheme {
         StepWake(
             step = 1,
+            wakeTime = OnbTimeSelection(hour = 7, minute = 0, isPm = false),
+            sleepTime = OnbTimeSelection(hour = 10, minute = 0, isPm = true),
+            onWakeTimeChange = {},
+            onNext = {},
+            onBack = {},
+        )
+    }
+}
+
+@Preview(name = "Landscape", widthDp = 900, heightDp = 420)
+@Composable
+private fun StepWakeLandscapePreview() {
+    DrinkWaterAppTheme {
+        StepWake(
+            step = 3,
+            wakeTime = OnbTimeSelection(hour = 7, minute = 0, isPm = false),
+            sleepTime = OnbTimeSelection(hour = 10, minute = 0, isPm = true),
+            onWakeTimeChange = {},
+            onNext = {},
+            onBack = {},
+        )
+    }
+}
+
+@Preview(name = "Tablet", widthDp = 1200, heightDp = 800)
+@Composable
+private fun StepWakeTabletPreview() {
+    DrinkWaterAppTheme {
+        StepWake(
+            step = 3,
             wakeTime = OnbTimeSelection(hour = 7, minute = 0, isPm = false),
             sleepTime = OnbTimeSelection(hour = 10, minute = 0, isPm = true),
             onWakeTimeChange = {},

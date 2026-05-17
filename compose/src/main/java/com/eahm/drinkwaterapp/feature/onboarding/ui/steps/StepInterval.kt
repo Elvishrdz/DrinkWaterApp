@@ -11,6 +11,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
@@ -78,6 +79,7 @@ internal fun StepInterval(
         subtitle = stringResource(R.string.onb_interval_subtitle),
         art = { OnbArtCircle(icon = DwIcons.Clock) },
         onBack = onBack,
+        useAdaptiveLayout = true,
         footer = {
             DwPrimaryButtonAnimated(
                 text = stringResource(R.string.onb_cta_continue),
@@ -148,6 +150,38 @@ private fun StepIntervalCustomSelectedPreview() {
         StepInterval(
             step = 1,
             selectedMinutes = 20,
+            wakeTime = OnbTimeSelection(hour = 7, minute = 0, isPm = false),
+            sleepTime = OnbTimeSelection(hour = 10, minute = 0, isPm = true),
+            onSelect = {},
+            onNext = {},
+            onBack = {},
+        )
+    }
+}
+
+@Preview(name = "Landscape", widthDp = 900, heightDp = 420)
+@Composable
+private fun StepIntervalLandscapePreview() {
+    DrinkWaterAppTheme {
+        StepInterval(
+            step = 5,
+            selectedMinutes = 45,
+            wakeTime = OnbTimeSelection(hour = 7, minute = 0, isPm = false),
+            sleepTime = OnbTimeSelection(hour = 10, minute = 0, isPm = true),
+            onSelect = {},
+            onNext = {},
+            onBack = {},
+        )
+    }
+}
+
+@Preview(name = "Tablet", widthDp = 1200, heightDp = 800)
+@Composable
+private fun StepIntervalTabletPreview() {
+    DrinkWaterAppTheme {
+        StepInterval(
+            step = 5,
+            selectedMinutes = 45,
             wakeTime = OnbTimeSelection(hour = 7, minute = 0, isPm = false),
             sleepTime = OnbTimeSelection(hour = 10, minute = 0, isPm = true),
             onSelect = {},

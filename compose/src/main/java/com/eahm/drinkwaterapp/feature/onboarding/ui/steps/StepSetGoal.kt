@@ -12,6 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
@@ -44,6 +45,7 @@ internal fun StepSetGoal(
         subtitle = stringResource(R.string.onb_set_goal_subtitle),
         art = { OnbArtCircle(icon = DwIcons.Drop) },
         onBack = onBack,
+        useAdaptiveLayout = true,
         footer = {
             DwPrimaryButtonAnimated(
                 text = stringResource(R.string.onb_set_goal_cta),
@@ -87,5 +89,21 @@ private fun StepSetGoalPreview() {
             onNext = {},
             onBack = {},
         )
+    }
+}
+
+@Preview(name = "Landscape", widthDp = 900, heightDp = 420)
+@Composable
+private fun StepSetGoalLandscapePreview() {
+    DrinkWaterAppTheme {
+        StepSetGoal(step = 2, goalMl = 2200f, onGoalChanged = {}, onNext = {}, onBack = {})
+    }
+}
+
+@Preview(name = "Tablet", widthDp = 1200, heightDp = 800)
+@Composable
+private fun StepSetGoalTabletPreview() {
+    DrinkWaterAppTheme {
+        StepSetGoal(step = 2, goalMl = 2200f, onGoalChanged = {}, onNext = {}, onBack = {})
     }
 }

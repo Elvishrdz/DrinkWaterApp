@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.R
@@ -79,6 +80,7 @@ private fun RequestLayout(
         subtitle = stringResource(R.string.onb_overlay_request_subtitle),
         art = { OnbArtCircle(icon = DwIcons.Star) },
         onBack = onBack,
+        useAdaptiveLayout = true,
         footer = {
             TextButton(
                 onClick = onSkip,
@@ -119,6 +121,7 @@ private fun GrantedLayout(
         subtitle = stringResource(R.string.onb_overlay_granted_subtitle),
         art = { OnbArtCircle(icon = OnbIcons.Check) },
         onBack = onBack,
+        useAdaptiveLayout = true,
         footer = {
             DwPrimaryButtonAnimated(
                 text = stringResource(R.string.onb_cta_continue),
@@ -386,5 +389,21 @@ private fun StepOverlayGrantedPreview() {
             onContinue = {},
             onBack = {},
         )
+    }
+}
+
+@Preview(name = "Landscape", widthDp = 900, heightDp = 420)
+@Composable
+private fun StepOverlayLandscapePreview() {
+    DrinkWaterAppTheme {
+        StepOverlay(step = 8, overlayGranted = false, onAllow = {}, onContinue = {}, onBack = {})
+    }
+}
+
+@Preview(name = "Tablet", widthDp = 1200, heightDp = 800)
+@Composable
+private fun StepOverlayTabletPreview() {
+    DrinkWaterAppTheme {
+        StepOverlay(step = 8, overlayGranted = false, onAllow = {}, onContinue = {}, onBack = {})
     }
 }
