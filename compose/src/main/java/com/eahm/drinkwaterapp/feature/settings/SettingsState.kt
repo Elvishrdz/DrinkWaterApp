@@ -1,8 +1,18 @@
 package com.eahm.drinkwaterapp.feature.settings
 
+import androidx.compose.runtime.Immutable
 import com.eahm.drinkwaterapp.core.billing.PurchaseState
 import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
 import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
+import com.revenuecat.purchases.Package as RcPackage
+
+@Immutable
+sealed interface OfferingsState {
+
+    data object Loading : OfferingsState
+    data class Success(val pkg: RcPackage?) : OfferingsState
+    data object Error : OfferingsState
+}
 
 data class SettingsState(
     val username: String?,
@@ -21,6 +31,7 @@ data class SettingsState(
     val buildVariant: String,
     val isAdFree: Boolean = false,
     val purchaseState: PurchaseState = PurchaseState.Idle,
+    val offeringsState: OfferingsState? = null,
 )
 
 enum class WaterUnit(val label: String) {

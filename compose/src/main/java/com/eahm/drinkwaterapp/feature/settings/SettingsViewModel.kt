@@ -224,8 +224,21 @@ internal class SettingsViewModel(
         }
     }
 
-    fun onFetchOfferings(onResult: (RcPackage?) -> Unit) {
-        purchaseManager.fetchOfferings(onResult)
+    fun onFetchOfferings() {
+        _state.update { it.copy(offeringsState = OfferingsState.Loading) }
+        purchaseManager.fetchOfferings(
+            onSuccess = { pkg ->
+                _state.update { it.copy(offeringsState = OfferingsState.Success(pkg)) }
+            },
+            onError = {
+                _state.update { it.copy(offeringsState = OfferingsState.Error) }
+            },
+        )
+    }
+
+    fun onOfferingsSheetDismissed() {
+        purchaseManager.cancel()
+        _state.update { it.copy(offeringsState = null) }
     }
 
     fun onPurchase(activity: Activity, pkg: RcPackage) {

@@ -2,6 +2,7 @@ package com.eahm.drinkwaterapp.core.billing
 
 import android.app.Activity
 import android.app.Application
+import androidx.compose.runtime.Immutable
 import com.eahm.drinkwaterapp.BuildConfig
 import com.eahm.drinkwaterapp.system.initializer.AppInitializer
 import com.revenuecat.purchases.CustomerInfo
@@ -17,7 +18,7 @@ import com.revenuecat.purchases.models.StoreTransaction
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import com.revenuecat.purchases.Package as RcPackage
+import com.revenuecat.purchases.Package as AvailablePackage
 
 private const val ENTITLEMENT_ADS_FREE = "ads_free"
 private const val OFFERING_REMOVE_ADS = "remove_ads"
@@ -51,22 +52,28 @@ internal class PurchaseManager(
         })
     }
 
-    fun fetchOfferings(onResult: (RcPackage?) -> Unit) {
+    fun fetchOfferings(
+        onSuccess: (AvailablePackage?) -> Unit,
+        onError: () -> Unit,
+    ) {
         Purchases.sharedInstance.getOfferings(object : ReceiveOfferingsCallback {
             override fun onReceived(offerings: Offerings) {
-                val pkg = offerings[OFFERING_REMOVE_ADS]?.availablePackages?.firstOrNull()
-                    ?: offerings.current?.availablePackages?.firstOrNull()
-                onResult(pkg)
+                val availablePackage =
+                    offerings[OFFERING_REMOVE_ADS]?.availablePackages?.firstOrNull()
+                        ?: offerings.current?.availablePackages?.firstOrNull()
+                onSuccess(availablePackage)
             }
 
             override fun onError(error: PurchasesError) {
-                onResult(null)
+                onError()
             }
         })
     }
 
-    fun purchase(activity: Activity, pkg: RcPackage) {
+    private var purchaseInProgress = false
+    fun purchase(activity: Activity, pkg: AvailablePackage) {
         _purchaseState.value = PurchaseState.Loading
+        purchaseInProgress = true
         Purchases.sharedInstance.purchase(
             PurchaseParams.Builder(activity, pkg).build(),
             object : PurchaseCallback {
@@ -74,6 +81,7 @@ internal class PurchaseManager(
                     storeTransaction: StoreTransaction,
                     customerInfo: CustomerInfo
                 ) {
+                    purchaseInProgress = false
                     _isAdFree.value =
                         customerInfo.entitlements[ENTITLEMENT_ADS_FREE]?.isActive == true
                     _purchaseState.value =
@@ -81,6 +89,7 @@ internal class PurchaseManager(
                 }
 
                 override fun onError(error: PurchasesError, userCancelled: Boolean) {
+                    purchaseInProgress = false
                     _purchaseState.value = if (userCancelled) {
                         PurchaseState.Idle
                     } else {
@@ -89,6 +98,23 @@ internal class PurchaseManager(
                 }
             }
         )
+    }
+
+    fun cancel() {
+        runCatching {
+            // close and initialize. This in the case the sheet is closed and a purchase was in progress
+            // Usually this happens only in dev builds, when rotating the screen and losing the purchase
+            // state.
+            if (purchaseInProgress) {
+                // TODO: track if this happens
+                Purchases.sharedInstance.close()
+                if (!Purchases.isConfigured) {
+                    initialize()
+                }
+            }
+        }
+
+        _purchaseState.value = PurchaseState.Idle
     }
 
     fun restore() {
@@ -116,7 +142,9 @@ internal class PurchaseManager(
     }
 }
 
+@Immutable
 sealed interface PurchaseState {
+
     data object Idle : PurchaseState
     data object Loading : PurchaseState
     data object Success : PurchaseState

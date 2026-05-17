@@ -1,6 +1,7 @@
 package com.eahm.drinkwaterapp.feature.settings.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,16 +29,18 @@ import com.eahm.drinkwaterapp.core.designsystem.component.button.DwSecondaryButt
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
+import com.eahm.drinkwaterapp.feature.settings.OfferingsState
 import com.eahm.drinkwaterapp.ui.bottomsheet.AppBottomSheet
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun RemoveAdsBottomSheet(
-    priceString: String?,
+    offeringsState: OfferingsState,
     purchaseState: PurchaseState,
     onPurchase: () -> Unit,
     onRestore: () -> Unit,
+    onRetry: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -82,23 +85,55 @@ internal fun RemoveAdsBottomSheet(
 
             Spacer(Modifier.height(24.dp))
 
-            DwPrimaryButton(
-                text = if (priceString != null) {
-                    stringResource(R.string.settings_remove_ads_cta_with_price, priceString)
-                } else {
-                    stringResource(R.string.settings_remove_ads_cta)
-                },
-                onClick = onPurchase,
-                enabled = !isLoading,
-                modifier = Modifier.fillMaxWidth(),
-            )
+            when (offeringsState) {
+                is OfferingsState.Loading -> {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        DwPrimaryButton(
+                            text = "",
+                            onClick = {},
+                            enabled = false,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        CircularProgressIndicator(
+                            color = DwInk500,
+                            strokeWidth = 2.dp,
+                            modifier = Modifier.size(20.dp),
+                        )
+                    }
+                }
+
+                is OfferingsState.Error -> {
+                    DwPrimaryButton(
+                        text = stringResource(R.string.action_retry),
+                        onClick = onRetry,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+
+                is OfferingsState.Success -> {
+                    val priceString = offeringsState.pkg?.product?.price?.formatted
+                    DwPrimaryButton(
+                        text = if (priceString != null) {
+                            stringResource(R.string.settings_remove_ads_cta_with_price, priceString)
+                        } else {
+                            stringResource(R.string.settings_remove_ads_cta)
+                        },
+                        onClick = onPurchase,
+                        enabled = !isLoading,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            }
 
             Spacer(Modifier.height(10.dp))
 
             DwSecondaryButton(
                 text = stringResource(R.string.settings_remove_ads_restore_cta),
                 onClick = onRestore,
-                enabled = !isLoading,
+                enabled = !isLoading && offeringsState is OfferingsState.Success,
                 modifier = Modifier.fillMaxWidth(),
             )
 

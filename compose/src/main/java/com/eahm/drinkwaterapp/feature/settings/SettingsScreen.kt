@@ -101,12 +101,12 @@ import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorDialog
 import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
 import kotlinx.coroutines.delay
 import org.koin.compose.viewmodel.koinViewModel
-import com.revenuecat.purchases.Package as RcPackage
 
 private val gradientMagentaHero = Brush.verticalGradient(
     colors = listOf(Color(0xFFB83A95), DwMagentaDark)
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun SettingsScreen(
     modifier: Modifier = Modifier,
@@ -118,35 +118,24 @@ internal fun SettingsScreen(
     var showClearDataDialog by rememberSaveable { mutableStateOf(false) }
 
     // ── Remove Ads purchase sheet ─────────────────────────────────────────────
-    var showRemoveAdsSheet by rememberSaveable { mutableStateOf(false) }
     var showPurchaseSuccessDialog by rememberSaveable { mutableStateOf(false) }
     var showRestoreSuccessDialog by rememberSaveable { mutableStateOf(false) }
-    var rcPackage by remember { mutableStateOf<RcPackage?>(null) }
-    var rcPriceString by remember { mutableStateOf<String?>(null) }
     val activity = context as Activity
 
     LaunchedEffect(state.purchaseState) {
-        if (!showRemoveAdsSheet) return@LaunchedEffect
+        if (state.offeringsState !is OfferingsState.Success) return@LaunchedEffect
         when (state.purchaseState) {
             is PurchaseState.Success -> {
-                showRemoveAdsSheet = false
+                viewModel.onOfferingsSheetDismissed()
                 showPurchaseSuccessDialog = true
             }
 
             is PurchaseState.Restored -> {
-                showRemoveAdsSheet = false
+                viewModel.onOfferingsSheetDismissed()
                 showRestoreSuccessDialog = true
             }
 
             else -> Unit
-        }
-    }
-
-    fun handleRemoveAdsTap() {
-        viewModel.onFetchOfferings { pkg ->
-            rcPackage = pkg
-            rcPriceString = pkg?.product?.price?.formatted
-            showRemoveAdsSheet = true
         }
     }
 
@@ -248,7 +237,7 @@ internal fun SettingsScreen(
         onReportProblemTap = ::handleReportProblem,
         onGoalCelebrationsToggled = { handleDrawOverlayToggle() },
         onClearDataTap = { showClearDataDialog = true },
-        onRemoveAdsTap = ::handleRemoveAdsTap,
+        onRemoveAdsTap = viewModel::onFetchOfferings,
         modifier = modifier,
     )
 
@@ -325,16 +314,17 @@ internal fun SettingsScreen(
     }
 
     // ── Remove Ads bottom sheet ───────────────────────────────────────────────
-    if (showRemoveAdsSheet) {
+    state.offeringsState?.let { offeringsState ->
         RemoveAdsBottomSheet(
-            priceString = rcPriceString,
+            offeringsState = offeringsState,
             purchaseState = state.purchaseState,
             onPurchase = {
-                val pkg = rcPackage
+                val pkg = (offeringsState as? OfferingsState.Success)?.pkg
                 if (pkg != null) viewModel.onPurchase(activity, pkg)
             },
             onRestore = viewModel::onRestorePurchase,
-            onDismiss = { showRemoveAdsSheet = false },
+            onRetry = { viewModel.onFetchOfferings() },
+            onDismiss = { viewModel.onOfferingsSheetDismissed() },
         )
     }
 
