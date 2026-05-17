@@ -1,8 +1,10 @@
 package com.eahm.drinkwaterapp.feature.settings
 
 import android.app.Activity
+import android.app.AlarmManager
 import android.app.Application
 import android.content.Intent
+import android.os.Build
 import android.provider.Settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -74,6 +76,13 @@ internal class SettingsViewModel(
 
     private val canDrawOverlay get() = Settings.canDrawOverlays(application)
 
+    private val canScheduleExactAlarms: Boolean
+        get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            application.getSystemService(AlarmManager::class.java)?.canScheduleExactAlarms() == true
+        } else {
+            true
+        }
+
     private val _state =
         MutableStateFlow(
             SettingsState(
@@ -83,6 +92,7 @@ internal class SettingsViewModel(
                 endTime = null,
                 intervalMinutes = 0,
                 goalReachedCelebrationsEnabled = canDrawOverlay,
+                exactAlarmsEnabled = canScheduleExactAlarms,
                 appVersion = appInfoService.versionName,
                 buildVariant = appInfoService.buildVariant,
             )
@@ -201,6 +211,10 @@ internal class SettingsViewModel(
 
     fun onDrawOverlayPermissionResult() {
         _state.update { it.copy(goalReachedCelebrationsEnabled = canDrawOverlay) }
+    }
+
+    fun onExactAlarmPermissionResult() {
+        _state.update { it.copy(exactAlarmsEnabled = canScheduleExactAlarms) }
     }
 
     fun clearAllData() {

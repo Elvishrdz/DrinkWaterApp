@@ -193,6 +193,9 @@
     <string name="settings_row_interval">Intervalo</string>
     <string name="settings_row_notification_amount">Cantidad de notificación</string>
     <string name="settings_row_goal_celebrations">Celebraciones al alcanzar la meta</string>
+    <string name="settings_row_reminder_type">Tipo de recordatorio</string>
+    <string name="settings_row_reminder_status">Exacta</string>
+    <string name="settings_row_reminder_status_approximate">Aproximado</string>
     <string name="settings_row_remove_ads">Quitar anuncios</string>
     <string name="settings_row_share">Compartir con amigos</string>
     <string name="settings_row_rate">Calificar la app</string>
@@ -215,6 +218,12 @@
     <!-- Ajustes — Diálogo de desactivar notificaciones -->
     <string name="settings_notif_disable_title">Desactivar notificaciones</string>
     <string name="settings_notif_disable_body">Para desactivar los recordatorios, deshabilita las notificaciones de DrinkWater en los Ajustes de tu teléfono.\n\n1. Toca \"Continuar a ajustes\" abajo.\n2. Deshabilita las notificaciones para esta app.\n3. Presiona atrás para volver.</string>
+
+    <!-- Ajustes — Diálogo de recordatorios exactos -->
+    <string name="settings_reminder_type_enable_title">Activar recordatorios exactos</string>
+    <string name="settings_reminder_type_enable_instructions">Para recibir recordatorios que suenen exactamente a tiempo, permite recordatorios exactos para DrinkWater.\n\n1. Toca \"Continuar a ajustes\" abajo.\n2. Encuentra DrinkWater en la lista.\n3. Activa \"Alarmas y recordatorios\".\n\nLuego presiona atrás para volver.</string>
+    <string name="settings_reminder_type_disable_title">Desactivar recordatorios exactos</string>
+    <string name="settings_reminder_type_disable_instructions">Para volver al tiempo aproximado, retira el permiso de recordatorios exactos.\n\n1. Toca \"Continuar a ajustes\" abajo.\n2. Encuentra DrinkWater en la lista.\n3. Desactiva \"Alarmas y recordatorios\".\n\nLos recordatorios seguirán llegando, pero pueden tener un pequeño retraso.</string>
 
     <!-- Ajustes — Diálogo de superposición -->
     <string name="settings_overlay_disable_title">Desactivar mostrar sobre otras apps</string>

@@ -186,6 +186,19 @@ internal fun SettingsScreen(
         showOverlayInstructionsDialog = true
     }
 
+    // ── Exact alarm permission ────────────────────────────────────────────────
+    var showExactAlarmInstructionsDialog by rememberSaveable { mutableStateOf(false) }
+
+    val exactAlarmLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+    ) {
+        viewModel.onExactAlarmPermissionResult()
+    }
+
+    fun handleExactAlarmTap() {
+        showExactAlarmInstructionsDialog = true
+    }
+
     fun handleRequestFeature() {
         val intent = Intent(Intent.ACTION_SENDTO).apply {
             data =
@@ -236,6 +249,7 @@ internal fun SettingsScreen(
         onRequestFeatureTap = ::handleRequestFeature,
         onReportProblemTap = ::handleReportProblem,
         onGoalCelebrationsToggled = { handleDrawOverlayToggle() },
+        onExactAlarmTap = ::handleExactAlarmTap,
         onClearDataTap = { showClearDataDialog = true },
         onRemoveAdsTap = viewModel::onFetchOfferings,
         modifier = modifier,
@@ -313,6 +327,22 @@ internal fun SettingsScreen(
         )
     }
 
+    // ── Exact alarm instructions dialog ───────────────────────────────────────
+    if (showExactAlarmInstructionsDialog) {
+        ExactAlarmInstructionsDialog(
+            isGranted = state.exactAlarmsEnabled,
+            onDismiss = { showExactAlarmInstructionsDialog = false },
+            onGoToSettings = {
+                showExactAlarmInstructionsDialog = false
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    exactAlarmLauncher.launch(
+                        Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+                    )
+                }
+            },
+        )
+    }
+
     // ── Remove Ads bottom sheet ───────────────────────────────────────────────
     state.offeringsState?.let { offeringsState ->
         RemoveAdsBottomSheet(
@@ -357,6 +387,7 @@ internal fun SettingsContent(
     onRequestFeatureTap: () -> Unit,
     onReportProblemTap: () -> Unit,
     onGoalCelebrationsToggled: (Boolean) -> Unit,
+    onExactAlarmTap: () -> Unit,
     onClearDataTap: () -> Unit,
     onRemoveAdsTap: () -> Unit,
     modifier: Modifier = Modifier,
@@ -447,6 +478,18 @@ internal fun SettingsContent(
                                 uncheckedBorderColor = DwInk200,
                             ),
                         )
+                    }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        HorizontalDivider(color = DwInk100)
+                        SettingRow(
+                            icon = DwIcons.Clock,
+                            iconBg = DwTintWater,
+                            iconTint = DwWater,
+                            label = stringResource(R.string.settings_row_reminder_type),
+                            onClick = onExactAlarmTap,
+                        ) {
+                            AlarmTypeBadge(isExact = state.exactAlarmsEnabled)
+                        }
                     }
                     HorizontalDivider(color = DwInk100)
                     SettingRow(
@@ -1111,6 +1154,101 @@ private fun formatTime(hour: Int, minute: Int): String {
     return "$displayHour:${minute.toString().padStart(2, '0')} $ampm"
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ExactAlarmInstructionsDialog(
+    isGranted: Boolean,
+    onDismiss: () -> Unit,
+    onGoToSettings: () -> Unit,
+) {
+    val title = if (!isGranted) {
+        stringResource(R.string.settings_reminder_type_enable_title)
+    } else {
+        stringResource(R.string.settings_reminder_type_disable_title)
+    }
+
+    val instructions = if (!isGranted) {
+        stringResource(R.string.settings_reminder_type_enable_instructions)
+    } else {
+        stringResource(R.string.settings_reminder_type_disable_instructions)
+    }
+
+    BasicAlertDialog(onDismissRequest = onDismiss) {
+        Column(
+            modifier = Modifier
+                .clip(RoundedCornerShape(20.dp))
+                .background(color = MaterialTheme.colorScheme.background)
+                .padding(24.dp),
+        ) {
+            Text(
+                text = title,
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+            Spacer(Modifier.height(10.dp))
+            Text(
+                text = instructions,
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp,
+                color = DwInk500,
+            )
+            Spacer(Modifier.height(24.dp))
+            DwPrimaryButton(
+                text = stringResource(R.string.action_continue_to_settings),
+                onClick = onGoToSettings,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(Modifier.height(8.dp))
+            DwSecondaryButton(
+                text = stringResource(R.string.action_not_now),
+                onClick = onDismiss,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+}
+
+// ── Exact alarm status badge ───────────────────────────────────────────────────
+
+@Composable
+private fun AlarmTypeBadge(isExact: Boolean) {
+    val text = stringResource(
+        if (isExact) R.string.settings_row_reminder_status
+        else R.string.settings_row_reminder_status_approximate
+    )
+    val textColor = if (isExact) DwWater else DwInk400
+    val bgColor = if (isExact) DwTintWater else DwInk100
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(999.dp))
+                .background(bgColor)
+                .padding(horizontal = 8.dp, vertical = 3.dp),
+        ) {
+            Text(
+                text = text,
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 11.sp,
+                color = textColor,
+            )
+        }
+        Icon(
+            imageVector = DwIcons.ChevronRight,
+            contentDescription = null,
+            tint = DwInk400,
+            modifier = Modifier.size(16.dp),
+        )
+    }
+}
+
 // ── Purchase success dialog ───────────────────────────────────────────────────
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -1256,6 +1394,7 @@ private fun SettingsScreenPreview() {
             onRequestFeatureTap = {},
             onReportProblemTap = {},
             onGoalCelebrationsToggled = {},
+            onExactAlarmTap = {},
             onClearDataTap = {},
             onRemoveAdsTap = {},
         )
