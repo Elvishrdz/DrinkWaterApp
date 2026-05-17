@@ -47,6 +47,10 @@ fun ProgressRing(
     modifier: Modifier = Modifier,
     size: Dp = 220.dp,
     displayZeroPercentage: Boolean = true,
+    onClick: (() -> Unit)? = null,
+    bounceEnabled: Boolean = true,
+    rippleEnabled: Boolean = false,
+    idleShimmerEnabled: Boolean = true,
 ) {
     val percent = ((current / goal) * 100f)
         .takeIf { !it.isNaN() } ?: 0f
@@ -60,7 +64,14 @@ fun ProgressRing(
 
     Box(
         contentAlignment = Alignment.Center,
-        modifier = modifier.size(size)
+        modifier = modifier
+            .size(size)
+            .idleShimmer(enabled = idleShimmerEnabled && current == 0f)
+            .bounceTap(
+                onClick = { onClick?.invoke() },
+                enabled = bounceEnabled,
+                rippleEnabled = rippleEnabled,
+            ),
     ) {
         val strokeWidth = 14.dp
         val trackColor = DwWater.copy(alpha = 0.15f)

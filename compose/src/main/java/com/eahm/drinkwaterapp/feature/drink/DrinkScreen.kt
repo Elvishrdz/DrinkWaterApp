@@ -113,6 +113,7 @@ internal fun DrinkScreen(
                     current = state.drinkStats?.drinkAmount ?: 0f,
                     goal = state.drinkStats?.goalAmount ?: 0f,
                     displayZeroPercentage = false,
+                    onClick = {},
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
