@@ -50,8 +50,15 @@ class DrinkAlarmManagerV2(
     /**
      * Called on boot, package replaced, permission re-granted, or settings changed.
      * Schedules both alarms if either is missing or pointing at a stale slot.
+     *
+     * No-op until onboarding is completed so that system broadcasts received during the
+     * first-launch setup flow do not schedule alarms with unconfigured default values.
      */
     suspend fun restoreAlarm(source: String = "unknown") {
+        if (!prefsStorage.getOnboardingCompleted().first()) {
+            Log.i(TAG, "restoreAlarm: onboarding not completed — skipping (source=$source)")
+            return
+        }
         Log.i(TAG, "restoreAlarm: source=$source — waiting for lock")
         schedulingMutex.withLock {
             Log.i(TAG, "restoreAlarm: source=$source — lock acquired")
