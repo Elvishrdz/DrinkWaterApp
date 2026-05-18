@@ -33,11 +33,9 @@ To Complete
 - [x] privacy policy and tracking request.
 - [x] fix remove ads bottom sheet on rotation bug
 - [x] adaptive layouts (v1)
-- [] new alarm design (exact and inexact)
-  - 1. obtener permiso del usuario (onboarding/dev menu)
-  - 2. 
-- new alarm design (exact and inexact) - onboarding/settings integration
-- fix alarm bug
+- [x] new alarm design (exact and inexact)
+- tiempo en drink water (countdown) ahora no se actualiza al cambiar de horas activas
+- [-] fix alarm bug
 
 Next release priorities
 
