@@ -337,6 +337,9 @@
     <string name="stats_summary_avg_label">%1$s avg</string>
     <string name="stats_summary_unit">mL/day</string>
     <string name="stats_summary_vs_previous">vs previous period</string>
+    <string name="stats_summary_first_week">My first week</string>
+    <string name="stats_summary_first_month">My first month</string>
+    <string name="stats_summary_first_year">My first year</string>
 
     <!-- Stats — Bar chart -->
     <string name="stats_chart_daily_intake">Daily intake</string>

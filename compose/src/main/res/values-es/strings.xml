@@ -334,6 +334,9 @@
     <string name="stats_summary_avg_label">Prom. %1$s</string>
     <string name="stats_summary_unit">mL/día</string>
     <string name="stats_summary_vs_previous">vs período anterior</string>
+    <string name="stats_summary_first_week">Mi primera semana</string>
+    <string name="stats_summary_first_month">Mi primer mes</string>
+    <string name="stats_summary_first_year">Mi primer año</string>
 
     <!-- Estadísticas — Gráfico de barras -->
     <string name="stats_chart_daily_intake">Ingesta diaria</string>

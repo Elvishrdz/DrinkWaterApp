@@ -44,6 +44,9 @@ fun SummaryCard(
     trendPercent: Int,
     isTrendPositive: Boolean,
     periodLabel: String,
+    /** Non-null when this is the user's first period (no prior data to compare).
+     *  The string is shown instead of the trend percentage row. */
+    firstPeriodLabel: String?,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -91,17 +94,27 @@ fun SummaryCard(
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            val arrow = if (isTrendPositive) "▲" else "▼"
-            val trendColor = if (isTrendPositive) TrendUpColor else TrendDownColor
-            val vsLabel = stringResource(R.string.stats_summary_vs_previous)
+        if (firstPeriodLabel != null) {
             Text(
-                text = "$arrow $trendPercent%  $vsLabel",
+                text = firstPeriodLabel,
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Medium,
                 fontSize = 12.sp,
-                color = trendColor
+                color = Color.White.copy(alpha = 0.55f)
             )
+        } else {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                val arrow = if (isTrendPositive) "▲" else "▼"
+                val trendColor = if (isTrendPositive) TrendUpColor else TrendDownColor
+                val vsLabel = stringResource(R.string.stats_summary_vs_previous)
+                Text(
+                    text = "$arrow $trendPercent%  $vsLabel",
+                    fontFamily = PlusJakartaSans,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 12.sp,
+                    color = trendColor
+                )
+            }
         }
     }
 }
@@ -115,6 +128,22 @@ private fun SummaryCardPreview() {
             trendPercent = 12,
             isTrendPositive = true,
             periodLabel = "This week's",
+            firstPeriodLabel = null,
+            modifier = Modifier.padding(16.dp)
+        )
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFFF2F6F9)
+@Composable
+private fun SummaryCardFirstPeriodPreview() {
+    DrinkWaterAppTheme {
+        SummaryCard(
+            avgMl = 1340,
+            trendPercent = 0,
+            isTrendPositive = true,
+            periodLabel = "This week's",
+            firstPeriodLabel = "My first week",
             modifier = Modifier.padding(16.dp)
         )
     }

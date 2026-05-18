@@ -89,6 +89,17 @@ internal fun StatsContent(
         StatsPeriod.YEAR -> periodLabelYear
     }
 
+    val firstWeekLabel = stringResource(R.string.stats_summary_first_week)
+    val firstMonthLabel = stringResource(R.string.stats_summary_first_month)
+    val firstYearLabel = stringResource(R.string.stats_summary_first_year)
+    val firstPeriodLabel: String? = if (!state.showTrend) {
+        when (state.selectedPeriod) {
+            StatsPeriod.WEEK -> firstWeekLabel
+            StatsPeriod.MONTH -> firstMonthLabel
+            StatsPeriod.YEAR -> firstYearLabel
+        }
+    } else null
+
     val periodWeek = stringResource(R.string.stats_period_week)
     val periodMonth = stringResource(R.string.stats_period_month)
     val periodYear = stringResource(R.string.stats_period_year)
@@ -134,6 +145,7 @@ internal fun StatsContent(
                 trendPercent = state.avgTrendPercent,
                 isTrendPositive = state.isTrendPositive,
                 periodLabel = periodLabel,
+                firstPeriodLabel = firstPeriodLabel,
                 modifier = Modifier.padding(horizontal = 18.dp)
             )
         }
@@ -252,6 +264,7 @@ private val previewState = StatsState(
     avgMl = 1850,
     avgTrendPercent = 12,
     isTrendPositive = true,
+    showTrend = true,
     goalStreakDays = 4,
     bestGoalStreakDays = 12,
     drinkStreakDays = 7,

@@ -79,6 +79,7 @@ internal class StatsViewModel(
                 avgMl = summary.avgMl,
                 avgTrendPercent = summary.trendPercent,
                 isTrendPositive = summary.isTrendPositive,
+                showTrend = summary.showTrend,
             )
         },
         streakData,
@@ -107,20 +108,35 @@ internal class StatsViewModel(
 
     // ── Summary ──────────────────────────────────────────────────────────────
 
-    private data class Summary(val avgMl: Int, val trendPercent: Int, val isTrendPositive: Boolean)
+    private data class Summary(
+        val avgMl: Int,
+        val trendPercent: Int,
+        val isTrendPositive: Boolean,
+        val showTrend: Boolean,
+    )
 
     /**
      * Average intake and period-over-period trend for [pageIndex].
      * Only days/months with amountMl > 0 are counted.
      * pages[0] = oldest, pages[N] = most recent.
      * Trend compares against the previous (older) page at pageIndex - 1.
+     *
+     * [showTrend] is true only when at least one prior page has recorded data,
+     * meaning the user has been using the app long enough to have a meaningful
+     * comparison period. This prevents showing the trend on a fresh install.
      */
     private fun computeSummary(pages: List<PeriodPage>, pageIndex: Int): Summary {
         if (pages.isEmpty() || pageIndex !in pages.indices) {
-            return Summary(avgMl = 0, trendPercent = 0, isTrendPositive = true)
+            return Summary(avgMl = 0, trendPercent = 0, isTrendPositive = true, showTrend = false)
         }
         val amounts = pages[pageIndex].entries.map { it.amountMl }.filter { it > 0 }
         val avg = if (amounts.isNotEmpty()) amounts.average().toInt() else 0
+
+        // Show trend only when there is at least one prior page with recorded data.
+        // If every page before the current one is empty the app is just starting out.
+        val showTrend = pageIndex > 0 && (0 until pageIndex).any { i ->
+            pages[i].entries.any { it.amountMl > 0 }
+        }
 
         val prevAmounts = pages.getOrNull(pageIndex - 1)
             ?.entries?.map { it.amountMl }?.filter { it > 0 }
@@ -133,6 +149,7 @@ internal class StatsViewModel(
             avgMl = avg,
             trendPercent = abs(trendPercent),
             isTrendPositive = trendPercent >= 0,
+            showTrend = showTrend,
         )
     }
 
