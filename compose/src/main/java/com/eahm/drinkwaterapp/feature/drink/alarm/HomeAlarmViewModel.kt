@@ -77,6 +77,9 @@ internal class HomeAlarmViewModel(
             isInActiveHours = computeIsInActiveHours(now, startTime, endTime),
             now = now,
         )
+    }.combine(prefsStorage.getTimeFormatPreference()) { alarmState, timeFormat ->
+        if (alarmState is HomeAlarmState.Active) alarmState.copy(timeFormatPreference = timeFormat)
+        else alarmState
     }.stateIn(viewModelScope, SharingStarted.Lazily, HomeAlarmState.Loading)
 
     private fun buildSchedule(

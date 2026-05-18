@@ -2,6 +2,7 @@ package com.eahm.drinkwaterapp.feature.drink.alarm
 
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkSchedule
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
+import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import kotlinx.datetime.LocalDateTime
 
 internal sealed interface HomeAlarmState {
@@ -23,5 +24,6 @@ internal sealed interface HomeAlarmState {
         val nextAlarmSlot: LocalDateTime?,
         val isInActiveHours: Boolean,
         val now: LocalDateTime,
+        val timeFormatPreference: TimeFormatPreference = TimeFormatPreference.SYSTEM,
     ) : HomeAlarmState
 }

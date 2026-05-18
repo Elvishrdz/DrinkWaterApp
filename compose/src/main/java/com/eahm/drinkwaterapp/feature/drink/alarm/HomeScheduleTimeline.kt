@@ -31,7 +31,6 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterDeep
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
-import com.eahm.drinkwaterapp.core.domain.extension.pad
 import kotlinx.datetime.LocalDateTime
 
 @Composable
@@ -41,6 +40,7 @@ internal fun HomeScheduleTimeline(
     endTime: LocalDateTime,
     now: LocalDateTime,
     isInActiveHours: Boolean,
+    is24Hour: Boolean = true,
 ) {
     val slots = schedule.slots
     val startMin = startTime.hour * 60 + startTime.minute
@@ -66,13 +66,13 @@ internal fun HomeScheduleTimeline(
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(
-                text = "${startTime.hour.pad()}:${startTime.minute.pad()}",
+                text = startTime.formatTime(is24Hour),
                 fontFamily = PlusJakartaSans,
                 fontSize = 11.sp,
                 color = DwInk400,
             )
             Text(
-                text = "${endTime.hour.pad()}:${endTime.minute.pad()}",
+                text = endTime.formatTime(is24Hour),
                 fontFamily = PlusJakartaSans,
                 fontSize = 11.sp,
                 color = DwInk400,
@@ -158,6 +158,21 @@ internal fun HomeScheduleTimeline(
                 }
             }
         }
+    }
+}
+
+private fun LocalDateTime.formatTime(is24Hour: Boolean): String {
+    val mm = minute.toString().padStart(2, '0')
+    return if (is24Hour) {
+        "${hour.toString().padStart(2, '0')}:$mm"
+    } else {
+        val h12 = when {
+            hour == 0 -> 12
+            hour > 12 -> hour - 12
+            else -> hour
+        }
+        val period = if (hour < 12) "AM" else "PM"
+        "$h12:$mm $period"
     }
 }
 

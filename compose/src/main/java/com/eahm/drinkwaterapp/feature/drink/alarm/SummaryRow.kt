@@ -9,7 +9,6 @@ import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkSchedule
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
-import com.eahm.drinkwaterapp.core.domain.extension.pad
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import kotlinx.datetime.LocalDateTime
 
@@ -19,6 +18,7 @@ internal fun SummaryRow(
     interval: AlarmInterval,
     nextAlarmSlot: LocalDateTime?,
     isInActiveHours: Boolean,
+    is24Hour: Boolean = true,
 ) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         if (schedule != null) {
@@ -47,9 +47,24 @@ internal fun SummaryRow(
                 )
             SummaryChip(
                 label = label,
-                value = "${next.hour.pad()}:${next.minute.pad()}",
+                value = next.formatTime(is24Hour),
             )
         }
+    }
+}
+
+private fun LocalDateTime.formatTime(is24Hour: Boolean): String {
+    val mm = minute.toString().padStart(2, '0')
+    return if (is24Hour) {
+        "${hour.toString().padStart(2, '0')}:$mm"
+    } else {
+        val h12 = when {
+            hour == 0 -> 12
+            hour > 12 -> hour - 12
+            else -> hour
+        }
+        val period = if (hour < 12) "AM" else "PM"
+        "$h12:$mm $period"
     }
 }
 

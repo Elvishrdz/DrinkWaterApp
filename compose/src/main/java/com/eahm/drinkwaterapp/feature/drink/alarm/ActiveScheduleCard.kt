@@ -1,5 +1,6 @@
 package com.eahm.drinkwaterapp.feature.drink.alarm
 
+import android.text.format.DateFormat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -23,6 +25,7 @@ import com.eahm.drinkwaterapp.core.designsystem.component.extension.outlineBorde
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
+import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import kotlinx.datetime.LocalDateTime
 
 @Composable
@@ -30,6 +33,13 @@ internal fun ActiveScheduleCard(
     state: HomeAlarmState.Active,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    val is24Hour = when (state.timeFormatPreference) {
+        TimeFormatPreference.SYSTEM -> DateFormat.is24HourFormat(context)
+        TimeFormatPreference.HOUR_12 -> false
+        TimeFormatPreference.HOUR_24 -> true
+    }
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -62,6 +72,7 @@ internal fun ActiveScheduleCard(
                 endTime = state.endTime,
                 now = state.now,
                 isInActiveHours = state.isInActiveHours,
+                is24Hour = is24Hour,
             )
         }
 
@@ -70,6 +81,7 @@ internal fun ActiveScheduleCard(
             interval = state.interval,
             nextAlarmSlot = state.nextAlarmSlot,
             isInActiveHours = state.isInActiveHours,
+            is24Hour = is24Hour,
         )
     }
 }
