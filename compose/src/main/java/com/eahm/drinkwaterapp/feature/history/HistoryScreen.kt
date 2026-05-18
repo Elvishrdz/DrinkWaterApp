@@ -1,5 +1,6 @@
 package com.eahm.drinkwaterapp.feature.history
 
+import android.text.format.DateFormat
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +18,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -37,6 +39,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 import com.eahm.drinkwaterapp.core.domain.mock.Mock
 import com.eahm.drinkwaterapp.core.domain.mock.hourGroupMock
 import com.eahm.drinkwaterapp.core.domain.mock.localDateTimeMock
+import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.eahm.drinkwaterapp.ui.historylist.DateTimePickerButton
 import com.eahm.drinkwaterapp.ui.historylist.HistoryTimeline
 import com.eahm.drinkwaterapp.ui.historylist.HourGroup
@@ -51,6 +54,13 @@ internal fun HistoryScreen(
     onDateChanged: (LocalDateTime) -> Unit,
     onGoToToday: () -> Unit,
 ) {
+    val context = LocalContext.current
+    val is24Hour = when (state.timeFormatPreference) {
+        TimeFormatPreference.SYSTEM -> DateFormat.is24HourFormat(context)
+        TimeFormatPreference.HOUR_12 -> false
+        TimeFormatPreference.HOUR_24 -> true
+    }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
     ) { innerPadding ->
@@ -64,6 +74,7 @@ internal fun HistoryScreen(
             goalMl = state.goalMl,
             consumedMl = state.consumedMl,
             isToday = state.isToday,
+            is24Hour = is24Hour,
             onDelete = onDelete,
             onDateChanged = onDateChanged,
             onGoToToday = onGoToToday,
@@ -78,6 +89,7 @@ private fun Content(
     goalMl: Float,
     consumedMl: Float,
     isToday: Boolean,
+    is24Hour: Boolean,
     modifier: Modifier = Modifier,
     onDelete: (HistoryEntity) -> Unit,
     onDateChanged: (LocalDateTime) -> Unit,
@@ -145,6 +157,7 @@ private fun Content(
         if (historyRecords.isNotEmpty()) {
             HistoryTimeline(
                 historyRecords = historyRecords,
+                is24Hour = is24Hour,
                 onDelete = { onDelete(it.toEntity()) },
             )
         } else {
@@ -247,6 +260,7 @@ private fun HistoryScreenPreview() {
             goalMl = 2000f,
             consumedMl = 750f,
             isToday = false,
+            is24Hour = false,
             onDelete = {},
             onDateChanged = {},
             onGoToToday = {},

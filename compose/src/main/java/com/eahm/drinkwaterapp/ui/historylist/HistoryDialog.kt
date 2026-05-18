@@ -163,7 +163,8 @@ private fun HistoryDialogPreview() {
 fun HistoryTimeline(
     historyRecords: ImmutableList<HourGroup>,
     onDelete: (HistoryUI) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    is24Hour: Boolean = true,
 ) {
     Column(
         modifier = modifier
@@ -179,6 +180,7 @@ fun HistoryTimeline(
             TimelineHourGroup(
                 hourGroup = hourGroup,
                 isCurrentHour = hourGroup.isCurrentHour,
+                is24Hour = is24Hour,
                 onDelete = onDelete,
             )
         }
@@ -189,9 +191,20 @@ fun HistoryTimeline(
 private fun TimelineHourGroup(
     hourGroup: HourGroup,
     isCurrentHour: Boolean,
+    is24Hour: Boolean,
     onDelete: (HistoryUI) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val hourHeaderText = if (is24Hour) {
+        String.format(Locale.getDefault(), "%02d:00", hourGroup.hour)
+    } else {
+        val h12 = when {
+            hourGroup.hour == 0 -> 12; hourGroup.hour > 12 -> hourGroup.hour - 12; else -> hourGroup.hour
+        }
+        val period = if (hourGroup.hour < 12) "AM" else "PM"
+        "$h12 $period"
+    }
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(6.dp),
@@ -203,7 +216,7 @@ private fun TimelineHourGroup(
             modifier = Modifier.padding(horizontal = 4.dp),
         ) {
             Text(
-                text = String.format(Locale.getDefault(), "%02d:00", hourGroup.hour),
+                text = hourHeaderText,
                 fontFamily = JetBrainsMono,
                 fontWeight = FontWeight.Medium,
                 fontSize = 11.sp,
@@ -230,7 +243,7 @@ private fun TimelineHourGroup(
                 .background(MaterialTheme.colorScheme.surface)
         ) {
             hourGroup.items.forEachIndexed { index, item ->
-                TimelineItemCard(item = item, onDelete = onDelete)
+                TimelineItemCard(item = item, is24Hour = is24Hour, onDelete = onDelete)
                 if (index < hourGroup.items.lastIndex) {
                     HorizontalDivider(color = DwInk100)
                 }
@@ -242,6 +255,7 @@ private fun TimelineHourGroup(
 @Composable
 private fun TimelineItemCard(
     item: HistoryUI,
+    is24Hour: Boolean,
     onDelete: (HistoryUI) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -277,7 +291,7 @@ private fun TimelineItemCard(
                 color = MaterialTheme.colorScheme.onSurface,
             )
             Text(
-                text = formatTime(item.timestamp),
+                text = formatTime(item.timestamp, is24Hour),
                 fontFamily = JetBrainsMono,
                 fontWeight = FontWeight.Normal,
                 fontSize = 11.sp,
@@ -299,10 +313,18 @@ private fun TimelineItemCard(
     }
 }
 
-private fun formatTime(timestamp: LocalDateTime): String {
-    val hour = timestamp.hour
-    val minute = timestamp.minute
-    return String.format(Locale.getDefault(), "%02d:%02d", hour, minute)
+private fun formatTime(timestamp: LocalDateTime, is24Hour: Boolean): String {
+    val h = timestamp.hour
+    val m = timestamp.minute
+    return if (is24Hour) {
+        String.format(Locale.getDefault(), "%02d:%02d", h, m)
+    } else {
+        val h12 = when {
+            h == 0 -> 12; h > 12 -> h - 12; else -> h
+        }
+        val period = if (h < 12) "AM" else "PM"
+        String.format(Locale.getDefault(), "%02d:%02d %s", h12, m, period)
+    }
 }
 
 @OptIn(ExperimentalTime::class)

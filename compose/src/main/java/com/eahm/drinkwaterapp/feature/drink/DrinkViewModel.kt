@@ -2,6 +2,7 @@ package com.eahm.drinkwaterapp.feature.drink
 
 import android.app.Application
 import android.provider.Settings
+import android.text.format.DateFormat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingDrink
@@ -17,6 +18,7 @@ import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.database.entity.Status
 import com.eahm.drinkwaterapp.core.domain.extension.toEndOfDayTime
 import com.eahm.drinkwaterapp.core.domain.extension.toStartOfDayTime
+import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.eahm.drinkwaterapp.feature.drink.data.HistoryData
 import com.eahm.drinkwaterapp.feature.drink.ui.DrinkLogEntry
 import com.eahm.drinkwaterapp.system.alarm.AlarmSchedulerV3
@@ -34,10 +36,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.format
-import kotlinx.datetime.format.char
 import kotlinx.datetime.toInstant
 import kotlin.time.ExperimentalTime
 
@@ -89,19 +88,30 @@ internal class DrinkViewModel(
     private val history = combine(
         historyDate,
         records,
-    ) { date, records ->
+        prefsStorage.getTimeFormatPreference(),
+    ) { date, records, timeFormatPref ->
+        val is24Hour = when (timeFormatPref) {
+            TimeFormatPreference.SYSTEM -> DateFormat.is24HourFormat(application)
+            TimeFormatPreference.HOUR_12 -> false
+            TimeFormatPreference.HOUR_24 -> true
+        }
         val todayLogs = records
             .filter { it.timestamp in date.toStartOfDayTime..date.toEndOfDayTime }
             .sortedByDescending { it.timestamp }
             .map {
+                val h = it.timestamp.hour
+                val m = it.timestamp.minute
+                val timeStr = if (is24Hour) {
+                    "${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}"
+                } else {
+                    val h12 = when {
+                        h == 0 -> 12; h > 12 -> h - 12; else -> h
+                    }
+                    val period = if (h < 12) "AM" else "PM"
+                    "${h12.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')} $period"
+                }
                 DrinkLogEntry(
-                    time = it.timestamp.time.format(
-                        LocalTime.Format {
-                            hour()
-                            char(':')
-                            minute()
-                        }
-                    ),
+                    time = timeStr,
                     amount = it.amount,
                     timestamp = it.timestamp
                         .toInstant(TimeZone.currentSystemDefault())

@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.core.bindings.toUI
+import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
@@ -33,6 +34,7 @@ import kotlin.time.ExperimentalTime
 internal class HistoryViewModel(
     val application: Application,
     val database: AppDatabase,
+    val prefsStorage: PrefsStorage,
 ) : ViewModel() {
 
     private val historyDao = database.getHistoryDao()
@@ -117,6 +119,8 @@ internal class HistoryViewModel(
             consumedMl = consumed,
             isToday = isToday,
         )
+    }.combine(prefsStorage.getTimeFormatPreference()) { historyState, timeFormat ->
+        historyState.copy(timeFormatPreference = timeFormat)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
