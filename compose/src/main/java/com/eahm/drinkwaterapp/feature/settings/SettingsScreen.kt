@@ -473,6 +473,18 @@ internal fun SettingsContent(
 
             item {
                 SettingsSection(title = stringResource(R.string.settings_section_reminders)) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        SettingRow(
+                            icon = DwIcons.Clock,
+                            iconBg = DwTintWater,
+                            iconTint = DwWater,
+                            label = stringResource(R.string.settings_row_reminder_type),
+                            onClick = onExactAlarmTap,
+                        ) {
+                            AlarmTypeBadge(isExact = state.exactAlarmsEnabled)
+                        }
+                        HorizontalDivider(color = DwInk100)
+                    }
                     SettingRow(
                         icon = DwIcons.Bell,
                         iconBg = DwTintMagenta,
@@ -491,32 +503,30 @@ internal fun SettingsContent(
                             ),
                         )
                     }
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        HorizontalDivider(color = DwInk100)
-                        SettingRow(
-                            icon = DwIcons.Clock,
-                            iconBg = DwTintWater,
-                            iconTint = DwWater,
-                            label = stringResource(R.string.settings_row_reminder_type),
-                            onClick = onExactAlarmTap,
-                        ) {
-                            AlarmTypeBadge(isExact = state.exactAlarmsEnabled)
-                        }
+                    HorizontalDivider(color = DwInk100)
+                    SettingRow(
+                        icon = DwIcons.Glass,
+                        iconBg = DwTintWater,
+                        iconTint = DwWater,
+                        label = stringResource(R.string.settings_row_notification_amount),
+                        onClick = { showNotificationAmountSheet = true },
+                    ) {
+                        RowValueTrailing(
+                            value = stringResource(
+                                R.string.settings_notification_amount_value,
+                                state.notificationAmountMl.toInt()
+                            )
+                        )
                     }
                     HorizontalDivider(color = DwInk100)
                     SettingRow(
                         icon = DwIcons.Clock,
                         iconBg = DwTintWater,
                         iconTint = DwWater,
-                        label = stringResource(R.string.settings_row_interval),
-                        onClick = { showIntervalSheet = true },
+                        label = stringResource(R.string.settings_row_time_format),
+                        onClick = { showTimeFormatSheet = true },
                     ) {
-                        RowValueTrailing(
-                            value = stringResource(
-                                R.string.settings_interval_value,
-                                state.intervalMinutes
-                            )
-                        )
+                        TimeFormatBadge(preference = state.timeFormatPreference)
                     }
                     HorizontalDivider(color = DwInk100)
                     SettingRowTimeSelector(
@@ -543,23 +553,13 @@ internal fun SettingsContent(
                         icon = DwIcons.Clock,
                         iconBg = DwTintWater,
                         iconTint = DwWater,
-                        label = stringResource(R.string.settings_row_time_format),
-                        onClick = { showTimeFormatSheet = true },
-                    ) {
-                        TimeFormatBadge(preference = state.timeFormatPreference)
-                    }
-                    HorizontalDivider(color = DwInk100)
-                    SettingRow(
-                        icon = DwIcons.Glass,
-                        iconBg = DwTintWater,
-                        iconTint = DwWater,
-                        label = stringResource(R.string.settings_row_notification_amount),
-                        onClick = { showNotificationAmountSheet = true },
+                        label = stringResource(R.string.settings_row_interval),
+                        onClick = { showIntervalSheet = true },
                     ) {
                         RowValueTrailing(
                             value = stringResource(
-                                R.string.settings_notification_amount_value,
-                                state.notificationAmountMl.toInt()
+                                R.string.settings_interval_value,
+                                state.intervalMinutes
                             )
                         )
                     }
