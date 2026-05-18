@@ -200,6 +200,11 @@
     <string name="settings_time_format_auto_description">Follows your device\'s locale setting</string>
     <string name="settings_time_format_12h_description">Always show AM / PM</string>
     <string name="settings_time_format_24h_description">Always show 24-hour clock</string>
+    <string name="settings_group_app">APP</string>
+    <string name="settings_unit_preference_title">Volume Units</string>
+    <string name="settings_unit_ml">Milliliters (mL)</string>
+    <string name="settings_unit_auto_liters">Auto Liters (mL / L)</string>
+    <string name="settings_unit_fl_oz">Fluid Ounces (fl oz)</string>
     <string name="settings_row_goal_celebrations">Goal reached celebrations</string>
     <string name="settings_row_reminder_type">Reminder type</string>
     <string name="settings_row_reminder_status">Exact</string>
@@ -337,6 +342,9 @@
     <string name="stats_summary_avg_label">%1$s avg</string>
     <string name="stats_summary_unit">mL/day</string>
     <string name="stats_summary_vs_previous">vs previous period</string>
+    <string name="stats_summary_consistent_week">Excellent! You matched last week\'s records. Keep it up!</string>
+    <string name="stats_summary_consistent_month">Excellent! You matched last month\'s records. Keep it up!</string>
+    <string name="stats_summary_consistent_year">Excellent! You matched last year\'s records. Keep it up!</string>
     <string name="stats_summary_first_week">My first week</string>
     <string name="stats_summary_first_month">My first month</string>
     <string name="stats_summary_first_year">My first year</string>

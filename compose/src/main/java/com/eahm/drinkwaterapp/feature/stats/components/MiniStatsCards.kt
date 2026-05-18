@@ -19,7 +19,8 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
-import com.eahm.drinkwaterapp.core.domain.extension.sanitizeZeroDecimals
+import com.eahm.drinkwaterapp.core.domain.extension.formatVolume
+import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 
 @Composable
 fun MiniStatsCards(
@@ -29,6 +30,7 @@ fun MiniStatsCards(
     bestGoalStreakDays: Int?,
     personalBestMl: Float?,
     modifier: Modifier = Modifier,
+    unitPreference: UnitPreference = UnitPreference.ML,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -91,7 +93,7 @@ fun MiniStatsCards(
                     icon = DwIcons.Glass,
                     iconBg = DwTintWater,
                     iconTint = DwWater,
-                    value = it.sanitizeZeroDecimals(),
+                    value = it.formatVolume(unitPreference),
                     label = stringResource(R.string.stats_mini_personal_best),
                     modifier = Modifier.weight(1f),
                 )

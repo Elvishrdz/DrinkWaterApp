@@ -18,6 +18,7 @@ import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
 import com.eahm.drinkwaterapp.core.database.entity.DailyGoalEntity
 import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
+import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.feature.drink.DateTimeZoneChangedObserver
 import com.eahm.drinkwaterapp.feature.settings.data.ActiveTimes
 import com.eahm.drinkwaterapp.ui.inputfield.validateText
@@ -134,6 +135,9 @@ internal class SettingsViewModel(
         .combine(prefsStorage.getTimeFormatPreference()) { state, timeFormatPreference ->
             state.copy(timeFormatPreference = timeFormatPreference)
         }
+        .combine(prefsStorage.getUnitPreference()) { state, unitPref ->
+            state.copy(unitPreference = unitPref)
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Lazily,
@@ -215,6 +219,10 @@ internal class SettingsViewModel(
 
     fun onTimeFormatPreferenceChanged(pref: TimeFormatPreference) {
         viewModelScope.launch { prefsStorage.setTimeFormatPreference(pref) }
+    }
+
+    fun onUnitPreferenceChanged(pref: UnitPreference) {
+        viewModelScope.launch { prefsStorage.setUnitPreference(pref) }
     }
 
     fun onDrawOverlayPermissionResult() {

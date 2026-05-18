@@ -90,8 +90,10 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.JetBrainsMono
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
+import com.eahm.drinkwaterapp.core.domain.extension.formatVolume
 import com.eahm.drinkwaterapp.core.domain.extension.sanitizeZeroDecimals
 import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
+import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.core.presentation.composable.BuildInfoFooter
 import com.eahm.drinkwaterapp.feature.settings.ui.EditButton
 import com.eahm.drinkwaterapp.feature.settings.ui.GoalBottomSheet
@@ -99,6 +101,7 @@ import com.eahm.drinkwaterapp.feature.settings.ui.IntervalBottomSheet
 import com.eahm.drinkwaterapp.feature.settings.ui.NotificationAmountBottomSheet
 import com.eahm.drinkwaterapp.feature.settings.ui.RemoveAdsBottomSheet
 import com.eahm.drinkwaterapp.feature.settings.ui.TimeFormatBottomSheet
+import com.eahm.drinkwaterapp.feature.settings.ui.UnitPreferenceBottomSheet
 import com.eahm.drinkwaterapp.feature.settings.ui.UnitsBottomSheet
 import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorDialog
 import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
@@ -256,6 +259,7 @@ internal fun SettingsScreen(
         onClearDataTap = { showClearDataDialog = true },
         onRemoveAdsTap = viewModel::onFetchOfferings,
         onTimeFormatChanged = viewModel::onTimeFormatPreferenceChanged,
+        onUnitPreferenceChanged = viewModel::onUnitPreferenceChanged,
         modifier = modifier,
     )
 
@@ -395,6 +399,7 @@ internal fun SettingsContent(
     onClearDataTap: () -> Unit,
     onRemoveAdsTap: () -> Unit,
     onTimeFormatChanged: (TimeFormatPreference) -> Unit,
+    onUnitPreferenceChanged: (UnitPreference) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -418,6 +423,7 @@ internal fun SettingsContent(
     var showIntervalSheet by rememberSaveable { mutableStateOf(false) }
     var showNotificationAmountSheet by rememberSaveable { mutableStateOf(false) }
     var showTimeFormatSheet by rememberSaveable { mutableStateOf(false) }
+    var showUnitSheet by rememberSaveable { mutableStateOf(false) }
 
     Scaffold { innerPadding ->
         LazyColumn(
@@ -453,7 +459,7 @@ internal fun SettingsContent(
                         label = stringResource(R.string.label_daily_goal),
                         onClick = { showGoalSheet = true },
                     ) {
-                        RowValueTrailing(value = formatGoal(state.dailyGoalMl))
+                        RowValueTrailing(value = state.dailyGoalMl.formatVolume(state.unitPreference))
                     }
                     if (false) {
                         // TODO: setup units in the app
@@ -467,6 +473,30 @@ internal fun SettingsContent(
                         ) {
                             RowValueTrailing(value = "${state.unit.label} · ${state.weightUnit.label}")
                         }
+                    }
+                }
+            }
+
+            item {
+                SettingsSection(title = stringResource(R.string.settings_group_app)) {
+                    SettingRow(
+                        icon = DwIcons.Ruler,
+                        iconBg = DwTintWater,
+                        iconTint = DwWater,
+                        label = stringResource(R.string.settings_unit_preference_title),
+                        onClick = { showUnitSheet = true },
+                    ) {
+                        UnitPreferenceBadge(preference = state.unitPreference)
+                    }
+                    HorizontalDivider(color = DwInk100)
+                    SettingRow(
+                        icon = DwIcons.Clock,
+                        iconBg = DwTintWater,
+                        iconTint = DwWater,
+                        label = stringResource(R.string.settings_row_time_format),
+                        onClick = { showTimeFormatSheet = true },
+                    ) {
+                        TimeFormatBadge(preference = state.timeFormatPreference)
                     }
                 }
             }
@@ -512,21 +542,8 @@ internal fun SettingsContent(
                         onClick = { showNotificationAmountSheet = true },
                     ) {
                         RowValueTrailing(
-                            value = stringResource(
-                                R.string.settings_notification_amount_value,
-                                state.notificationAmountMl.toInt()
-                            )
+                            value = state.notificationAmountMl.formatVolume(state.unitPreference)
                         )
-                    }
-                    HorizontalDivider(color = DwInk100)
-                    SettingRow(
-                        icon = DwIcons.Clock,
-                        iconBg = DwTintWater,
-                        iconTint = DwWater,
-                        label = stringResource(R.string.settings_row_time_format),
-                        onClick = { showTimeFormatSheet = true },
-                    ) {
-                        TimeFormatBadge(preference = state.timeFormatPreference)
                     }
                     HorizontalDivider(color = DwInk100)
                     SettingRowTimeSelector(
@@ -708,6 +725,7 @@ internal fun SettingsContent(
             goalMl = state.dailyGoalMl,
             onGoalChanged = onGoalChanged,
             onDismiss = { showGoalSheet = false },
+            unitPreference = state.unitPreference,
         )
     }
 
@@ -733,6 +751,7 @@ internal fun SettingsContent(
             currentAmountMl = state.notificationAmountMl,
             onAmountChanged = onNotificationAmountChanged,
             onDismiss = { showNotificationAmountSheet = false },
+            unitPreference = state.unitPreference,
         )
     }
 
@@ -741,6 +760,14 @@ internal fun SettingsContent(
             current = state.timeFormatPreference,
             onPreferenceChanged = onTimeFormatChanged,
             onDismiss = { showTimeFormatSheet = false },
+        )
+    }
+
+    if (showUnitSheet) {
+        UnitPreferenceBottomSheet(
+            current = state.unitPreference,
+            onPreferenceChanged = onUnitPreferenceChanged,
+            onDismiss = { showUnitSheet = false },
         )
     }
 }
@@ -1275,6 +1302,41 @@ private fun AlarmTypeBadge(isExact: Boolean) {
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 11.sp,
                 color = textColor,
+            )
+        }
+        Icon(
+            imageVector = DwIcons.ChevronRight,
+            contentDescription = null,
+            tint = DwInk400,
+            modifier = Modifier.size(16.dp),
+        )
+    }
+}
+
+@Composable
+private fun UnitPreferenceBadge(preference: UnitPreference) {
+    val text = when (preference) {
+        UnitPreference.ML -> stringResource(R.string.settings_unit_ml)
+        UnitPreference.AUTO_LITERS -> stringResource(R.string.settings_unit_auto_liters)
+        UnitPreference.FL_OZ -> stringResource(R.string.settings_unit_fl_oz)
+    }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(999.dp))
+                .background(DwInk100)
+                .padding(horizontal = 8.dp, vertical = 3.dp),
+        ) {
+            Text(
+                text = text,
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 11.sp,
+                color = DwInk400,
             )
         }
         Icon(

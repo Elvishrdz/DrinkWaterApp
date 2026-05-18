@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
+import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.system.service.goalcelebration.data.CelebrationStyle
 import com.eahm.drinkwaterapp.system.service.goalcelebration.data.CelebrationVariant
 import com.eahm.drinkwaterapp.system.service.goalcelebration.data.getStyle
@@ -74,6 +75,7 @@ fun GoalCelebrationScreen(
     // the card's visual bounds. When false, dragging from anywhere on screen moves the card.
     dragFromCardOnly: Boolean = true,
     showScrim: Boolean = true,
+    unitPreference: UnitPreference = UnitPreference.ML,
     onClose: () -> Unit,
     onShare: (Bitmap) -> Unit,
 ) {
@@ -172,6 +174,7 @@ fun GoalCelebrationScreen(
                 onShare = onShare,
                 showStreakDays = false, // Streak disabled until is working
                 showShareProgressButton = false, // Share disabled until is fully ready
+                unitPreference = unitPreference,
                 modifier = Modifier
                     .padding(horizontal = 20.dp)
                     .offset { IntOffset(dragOffset.x.roundToInt(), dragOffset.y.roundToInt()) }

@@ -38,12 +38,13 @@ import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
+import com.eahm.drinkwaterapp.core.domain.extension.formatVolume
+import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.ui.bottomsheet.AppBottomSheet
 import kotlinx.coroutines.launch
 
@@ -57,6 +58,7 @@ internal fun NotificationAmountBottomSheet(
     currentAmountMl: Float,
     onAmountChanged: (Float) -> Unit,
     onDismiss: () -> Unit,
+    unitPreference: UnitPreference = UnitPreference.ML,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
@@ -89,6 +91,7 @@ internal fun NotificationAmountBottomSheet(
                 onAmountChanged(value.toFloat())
                 dismissWithAnimation()
             },
+            unitPreference = unitPreference,
         )
     }
 }
@@ -101,6 +104,7 @@ private fun NotificationAmountSheetContent(
     onDecrement: () -> Unit,
     onIncrement: () -> Unit,
     onSave: () -> Unit,
+    unitPreference: UnitPreference = UnitPreference.ML,
 ) {
     Column(
         modifier = Modifier
@@ -141,18 +145,11 @@ private fun NotificationAmountSheetContent(
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "$value",
+                    text = value.toFloat().formatVolume(unitPreference),
                     fontFamily = Nunito,
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 48.sp,
                     color = MaterialTheme.colorScheme.onBackground,
-                )
-                Text(
-                    text = stringResource(R.string.volume_unit_mililiters),
-                    fontFamily = PlusJakartaSans,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 16.sp,
-                    color = DwInk400,
                 )
             }
 

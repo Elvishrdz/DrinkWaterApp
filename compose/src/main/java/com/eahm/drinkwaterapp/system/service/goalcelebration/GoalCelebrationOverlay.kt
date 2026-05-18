@@ -24,6 +24,7 @@ import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
+import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.system.service.goalcelebration.data.CelebrationStyle
 import com.eahm.drinkwaterapp.system.service.goalcelebration.data.OverlayConfigurations
 import com.eahm.drinkwaterapp.system.service.goalcelebration.data.getStyle
@@ -44,6 +45,7 @@ class GoalCelebrationOverlay : Service(),
     private val goalMlState = mutableFloatStateOf(2400f)
     private val drinkCountState = mutableIntStateOf(1)
     private val streakDaysState = mutableIntStateOf(1)
+    private val unitPreferenceState = mutableStateOf(UnitPreference.ML)
 
     private val _savedStateRegistryController = SavedStateRegistryController.create(this)
     private val _lifecycleRegistry = LifecycleRegistry(this)
@@ -63,6 +65,9 @@ class GoalCelebrationOverlay : Service(),
             goalMlState.floatValue = it.getFloatExtra(OVERLAY_GOAL_ML, goalMlState.floatValue)
             drinkCountState.intValue = it.getIntExtra(OVERLAY_DRINK_COUNT, drinkCountState.intValue)
             streakDaysState.intValue = it.getIntExtra(OVERLAY_STREAK_DAYS, streakDaysState.intValue)
+            unitPreferenceState.value = it.getStringExtra(OVERLAY_UNIT_PREFERENCE)
+                ?.let { name -> runCatching { UnitPreference.valueOf(name) }.getOrNull() }
+                ?: UnitPreference.ML
         }
         return START_NOT_STICKY
     }
@@ -104,6 +109,7 @@ class GoalCelebrationOverlay : Service(),
                                 end = 7.dp,
                             ),
                             showScrim = false,
+                            unitPreference = unitPreferenceState.value,
                             onClose = ::stopSelf,
                             onShare = ::shareGoalCelebration,
                         )
@@ -139,5 +145,6 @@ class GoalCelebrationOverlay : Service(),
         const val OVERLAY_GOAL_ML = "OVERLAY_GOAL_ML"
         const val OVERLAY_DRINK_COUNT = "OVERLAY_DRINK_COUNT"
         const val OVERLAY_STREAK_DAYS = "OVERLAY_STREAK_DAYS"
+        const val OVERLAY_UNIT_PREFERENCE = "OVERLAY_UNIT_PREFERENCE"
     }
 }

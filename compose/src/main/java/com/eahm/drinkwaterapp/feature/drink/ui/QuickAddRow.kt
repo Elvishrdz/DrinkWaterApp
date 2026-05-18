@@ -7,6 +7,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
+import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.feature.drink.DrinkSource
 import com.eahm.drinkwaterapp.feature.drink.drinkSuggestionsMocks
 
@@ -21,12 +22,14 @@ fun QuickAddRow(
     onRestorePreset: (DrinkSuggestion) -> Unit,
     onBottomSheetOpened: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    unitPreference: UnitPreference = UnitPreference.ML,
 ) {
     DraggableQuickAddRow(
         presets = quickPresets,
         onDrink = { amount -> onDrink(amount, DrinkSource.QUICK_SUGGESTION) },
         onReorder = onReorder,
         modifier = modifier,
+        unitPreference = unitPreference,
         trailingContent = { trailingModifier ->
             AddDrinkButton(
                 presets = allPresets,
@@ -42,6 +45,7 @@ fun QuickAddRow(
                 onDelete = onDelete,
                 onRestorePreset = onRestorePreset,
                 onBottomSheetOpened = onBottomSheetOpened,
+                unitPreference = unitPreference,
                 modifier = trailingModifier,
             )
         },

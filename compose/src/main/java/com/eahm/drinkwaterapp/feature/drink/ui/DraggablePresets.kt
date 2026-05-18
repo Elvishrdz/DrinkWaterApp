@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterLight
+import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 
 private const val DRAG_SCALE = 1.3f
 private const val DRAG_ELEVATION = 0f // FIXME: elevation cutout
@@ -88,6 +89,7 @@ fun DraggableQuickAddRow(
     onReorder: (List<DrinkSuggestion>, Boolean) -> Unit,
     modifier: Modifier = Modifier,
     trailingContent: @Composable (Modifier) -> Unit = {},
+    unitPreference: UnitPreference = UnitPreference.ML,
 ) {
     var currentPresets by remember { mutableStateOf(presets) }
     var previousPresets by remember { mutableStateOf(emptyList<DrinkSuggestion>()) }
@@ -151,6 +153,7 @@ fun DraggableQuickAddRow(
                         onDrink(preset.amountMl)
                     },
                     animateOnClick = !isDraggingItem,
+                    unitPreference = unitPreference,
                     modifier = Modifier
                         .testTag("chip_${preset.amountMl.toInt()}")
                         .weight(1f)
@@ -250,6 +253,7 @@ fun DraggablePresetGrid(
     onDraggingChanged: (Boolean) -> Unit = {},
     onDeleteHover: (Boolean) -> Unit = {},
     columns: Int = GRID_COLUMNS,
+    unitPreference: UnitPreference = UnitPreference.ML,
 ) {
     var currentPresets by remember { mutableStateOf(presets) }
     var previousPresets by remember { mutableStateOf(emptyList<DrinkSuggestion>()) }
@@ -466,6 +470,7 @@ fun DraggablePresetGrid(
                                     if (isDraggingItem) return@WaterChip
                                     onDrink(preset.amountMl)
                                 },
+                                unitPreference = unitPreference,
                                 modifier = Modifier
                                     .weight(1f)
                                     .onSizeChanged {

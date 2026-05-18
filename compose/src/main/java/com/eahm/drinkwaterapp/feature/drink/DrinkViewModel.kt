@@ -19,6 +19,7 @@ import com.eahm.drinkwaterapp.core.database.entity.Status
 import com.eahm.drinkwaterapp.core.domain.extension.toEndOfDayTime
 import com.eahm.drinkwaterapp.core.domain.extension.toStartOfDayTime
 import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
+import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.feature.drink.data.HistoryData
 import com.eahm.drinkwaterapp.feature.drink.ui.DrinkLogEntry
 import com.eahm.drinkwaterapp.system.alarm.AlarmSchedulerV3
@@ -188,6 +189,9 @@ internal class DrinkViewModel(
                 alarmTriggerAtMs = alarmTriggerAtMs,
             )
         }
+    }.combine(prefsStorage.getUnitPreference()) { drinkState, unitPref ->
+        if (drinkState is DrinkState.Data) drinkState.copy(unitPreference = unitPref)
+        else drinkState
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
@@ -297,6 +301,7 @@ internal class DrinkViewModel(
                 goalMl = currentState?.drinkStats?.goalAmount ?: 2400f,
                 drinkCount = records.value.size.coerceAtLeast(1),
                 streakDays = streakRepository.streakData.firstOrNull()?.goalStreakDays ?: 0,
+                unitPreference = currentState?.unitPreference ?: UnitPreference.ML,
             )
             application.startService(intent)
         }

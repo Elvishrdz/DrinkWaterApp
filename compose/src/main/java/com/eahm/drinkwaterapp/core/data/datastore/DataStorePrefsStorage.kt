@@ -11,6 +11,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
 import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
 import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
+import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
@@ -51,6 +52,7 @@ private class DataStorePrefsStorage(
     private val bestGoalStreakKey = intPreferencesKey("BEST_GOAL_STREAK")
     private val bestDrinkStreakKey = intPreferencesKey("BEST_DRINK_STREAK")
     private val timeFormatPreferenceKey = stringPreferencesKey("TIME_FORMAT_PREFERENCE")
+    private val unitPreferenceKey = stringPreferencesKey("UNIT_PREFERENCE")
 
     private val json = Json {
         ignoreUnknownKeys = true
@@ -254,6 +256,19 @@ private class DataStorePrefsStorage(
         }
     }
 
+    override fun getUnitPreference(): Flow<UnitPreference> =
+        dataStore.data.map { prefs ->
+            prefs[unitPreferenceKey]
+                ?.let { runCatching { UnitPreference.valueOf(it) }.getOrNull() }
+                ?: UnitPreference.ML
+        }
+
+    override suspend fun setUnitPreference(pref: UnitPreference) {
+        dataStore.updateData { prefs ->
+            prefs.toMutablePreferences().also { it[unitPreferenceKey] = pref.name }
+        }
+    }
+
     override suspend fun clear() {
         clearPrivacyPolicyAccepted()
         clearTrackingConsentDecided()
@@ -267,6 +282,7 @@ private class DataStorePrefsStorage(
             it.remove(bestGoalStreakKey)
             it.remove(bestDrinkStreakKey)
             it.remove(timeFormatPreferenceKey)
+            it.remove(unitPreferenceKey)
         }
     }
 }

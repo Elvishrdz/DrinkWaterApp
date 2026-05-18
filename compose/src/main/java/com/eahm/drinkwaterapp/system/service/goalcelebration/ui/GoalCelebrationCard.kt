@@ -68,6 +68,8 @@ import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
+import com.eahm.drinkwaterapp.core.domain.extension.formatVolume
+import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.system.service.goalcelebration.data.CELEBRATIONS
 import com.eahm.drinkwaterapp.system.service.goalcelebration.data.CelebrationMark
 import com.eahm.drinkwaterapp.system.service.goalcelebration.data.CelebrationVariant
@@ -84,6 +86,7 @@ fun GoalCelebrationCard(
     modifier: Modifier = Modifier,
     showStreakDays: Boolean = true,
     showShareProgressButton: Boolean = true,
+    unitPreference: UnitPreference = UnitPreference.ML,
     onBoundsInRoot: ((Rect) -> Unit)? = null,
 ) {
     val graphicsLayer = rememberGraphicsLayer()
@@ -309,8 +312,8 @@ fun GoalCelebrationCard(
                         horizontalArrangement = Arrangement.SpaceEvenly,
                     ) {
                         StatCell(
-                            value = "%.1f".format(goalMl / 1000f),
-                            unit = "L",
+                            value = goalMl.formatVolume(unitPreference),
+                            unit = "",
                             label = "Reached",
                             modifier = Modifier.weight(1f),
                         )

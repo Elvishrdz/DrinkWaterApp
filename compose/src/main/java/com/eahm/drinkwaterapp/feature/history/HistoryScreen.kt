@@ -36,10 +36,12 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
 import com.eahm.drinkwaterapp.core.designsystem.theme.JetBrainsMono
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
+import com.eahm.drinkwaterapp.core.domain.extension.formatVolume
 import com.eahm.drinkwaterapp.core.domain.mock.Mock
 import com.eahm.drinkwaterapp.core.domain.mock.hourGroupMock
 import com.eahm.drinkwaterapp.core.domain.mock.localDateTimeMock
 import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
+import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.ui.historylist.DateTimePickerButton
 import com.eahm.drinkwaterapp.ui.historylist.HistoryTimeline
 import com.eahm.drinkwaterapp.ui.historylist.HourGroup
@@ -75,6 +77,7 @@ internal fun HistoryScreen(
             consumedMl = state.consumedMl,
             isToday = state.isToday,
             is24Hour = is24Hour,
+            unitPreference = state.unitPreference,
             onDelete = onDelete,
             onDateChanged = onDateChanged,
             onGoToToday = onGoToToday,
@@ -91,6 +94,7 @@ private fun Content(
     isToday: Boolean,
     is24Hour: Boolean,
     modifier: Modifier = Modifier,
+    unitPreference: UnitPreference = UnitPreference.ML,
     onDelete: (HistoryEntity) -> Unit,
     onDateChanged: (LocalDateTime) -> Unit,
     onGoToToday: () -> Unit,
@@ -141,7 +145,11 @@ private fun Content(
 
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 SectionLabel(stringResource(R.string.history_section_summary))
-                DaySummaryRow(consumedMl = consumedMl, goalMl = goalMl)
+                DaySummaryRow(
+                    consumedMl = consumedMl,
+                    goalMl = goalMl,
+                    unitPreference = unitPreference
+                )
             }
         }
 
@@ -158,6 +166,7 @@ private fun Content(
             HistoryTimeline(
                 historyRecords = historyRecords,
                 is24Hour = is24Hour,
+                unitPreference = unitPreference,
                 onDelete = { onDelete(it.toEntity()) },
             )
         } else {
@@ -187,6 +196,7 @@ private fun DaySummaryRow(
     consumedMl: Float,
     goalMl: Float,
     modifier: Modifier = Modifier,
+    unitPreference: UnitPreference = UnitPreference.ML,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -194,12 +204,12 @@ private fun DaySummaryRow(
     ) {
         StatChip(
             label = stringResource(R.string.history_stat_consumed),
-            value = stringResource(R.string.drink_log_entry_amount, consumedMl.toInt().toString()),
+            value = consumedMl.formatVolume(unitPreference),
             modifier = Modifier.weight(1f),
         )
         StatChip(
             label = stringResource(R.string.history_stat_goal),
-            value = stringResource(R.string.drink_log_entry_amount, goalMl.toInt().toString()),
+            value = goalMl.formatVolume(unitPreference),
             modifier = Modifier.weight(1f),
         )
     }

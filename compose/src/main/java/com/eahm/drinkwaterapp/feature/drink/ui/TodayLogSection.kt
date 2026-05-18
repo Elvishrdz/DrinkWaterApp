@@ -45,7 +45,8 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.JetBrainsMono
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
-import com.eahm.drinkwaterapp.ui.inputfield.toDigitString
+import com.eahm.drinkwaterapp.core.domain.extension.formatVolume
+import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 
 data class DrinkLogEntry(
     val time: String,
@@ -58,6 +59,7 @@ fun TodayLogSection(
     items: List<DrinkLogEntry>,
     onSeeAll: () -> Unit,
     modifier: Modifier = Modifier,
+    unitPreference: UnitPreference = UnitPreference.ML,
 ) {
     Column(
         modifier = modifier
@@ -137,7 +139,7 @@ fun TodayLogSection(
                             ) + fadeIn(animationSpec = spring()),
                         ) {
                             Column {
-                                DrinkLogRow(entry = entry)
+                                DrinkLogRow(entry = entry, unitPreference = unitPreference)
                                 if (index < items.lastIndex) {
                                     HorizontalDivider(
                                         color = DwInk100,
@@ -155,7 +157,7 @@ fun TodayLogSection(
 }
 
 @Composable
-private fun DrinkLogRow(entry: DrinkLogEntry) {
+private fun DrinkLogRow(entry: DrinkLogEntry, unitPreference: UnitPreference = UnitPreference.ML) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -178,7 +180,7 @@ private fun DrinkLogRow(entry: DrinkLogEntry) {
         }
 
         Text(
-            text = stringResource(R.string.drink_log_entry_amount, entry.amount.toDigitString()),
+            text = entry.amount.formatVolume(unitPreference),
             fontFamily = Nunito,
             fontWeight = FontWeight.Bold,
             fontSize = 14.sp,

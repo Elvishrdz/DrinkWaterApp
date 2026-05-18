@@ -2,6 +2,7 @@ package com.eahm.drinkwaterapp.feature.history
 
 import androidx.compose.runtime.Immutable
 import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
+import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.ui.historylist.HourGroup
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.datetime.LocalDateTime
@@ -18,5 +19,6 @@ internal sealed interface HistoryState {
         val consumedMl: Float,
         val isToday: Boolean,
         val timeFormatPreference: TimeFormatPreference = TimeFormatPreference.SYSTEM,
+        val unitPreference: UnitPreference = UnitPreference.ML,
     ) : HistoryState
 }

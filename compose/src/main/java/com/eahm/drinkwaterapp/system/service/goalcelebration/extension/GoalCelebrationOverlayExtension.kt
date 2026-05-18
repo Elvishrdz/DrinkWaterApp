@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import androidx.core.content.FileProvider
 import com.eahm.drinkwaterapp.core.domain.extension.startImageSendIntent
 import com.eahm.drinkwaterapp.core.domain.extension.startTextSendIntent
+import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.system.service.goalcelebration.GoalCelebrationOverlay
 import com.eahm.drinkwaterapp.system.service.goalcelebration.data.CelebrationStyle
 import java.io.File
@@ -17,12 +18,14 @@ fun GoalCelebrationOverlay.Companion.createIntent(
     goalMl: Float,
     drinkCount: Int,
     streakDays: Int,
+    unitPreference: UnitPreference = UnitPreference.ML,
 ): Intent {
     return Intent(context, GoalCelebrationOverlay::class.java).apply {
         putExtra(OVERLAY_STYLE, style)
         putExtra(OVERLAY_GOAL_ML, goalMl)
         putExtra(OVERLAY_DRINK_COUNT, drinkCount)
         putExtra(OVERLAY_STREAK_DAYS, streakDays)
+        putExtra(OVERLAY_UNIT_PREFERENCE, unitPreference.name)
     }
 }
 

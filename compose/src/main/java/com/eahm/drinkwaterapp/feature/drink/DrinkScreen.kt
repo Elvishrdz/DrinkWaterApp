@@ -131,6 +131,7 @@ private fun RingSection(state: DrinkState.Data) {
             goal = state.drinkStats?.goalAmount ?: 0f,
             displayZeroPercentage = false,
             onClick = {},
+            unitPreference = state.unitPreference,
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -161,6 +162,7 @@ private fun ActionsSection(
         onDelete = onDeletePreset,
         onRestorePreset = onRestorePreset,
         onBottomSheetOpened = onBottomSheetOpened,
+        unitPreference = state.unitPreference,
         modifier = Modifier.padding(horizontal = 20.dp),
     )
 }
@@ -183,6 +185,7 @@ private fun InfoSection(
         items = state.todayLogs,
         onSeeAll = onNavigateToHistory,
         modifier = Modifier.padding(horizontal = 20.dp),
+        unitPreference = state.unitPreference,
     )
 }
 

@@ -1,5 +1,7 @@
 package com.eahm.drinkwaterapp.feature.stats
 
+import com.eahm.drinkwaterapp.core.presentation.UnitPreference
+
 data class StatsState(
     val selectedPeriod: StatsPeriod = StatsPeriod.WEEK,
     val chartPage: Int = 0,
@@ -14,6 +16,7 @@ data class StatsState(
     val goalStreakDays: Int = 0,
     val bestGoalStreakDays: Int? = null,
     val personalBestMl: Float? = null,
+    val unitPreference: UnitPreference = UnitPreference.ML,
 )
 
 enum class StatsPeriod(val label: String) {

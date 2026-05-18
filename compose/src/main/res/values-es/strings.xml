@@ -197,6 +197,11 @@
     <string name="settings_time_format_auto_description">Usa la configuración regional del dispositivo</string>
     <string name="settings_time_format_12h_description">Muestra siempre AM / PM</string>
     <string name="settings_time_format_24h_description">Muestra siempre el reloj de 24 horas</string>
+    <string name="settings_group_app">APP</string>
+    <string name="settings_unit_preference_title">Volume Units</string>
+    <string name="settings_unit_ml">Milliliters (mL)</string>
+    <string name="settings_unit_auto_liters">Auto Liters (mL / L)</string>
+    <string name="settings_unit_fl_oz">Fluid Ounces (fl oz)</string>
     <string name="settings_row_goal_celebrations">Celebraciones al alcanzar la meta</string>
     <string name="settings_row_reminder_type">Tipo de recordatorio</string>
     <string name="settings_row_reminder_status">Exacta</string>
@@ -334,6 +339,9 @@
     <string name="stats_summary_avg_label">Prom. %1$s</string>
     <string name="stats_summary_unit">mL/día</string>
     <string name="stats_summary_vs_previous">vs período anterior</string>
+    <string name="stats_summary_consistent_week">¡Excelente! Igualaste tus registros de la semana pasada. ¡Sigue así!</string>
+    <string name="stats_summary_consistent_month">¡Excelente! Igualaste tus registros del mes pasado. ¡Sigue así!</string>
+    <string name="stats_summary_consistent_year">¡Excelente! Igualaste tus registros del año pasado. ¡Sigue así!</string>
     <string name="stats_summary_first_week">Mi primera semana</string>
     <string name="stats_summary_first_month">Mi primer mes</string>
     <string name="stats_summary_first_year">Mi primer año</string>

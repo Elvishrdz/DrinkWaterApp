@@ -36,13 +36,13 @@ import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
-import com.eahm.drinkwaterapp.core.domain.extension.sanitizeZeroDecimals
+import com.eahm.drinkwaterapp.core.domain.extension.formatVolume
+import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.ui.bottomsheet.AppBottomSheet
 import kotlinx.coroutines.launch
 
@@ -56,6 +56,7 @@ internal fun GoalBottomSheet(
     goalMl: Float,
     onGoalChanged: (Float) -> Unit,
     onDismiss: () -> Unit,
+    unitPreference: UnitPreference = UnitPreference.ML,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
@@ -91,6 +92,7 @@ internal fun GoalBottomSheet(
                 value = value,
                 onDecrement = { value -= GOAL_STEP },
                 onIncrement = { value += GOAL_STEP },
+                unitPreference = unitPreference,
             )
 
             Spacer(Modifier.height(32.dp))
@@ -113,6 +115,7 @@ internal fun GoalStepperRow(
     onDecrement: () -> Unit,
     onIncrement: () -> Unit,
     modifier: Modifier = Modifier,
+    unitPreference: UnitPreference = UnitPreference.ML,
 ) {
     Column(
         modifier = modifier,
@@ -133,18 +136,11 @@ internal fun GoalStepperRow(
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = value.sanitizeZeroDecimals(),
+                    text = value.formatVolume(unitPreference),
                     fontFamily = Nunito,
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 48.sp,
                     color = MaterialTheme.colorScheme.onBackground,
-                )
-                Text(
-                    text = stringResource(R.string.volume_unit_mililiters),
-                    fontFamily = PlusJakartaSans,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 16.sp,
-                    color = DwInk400,
                 )
             }
 

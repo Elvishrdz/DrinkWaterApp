@@ -60,6 +60,8 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterLight
 import com.eahm.drinkwaterapp.core.designsystem.theme.JetBrainsMono
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
+import com.eahm.drinkwaterapp.core.domain.extension.formatVolume
+import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.feature.stats.DayEntry
 import com.eahm.drinkwaterapp.feature.stats.PeriodPage
 import com.eahm.drinkwaterapp.feature.stats.StatsPeriod
@@ -96,6 +98,7 @@ fun WeeklyBarChart(
     goalMl: Int,
     onPageChanged: (page: Int) -> Unit,
     modifier: Modifier = Modifier,
+    unitPreference: UnitPreference = UnitPreference.ML,
 ) {
     if (pages.isEmpty()) return
 
@@ -160,6 +163,7 @@ fun WeeklyBarChart(
             BarChartPage(
                 entries = pages[pageIndex].entries,
                 goalMl = goalMl,
+                unitPreference = unitPreference,
             )
         }
 
@@ -265,6 +269,7 @@ private fun BarChartPage(
     entries: List<DayEntry>,
     goalMl: Int,
     modifier: Modifier = Modifier,
+    unitPreference: UnitPreference = UnitPreference.ML,
 ) {
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
 
@@ -292,6 +297,7 @@ private fun BarChartPage(
                 displayLabel = if (showLabel) entry.shortLabel else "",
                 isMonthly = isMonthly,
                 isSelected = selectedIndex == index,
+                unitPreference = unitPreference,
                 onClick = {
                     selectedIndex = if (selectedIndex == index) null else index
                 },
@@ -310,6 +316,7 @@ private fun BarColumn(
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    unitPreference: UnitPreference = UnitPreference.ML,
 ) {
     var triggered by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { triggered = true }
@@ -353,7 +360,11 @@ private fun BarColumn(
             // Popup tooltip shown when bar is pressed
             if (isSelected && entry.amountMl > 0) {
                 Popup(alignment = Alignment.TopCenter) {
-                    BarTooltip(amountMl = entry.amountMl, goalMl = goalMl)
+                    BarTooltip(
+                        amountMl = entry.amountMl,
+                        goalMl = goalMl,
+                        unitPreference = unitPreference
+                    )
                 }
             }
         }
@@ -374,7 +385,11 @@ private fun BarColumn(
 }
 
 @Composable
-private fun BarTooltip(amountMl: Int, goalMl: Int) {
+private fun BarTooltip(
+    amountMl: Int,
+    goalMl: Int,
+    unitPreference: UnitPreference = UnitPreference.ML,
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -384,14 +399,14 @@ private fun BarTooltip(amountMl: Int, goalMl: Int) {
             .padding(horizontal = 10.dp, vertical = 6.dp),
     ) {
         Text(
-            text = stringResource(R.string.stats_chart_tooltip_amount, amountMl),
+            text = amountMl.toFloat().formatVolume(unitPreference),
             fontFamily = PlusJakartaSans,
             fontWeight = FontWeight.Bold,
             fontSize = 12.sp,
             color = Color.White,
         )
         Text(
-            text = stringResource(R.string.stats_chart_tooltip_goal, goalMl),
+            text = "/ ${goalMl.toFloat().formatVolume(unitPreference)}",
             fontFamily = PlusJakartaSans,
             fontWeight = FontWeight.Normal,
             fontSize = 10.sp,

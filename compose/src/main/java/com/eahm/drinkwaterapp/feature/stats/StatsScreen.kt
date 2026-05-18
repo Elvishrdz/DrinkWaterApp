@@ -92,13 +92,28 @@ internal fun StatsContent(
     val firstWeekLabel = stringResource(R.string.stats_summary_first_week)
     val firstMonthLabel = stringResource(R.string.stats_summary_first_month)
     val firstYearLabel = stringResource(R.string.stats_summary_first_year)
-    val firstPeriodLabel: String? = if (!state.showTrend) {
-        when (state.selectedPeriod) {
+    val consistentWeekLabel = stringResource(R.string.stats_summary_consistent_week)
+    val consistentMonthLabel = stringResource(R.string.stats_summary_consistent_month)
+    val consistentYearLabel = stringResource(R.string.stats_summary_consistent_year)
+    // overrideLabel replaces the trend percentage row:
+    //  • first period  → introductory label (no prior data to compare)
+    //  • 0 % change    → positive consistency message per period type
+    //  • null          → show the numeric percentage normally
+    val overrideLabel: String? = when {
+        !state.showTrend -> when (state.selectedPeriod) {
             StatsPeriod.WEEK -> firstWeekLabel
             StatsPeriod.MONTH -> firstMonthLabel
             StatsPeriod.YEAR -> firstYearLabel
         }
-    } else null
+
+        state.avgTrendPercent == 0 -> when (state.selectedPeriod) {
+            StatsPeriod.WEEK -> consistentWeekLabel
+            StatsPeriod.MONTH -> consistentMonthLabel
+            StatsPeriod.YEAR -> consistentYearLabel
+        }
+
+        else -> null
+    }
 
     val periodWeek = stringResource(R.string.stats_period_week)
     val periodMonth = stringResource(R.string.stats_period_month)
@@ -145,7 +160,8 @@ internal fun StatsContent(
                 trendPercent = state.avgTrendPercent,
                 isTrendPositive = state.isTrendPositive,
                 periodLabel = periodLabel,
-                firstPeriodLabel = firstPeriodLabel,
+                overrideLabel = overrideLabel,
+                unitPreference = state.unitPreference,
                 modifier = Modifier.padding(horizontal = 18.dp)
             )
         }
@@ -156,6 +172,7 @@ internal fun StatsContent(
                 pages = state.pages,
                 goalMl = state.goalMl,
                 onPageChanged = onChartPageChanged,
+                unitPreference = state.unitPreference,
                 modifier = Modifier.padding(horizontal = 18.dp)
             )
         }
@@ -167,6 +184,7 @@ internal fun StatsContent(
                 goalStreakDays = state.goalStreakDays,
                 bestGoalStreakDays = state.bestGoalStreakDays,
                 personalBestMl = state.personalBestMl,
+                unitPreference = state.unitPreference,
                 modifier = Modifier.padding(horizontal = 18.dp)
             )
         }

@@ -121,6 +121,8 @@ internal class HistoryViewModel(
         )
     }.combine(prefsStorage.getTimeFormatPreference()) { historyState, timeFormat ->
         historyState.copy(timeFormatPreference = timeFormat)
+    }.combine(prefsStorage.getUnitPreference()) { historyState, unitPref ->
+        historyState.copy(unitPreference = unitPref)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,

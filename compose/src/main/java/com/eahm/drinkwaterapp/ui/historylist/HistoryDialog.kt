@@ -47,9 +47,11 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.JetBrainsMono
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
+import com.eahm.drinkwaterapp.core.domain.extension.formatVolume
 import com.eahm.drinkwaterapp.core.domain.mock.Mock
 import com.eahm.drinkwaterapp.core.domain.mock.hourGroupMock
 import com.eahm.drinkwaterapp.core.domain.mock.localDateTimeMock
+import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.datetime.LocalDateTime
@@ -165,6 +167,7 @@ fun HistoryTimeline(
     onDelete: (HistoryUI) -> Unit,
     modifier: Modifier = Modifier,
     is24Hour: Boolean = true,
+    unitPreference: UnitPreference = UnitPreference.ML,
 ) {
     Column(
         modifier = modifier
@@ -181,6 +184,7 @@ fun HistoryTimeline(
                 hourGroup = hourGroup,
                 isCurrentHour = hourGroup.isCurrentHour,
                 is24Hour = is24Hour,
+                unitPreference = unitPreference,
                 onDelete = onDelete,
             )
         }
@@ -194,6 +198,7 @@ private fun TimelineHourGroup(
     is24Hour: Boolean,
     onDelete: (HistoryUI) -> Unit,
     modifier: Modifier = Modifier,
+    unitPreference: UnitPreference = UnitPreference.ML,
 ) {
     val hourHeaderText = if (is24Hour) {
         String.format(Locale.getDefault(), "%02d:00", hourGroup.hour)
@@ -243,7 +248,12 @@ private fun TimelineHourGroup(
                 .background(MaterialTheme.colorScheme.surface)
         ) {
             hourGroup.items.forEachIndexed { index, item ->
-                TimelineItemCard(item = item, is24Hour = is24Hour, onDelete = onDelete)
+                TimelineItemCard(
+                    item = item,
+                    is24Hour = is24Hour,
+                    unitPreference = unitPreference,
+                    onDelete = onDelete
+                )
                 if (index < hourGroup.items.lastIndex) {
                     HorizontalDivider(color = DwInk100)
                 }
@@ -258,6 +268,7 @@ private fun TimelineItemCard(
     is24Hour: Boolean,
     onDelete: (HistoryUI) -> Unit,
     modifier: Modifier = Modifier,
+    unitPreference: UnitPreference = UnitPreference.ML,
 ) {
     Row(
         modifier = modifier
@@ -282,9 +293,8 @@ private fun TimelineItemCard(
         }
 
         Column(modifier = Modifier.weight(1f)) {
-            val unit = stringResource(R.string.volume_unit_mililiters)
             Text(
-                text = "${item.amount}$unit",
+                text = item.amount.toFloat().formatVolume(unitPreference),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 14.sp,

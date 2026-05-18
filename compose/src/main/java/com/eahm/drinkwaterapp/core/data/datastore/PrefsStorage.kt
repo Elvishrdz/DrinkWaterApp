@@ -3,6 +3,7 @@ package com.eahm.drinkwaterapp.core.data.datastore
 import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
 import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
 import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
+import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import kotlinx.coroutines.flow.Flow
 
 interface PrefsStorage {
@@ -44,6 +45,9 @@ interface PrefsStorage {
 
     fun getTimeFormatPreference(): Flow<TimeFormatPreference>
     suspend fun setTimeFormatPreference(pref: TimeFormatPreference)
+
+    fun getUnitPreference(): Flow<UnitPreference>
+    suspend fun setUnitPreference(pref: UnitPreference)
 
     suspend fun clear()
 }

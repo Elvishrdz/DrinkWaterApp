@@ -2,6 +2,7 @@ package com.eahm.drinkwaterapp.feature.stats
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.streak.StreakData
 import com.eahm.drinkwaterapp.core.data.streak.StreakRepository
 import com.eahm.drinkwaterapp.core.database.AppDatabase
@@ -34,6 +35,7 @@ import kotlin.time.ExperimentalTime
 internal class StatsViewModel(
     database: AppDatabase,
     streakRepository: StreakRepository,
+    prefsStorage: PrefsStorage,
 ) : ViewModel() {
 
     private val historyDao = database.getHistoryDao()
@@ -91,6 +93,8 @@ internal class StatsViewModel(
             bestGoalStreakDays = streak.bestGoalStreakDays,
             personalBestMl = streak.personalBestMl,
         )
+    }.combine(prefsStorage.getUnitPreference()) { state, unitPref ->
+        state.copy(unitPreference = unitPref)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
@@ -117,33 +121,59 @@ internal class StatsViewModel(
 
     /**
      * Average intake and period-over-period trend for [pageIndex].
-     * Only days/months with amountMl > 0 are counted.
      * pages[0] = oldest, pages[N] = most recent.
-     * Trend compares against the previous (older) page at pageIndex - 1.
+     * Trend compares against the immediately preceding page (pageIndex − 1).
      *
-     * [showTrend] is true only when at least one prior page has recorded data,
-     * meaning the user has been using the app long enough to have a meaningful
-     * comparison period. This prevents showing the trend on a fresh install.
+     * ── avgMl ────────────────────────────────────────────────────────────────
+     * Average mL on days/months where at least something was recorded
+     * (zeros excluded). Represents the user's typical intake on a drinking day.
+     *
+     * ── trendPercent ─────────────────────────────────────────────────────────
+     * Percentage change in *total* consumption vs the previous period:
+     *
+     *   trendPercent = (currentTotal − prevTotal) / prevTotal × 100
+     *
+     * Why totals instead of per-active-day averages?
+     * Comparing averages-of-active-days divides by a different number of active
+     * days each period (e.g. 1 logging day last week vs 5 this week), which
+     * inflates the percentage dramatically even when total volume barely changed.
+     * Totals give an honest "did I drink more or less overall?" answer,
+     * independent of how many individual log entries existed.
+     *
+     * Example: 500 mL/day × 7 days this week = 3500 mL total.
+     *          500 mL/day × 7 days last week  = 3500 mL total.
+     *          → trendPercent = 0  →  UI shows the "consistent" message.
+     *
+     * Special cases:
+     *   • prevTotal == 0  → trendPercent = 0 (guarded upstream by showTrend,
+     *     so the trend row is hidden in the UI when no prior data exists).
+     *   • trendPercent == 0 → the UI replaces "0 %" with a positive message
+     *     ("Excellent! You matched last week's records. Keep it up!").
+     *
+     * ── showTrend ────────────────────────────────────────────────────────────
+     * True only when at least one prior page contains recorded data. Prevents
+     * showing any comparison on a fresh install where there is nothing to compare.
      */
     private fun computeSummary(pages: List<PeriodPage>, pageIndex: Int): Summary {
         if (pages.isEmpty() || pageIndex !in pages.indices) {
             return Summary(avgMl = 0, trendPercent = 0, isTrendPositive = true, showTrend = false)
         }
-        val amounts = pages[pageIndex].entries.map { it.amountMl }.filter { it > 0 }
-        val avg = if (amounts.isNotEmpty()) amounts.average().toInt() else 0
 
-        // Show trend only when there is at least one prior page with recorded data.
-        // If every page before the current one is empty the app is just starting out.
+        // avgMl: average on days/months where something was recorded
+        val activeAmounts = pages[pageIndex].entries.map { it.amountMl }.filter { it > 0 }
+        val avg = if (activeAmounts.isNotEmpty()) activeAmounts.average().toInt() else 0
+
+        // showTrend: only show when at least one prior page has recorded data
         val showTrend = pageIndex > 0 && (0 until pageIndex).any { i ->
             pages[i].entries.any { it.amountMl > 0 }
         }
 
-        val prevAmounts = pages.getOrNull(pageIndex - 1)
-            ?.entries?.map { it.amountMl }?.filter { it > 0 }
-        val prevAvg = if (!prevAmounts.isNullOrEmpty()) prevAmounts.average().toInt() else avg
+        // trendPercent: total consumption this period vs total consumption last period
+        val currentTotal = pages[pageIndex].entries.sumOf { it.amountMl }
+        val prevTotal = pages.getOrNull(pageIndex - 1)?.entries?.sumOf { it.amountMl } ?: 0
 
         val trendPercent =
-            if (prevAvg > 0) ((avg - prevAvg).toDouble() / prevAvg * 100).toInt() else 0
+            if (prevTotal > 0) ((currentTotal - prevTotal).toDouble() / prevTotal * 100).toInt() else 0
 
         return Summary(
             avgMl = avg,

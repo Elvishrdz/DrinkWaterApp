@@ -16,10 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,6 +26,8 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterDeep
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterLight
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
+import com.eahm.drinkwaterapp.core.domain.extension.formatVolume
+import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 
 private val gradientWaterHero = Brush.verticalGradient(
     colors = listOf(DwWaterLight, DwWaterDeep)
@@ -44,10 +43,11 @@ fun SummaryCard(
     trendPercent: Int,
     isTrendPositive: Boolean,
     periodLabel: String,
-    /** Non-null when this is the user's first period (no prior data to compare).
-     *  The string is shown instead of the trend percentage row. */
-    firstPeriodLabel: String?,
+    /** Non-null to override the trend row with a custom label (e.g. first-period
+     *  greeting or consistent-streak message). When null the percentage row is shown. */
+    overrideLabel: String?,
     modifier: Modifier = Modifier,
+    unitPreference: UnitPreference = UnitPreference.ML,
 ) {
     Column(
         modifier = modifier
@@ -66,41 +66,23 @@ fun SummaryCard(
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        val mlDayUnit = stringResource(R.string.stats_summary_unit)
         Text(
-            text = buildAnnotatedString {
-                withStyle(
-                    SpanStyle(
-                        fontFamily = Nunito,
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 36.sp,
-                        color = Color.White
-                    )
-                ) {
-                    append(avgMl.toString())
-                }
-                withStyle(
-                    SpanStyle(
-                        fontFamily = PlusJakartaSans,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 14.sp,
-                        color = Color.White.copy(alpha = 0.85f)
-                    )
-                ) {
-                    append("  $mlDayUnit")
-                }
-            }
+            text = avgMl.toFloat().formatVolume(unitPreference),
+            fontFamily = Nunito,
+            fontWeight = FontWeight.ExtraBold,
+            fontSize = 36.sp,
+            color = Color.White,
         )
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        if (firstPeriodLabel != null) {
+        if (overrideLabel != null) {
             Text(
-                text = firstPeriodLabel,
+                text = overrideLabel,
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Medium,
                 fontSize = 12.sp,
-                color = Color.White.copy(alpha = 0.55f)
+                color = TrendUpColor
             )
         } else {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -128,7 +110,22 @@ private fun SummaryCardPreview() {
             trendPercent = 12,
             isTrendPositive = true,
             periodLabel = "This week's",
-            firstPeriodLabel = null,
+            overrideLabel = null,
+            modifier = Modifier.padding(16.dp)
+        )
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFFF2F6F9)
+@Composable
+private fun SummaryCardConsistentPreview() {
+    DrinkWaterAppTheme {
+        SummaryCard(
+            avgMl = 2000,
+            trendPercent = 0,
+            isTrendPositive = true,
+            periodLabel = "This week's",
+            overrideLabel = "Excellent! You matched last week's records. Keep it up!",
             modifier = Modifier.padding(16.dp)
         )
     }
@@ -143,7 +140,7 @@ private fun SummaryCardFirstPeriodPreview() {
             trendPercent = 0,
             isTrendPositive = true,
             periodLabel = "This week's",
-            firstPeriodLabel = "My first week",
+            overrideLabel = "My first week",
             modifier = Modifier.padding(16.dp)
         )
     }

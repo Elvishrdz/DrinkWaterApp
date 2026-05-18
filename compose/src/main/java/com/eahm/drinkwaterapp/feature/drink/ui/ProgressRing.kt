@@ -21,10 +21,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -37,7 +34,8 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterDeep
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterLight
 import com.eahm.drinkwaterapp.core.designsystem.theme.JetBrainsMono
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
-import com.eahm.drinkwaterapp.core.domain.extension.sanitizeZeroDecimals
+import com.eahm.drinkwaterapp.core.domain.extension.formatVolume
+import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import kotlin.math.roundToInt
 
 @Composable
@@ -51,6 +49,7 @@ fun ProgressRing(
     bounceEnabled: Boolean = true,
     rippleEnabled: Boolean = false,
     idleShimmerEnabled: Boolean = true,
+    unitPreference: UnitPreference = UnitPreference.ML,
 ) {
     val percent = ((current / goal) * 100f)
         .takeIf { !it.isNaN() } ?: 0f
@@ -127,29 +126,12 @@ fun ProgressRing(
 
             Spacer(modifier = Modifier.height(2.dp))
 
-            val mlUnit = stringResource(R.string.volume_unit_mililiters)
             Text(
-                text = buildAnnotatedString {
-                    withStyle(
-                        SpanStyle(
-                            fontFamily = Nunito,
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 36.sp,
-                            color = MaterialTheme.colorScheme.onBackground,
-                        )
-                    ) {
-                        append(current.sanitizeZeroDecimals())
-                    }
-                    withStyle(
-                        SpanStyle(
-                            fontFamily = Nunito,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 14.sp,
-                        )
-                    ) {
-                        append(" $mlUnit")
-                    }
-                },
+                text = current.formatVolume(unitPreference),
+                fontFamily = Nunito,
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 36.sp,
+                color = MaterialTheme.colorScheme.onBackground,
             )
 
             Spacer(modifier = Modifier.height(2.dp))
@@ -157,7 +139,7 @@ fun ProgressRing(
             Text(
                 text = stringResource(
                     R.string.drink_progress_goal_label,
-                    goal.sanitizeZeroDecimals()
+                    goal.formatVolume(unitPreference)
                 ),
                 style = MaterialTheme.typography.bodySmall,
                 color = DwInk400

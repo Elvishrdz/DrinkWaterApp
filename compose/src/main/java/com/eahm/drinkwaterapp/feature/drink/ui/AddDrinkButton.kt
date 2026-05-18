@@ -53,6 +53,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk300
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
+import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.feature.drink.drinkSuggestionsMocks
 import com.eahm.drinkwaterapp.ui.bottomsheet.AppBottomSheet
 import com.eahm.drinkwaterapp.ui.inputfield.AppInputField
@@ -74,6 +75,7 @@ internal fun AddDrinkButton(
     onRestorePreset: (DrinkSuggestion) -> Unit,
     onBottomSheetOpened: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    unitPreference: UnitPreference = UnitPreference.ML,
 ) {
     var showBottomSheet by rememberSaveable { mutableStateOf(false) }
     var showInfoDialog by remember { mutableStateOf(false) }
@@ -156,6 +158,7 @@ internal fun AddDrinkButton(
                             dismissBottomSheet()
                         },
                         onReorder = { onReorder(it, false) },
+                        unitPreference = unitPreference,
                         onDelete = { preset ->
                             onDelete(preset)
                             scope.launch {
