@@ -40,6 +40,23 @@ alarma. Si cambia el tipo de alarma, reprogramar alarma:
 a) si es inexact, basado en la hora de la ultima notificacion recibida programar la siguiente alarma
 b) si es exact, usar la logica actual para programar la alarma.
 
+# IMPL
+ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED
+recibe solo cuando tenemos el permiso, NO cuando se revoca.
+-> recibido: check permission
+tiene permiso: reajustar y programar alarmas exactas al momento.
+no tiene permiso: revisar y ajustar alarma inexacta si es necesario. 
+
+-> quitar permiso.
+la app no recibe ningun broadcast cuando el permiso se quita.
+TODAS las alarmas exactas existentes se borraran de immediato.
+
+mostrar dialogo al entrar en la app que las alarmas se han restaurado nuevamente
+(en caso de quitar el permiso y volverlo a dar, las alarmas ya estaran muertas sin poder reprogramarse
+solo hasta abrir la app otra vez)
+
+IMPORTANTE: antes de ir a app settings, avisar al usuario que las alarmas no se programaran otra vez si 
+quita y pone el permiso otra vez.
 
 
 # Requerimientos

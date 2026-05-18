@@ -38,6 +38,7 @@ class DrinkAlarmManager(
     private val database: AppDatabase,
     private val whatToDoService: WhatToDoService,
 ) {
+
     private val _state = MutableStateFlow(getState())
 
     val state = combine(
