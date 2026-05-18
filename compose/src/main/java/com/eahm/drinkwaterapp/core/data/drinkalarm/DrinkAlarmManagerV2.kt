@@ -37,7 +37,7 @@ class DrinkAlarmManagerV2(
     private val slots = listOf(
         Pair(10, 0),
         Pair(13, 0),
-        Pair(16, 0),
+        Pair(14, 29),
     )
 
     private val activeStartHour = 6
@@ -98,6 +98,25 @@ class DrinkAlarmManagerV2(
      */
     suspend fun onInexactAlarmReceived(source: AlarmSource, hour: Int?, minute: Int?) {
         schedulingMutex.withLock {
+            // Always clear the previous receipt first, then save a new one only if this
+            // alarm fired before its scheduled time (inexact alarms can be batched early).
+            AlarmSchedulerV3.clearInexactEarlyReceipt(application, INEXACT_ALARM_ID)
+            if (hour != null && minute != null) {
+                val now = Calendar.getInstance()
+                val scheduled = Calendar.getInstance().apply {
+                    set(Calendar.HOUR_OF_DAY, hour)
+                    set(Calendar.MINUTE, minute)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                    if (!after(now)) add(Calendar.DAY_OF_YEAR, 1)
+                }
+                val earlyMs = scheduled.timeInMillis - now.timeInMillis
+                if (earlyMs > 0) {
+                    AlarmSchedulerV3.saveInexactEarlyReceipt(application, INEXACT_ALARM_ID, earlyMs, hour, minute)
+                    Log.i(TAG, "onInexactAlarmReceived: fired ${earlyMs}ms early (scheduled at %02d:%02d)".format(hour, minute))
+                }
+            }
+
             val exactPermissionGranted = ExactAlarmPermission.isGranted(application)
             val exactAlarmActive = AlarmSchedulerV3.isExactAlarmActive(application, EXACT_ALARM_ID)
 

@@ -101,8 +101,22 @@ object AlarmSchedulerV3 {
 
     // region Status
 
-    fun isExactAlarmActive(context: Context, alarmId: Int): Boolean =
-        exactPendingIntent(context, alarmId, 0, 0, update = false) != null
+    /**
+     * Returns true only when the exact alarm PendingIntent exists AND the
+     * SCHEDULE_EXACT_ALARM permission is currently granted.
+     *
+     * When the permission is revoked Android automatically cancels the scheduled
+     * alarm but does NOT cancel the PendingIntent, so a FLAG_NO_CREATE probe would
+     * still return non-null. Adding the permission guard keeps the status accurate.
+     */
+    fun isExactAlarmActive(context: Context, alarmId: Int): Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (!context.getSystemService(AlarmManager::class.java).canScheduleExactAlarms()) {
+                return false
+            }
+        }
+        return exactPendingIntent(context, alarmId, 0, 0, update = false) != null
+    }
 
     fun isInexactAlarmActive(context: Context, alarmId: Int): Boolean =
         inexactPendingIntent(context, alarmId, 0, 0, update = false) != null
@@ -114,9 +128,78 @@ object AlarmSchedulerV3 {
     fun getStoredExactSlot(context: Context, alarmId: Int): Pair<Int, Int>? =
         readFromStorage(context, alarmId, prefix = "exact")
 
+    /**
+     * Removes the stored slot for the exact alarm.
+     * Call when the alarm is confirmed inactive (e.g. permission revoked) to prevent
+     * stale data from surfacing in the UI or triggering incorrect reschedule decisions.
+     */
+    fun clearStoredExactSlot(context: Context, alarmId: Int) =
+        clearFromStorage(context, alarmId, prefix = "exact")
+
     /** Returns the last slot saved when this inexact alarm was scheduled, or null if never stored. */
     fun getStoredInexactSlot(context: Context, alarmId: Int): Pair<Int, Int>? =
         readFromStorage(context, alarmId, prefix = "inexact")
+
+    /**
+     * Returns milliseconds until the stored exact alarm target time fires,
+     * or null if no slot has been stored. Always returns a positive value
+     * (rolls over to next day if the stored time has already passed today).
+     */
+    fun getMillisUntilExactTrigger(context: Context, alarmId: Int): Long? =
+        readFromStorage(context, alarmId, prefix = "exact")?.let { (h, m) -> delayUntilNext(h, m) }
+
+    /**
+     * Returns milliseconds until the stored inexact alarm target time fires,
+     * or null if no slot has been stored. Always returns a positive value
+     * (rolls over to next day if the stored time has already passed today).
+     */
+    fun getMillisUntilInexactTrigger(context: Context, alarmId: Int): Long? =
+        readFromStorage(context, alarmId, prefix = "inexact")?.let { (h, m) -> delayUntilNext(h, m) }
+
+    // endregion
+
+    // region Early receipt (dev diagnostics)
+
+    /**
+     * Saves the fact that an inexact alarm fired [earlyMs] milliseconds before its
+     * scheduled [scheduledHour]:[scheduledMinute] time.
+     */
+    fun saveInexactEarlyReceipt(
+        context: Context,
+        alarmId: Int,
+        earlyMs: Long,
+        scheduledHour: Int,
+        scheduledMinute: Int,
+    ) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit {
+            putLong("inexact_early_ms_$alarmId", earlyMs)
+            putInt("inexact_early_h_$alarmId", scheduledHour)
+            putInt("inexact_early_m_$alarmId", scheduledMinute)
+        }
+    }
+
+    /** Removes any previously saved early receipt for this inexact alarm. */
+    fun clearInexactEarlyReceipt(context: Context, alarmId: Int) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit {
+            remove("inexact_early_ms_$alarmId")
+            remove("inexact_early_h_$alarmId")
+            remove("inexact_early_m_$alarmId")
+        }
+    }
+
+    /**
+     * Returns (earlyMs, scheduledHour, scheduledMinute) if an early receipt exists,
+     * null otherwise.
+     */
+    fun getInexactEarlyReceipt(context: Context, alarmId: Int): Triple<Long, Int, Int>? {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val earlyMs = prefs.getLong("inexact_early_ms_$alarmId", -1L)
+        if (earlyMs == -1L) return null
+        val h = prefs.getInt("inexact_early_h_$alarmId", -1)
+        val m = prefs.getInt("inexact_early_m_$alarmId", -1)
+        if (h == -1 || m == -1) return null
+        return Triple(earlyMs, h, m)
+    }
 
     // endregion
 

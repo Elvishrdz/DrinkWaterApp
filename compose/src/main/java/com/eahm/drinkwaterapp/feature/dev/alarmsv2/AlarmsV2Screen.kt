@@ -4,10 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -26,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -73,7 +72,7 @@ private fun DataContent(
             .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        // Clock
+        // Live clock
         Text(
             text = state.currentTime,
             fontSize = 32.sp,
@@ -83,18 +82,41 @@ private fun DataContent(
 
         HorizontalDivider()
 
-        // Alarm statuses
-        SectionTitle("Alarm Status")
-        StatusRow(label = "Exact alarm active", value = state.exactAlarmActive)
-        StatusRow(label = "Inexact alarm active", value = state.inexactAlarmActive)
+        // Exact alarm
+        SectionTitle("Exact Alarm (primary)")
+        StatusRow(label = "Active", value = state.exactAlarmActive)
+        AlarmCountdownRow(
+            scheduledAt = state.exactScheduledAt,
+            countdownMs = state.exactCountdownMs,
+            postFireLabel = "will trigger soon",
+        )
 
         HorizontalDivider()
 
-        // Permission & active hours
+        // Inexact alarm
+        SectionTitle("Inexact Alarm (guard / fallback)")
+        StatusRow(label = "Active", value = state.inexactAlarmActive)
+        AlarmCountdownRow(
+            scheduledAt = state.inexactScheduledAt,
+            countdownMs = state.inexactCountdownMs,
+            postFireLabel = "will trigger anytime from now",
+        )
+        state.inexactEarlyMessage?.let { message ->
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodySmall,
+                fontStyle = FontStyle.Italic,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
+
+        HorizontalDivider()
+
+        // System state
         SectionTitle("System State")
         StatusRow(label = "Exact permission granted", value = state.exactPermissionGranted)
         StatusRow(label = "Within active hours (06:00–18:00)", value = state.isWithinActiveHours)
-        InfoRow(label = "Next slot", value = state.nextSlot)
+        InfoRow(label = "Next computed slot", value = state.nextSlot)
 
         HorizontalDivider()
 
@@ -123,13 +145,45 @@ private fun DataContent(
         }
 
         if (!state.exactPermissionGranted) {
-            Spacer(Modifier.height(4.dp))
             OutlinedButton(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = { onAction(AlarmsV2Action.OpenExactPermissionSettings) },
             ) {
                 Text("Open Exact Alarm Permission Settings")
             }
+        }
+    }
+}
+
+@Composable
+private fun AlarmCountdownRow(
+    scheduledAt: String?,
+    countdownMs: Long?,
+    postFireLabel: String,
+) {
+    when {
+        scheduledAt == null || countdownMs == null -> {
+            InfoRow(label = "Scheduled at", value = "—")
+            InfoRow(label = "Triggers in", value = "—")
+        }
+        countdownMs == 0L -> {
+            InfoRow(label = "Scheduled at", value = scheduledAt)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(text = "Triggers in", style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = postFireLabel,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFFE65100),
+                    fontFamily = FontFamily.Monospace,
+                )
+            }
+        }
+        else -> {
+            InfoRow(label = "Scheduled at", value = scheduledAt)
+            InfoRow(label = "Triggers in", value = formatCountdown(countdownMs))
         }
     }
 }
@@ -170,5 +224,16 @@ private fun InfoRow(label: String, value: String) {
             fontWeight = FontWeight.Medium,
             fontFamily = FontFamily.Monospace,
         )
+    }
+}
+
+private fun formatCountdown(ms: Long): String {
+    val hours = ms / 3_600_000
+    val minutes = (ms % 3_600_000) / 60_000
+    val seconds = (ms % 60_000) / 1_000
+    return when {
+        hours > 0 -> "${hours}h %02dm %02ds".format(minutes, seconds)
+        minutes > 0 -> "${minutes}m %02ds".format(seconds)
+        else -> "${seconds}s"
     }
 }
