@@ -62,12 +62,13 @@ class DrinkAlarmManagerV2(
                 )
                 return@withLock
             }
-            scheduleNextAlarm()
+            val result = scheduleNextAlarm()
+            Log.i(TAG, "restoreAlarm: source=$source — $result")
         }
     }
 
     /**
-     * Called when the exact alarm ([EXACT_ALARM_ACTION]) fires.
+     * Called when the exact alarm (EXACT_ALARM_ACTION) fires.
      * Reschedules both alarms and shows the notification — only if exact permission is still granted.
      */
     suspend fun onAlarmReceived(source: AlarmSource, hour: Int?, minute: Int?) {
@@ -81,13 +82,14 @@ class DrinkAlarmManagerV2(
                 return@withLock
             }
 
-            scheduleNextAlarm()
+            val result = scheduleNextAlarm()
+            Log.i(TAG, "onAlarmReceived: $result")
             NotificationService.showDrinkNotification(application, hour, minute)
         }
     }
 
     /**
-     * Called when the inexact guard alarm ([INEXACT_ALARM_ACTION]) fires.
+     * Called when the inexact guard alarm (INEXACT_ALARM_ACTION) fires.
      *
      * Decision tree:
      *  - Exact permission granted + exact alarm active  → sync inexact to next slot, no notification
@@ -108,38 +110,47 @@ class DrinkAlarmManagerV2(
             when {
                 exactPermissionGranted && exactAlarmActive -> {
                     // Normal state — exact alarm is alive and will show the notification.
-                    // Keep the inexact in sync with the same next slot.
-                    Log.i(
-                        TAG,
-                        "onInexactAlarmReceived: exact alarm active — syncing inexact, no notification"
-                    )
+                    // Keep the inexact in sync with the same next slot only if it has drifted.
                     val (nextHour, nextMinute) = getNextSlot()
-                    AlarmSchedulerV3.scheduleInexactAlarm(
-                        application,
-                        INEXACT_ALARM_ID,
-                        nextHour,
-                        nextMinute,
-                    )
+                    val nextSlot = Pair(nextHour, nextMinute)
+                    val inexactActive =
+                        AlarmSchedulerV3.isInexactAlarmActive(application, INEXACT_ALARM_ID)
+                    val storedInexact =
+                        AlarmSchedulerV3.getStoredInexactSlot(application, INEXACT_ALARM_ID)
+                    if (!inexactActive || storedInexact != nextSlot) {
+                        AlarmSchedulerV3.scheduleInexactAlarm(
+                            application,
+                            INEXACT_ALARM_ID,
+                            nextHour,
+                            nextMinute
+                        )
+                        Log.i(
+                            TAG,
+                            "onInexactAlarmReceived: exact active — inexact rescheduled to $nextHour:$nextMinute"
+                        )
+                    } else {
+                        Log.i(
+                            TAG,
+                            "onInexactAlarmReceived: exact active — inexact already at $nextHour:$nextMinute, no change"
+                        )
+                    }
                 }
 
                 exactPermissionGranted && !exactAlarmActive -> {
                     // Sync needed — permission is granted but the exact alarm was somehow lost.
                     // Restore both alarms silently (next exact fire will show the notification).
-                    Log.i(
-                        TAG,
-                        "onInexactAlarmReceived: exact alarm missing — restoring both, no notification"
-                    )
-                    scheduleNextAlarm()
+                    val result = scheduleNextAlarm()
+                    Log.i(TAG, "onInexactAlarmReceived: exact alarm missing — $result")
                 }
 
                 else -> {
                     // Fallback — exact permission is revoked; inexact acts as the active alarm.
                     // scheduleNextAlarm() only schedules the inexact here (exact skipped, no permission).
+                    val result = scheduleNextAlarm()
                     Log.i(
                         TAG,
-                        "onInexactAlarmReceived: no exact permission — fallback notification"
+                        "onInexactAlarmReceived: no exact permission — fallback notification — $result"
                     )
-                    scheduleNextAlarm()
                     NotificationService.showDrinkNotification(application, hour, minute)
                 }
             }
@@ -161,17 +172,93 @@ class DrinkAlarmManagerV2(
     // region Private helpers
 
     /**
-     * Schedules the exact alarm (if permission is granted) and the inexact alarm
-     * for the next available slot.
+     * Compares the next computed slot against the currently stored slot for each alarm.
+     * Only schedules an alarm if it is missing or pointing at a different slot.
+     *
+     * @return [ScheduleResult.Unchanged] when both alarms were already correct,
+     *         [ScheduleResult.Rescheduled] with details of what was actually updated.
      */
-    private fun scheduleNextAlarm() {
+    private fun scheduleNextAlarm(): ScheduleResult {
         val (hour, minute) = getNextSlot()
-        Log.i(TAG, "scheduleNextAlarm: next slot at $hour:$minute")
+        val permissionGranted = ExactAlarmPermission.isGranted(application)
+        val nextSlot = Pair(hour, minute)
 
-        if (ExactAlarmPermission.isGranted(application)) {
+        val exactActive = AlarmSchedulerV3.isExactAlarmActive(application, EXACT_ALARM_ID)
+        val inexactActive = AlarmSchedulerV3.isInexactAlarmActive(application, INEXACT_ALARM_ID)
+        val storedExact = AlarmSchedulerV3.getStoredExactSlot(application, EXACT_ALARM_ID)
+        val storedInexact = AlarmSchedulerV3.getStoredInexactSlot(application, INEXACT_ALARM_ID)
+
+        // Exact alarm needs updating if we have permission and it is missing or stale.
+        val exactNeedsUpdate = permissionGranted && (!exactActive || storedExact != nextSlot)
+        // Inexact alarm always needs to be alive; update if missing or stale.
+        val inexactNeedsUpdate = !inexactActive || storedInexact != nextSlot
+
+        if (!exactNeedsUpdate && !inexactNeedsUpdate) {
+            return ScheduleResult.Unchanged(hour, minute)
+        }
+
+        if (exactNeedsUpdate) {
+            if (!exactActive) {
+                Log.i(
+                    TAG,
+                    "scheduleNextAlarm: exact alarm was missing — restoring at %02d:%02d (permission re-granted or alarm lost)".format(
+                        hour,
+                        minute
+                    )
+                )
+            } else {
+                val oldTime =
+                    storedExact?.let { "%02d:%02d".format(it.first, it.second) } ?: "unknown"
+                Log.i(
+                    TAG,
+                    "scheduleNextAlarm: exact alarm at wrong time — fixing $oldTime → %02d:%02d".format(
+                        hour,
+                        minute
+                    )
+                )
+            }
             AlarmSchedulerV3.scheduleExactAlarm(application, EXACT_ALARM_ID, hour, minute)
         }
-        AlarmSchedulerV3.scheduleInexactAlarm(application, INEXACT_ALARM_ID, hour, minute)
+        if (inexactNeedsUpdate) {
+            if (inexactActive) {
+                val oldTime =
+                    storedInexact?.let { "%02d:%02d".format(it.first, it.second) } ?: "unknown"
+                Log.i(
+                    TAG,
+                    "scheduleNextAlarm: inexact alarm at wrong time — fixing $oldTime → %02d:%02d".format(
+                        hour,
+                        minute
+                    )
+                )
+            }
+            AlarmSchedulerV3.scheduleInexactAlarm(application, INEXACT_ALARM_ID, hour, minute)
+        }
+
+        return ScheduleResult.Rescheduled(
+            hour,
+            minute,
+            exact = exactNeedsUpdate,
+            inexact = inexactNeedsUpdate
+        )
+    }
+
+    private sealed interface ScheduleResult {
+        data class Rescheduled(
+            val hour: Int,
+            val minute: Int,
+            val exact: Boolean,
+            val inexact: Boolean,
+        ) : ScheduleResult {
+            override fun toString() = "Rescheduled → %02d:%02d [exact=%s inexact=%s]".format(
+                hour, minute,
+                if (exact) "updated" else "skipped",
+                if (inexact) "updated" else "skipped",
+            )
+        }
+
+        data class Unchanged(val hour: Int, val minute: Int) : ScheduleResult {
+            override fun toString() = "Unchanged → already at %02d:%02d".format(hour, minute)
+        }
     }
 
     /**

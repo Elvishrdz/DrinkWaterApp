@@ -110,6 +110,14 @@ object AlarmSchedulerV3 {
     fun areAlarmsActive(context: Context, exactAlarmId: Int, inexactAlarmId: Int): Boolean =
         isExactAlarmActive(context, exactAlarmId) && isInexactAlarmActive(context, inexactAlarmId)
 
+    /** Returns the last slot saved when this exact alarm was scheduled, or null if never stored. */
+    fun getStoredExactSlot(context: Context, alarmId: Int): Pair<Int, Int>? =
+        readFromStorage(context, alarmId, prefix = "exact")
+
+    /** Returns the last slot saved when this inexact alarm was scheduled, or null if never stored. */
+    fun getStoredInexactSlot(context: Context, alarmId: Int): Pair<Int, Int>? =
+        readFromStorage(context, alarmId, prefix = "inexact")
+
     // endregion
 
     // region Private helpers
@@ -181,6 +189,13 @@ object AlarmSchedulerV3 {
             remove("${prefix}_hour_$alarmId")
             remove("${prefix}_minute_$alarmId")
         }
+    }
+
+    private fun readFromStorage(context: Context, alarmId: Int, prefix: String): Pair<Int, Int>? {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val hour = prefs.getInt("${prefix}_hour_$alarmId", -1)
+        val minute = prefs.getInt("${prefix}_minute_$alarmId", -1)
+        return if (hour != -1 && minute != -1) Pair(hour, minute) else null
     }
 
     // endregion
