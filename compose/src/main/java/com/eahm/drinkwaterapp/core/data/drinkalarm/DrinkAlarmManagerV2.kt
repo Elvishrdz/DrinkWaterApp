@@ -2,15 +2,26 @@ package com.eahm.drinkwaterapp.core.data.drinkalarm
 
 import android.app.Application
 import android.util.Log
+import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManagerV2.Companion.EXACT_ALARM_ID
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManagerV2.Companion.INEXACT_ALARM_ID
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
+import com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.getNextAlarmSlot
 import com.eahm.drinkwaterapp.core.data.systemnotifications.NotificationService
+import com.eahm.drinkwaterapp.core.database.AppDatabase
+import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
+import com.eahm.drinkwaterapp.core.domain.extension.toLocalDateTime
+import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import com.eahm.drinkwaterapp.system.alarm.AlarmSchedulerV3
 import com.eahm.drinkwaterapp.system.alarm.ExactAlarmPermission
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import java.util.Calendar
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 /**
  * Alarm manager for the dual-alarm system.
@@ -22,46 +33,28 @@ import java.util.Calendar
  * All scheduling paths share [schedulingMutex] to prevent race conditions when both alarms
  * fire simultaneously.
  *
- * NOTE: Uses hardcoded test data (slots 10:00 / 13:00 / 16:00, active hours 06:00–18:00).
- * Replace with PrefsStorage reads when the testing phase is complete.
+ * Slot calculation is driven by [PrefsStorage] (interval, start/end time) and [AppDatabase]
+ * (daily goal), delegating to [getNextAlarmSlot] from WhatToDoNowDecider.
  */
+@OptIn(ExperimentalTime::class)
 class DrinkAlarmManagerV2(
     private val application: Application,
+    private val prefsStorage: PrefsStorage,
+    private val database: AppDatabase,
 ) {
 
     private val schedulingMutex = Mutex()
 
-    // region Hardcoded test data
-
-    /** Fixed reminder slots used during the testing phase. */
-    private val slots = listOf(
-        Pair(10, 0),
-        Pair(13, 0),
-        Pair(15, 1),
-    )
-
-    private val activeStartHour = 6
-    private val activeEndHour = 18
-
-    // endregion
-
     // region Public API
 
     /**
-     * Called on boot, package replaced, and permission re-granted.
-     * Schedules both alarms if within active hours and either alarm is missing or stale.
+     * Called on boot, package replaced, permission re-granted, or settings changed.
+     * Schedules both alarms if either is missing or pointing at a stale slot.
      */
     suspend fun restoreAlarm(source: String = "unknown") {
         Log.i(TAG, "restoreAlarm: source=$source — waiting for lock")
         schedulingMutex.withLock {
             Log.i(TAG, "restoreAlarm: source=$source — lock acquired")
-            if (!isWithinActiveHours()) {
-                Log.i(
-                    TAG,
-                    "restoreAlarm: outside active hours ($activeStartHour:00–$activeEndHour:00) — skipping"
-                )
-                return@withLock
-            }
             val result = scheduleNextAlarm()
             Log.i(TAG, "restoreAlarm: source=$source — $result")
         }
@@ -209,7 +202,7 @@ class DrinkAlarmManagerV2(
      * @return [ScheduleResult.Unchanged] when both alarms were already correct,
      *         [ScheduleResult.Rescheduled] with details of what was actually updated.
      */
-    private fun scheduleNextAlarm(): ScheduleResult {
+    private suspend fun scheduleNextAlarm(): ScheduleResult {
         val (hour, minute) = getNextSlot()
         val permissionGranted = ExactAlarmPermission.isGranted(application)
         val nextSlot = Pair(hour, minute)
@@ -293,28 +286,23 @@ class DrinkAlarmManagerV2(
     }
 
     /**
-     * Returns the first slot from [slots] that is still in the future today.
-     * Falls back to the first slot (scheduled for the next day) if all have passed.
+     * Reads the user's preferences (start time, end time, interval) and today's goal from the
+     * database, then delegates to [getNextAlarmSlot] to compute the next alarm time.
+     *
+     * When called outside active hours, [getNextAlarmSlot] returns the start of the next active
+     * window so the alarm is always scheduled correctly regardless of the current time.
      */
-    private fun getNextSlot(): Pair<Int, Int> {
-        val now = Calendar.getInstance()
-        val nowHour = now.get(Calendar.HOUR_OF_DAY)
-        val nowMinute = now.get(Calendar.MINUTE)
-
-        for ((hour, minute) in slots) {
-            if (hour > nowHour || (hour == nowHour && minute > nowMinute)) {
-                return Pair(hour, minute)
-            }
-        }
-
-        // All slots have passed today — schedule for the first slot tomorrow.
-        // AlarmSchedulerV3.delayUntilNext() handles the day rollover automatically.
-        return slots.first()
-    }
-
-    private fun isWithinActiveHours(): Boolean {
-        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-        return hour in activeStartHour until activeEndHour
+    private suspend fun getNextSlot(): Pair<Int, Int> {
+        val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        val intervalPrefs = prefsStorage.getInterval().first()
+        val interval = AlarmInterval(intervalPrefs.hour, intervalPrefs.minute)
+        val startTime = prefsStorage.getStartTime().first().toLocalDateTime()
+        val endTime = prefsStorage.getEndTime().first().toLocalDateTime()
+        val todayEpoch = now.date.toEpochDays()
+        val goalMl = database.getDailyGoalDao().getGoalForDate(todayEpoch).first()?.goalMl
+            ?: DEFAULT_GOAL_ML
+        val nextSlotTime = getNextAlarmSlot(now, startTime, endTime, goalMl, interval)
+        return Pair(nextSlotTime.hour, nextSlotTime.minute)
     }
 
     // endregion

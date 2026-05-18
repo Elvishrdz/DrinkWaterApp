@@ -13,6 +13,7 @@ import com.eahm.drinkwaterapp.core.config.AppInfoService
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
+import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManagerV2
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.data.notificationpermission.NotificationPermissionObserver
 import com.eahm.drinkwaterapp.core.database.AppDatabase
@@ -43,6 +44,7 @@ internal class SettingsViewModel(
     val database: AppDatabase,
     val prefsStorage: PrefsStorage,
     val drinkAlarmManager: DrinkAlarmManager,
+    val drinkAlarmManagerV2: DrinkAlarmManagerV2,
     dateTimeZoneChangedObserver: DateTimeZoneChangedObserver,
     notificationPermissionObserver: NotificationPermissionObserver,
     appInfoService: AppInfoService,
@@ -154,6 +156,7 @@ internal class SettingsViewModel(
     fun onGoalChanged(goalMl: Float) {
         viewModelScope.launch {
             setGoalFromToday(goalMl)
+            drinkAlarmManagerV2.restoreAlarm(source = "settings-goal-changed")
         }
     }
 
@@ -166,6 +169,7 @@ internal class SettingsViewModel(
             _state.update { it.copy(intervalMinutes = minutes) }
             prefsStorage.setInterval(ActiveTime(0, minutes))
             drinkAlarmManager.determineAction(AlarmSource.NotificationActiveHoursStartTimeChanged)
+            drinkAlarmManagerV2.restoreAlarm(source = "settings-interval-changed")
         }
     }
 
@@ -189,6 +193,7 @@ internal class SettingsViewModel(
             _state.update { it.copy(timeRangeError = null) }
             prefsStorage.setStartTime(newStart)
             drinkAlarmManager.determineAction(AlarmSource.NotificationActiveHoursStartTimeChanged)
+            drinkAlarmManagerV2.restoreAlarm(source = "settings-start-time-changed")
         }
     }
 
@@ -206,6 +211,7 @@ internal class SettingsViewModel(
             _state.update { it.copy(timeRangeError = null) }
             prefsStorage.setEndTime(newEnd)
             drinkAlarmManager.determineAction(AlarmSource.NotificationActiveHoursEndTimeChanged)
+            drinkAlarmManagerV2.restoreAlarm(source = "settings-end-time-changed")
         }
     }
 
@@ -223,6 +229,7 @@ internal class SettingsViewModel(
             database.getDailyGoalDao().deleteAll()
             prefsStorage.clear()
             drinkAlarmManager.clear()
+            drinkAlarmManagerV2.clear()
 
             // restart application after cleanup
             application.packageManager
