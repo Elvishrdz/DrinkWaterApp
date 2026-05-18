@@ -10,6 +10,7 @@ import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import com.eahm.drinkwaterapp.core.data.datastore.initialAmountPerDrink
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
+import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManagerV2
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStatsObserver
 import com.eahm.drinkwaterapp.core.data.systemnotifications.NotificationService
@@ -39,10 +40,10 @@ import kotlin.time.ExperimentalTime
 class AlarmReceiver : BroadcastReceiver() {
 
     private val drinkAlarmManager
-        get() = let {
-            val koin = GlobalContext.get()
-            koin.get<DrinkAlarmManager>()
-        }
+        get() = GlobalContext.get().get<DrinkAlarmManager>()
+
+    private val drinkAlarmManagerV2
+        get() = GlobalContext.get().get<DrinkAlarmManagerV2>()
 
     override fun onReceive(context: Context, intent: Intent) = goAsync { _ ->
         Log.i("AlarmReceiverLogs", "onReceive: Intent:${intent.action}")
@@ -56,11 +57,11 @@ class AlarmReceiver : BroadcastReceiver() {
                 println("DrinkWaterApp: restore alarms with received intent: ${intent.action}")
                 // this is called multiple times depending on the intent action
                 drinkAlarmManager.restoreAlarm(source = intent.action.toString())
+                drinkAlarmManagerV2.restoreAlarm(source = intent.action.toString())
             }
 
             AlarmManager.ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED -> {
-                // when granted this is invoked immediately.
-                // always check if granted because it could be revoked immediately
+                // Fired immediately when permission is granted, NOT when revoked (confirmed by testing).
                 val granted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     val alarmManager =
                         context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -71,6 +72,30 @@ class AlarmReceiver : BroadcastReceiver() {
                 Log.i(
                     "AlarmReceiverLogs",
                     "SCHEDULE_EXACT_ALARM permission changed — granted=$granted"
+                )
+                if (granted) {
+                    drinkAlarmManager.restoreAlarm(
+                        source = AlarmManager.ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED,
+                    )
+                    drinkAlarmManagerV2.restoreAlarm(
+                        source = AlarmManager.ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED,
+                    )
+                }
+            }
+
+            EXACT_ALARM_ACTION -> {
+                val hour = intent.getIntExtra(ALARM_EXTRAS_TRIGGER_HOUR, -1).takeIf { it != -1 }
+                val minute = intent.getIntExtra(ALARM_EXTRAS_TRIGGER_MINUTE, -1).takeIf { it != -1 }
+                drinkAlarmManagerV2.onAlarmReceived(AlarmSource.DrinkAlarmReceived, hour, minute)
+            }
+
+            INEXACT_ALARM_ACTION -> {
+                val hour = intent.getIntExtra(ALARM_EXTRAS_TRIGGER_HOUR, -1).takeIf { it != -1 }
+                val minute = intent.getIntExtra(ALARM_EXTRAS_TRIGGER_MINUTE, -1).takeIf { it != -1 }
+                drinkAlarmManagerV2.onInexactAlarmReceived(
+                    AlarmSource.DrinkAlarmReceived,
+                    hour,
+                    minute
                 )
             }
 
@@ -158,8 +183,11 @@ class AlarmReceiver : BroadcastReceiver() {
 
     companion object {
 
-        // Action should match action in the AndroidManifest.xml receiver intent-filter
+        // Actions must match the intent-filter entries in AndroidManifest.xml
         const val ALARM_ACTION = "com.eahm.drinkwaterapp.ALARM_ACTION"
+        const val EXACT_ALARM_ACTION = "com.eahm.drinkwaterapp.EXACT_ALARM_ACTION"
+        const val INEXACT_ALARM_ACTION = "com.eahm.drinkwaterapp.INEXACT_ALARM_ACTION"
+
         const val ALARM_EXTRAS_TRIGGER_HOUR = "EXTRAS_TRIGGER_HOUR"
         const val ALARM_EXTRAS_TRIGGER_MINUTE = "EXTRAS_TRIGGER_MINUTE"
     }

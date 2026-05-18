@@ -5,4 +5,5 @@ import org.koin.dsl.module
 
 val drinkAlarmModule = module {
     singleOf(::DrinkAlarmManager)
+    singleOf(::DrinkAlarmManagerV2)
 }
