@@ -60,6 +60,7 @@ class DrinkAlarmManager(
 
     @OptIn(ExperimentalTime::class)
     suspend fun setupAlarm(source: AlarmSource) {
+        return
         val currentDeviceDateTime =
             Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 
@@ -98,6 +99,7 @@ class DrinkAlarmManager(
     }
 
     fun setupTestAlarm(source: AlarmSource) {
+        return
         val configuration = AlarmConfiguration(
             source = source,
             schedule = AlarmSchedule.AfterGivenTime(
@@ -112,6 +114,7 @@ class DrinkAlarmManager(
 
     @OptIn(ExperimentalTime::class)
     private fun scheduleDrinkAlarm(configuration: AlarmConfiguration) {
+        return
         val alarmId = DRINK_ALARM_ID
 
         when (val data = configuration.schedule) {
@@ -138,11 +141,13 @@ class DrinkAlarmManager(
     }
 
     suspend fun determineAction(source: AlarmSource) {
+        return
         askWhatToDo(source.toString())
     }
 
     @OptIn(ExperimentalTime::class)
     suspend fun onAlarmReceived(source: AlarmSource) {
+        return
         // always schedule next alarm when previous is received
         // FIXME: alarma recibida, revisar cual es el siguiente intervalo y programar alarma.
         setupAlarm(source)
@@ -153,6 +158,7 @@ class DrinkAlarmManager(
     }
 
     suspend fun onResume() {
+        return
         update()
 
         askWhatToDo("onResume")
@@ -160,6 +166,7 @@ class DrinkAlarmManager(
 
     @OptIn(ExperimentalTime::class)
     suspend fun restoreAlarm(source: String = "unknown") {
+        return
         Log.i("DRINK_ALARM_MANAGER", "restoreAlarms: Source: $source - waiting for lock")
         restoreAlarmMutex.withLock {
             Log.i("DRINK_ALARM_MANAGER", "restoreAlarms: Source: $source - lock acquired")
@@ -169,11 +176,13 @@ class DrinkAlarmManager(
     }
 
     suspend fun setInterval(hour: Int, minute: Int) {
+        return
         prefsStorage.setInterval(ActiveTime(hour, minute))
         update()
     }
 
     fun update() {
+        return
         _state.update { getState() }
     }
 
@@ -191,6 +200,7 @@ class DrinkAlarmManager(
     }
 
     suspend fun askWhatToDo(source: String = "unknown") {
+        return
         Log.i("DRINK_ALARM_MANAGER", "what to do? source: $source")
 
         when (val data = whatToDoService.whatShouldIDoNow()) {
@@ -234,11 +244,13 @@ class DrinkAlarmManager(
     }
 
     fun clear() {
+        return
         stopAlarm()
         NotificationService.cancelDrinkNotification(application)
     }
 
     fun stopAlarm() {
+        return
         AlarmScheduler.cancelAlarm(
             context = application,
             alarmId = DRINK_ALARM_ID,
