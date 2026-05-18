@@ -1,5 +1,6 @@
 package com.eahm.drinkwaterapp.feature.onboarding.ui.steps
 
+import android.text.format.DateFormat
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -30,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,6 +44,8 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
+import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
+import com.eahm.drinkwaterapp.feature.onboarding.OnbTimeSelection
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingFormState
 import com.eahm.drinkwaterapp.feature.onboarding.ui.components.DwPrimaryButtonAnimated
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbShell
@@ -63,7 +67,12 @@ internal fun StepDone(
     } else {
         stringResource(R.string.onb_done_title_with_name, state.name)
     }
-    val liters = "%.2f".format(state.goalMl / 1000.0)
+    val context = LocalContext.current
+    val is24Hour = when (state.timeFormatPreference) {
+        TimeFormatPreference.SYSTEM -> DateFormat.is24HourFormat(context)
+        TimeFormatPreference.HOUR_12 -> false
+        TimeFormatPreference.HOUR_24 -> true
+    }
 
     OnbShell(
         step = step,
@@ -81,14 +90,14 @@ internal fun StepDone(
             )
         },
     ) {
-        SummaryCard(state = state, liters = liters)
+        SummaryCard(state = state, is24Hour = is24Hour)
     }
 }
 
 @Composable
 private fun SummaryCard(
     state: OnboardingFormState,
-    liters: String,
+    is24Hour: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val rows = listOf(
@@ -97,7 +106,7 @@ private fun SummaryCard(
             iconBg = DwTintWater,
             iconTint = DwWater,
             label = stringResource(R.string.label_daily_goal),
-            value = "$liters L",
+            value = "${state.goalMl.toInt()} mL",
         ),
         SummaryRowData(
             icon = DwIcons.Bell,
@@ -111,14 +120,14 @@ private fun SummaryCard(
             iconBg = DwTintWater,
             iconTint = DwWater,
             label = stringResource(R.string.label_start_time),
-            value = state.wakeTime.label(),
+            value = state.wakeTime.formatTime(is24Hour),
         ),
         SummaryRowData(
             icon = DwIcons.Moon,
             iconBg = DwTintMagenta,
             iconTint = DwMagenta,
             label = stringResource(R.string.label_end_time),
-            value = state.sleepTime.label(),
+            value = state.sleepTime.formatTime(is24Hour),
         ),
     )
 
@@ -216,6 +225,15 @@ private fun formatInterval(minutes: Int): String = when {
     minutes < 60 -> "every $minutes min"
     minutes % 60 == 0 -> "every ${minutes / 60}h"
     else -> "every ${minutes / 60}h ${minutes % 60}min"
+}
+
+private fun OnbTimeSelection.formatTime(is24Hour: Boolean): String {
+    val mm = minute.toString().padStart(2, '0')
+    return if (is24Hour) {
+        "${toHour24().toString().padStart(2, '0')}:$mm"
+    } else {
+        "$hour:$mm ${if (isPm) "PM" else "AM"}"
+    }
 }
 
 @DwPreview
