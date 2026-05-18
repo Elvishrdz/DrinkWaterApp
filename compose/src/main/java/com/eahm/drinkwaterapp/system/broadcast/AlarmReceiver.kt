@@ -9,7 +9,6 @@ import android.provider.Settings
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import com.eahm.drinkwaterapp.core.data.datastore.initialAmountPerDrink
-import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManagerV2
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStatsObserver
@@ -39,9 +38,6 @@ import kotlin.time.ExperimentalTime
 
 class AlarmReceiver : BroadcastReceiver() {
 
-    private val drinkAlarmManager
-        get() = GlobalContext.get().get<DrinkAlarmManager>()
-
     private val drinkAlarmManagerV2
         get() = GlobalContext.get().get<DrinkAlarmManagerV2>()
 
@@ -55,8 +51,6 @@ class AlarmReceiver : BroadcastReceiver() {
             Intent.ACTION_LOCKED_BOOT_COMPLETED,
                 -> {
                 println("DrinkWaterApp: restore alarms with received intent: ${intent.action}")
-                // this is called multiple times depending on the intent action
-                drinkAlarmManager.restoreAlarm(source = intent.action.toString())
                 drinkAlarmManagerV2.restoreAlarm(source = intent.action.toString())
             }
 
@@ -74,9 +68,6 @@ class AlarmReceiver : BroadcastReceiver() {
                     "SCHEDULE_EXACT_ALARM permission changed — granted=$granted"
                 )
                 if (granted) {
-                    drinkAlarmManager.restoreAlarm(
-                        source = AlarmManager.ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED,
-                    )
                     drinkAlarmManagerV2.restoreAlarm(
                         source = AlarmManager.ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED,
                     )
@@ -102,9 +93,6 @@ class AlarmReceiver : BroadcastReceiver() {
             ALARM_ACTION -> {
                 val hour = intent.getIntExtra(ALARM_EXTRAS_TRIGGER_HOUR, -1).takeIf { it != -1 }
                 val minute = intent.getIntExtra(ALARM_EXTRAS_TRIGGER_MINUTE, -1).takeIf { it != -1 }
-
-                drinkAlarmManager.onAlarmReceived(AlarmSource.DrinkAlarmReceived)
-
                 NotificationService.showDrinkNotification(context, hour, minute)
             }
 
@@ -115,21 +103,21 @@ class AlarmReceiver : BroadcastReceiver() {
                         initialAmountPerDrink
                     )
                     registerDrink(context, amountPerDrink)
-                    drinkAlarmManager.setupAlarm(AlarmSource.NotificationDrinkButton)
+                    drinkAlarmManagerV2.restoreAlarm(source = "notification-drink")
                     removeNotificationFromSystem(context, intent)
                 }
             }
 
             SkipDrink.action -> {
                 if (code == SkipDrink.code) {
-                    drinkAlarmManager.setupAlarm(AlarmSource.NotificationSkipButton)
+                    drinkAlarmManagerV2.restoreAlarm(source = "notification-skip")
                     removeNotificationFromSystem(context, intent)
                 }
             }
 
             NotificationRemoved.action -> {
                 if (code == NotificationRemoved.code) {
-                    drinkAlarmManager.setupAlarm(AlarmSource.NotificationRemoved)
+                    drinkAlarmManagerV2.restoreAlarm(source = "notification-removed")
                     removeNotificationFromSystem(context, intent)
                 }
             }

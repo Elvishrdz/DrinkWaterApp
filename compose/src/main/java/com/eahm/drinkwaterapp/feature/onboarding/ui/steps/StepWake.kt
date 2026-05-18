@@ -29,6 +29,7 @@ internal fun StepWake(
     step: Int,
     wakeTime: OnbTimeSelection,
     sleepTime: OnbTimeSelection,
+    is24Hour: Boolean,
     onWakeTimeChange: (OnbTimeSelection) -> Unit,
     onNext: () -> Unit,
     onBack: () -> Unit,
@@ -66,6 +67,7 @@ internal fun StepWake(
         OnbTimeWheel(
             time = wakeTime,
             onTimeChange = onWakeTimeChange,
+            is24Hour = is24Hour,
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentWidth(Alignment.CenterHorizontally),
@@ -81,6 +83,7 @@ private fun StepWakePreview() {
             step = 1,
             wakeTime = OnbTimeSelection(hour = 7, minute = 0, isPm = false),
             sleepTime = OnbTimeSelection(hour = 10, minute = 0, isPm = true),
+            is24Hour = false,
             onWakeTimeChange = {},
             onNext = {},
             onBack = {},
@@ -96,6 +99,7 @@ private fun StepWakeLandscapePreview() {
             step = 3,
             wakeTime = OnbTimeSelection(hour = 7, minute = 0, isPm = false),
             sleepTime = OnbTimeSelection(hour = 10, minute = 0, isPm = true),
+            is24Hour = false,
             onWakeTimeChange = {},
             onNext = {},
             onBack = {},
@@ -111,6 +115,7 @@ private fun StepWakeTabletPreview() {
             step = 3,
             wakeTime = OnbTimeSelection(hour = 7, minute = 0, isPm = false),
             sleepTime = OnbTimeSelection(hour = 10, minute = 0, isPm = true),
+            is24Hour = false,
             onWakeTimeChange = {},
             onNext = {},
             onBack = {},

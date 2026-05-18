@@ -9,8 +9,7 @@ import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
 import com.eahm.drinkwaterapp.core.data.confetti.ConfettiController
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
-import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
-import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
+import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManagerV2
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStatsObserver
 import com.eahm.drinkwaterapp.core.data.streak.StreakRepository
 import com.eahm.drinkwaterapp.core.database.AppDatabase
@@ -20,6 +19,7 @@ import com.eahm.drinkwaterapp.core.domain.extension.toEndOfDayTime
 import com.eahm.drinkwaterapp.core.domain.extension.toStartOfDayTime
 import com.eahm.drinkwaterapp.feature.drink.data.HistoryData
 import com.eahm.drinkwaterapp.feature.drink.ui.DrinkLogEntry
+import com.eahm.drinkwaterapp.system.alarm.AlarmSchedulerV3
 import com.eahm.drinkwaterapp.system.service.goalcelebration.GoalCelebrationOverlay
 import com.eahm.drinkwaterapp.system.service.goalcelebration.data.CelebrationStyle
 import com.eahm.drinkwaterapp.system.service.goalcelebration.extension.createIntent
@@ -43,7 +43,7 @@ import kotlin.time.ExperimentalTime
 
 internal class DrinkViewModel(
     val application: Application,
-    val drinkAlarmManager: DrinkAlarmManager,
+    val drinkAlarmManagerV2: DrinkAlarmManagerV2,
     val database: AppDatabase,
     val prefsStorage: PrefsStorage,
     val confettiController: ConfettiController,
@@ -142,15 +142,32 @@ internal class DrinkViewModel(
         initialValue = null,
     )
 
+    // Emits Unit whenever the alarm slot may have changed (settings updated).
+    private val alarmSlotSignal = combine(
+        prefsStorage.getInterval(),
+        prefsStorage.getStartTime(),
+    ) { _, _ -> Unit }
+
     val state = combine(
         extras,
         history,
         drinkStatsObserver.drinkStats,
-        drinkAlarmManager.state
-    ) { extras, history, drinkStats, alarmState ->
+        alarmSlotSignal,
+    ) { extras, history, drinkStats, _ ->
         if (history == null || extras == null) {
             DrinkState.Loading
         } else {
+            // Prefer the exact alarm slot; fall back to inexact when exact permission is denied.
+            val alarmTriggerAtMs = (
+                    AlarmSchedulerV3.getMillisUntilExactTrigger(
+                        application,
+                        DrinkAlarmManagerV2.EXACT_ALARM_ID
+                    )
+                        ?: AlarmSchedulerV3.getMillisUntilInexactTrigger(
+                            application,
+                            DrinkAlarmManagerV2.INEXACT_ALARM_ID
+                        )
+                    )?.let { android.os.SystemClock.elapsedRealtime() + it }
             DrinkState.Data(
                 drinkStreakDays = extras.streakData.drinkStreakDays,
                 showStreakBadge = extras.streakData.drinkStreakDays > 0,
@@ -158,7 +175,7 @@ internal class DrinkViewModel(
                 allDrinkSuggestions = extras.allDrinkSuggestions,
                 todayLogs = history.todayLogs,
                 drinkStats = drinkStats,
-                alarmTriggerAtMs = alarmState.alarmStorageInfo?.alarmTriggerAtMillis,
+                alarmTriggerAtMs = alarmTriggerAtMs,
             )
         }
     }.stateIn(
@@ -184,7 +201,7 @@ internal class DrinkViewModel(
 
                 dao.insertAll(record)
 
-                drinkAlarmManager.setupAlarm(AlarmSource.DrinkButton)
+                drinkAlarmManagerV2.restoreAlarm(source = "drink-button")
             }
         }
     }

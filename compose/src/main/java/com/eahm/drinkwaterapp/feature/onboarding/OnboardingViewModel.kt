@@ -5,9 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
-import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManagerV2
-import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
 import com.eahm.drinkwaterapp.core.database.entity.DailyGoalEntity
@@ -28,7 +26,6 @@ import kotlin.time.ExperimentalTime
 internal class OnboardingViewModel(
     private val prefs: PrefsStorage,
     database: AppDatabase,
-    private val drinkAlarmManager: DrinkAlarmManager,
     private val drinkAlarmManagerV2: DrinkAlarmManagerV2,
     private val tracking: TrackingService,
 ) : ViewModel() {
@@ -52,10 +49,12 @@ internal class OnboardingViewModel(
         state.copy(
             goalMl = goal?.goalMl ?: DEFAULT_GOAL_ML,
         )
+    }.combine(prefs.getTimeFormatPreference()) { state, timeFormat ->
+        state.copy(timeFormatPreference = timeFormat)
     }.stateIn(
-        viewModelScope,
-        SharingStarted.Lazily,
-        _state.value,
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed((5_000)),
+        initialValue = _state.value,
     )
 
     fun onNameChange(name: String) = _state.update { it.copy(name = name) }
@@ -114,7 +113,6 @@ internal class OnboardingViewModel(
             tracking.trackOnboardingCompleted()
             tracking.stopTrackTimeOnboardingTime()
             prefs.setOnboardingCompleted(true)
-            drinkAlarmManager.determineAction(AlarmSource.OnboardingCompleted)
             drinkAlarmManagerV2.restoreAlarm(source = "onboarding")
             onComplete()
         }

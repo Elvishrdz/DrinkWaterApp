@@ -192,6 +192,11 @@
     <string name="settings_row_notifications">Notificaciones</string>
     <string name="settings_row_interval">Intervalo</string>
     <string name="settings_row_notification_amount">Cantidad de notificación</string>
+    <string name="settings_row_time_format">Formato de hora</string>
+    <string name="settings_time_format_auto">Auto</string>
+    <string name="settings_time_format_auto_description">Usa la configuración regional del dispositivo</string>
+    <string name="settings_time_format_12h_description">Muestra siempre AM / PM</string>
+    <string name="settings_time_format_24h_description">Muestra siempre el reloj de 24 horas</string>
     <string name="settings_row_goal_celebrations">Celebraciones al alcanzar la meta</string>
     <string name="settings_row_reminder_type">Tipo de recordatorio</string>
     <string name="settings_row_reminder_status">Exacta</string>

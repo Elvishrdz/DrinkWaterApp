@@ -12,13 +12,12 @@ import com.eahm.drinkwaterapp.core.billing.PurchaseManager
 import com.eahm.drinkwaterapp.core.config.AppInfoService
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
-import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManagerV2
-import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.data.notificationpermission.NotificationPermissionObserver
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
 import com.eahm.drinkwaterapp.core.database.entity.DailyGoalEntity
+import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.eahm.drinkwaterapp.feature.drink.DateTimeZoneChangedObserver
 import com.eahm.drinkwaterapp.feature.settings.data.ActiveTimes
 import com.eahm.drinkwaterapp.ui.inputfield.validateText
@@ -43,7 +42,6 @@ internal class SettingsViewModel(
     val application: Application,
     val database: AppDatabase,
     val prefsStorage: PrefsStorage,
-    val drinkAlarmManager: DrinkAlarmManager,
     val drinkAlarmManagerV2: DrinkAlarmManagerV2,
     dateTimeZoneChangedObserver: DateTimeZoneChangedObserver,
     notificationPermissionObserver: NotificationPermissionObserver,
@@ -133,6 +131,9 @@ internal class SettingsViewModel(
         .combine(purchaseManager.purchaseState) { state, purchaseState ->
             state.copy(purchaseState = purchaseState)
         }
+        .combine(prefsStorage.getTimeFormatPreference()) { state, timeFormatPreference ->
+            state.copy(timeFormatPreference = timeFormatPreference)
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Lazily,
@@ -168,7 +169,6 @@ internal class SettingsViewModel(
         viewModelScope.launch {
             _state.update { it.copy(intervalMinutes = minutes) }
             prefsStorage.setInterval(ActiveTime(0, minutes))
-            drinkAlarmManager.determineAction(AlarmSource.NotificationActiveHoursStartTimeChanged)
             drinkAlarmManagerV2.restoreAlarm(source = "settings-interval-changed")
         }
     }
@@ -192,7 +192,6 @@ internal class SettingsViewModel(
 
             _state.update { it.copy(timeRangeError = null) }
             prefsStorage.setStartTime(newStart)
-            drinkAlarmManager.determineAction(AlarmSource.NotificationActiveHoursStartTimeChanged)
             drinkAlarmManagerV2.restoreAlarm(source = "settings-start-time-changed")
         }
     }
@@ -210,9 +209,12 @@ internal class SettingsViewModel(
 
             _state.update { it.copy(timeRangeError = null) }
             prefsStorage.setEndTime(newEnd)
-            drinkAlarmManager.determineAction(AlarmSource.NotificationActiveHoursEndTimeChanged)
             drinkAlarmManagerV2.restoreAlarm(source = "settings-end-time-changed")
         }
+    }
+
+    fun onTimeFormatPreferenceChanged(pref: TimeFormatPreference) {
+        viewModelScope.launch { prefsStorage.setTimeFormatPreference(pref) }
     }
 
     fun onDrawOverlayPermissionResult() {
@@ -228,7 +230,6 @@ internal class SettingsViewModel(
             database.getHistoryDao().deleteAll()
             database.getDailyGoalDao().deleteAll()
             prefsStorage.clear()
-            drinkAlarmManager.clear()
             drinkAlarmManagerV2.clear()
 
             // restart application after cleanup

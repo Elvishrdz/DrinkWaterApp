@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import com.eahm.drinkwaterapp.core.billing.PurchaseState
 import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
 import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
+import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.revenuecat.purchases.Package as RcPackage
 
 @Immutable
@@ -33,6 +34,7 @@ data class SettingsState(
     val isAdFree: Boolean = false,
     val purchaseState: PurchaseState = PurchaseState.Idle,
     val offeringsState: OfferingsState? = null,
+    val timeFormatPreference: TimeFormatPreference = TimeFormatPreference.SYSTEM,
 )
 
 enum class WaterUnit(val label: String) {

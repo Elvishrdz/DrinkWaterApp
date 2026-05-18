@@ -195,6 +195,11 @@
     <string name="settings_row_notifications">Notifications</string>
     <string name="settings_row_interval">Interval</string>
     <string name="settings_row_notification_amount">Notification amount</string>
+    <string name="settings_row_time_format">Time format</string>
+    <string name="settings_time_format_auto">Auto</string>
+    <string name="settings_time_format_auto_description">Follows your device\'s locale setting</string>
+    <string name="settings_time_format_12h_description">Always show AM / PM</string>
+    <string name="settings_time_format_24h_description">Always show 24-hour clock</string>
     <string name="settings_row_goal_celebrations">Goal reached celebrations</string>
     <string name="settings_row_reminder_type">Reminder type</string>
     <string name="settings_row_reminder_status">Exact</string>

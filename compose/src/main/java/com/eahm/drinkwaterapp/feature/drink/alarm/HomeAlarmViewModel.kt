@@ -1,10 +1,11 @@
 package com.eahm.drinkwaterapp.feature.drink.alarm
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmCalculator2
-import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManager
+import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManagerV2
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkSchedule
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.TimeResult
 import com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo.getNextAlarmSlot
@@ -15,6 +16,7 @@ import com.eahm.drinkwaterapp.core.domain.extension.toLocalDateTime
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import com.eahm.drinkwaterapp.feature.drink.ClockGranularity
 import com.eahm.drinkwaterapp.feature.drink.ClockTickObserver
+import com.eahm.drinkwaterapp.system.alarm.AlarmSchedulerV3
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
@@ -22,7 +24,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.LocalDateTime
 
 internal class HomeAlarmViewModel(
-    val drinkAlarmManager: DrinkAlarmManager,
+    private val application: Application,
     clockTickObserver: ClockTickObserver,
     private val notificationPermissionObserver: NotificationPermissionObserver,
     private val prefsStorage: PrefsStorage,
@@ -38,11 +40,10 @@ internal class HomeAlarmViewModel(
     ) { interval, start, end -> Triple(interval, start, end) }
 
     val state = combine(
-        drinkAlarmManager.state,
         notificationPermissionObserver.hasPermission,
         clockTickObserver.observe(ClockGranularity.MINUTE),
         alarmPrefs,
-    ) { drinkAlarmState, hasPermission, now, prefs ->
+    ) { hasPermission, now, prefs ->
         if (!hasPermission) return@combine HomeAlarmState.NoPermission
 
         val (intervalPref, startTimePref, endTimePref) = prefs
@@ -50,7 +51,13 @@ internal class HomeAlarmViewModel(
         val endTime = endTimePref.toLocalDateTime()
         val alarmInterval = AlarmInterval(intervalPref.hour, intervalPref.minute)
 
-        if (!drinkAlarmState.isAlarmActive) return@combine HomeAlarmState.NotConfigured
+        val isAlarmActive =
+            AlarmSchedulerV3.isExactAlarmActive(application, DrinkAlarmManagerV2.EXACT_ALARM_ID) ||
+                    AlarmSchedulerV3.isInexactAlarmActive(
+                        application,
+                        DrinkAlarmManagerV2.INEXACT_ALARM_ID
+                    )
+        if (!isAlarmActive) return@combine HomeAlarmState.NotConfigured
 
         val goalMl = database.getDailyGoalDao()
             .getGoalForDate(now.date.toEpochDays())

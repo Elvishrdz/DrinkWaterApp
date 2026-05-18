@@ -1,6 +1,7 @@
 package com.eahm.drinkwaterapp.feature.onboarding
 
 import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
+import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 
 
 internal enum class Gender { FEMALE, MALE, PREFER_NOT_TO_SAY }
@@ -41,6 +42,7 @@ internal data class OnboardingFormState(
     val intervalMinutes: Int = 45,
     val goalMl: Float,
     val notifAmountMl: Float = 150f,
+    val timeFormatPreference: TimeFormatPreference = TimeFormatPreference.SYSTEM,
 )
 
 sealed interface OnboardingSteps {

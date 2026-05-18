@@ -30,6 +30,7 @@ internal fun StepSleep(
     step: Int,
     wakeTime: OnbTimeSelection,
     sleepTime: OnbTimeSelection,
+    is24Hour: Boolean,
     onSleepTimeChange: (OnbTimeSelection) -> Unit,
     onNext: () -> Unit,
     onBack: () -> Unit,
@@ -67,6 +68,7 @@ internal fun StepSleep(
         OnbTimeWheel(
             time = sleepTime,
             onTimeChange = onSleepTimeChange,
+            is24Hour = is24Hour,
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentWidth(Alignment.CenterHorizontally),
@@ -83,6 +85,7 @@ private fun StepSleepPreview() {
             step = 1,
             wakeTime = OnbTimeSelection(hour = 7, minute = 0, isPm = false),
             sleepTime = OnbTimeSelection(hour = 10, minute = 30, isPm = true),
+            is24Hour = false,
             onSleepTimeChange = {},
             onNext = {},
             onBack = {},
@@ -98,6 +101,7 @@ private fun StepSleepLandscapePreview() {
             step = 4,
             wakeTime = OnbTimeSelection(hour = 7, minute = 0, isPm = false),
             sleepTime = OnbTimeSelection(hour = 10, minute = 30, isPm = true),
+            is24Hour = false,
             onSleepTimeChange = {},
             onNext = {},
             onBack = {},
@@ -113,6 +117,7 @@ private fun StepSleepTabletPreview() {
             step = 4,
             wakeTime = OnbTimeSelection(hour = 7, minute = 0, isPm = false),
             sleepTime = OnbTimeSelection(hour = 10, minute = 30, isPm = true),
+            is24Hour = false,
             onSleepTimeChange = {},
             onNext = {},
             onBack = {},

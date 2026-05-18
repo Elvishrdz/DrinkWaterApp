@@ -3,6 +3,7 @@ package com.eahm.drinkwaterapp.feature.onboarding
 import android.app.AlarmManager
 import android.os.Build
 import android.provider.Settings
+import android.text.format.DateFormat
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -16,6 +17,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
+import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps.Celebrations
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps.DailyGoal
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps.Intro
@@ -92,6 +94,12 @@ internal fun OnboardingScreen(
             true
         }
 
+    val is24Hour = when (state.timeFormatPreference) {
+        TimeFormatPreference.SYSTEM -> DateFormat.is24HourFormat(context)
+        TimeFormatPreference.HOUR_12 -> false
+        TimeFormatPreference.HOUR_24 -> true
+    }
+
     val animatedProgress by animateFloatAsState(
         targetValue = state.step.toFloat() / OnboardingSteps.totalSteps.toFloat(),
         animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing),
@@ -117,6 +125,7 @@ internal fun OnboardingScreen(
                 step = state.step,
                 wakeTime = state.wakeTime,
                 sleepTime = state.sleepTime,
+                is24Hour = is24Hour,
                 onWakeTimeChange = viewModel::onWakeTimeChange,
                 onNext = { viewModel.nextStep() },
                 onBack = { viewModel.prevStep() },
@@ -126,6 +135,7 @@ internal fun OnboardingScreen(
                 step = state.step,
                 wakeTime = state.wakeTime,
                 sleepTime = state.sleepTime,
+                is24Hour = is24Hour,
                 onSleepTimeChange = viewModel::onSleepTimeChange,
                 onNext = { viewModel.nextStep() },
                 onBack = { viewModel.prevStep() },

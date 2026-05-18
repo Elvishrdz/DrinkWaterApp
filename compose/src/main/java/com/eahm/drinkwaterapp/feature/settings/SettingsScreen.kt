@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import android.text.format.DateFormat
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -90,12 +91,14 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.JetBrainsMono
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 import com.eahm.drinkwaterapp.core.domain.extension.sanitizeZeroDecimals
+import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.eahm.drinkwaterapp.core.presentation.composable.BuildInfoFooter
 import com.eahm.drinkwaterapp.feature.settings.ui.EditButton
 import com.eahm.drinkwaterapp.feature.settings.ui.GoalBottomSheet
 import com.eahm.drinkwaterapp.feature.settings.ui.IntervalBottomSheet
 import com.eahm.drinkwaterapp.feature.settings.ui.NotificationAmountBottomSheet
 import com.eahm.drinkwaterapp.feature.settings.ui.RemoveAdsBottomSheet
+import com.eahm.drinkwaterapp.feature.settings.ui.TimeFormatBottomSheet
 import com.eahm.drinkwaterapp.feature.settings.ui.UnitsBottomSheet
 import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorDialog
 import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
@@ -252,6 +255,7 @@ internal fun SettingsScreen(
         onExactAlarmTap = ::handleExactAlarmTap,
         onClearDataTap = { showClearDataDialog = true },
         onRemoveAdsTap = viewModel::onFetchOfferings,
+        onTimeFormatChanged = viewModel::onTimeFormatPreferenceChanged,
         modifier = modifier,
     )
 
@@ -390,8 +394,15 @@ internal fun SettingsContent(
     onExactAlarmTap: () -> Unit,
     onClearDataTap: () -> Unit,
     onRemoveAdsTap: () -> Unit,
+    onTimeFormatChanged: (TimeFormatPreference) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    val is24Hour = when (state.timeFormatPreference) {
+        TimeFormatPreference.SYSTEM -> DateFormat.is24HourFormat(context)
+        TimeFormatPreference.HOUR_12 -> false
+        TimeFormatPreference.HOUR_24 -> true
+    }
     // Window duration used to cap the reminder interval
     val windowMinutes = remember(state.startTime, state.endTime) {
         val s = state.startTime ?: return@remember 24 * 60
@@ -406,6 +417,7 @@ internal fun SettingsContent(
     var showUnitsSheet by rememberSaveable { mutableStateOf(false) }
     var showIntervalSheet by rememberSaveable { mutableStateOf(false) }
     var showNotificationAmountSheet by rememberSaveable { mutableStateOf(false) }
+    var showTimeFormatSheet by rememberSaveable { mutableStateOf(false) }
 
     Scaffold { innerPadding ->
         LazyColumn(
@@ -513,6 +525,7 @@ internal fun SettingsContent(
                         iconBg = DwTintWater,
                         iconTint = DwWater,
                         label = stringResource(R.string.label_start_time),
+                        is24HourFormat = is24Hour,
                         onStartTimeTap = onStartTimeChanged,
                     )
                     HorizontalDivider(color = DwInk100)
@@ -522,8 +535,19 @@ internal fun SettingsContent(
                         iconBg = DwTintMagenta,
                         iconTint = DwMagenta,
                         label = stringResource(R.string.label_end_time),
+                        is24HourFormat = is24Hour,
                         onStartTimeTap = onEndTimeChanged,
                     )
+                    HorizontalDivider(color = DwInk100)
+                    SettingRow(
+                        icon = DwIcons.Clock,
+                        iconBg = DwTintWater,
+                        iconTint = DwWater,
+                        label = stringResource(R.string.settings_row_time_format),
+                        onClick = { showTimeFormatSheet = true },
+                    ) {
+                        TimeFormatBadge(preference = state.timeFormatPreference)
+                    }
                     HorizontalDivider(color = DwInk100)
                     SettingRow(
                         icon = DwIcons.Glass,
@@ -709,6 +733,14 @@ internal fun SettingsContent(
             currentAmountMl = state.notificationAmountMl,
             onAmountChanged = onNotificationAmountChanged,
             onDismiss = { showNotificationAmountSheet = false },
+        )
+    }
+
+    if (showTimeFormatSheet) {
+        TimeFormatBottomSheet(
+            current = state.timeFormatPreference,
+            onPreferenceChanged = onTimeFormatChanged,
+            onDismiss = { showTimeFormatSheet = false },
         )
     }
 }
@@ -959,7 +991,7 @@ fun SettingRowTimeSelector(
         onClick = { showModal = !showModal },
     ) {
         RowValueTrailing(
-            value = time?.let { formatTime(it.hour, it.minute) }.orEmpty(),
+            value = time?.let { formatTime(it.hour, it.minute, is24HourFormat) }.orEmpty(),
         )
     }
 
@@ -1144,14 +1176,19 @@ private fun RowChevronTrailing() {
 
 private fun formatGoal(ml: Float): String = "${ml.sanitizeZeroDecimals()} mL"
 
-private fun formatTime(hour: Int, minute: Int): String {
-    val ampm = if (hour < 12) "a.m." else "p.m."
-    val displayHour = when {
-        hour == 0 -> 12
-        hour > 12 -> hour - 12
-        else -> hour
+private fun formatTime(hour: Int, minute: Int, is24Hour: Boolean = false): String {
+    val mm = minute.toString().padStart(2, '0')
+    return if (is24Hour) {
+        "${hour.toString().padStart(2, '0')}:$mm"
+    } else {
+        val ampm = if (hour < 12) "a.m." else "p.m."
+        val displayHour = when {
+            hour == 0 -> 12
+            hour > 12 -> hour - 12
+            else -> hour
+        }
+        "$displayHour:$mm $ampm"
     }
-    return "$displayHour:${minute.toString().padStart(2, '0')} $ampm"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -1238,6 +1275,41 @@ private fun AlarmTypeBadge(isExact: Boolean) {
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 11.sp,
                 color = textColor,
+            )
+        }
+        Icon(
+            imageVector = DwIcons.ChevronRight,
+            contentDescription = null,
+            tint = DwInk400,
+            modifier = Modifier.size(16.dp),
+        )
+    }
+}
+
+@Composable
+private fun TimeFormatBadge(preference: TimeFormatPreference) {
+    val text = when (preference) {
+        TimeFormatPreference.SYSTEM -> stringResource(R.string.settings_time_format_auto)
+        TimeFormatPreference.HOUR_12 -> "12h"
+        TimeFormatPreference.HOUR_24 -> "24h"
+    }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(999.dp))
+                .background(DwInk100)
+                .padding(horizontal = 8.dp, vertical = 3.dp),
+        ) {
+            Text(
+                text = text,
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 11.sp,
+                color = DwInk400,
             )
         }
         Icon(
@@ -1397,6 +1469,7 @@ private fun SettingsScreenPreview() {
             onExactAlarmTap = {},
             onClearDataTap = {},
             onRemoveAdsTap = {},
+            onTimeFormatChanged = {},
         )
     }
 }

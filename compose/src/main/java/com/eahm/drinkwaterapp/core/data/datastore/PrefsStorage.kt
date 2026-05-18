@@ -2,6 +2,7 @@ package com.eahm.drinkwaterapp.core.data.datastore
 
 import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
 import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
+import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import kotlinx.coroutines.flow.Flow
 
 interface PrefsStorage {
@@ -40,6 +41,9 @@ interface PrefsStorage {
 
     fun getBestDrinkStreak(): Flow<Int>
     suspend fun setBestDrinkStreak(days: Int)
+
+    fun getTimeFormatPreference(): Flow<TimeFormatPreference>
+    suspend fun setTimeFormatPreference(pref: TimeFormatPreference)
 
     suspend fun clear()
 }
