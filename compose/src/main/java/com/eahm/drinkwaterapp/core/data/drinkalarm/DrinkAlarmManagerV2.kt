@@ -37,7 +37,7 @@ class DrinkAlarmManagerV2(
     private val slots = listOf(
         Pair(10, 0),
         Pair(13, 0),
-        Pair(14, 29),
+        Pair(15, 1),
     )
 
     private val activeStartHour = 6
@@ -98,9 +98,9 @@ class DrinkAlarmManagerV2(
      */
     suspend fun onInexactAlarmReceived(source: AlarmSource, hour: Int?, minute: Int?) {
         schedulingMutex.withLock {
-            // Always clear the previous receipt first, then save a new one only if this
-            // alarm fired before its scheduled time (inexact alarms can be batched early).
-            AlarmSchedulerV3.clearInexactEarlyReceipt(application, INEXACT_ALARM_ID)
+            // Always clear the previous receipt first, then record how early or late
+            // this alarm fired relative to its scheduled time.
+            AlarmSchedulerV3.clearInexactReceipt(application, INEXACT_ALARM_ID)
             if (hour != null && minute != null) {
                 val now = Calendar.getInstance()
                 val scheduled = Calendar.getInstance().apply {
@@ -108,25 +108,25 @@ class DrinkAlarmManagerV2(
                     set(Calendar.MINUTE, minute)
                     set(Calendar.SECOND, 0)
                     set(Calendar.MILLISECOND, 0)
-                    if (!after(now)) add(Calendar.DAY_OF_YEAR, 1)
+                    // No day rollover — we want today's scheduled time to compute the real diff.
                 }
-                val earlyMs = scheduled.timeInMillis - now.timeInMillis
-                if (earlyMs > 0) {
-                    AlarmSchedulerV3.saveInexactEarlyReceipt(
-                        application,
-                        INEXACT_ALARM_ID,
-                        earlyMs,
-                        hour,
-                        minute
-                    )
-                    Log.i(
-                        TAG,
-                        "onInexactAlarmReceived: fired ${earlyMs}ms early (scheduled at %02d:%02d)".format(
-                            hour,
-                            minute
-                        )
-                    )
+                val deltaMs = scheduled.timeInMillis - now.timeInMillis
+                AlarmSchedulerV3.saveInexactReceipt(
+                    application,
+                    INEXACT_ALARM_ID,
+                    deltaMs,
+                    hour,
+                    minute
+                )
+                val logMsg = when {
+                    deltaMs > 1_000 -> "fired ${deltaMs}ms early"
+                    deltaMs < -1_000 -> "fired ${-deltaMs}ms late"
+                    else -> "fired on time"
                 }
+                Log.i(
+                    TAG,
+                    "onInexactAlarmReceived: $logMsg (scheduled at %02d:%02d)".format(hour, minute)
+                )
             }
 
             val exactPermissionGranted = ExactAlarmPermission.isGranted(application)

@@ -13,6 +13,7 @@ import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManagerV2
 import com.eahm.drinkwaterapp.core.domain.extension.canShowNotifications
 import com.eahm.drinkwaterapp.core.domain.extension.openSystemAppSettings
+import com.eahm.drinkwaterapp.feature.dev.alarmsv2.AlarmsV2ViewModel.Companion.ON_TIME_THRESHOLD_MS
 import com.eahm.drinkwaterapp.system.alarm.AlarmSchedulerV2
 import com.eahm.drinkwaterapp.system.alarm.AlarmSchedulerV3
 import com.eahm.drinkwaterapp.system.alarm.ExactAlarmPermission
@@ -285,14 +286,23 @@ internal class AlarmsV2ViewModel(
             inexactScheduledAt = null
         }
 
-        // --- V2 Inexact early receipt ---
-        val earlyReceipt = AlarmSchedulerV3.getInexactEarlyReceipt(
+        // --- V2 Inexact receipt (early / late / on time) ---
+        val receipt = AlarmSchedulerV3.getInexactReceipt(
             application,
             DrinkAlarmManagerV2.INEXACT_ALARM_ID
         )
-        val inexactEarlyMessage = earlyReceipt?.let { (earlyMs, scheduledH, scheduledM) ->
+        val inexactEarlyMessage = receipt?.let { (deltaMs, scheduledH, scheduledM) ->
             val timeStr = "%02d:%02d".format(scheduledH, scheduledM)
-            "received ${formatDuration(earlyMs)} earlier (scheduled at $timeStr)"
+            when {
+                deltaMs > ON_TIME_THRESHOLD_MS ->
+                    "received ${formatDuration(deltaMs)} earlier (scheduled at $timeStr)"
+
+                deltaMs < -ON_TIME_THRESHOLD_MS ->
+                    "received ${formatDuration(-deltaMs)} later (scheduled at $timeStr)"
+
+                else ->
+                    "received at $timeStr (on time)"
+            }
         }
 
         // --- V1 alarm state (legacy) ---
@@ -416,5 +426,11 @@ internal class AlarmsV2ViewModel(
 
         /** Request code for the AlarmSchedulerV2 test alarm (AlarmsViewModel.TEST_ALARM_ID). */
         private const val TEST_ALARM_ID = 200
+
+        /**
+         * Receipt delta within ±[ON_TIME_THRESHOLD_MS] is displayed as "on time".
+         * Anything outside this window is shown as "X earlier" or "X later".
+         */
+        private const val ON_TIME_THRESHOLD_MS = 30_000L
     }
 }

@@ -154,51 +154,60 @@ object AlarmSchedulerV3 {
      * (rolls over to next day if the stored time has already passed today).
      */
     fun getMillisUntilInexactTrigger(context: Context, alarmId: Int): Long? =
-        readFromStorage(context, alarmId, prefix = "inexact")?.let { (h, m) -> delayUntilNext(h, m) }
+        readFromStorage(context, alarmId, prefix = "inexact")?.let { (h, m) ->
+            delayUntilNext(
+                h,
+                m
+            )
+        }
 
     // endregion
 
-    // region Early receipt (dev diagnostics)
+    // region Receipt (dev diagnostics)
 
     /**
-     * Saves the fact that an inexact alarm fired [earlyMs] milliseconds before its
-     * scheduled [scheduledHour]:[scheduledMinute] time.
+     * Saves how far off an inexact alarm fired relative to its scheduled time.
+     *
+     * [deltaMs] = scheduled − actual fire time:
+     *  > 0 → fired early (alarm arrived before the target)
+     *  < 0 → fired late  (alarm arrived after the target)
+     *  ≈ 0 → fired on time
      */
-    fun saveInexactEarlyReceipt(
+    fun saveInexactReceipt(
         context: Context,
         alarmId: Int,
-        earlyMs: Long,
+        deltaMs: Long,
         scheduledHour: Int,
         scheduledMinute: Int,
     ) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit {
-            putLong("inexact_early_ms_$alarmId", earlyMs)
-            putInt("inexact_early_h_$alarmId", scheduledHour)
-            putInt("inexact_early_m_$alarmId", scheduledMinute)
+            putLong("inexact_delta_ms_$alarmId", deltaMs)
+            putInt("inexact_receipt_h_$alarmId", scheduledHour)
+            putInt("inexact_receipt_m_$alarmId", scheduledMinute)
         }
     }
 
-    /** Removes any previously saved early receipt for this inexact alarm. */
-    fun clearInexactEarlyReceipt(context: Context, alarmId: Int) {
+    /** Removes any previously saved receipt for this inexact alarm. */
+    fun clearInexactReceipt(context: Context, alarmId: Int) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit {
-            remove("inexact_early_ms_$alarmId")
-            remove("inexact_early_h_$alarmId")
-            remove("inexact_early_m_$alarmId")
+            remove("inexact_delta_ms_$alarmId")
+            remove("inexact_receipt_h_$alarmId")
+            remove("inexact_receipt_m_$alarmId")
         }
     }
 
     /**
-     * Returns (earlyMs, scheduledHour, scheduledMinute) if an early receipt exists,
-     * null otherwise.
+     * Returns (deltaMs, scheduledHour, scheduledMinute) if a receipt exists, null otherwise.
+     * [deltaMs] is signed: positive = early, negative = late, near-zero = on time.
      */
-    fun getInexactEarlyReceipt(context: Context, alarmId: Int): Triple<Long, Int, Int>? {
+    fun getInexactReceipt(context: Context, alarmId: Int): Triple<Long, Int, Int>? {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val earlyMs = prefs.getLong("inexact_early_ms_$alarmId", -1L)
-        if (earlyMs == -1L) return null
-        val h = prefs.getInt("inexact_early_h_$alarmId", -1)
-        val m = prefs.getInt("inexact_early_m_$alarmId", -1)
+        val deltaMs = prefs.getLong("inexact_delta_ms_$alarmId", Long.MIN_VALUE)
+        if (deltaMs == Long.MIN_VALUE) return null
+        val h = prefs.getInt("inexact_receipt_h_$alarmId", -1)
+        val m = prefs.getInt("inexact_receipt_m_$alarmId", -1)
         if (h == -1 || m == -1) return null
-        return Triple(earlyMs, h, m)
+        return Triple(deltaMs, h, m)
     }
 
     // endregion
