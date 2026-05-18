@@ -112,8 +112,20 @@ class DrinkAlarmManagerV2(
                 }
                 val earlyMs = scheduled.timeInMillis - now.timeInMillis
                 if (earlyMs > 0) {
-                    AlarmSchedulerV3.saveInexactEarlyReceipt(application, INEXACT_ALARM_ID, earlyMs, hour, minute)
-                    Log.i(TAG, "onInexactAlarmReceived: fired ${earlyMs}ms early (scheduled at %02d:%02d)".format(hour, minute))
+                    AlarmSchedulerV3.saveInexactEarlyReceipt(
+                        application,
+                        INEXACT_ALARM_ID,
+                        earlyMs,
+                        hour,
+                        minute
+                    )
+                    Log.i(
+                        TAG,
+                        "onInexactAlarmReceived: fired ${earlyMs}ms early (scheduled at %02d:%02d)".format(
+                            hour,
+                            minute
+                        )
+                    )
                 }
             }
 
