@@ -295,7 +295,7 @@
     <string name="settings_interval_window_hint">Ventana activa: %1$s · Máx: %2$dm</string>
 
     <!-- Ajustes — Sheet de cantidad de notificación -->
-    <string name="settings_notif_amount_hint">Cantidad registrada al tocar bebida en la notificación</string>
+    <string name="settings_notif_amount_hint">Cantidad que aparecera en las notificationes para rapidamente registrar que tomaste agua</string>
 
     <!-- Ajustes — Sheet de quitar anuncios -->
     <string name="settings_remove_ads_title">Quitar anuncios</string>

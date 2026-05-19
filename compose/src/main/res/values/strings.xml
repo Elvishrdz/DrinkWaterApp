@@ -317,7 +317,7 @@
     <string name="settings_interval_window_hint">Active window: %1$s · Max: %2$dm</string>
 
     <!-- Settings — Notification amount sheet -->
-    <string name="settings_notif_amount_hint">Amount logged when tapping drink in the notification</string>
+    <string name="settings_notif_amount_hint">The amount that will appear in notifications to quickly log that you drank water.</string>
 
     <!-- Settings — Units sheet -->
     <string name="settings_unit_metric_label">Milliliters</string>
