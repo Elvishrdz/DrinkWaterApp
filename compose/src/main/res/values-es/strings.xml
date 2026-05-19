@@ -319,7 +319,7 @@
     <string name="drink_next_alarm_prefix">Próxima alarma en </string>
 
     <!-- Drink — Anillo de progreso -->
-    <string name="drink_progress_goal_label">de %1$s mL</string>
+    <string name="drink_progress_goal_label">de %1$s</string>
 
     <!-- Drink — Sección de registros -->
     <string name="drink_log_see_all">VER TODO</string>

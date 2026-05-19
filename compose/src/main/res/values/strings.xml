@@ -320,7 +320,7 @@
     <string name="drink_next_alarm_prefix">Next alarm in </string>
 
     <!-- Drink — Progress ring -->
-    <string name="drink_progress_goal_label">of %1$s mL</string>
+    <string name="drink_progress_goal_label">of %1$s</string>
 
     <!-- Drink — Log section -->
     <string name="drink_log_see_all">SEE ALL</string>
