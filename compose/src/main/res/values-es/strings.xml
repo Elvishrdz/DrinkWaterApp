@@ -237,8 +237,7 @@
     <string name="settings_row_request_feature">Solicitar una función</string>
     <string name="settings_row_report_problem">Reportar un problema</string>
     <string name="settings_row_share_usage_data">Compartir datos de uso</string>
-    <string name="settings_row_privacy_policy">Política de privacidad</string>
-    <string name="settings_row_terms_of_use">Términos de uso</string>
+    <string name="settings_row_privacy_policy_terms_of_use">Política de privacidad y Términos de uso</string>
     <string name="settings_row_reset_data">Restablecer todos los datos</string>
 
     <!-- Ajustes — Valores de filas -->

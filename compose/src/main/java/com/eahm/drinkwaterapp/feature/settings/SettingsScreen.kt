@@ -95,6 +95,7 @@ import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.core.presentation.composable.BuildInfoFooter
 import com.eahm.drinkwaterapp.feature.settings.extension.openPlayStoreUrl
+import com.eahm.drinkwaterapp.feature.settings.extension.openPrivacyPolicyAndTermsOfUse
 import com.eahm.drinkwaterapp.feature.settings.extension.startAppShareIntent
 import com.eahm.drinkwaterapp.feature.settings.extension.startFeatureRequestIntent
 import com.eahm.drinkwaterapp.feature.settings.extension.startReportProblemIntent
@@ -229,22 +230,7 @@ internal fun SettingsScreen(
         onTimeFormatChanged = viewModel::onTimeFormatPreferenceChanged,
         onUnitPreferenceChanged = viewModel::onUnitPreferenceChanged,
         onTrackingToggled = viewModel::onTrackingToggled,
-        onPrivacyPolicyTap = {
-            context.startActivity(
-                android.content.Intent(
-                    android.content.Intent.ACTION_VIEW,
-                    "https://www.freeprivacypolicy.com/privacy/view/04c015dc119a00b1ec8a21df46a9bfb1".toUri()
-                )
-            )
-        },
-        onTermsOfUseTap = {
-            context.startActivity(
-                android.content.Intent(
-                    android.content.Intent.ACTION_VIEW,
-                    "https://www.freeprivacypolicy.com/privacy/view/04c015dc119a00b1ec8a21df46a9bfb1".toUri()
-                )
-            )
-        },
+        onPrivacyPolicyAndTermsOfUseTap = context::openPrivacyPolicyAndTermsOfUse,
         modifier = modifier,
     )
 
@@ -386,8 +372,7 @@ internal fun SettingsContent(
     onTimeFormatChanged: (TimeFormatPreference) -> Unit,
     onUnitPreferenceChanged: (UnitPreference) -> Unit,
     onTrackingToggled: (Boolean) -> Unit,
-    onPrivacyPolicyTap: () -> Unit,
-    onTermsOfUseTap: () -> Unit,
+    onPrivacyPolicyAndTermsOfUseTap: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -460,6 +445,22 @@ internal fun SettingsContent(
                             onClick = { showUnitsSheet = true },
                         ) {
                             RowValueTrailing(value = "${state.unit.label} · ${state.weightUnit.label}")
+                        }
+                    }
+                }
+            }
+
+            if (!state.isAdFree) {
+                item {
+                    SettingsSection(title = stringResource(R.string.settings_section_premium)) {
+                        SettingRow(
+                            icon = DwIcons.Star,
+                            iconBg = DwTintGold,
+                            iconTint = Color.White,
+                            label = stringResource(R.string.settings_row_remove_ads),
+                            onClick = onRemoveAdsTap,
+                        ) {
+                            RowChevronTrailing()
                         }
                     }
                 }
@@ -594,22 +595,6 @@ internal fun SettingsContent(
                 }
             }
 
-            if (!state.isAdFree) {
-                item {
-                    SettingsSection(title = stringResource(R.string.settings_section_premium)) {
-                        SettingRow(
-                            icon = DwIcons.Star,
-                            iconBg = DwTintGold,
-                            iconTint = Color.White,
-                            label = stringResource(R.string.settings_row_remove_ads),
-                            onClick = onRemoveAdsTap,
-                        ) {
-                            RowChevronTrailing()
-                        }
-                    }
-                }
-            }
-
             item {
                 SettingsSection(title = stringResource(R.string.settings_section_privacy_legal)) {
                     SettingRow(
@@ -635,18 +620,8 @@ internal fun SettingsContent(
                         icon = DwIcons.Info,
                         iconBg = DwInk100,
                         iconTint = DwInk500,
-                        label = stringResource(R.string.settings_row_privacy_policy),
-                        onClick = onPrivacyPolicyTap,
-                    ) {
-                        RowChevronTrailing()
-                    }
-                    HorizontalDivider(color = DwInk100)
-                    SettingRow(
-                        icon = DwIcons.Info,
-                        iconBg = DwInk100,
-                        iconTint = DwInk500,
-                        label = stringResource(R.string.settings_row_terms_of_use),
-                        onClick = onTermsOfUseTap,
+                        label = stringResource(R.string.settings_row_privacy_policy_terms_of_use),
+                        onClick = onPrivacyPolicyAndTermsOfUseTap,
                     ) {
                         RowChevronTrailing()
                     }
@@ -1565,8 +1540,7 @@ private fun SettingsScreenPreview() {
             onTimeFormatChanged = {},
             onUnitPreferenceChanged = {},
             onTrackingToggled = {},
-            onPrivacyPolicyTap = {},
-            onTermsOfUseTap = {},
+            onPrivacyPolicyAndTermsOfUseTap = {},
         )
     }
 }

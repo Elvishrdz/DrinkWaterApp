@@ -238,8 +238,7 @@
     <string name="settings_row_request_feature">Request a feature</string>
     <string name="settings_row_report_problem">Report a problem</string>
     <string name="settings_row_share_usage_data">Share usage data</string>
-    <string name="settings_row_privacy_policy">Privacy Policy</string>
-    <string name="settings_row_terms_of_use">Terms of Use</string>
+    <string name="settings_row_privacy_policy_terms_of_use">Privacy Policy and Terms of Use</string>
     <string name="settings_row_reset_data">Reset all data</string>
 
     <!-- Settings — Row trailing values -->
