@@ -321,7 +321,7 @@
 
     <!-- Drink — Log section -->
     <string name="drink_log_see_all">SEE ALL</string>
-    <string name="drink_log_empty_state">No drinks logged yet — tap Add water to start.</string>
+    <string name="drink_log_empty_state">No drinks logged yet. Tap Add water to start.</string>
     <string name="drink_log_entry_amount">%1$s mL</string>
 
     <!-- Drink — Add drink bottom sheet -->
