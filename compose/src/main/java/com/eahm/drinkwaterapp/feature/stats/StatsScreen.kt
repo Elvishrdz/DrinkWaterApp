@@ -89,15 +89,22 @@ internal fun StatsContent(
         StatsPeriod.YEAR -> periodLabelYear
     }
 
+    val firstWeekLabel = stringResource(R.string.stats_summary_first_week)
+    val firstMonthLabel = stringResource(R.string.stats_summary_first_month)
+    val firstYearLabel = stringResource(R.string.stats_summary_first_year)
     val consistentWeekLabel = stringResource(R.string.stats_summary_consistent_week)
     val consistentMonthLabel = stringResource(R.string.stats_summary_consistent_month)
     val consistentYearLabel = stringResource(R.string.stats_summary_consistent_year)
     // overrideLabel replaces the trend percentage row:
-    //  • first period  → "" (empty: no prior data, hide the row)
+    //  • first period  → introductory label (no prior data to compare)
     //  • 0 % change    → positive consistency message per period type
     //  • null          → show the numeric percentage normally
     val overrideLabel: String? = when {
-        !state.showTrend -> ""
+        !state.showTrend -> when (state.selectedPeriod) {
+            StatsPeriod.WEEK -> firstWeekLabel
+            StatsPeriod.MONTH -> firstMonthLabel
+            StatsPeriod.YEAR -> firstYearLabel
+        }
 
         state.avgTrendPercent == 0 -> when (state.selectedPeriod) {
             StatsPeriod.WEEK -> consistentWeekLabel
