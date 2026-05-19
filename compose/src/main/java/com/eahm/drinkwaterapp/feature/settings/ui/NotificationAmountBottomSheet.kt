@@ -21,12 +21,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -69,9 +76,18 @@ internal fun NotificationAmountBottomSheet(
                 .coerceAtLeast(AMOUNT_MIN)
         )
     }
+    var textInput by remember { mutableStateOf("") }
 
     val isAtMax = value >= AMOUNT_MAX
     val isAtMin = value <= AMOUNT_MIN
+
+    fun applyTextInput() {
+        val parsed = textInput.trim().toIntOrNull()
+        if (parsed != null && parsed >= AMOUNT_MIN && parsed <= AMOUNT_MAX) {
+            value = parsed
+        }
+        textInput = ""
+    }
 
     fun dismissWithAnimation() {
         scope.launch { sheetState.hide() }.invokeOnCompletion { onDismiss() }
@@ -88,9 +104,13 @@ internal fun NotificationAmountBottomSheet(
             onDecrement = { value = (value - AMOUNT_STEP).coerceAtLeast(AMOUNT_MIN) },
             onIncrement = { value = (value + AMOUNT_STEP).coerceAtMost(AMOUNT_MAX) },
             onSave = {
+                applyTextInput()
                 onAmountChanged(value.toFloat())
                 dismissWithAnimation()
             },
+            textInput = textInput,
+            onTextInputChange = { textInput = it },
+            onApplyTextInput = ::applyTextInput,
             unitPreference = unitPreference,
         )
     }
@@ -104,6 +124,9 @@ private fun NotificationAmountSheetContent(
     onDecrement: () -> Unit,
     onIncrement: () -> Unit,
     onSave: () -> Unit,
+    textInput: String = "",
+    onTextInputChange: (String) -> Unit = {},
+    onApplyTextInput: () -> Unit = {},
     unitPreference: UnitPreference = UnitPreference.ML,
 ) {
     Column(
@@ -178,7 +201,26 @@ private fun NotificationAmountSheetContent(
             color = DwInk500,
         )
 
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(16.dp))
+
+        val focusManager = LocalFocusManager.current
+        OutlinedTextField(
+            value = textInput,
+            onValueChange = onTextInputChange,
+            label = { Text(stringResource(R.string.settings_stepper_custom_hint)) },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done,
+            ),
+            keyboardActions = KeyboardActions(onDone = {
+                onApplyTextInput()
+                focusManager.clearFocus()
+            }),
+            modifier = Modifier.fillMaxWidth(),
+        )
+
+        Spacer(Modifier.height(16.dp))
 
         DwPrimaryButton(
             text = stringResource(R.string.action_save),

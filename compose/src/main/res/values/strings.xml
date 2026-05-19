@@ -325,6 +325,7 @@
 
     <!-- Settings — Interval sheet -->
     <string name="settings_interval_sheet_title">Reminder interval</string>
+    <string name="settings_stepper_custom_hint">Or enter a value</string>
     <string name="settings_interval_window_hint">Active window: %1$s · Max: %2$dm</string>
 
     <!-- Settings — Notification amount sheet -->

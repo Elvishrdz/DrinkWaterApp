@@ -303,6 +303,7 @@
 
     <!-- Ajustes — Sheet de intervalo -->
     <string name="settings_interval_sheet_title">Intervalo de recordatorio</string>
+    <string name="settings_stepper_custom_hint">O escribe un valor</string>
     <string name="settings_interval_window_hint">Ventana activa: %1$s · Máx: %2$dm</string>
 
     <!-- Ajustes — Sheet de cantidad de notificación -->

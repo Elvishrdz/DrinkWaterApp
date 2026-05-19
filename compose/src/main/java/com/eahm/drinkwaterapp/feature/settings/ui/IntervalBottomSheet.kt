@@ -20,12 +20,19 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -65,9 +72,18 @@ internal fun IntervalBottomSheet(
     var value by remember {
         mutableIntStateOf(currentMinutes.coerceIn(INTERVAL_MIN, maxMinutes))
     }
+    var textInput by remember { mutableStateOf("") }
 
     val isAtMax = value >= maxMinutes
     val isAtMin = value <= INTERVAL_MIN
+
+    fun applyTextInput() {
+        val parsed = textInput.trim().toIntOrNull()
+        if (parsed != null && parsed >= INTERVAL_MIN && parsed <= maxMinutes) {
+            value = parsed
+        }
+        textInput = ""
+    }
 
     fun dismissWithAnimation() {
         scope.launch { sheetState.hide() }.invokeOnCompletion { onDismiss() }
@@ -162,11 +178,31 @@ internal fun IntervalBottomSheet(
                 )
             }
 
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(16.dp))
+
+            val focusManager = LocalFocusManager.current
+            OutlinedTextField(
+                value = textInput,
+                onValueChange = { textInput = it },
+                label = { Text(stringResource(R.string.settings_stepper_custom_hint)) },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Done,
+                ),
+                keyboardActions = KeyboardActions(onDone = {
+                    applyTextInput()
+                    focusManager.clearFocus()
+                }),
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            Spacer(Modifier.height(16.dp))
 
             DwPrimaryButton(
                 text = stringResource(R.string.action_save),
                 onClick = {
+                    applyTextInput()
                     onIntervalChanged(value)
                     dismissWithAnimation()
                 },

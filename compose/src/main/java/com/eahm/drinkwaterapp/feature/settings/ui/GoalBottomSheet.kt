@@ -21,11 +21,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -60,6 +67,15 @@ internal fun GoalBottomSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
     var value by remember { mutableFloatStateOf(goalMl.coerceIn(GOAL_MIN, GOAL_MAX)) }
+    var textInput by remember { mutableStateOf("") }
+
+    fun applyTextInput() {
+        val parsed = textInput.trim().toFloatOrNull()
+        if (parsed != null && parsed >= GOAL_MIN && parsed <= GOAL_MAX) {
+            value = parsed
+        }
+        textInput = ""
+    }
 
     fun dismissWithAnimation() {
         scope.launch { sheetState.hide() }.invokeOnCompletion { onDismiss() }
@@ -94,11 +110,31 @@ internal fun GoalBottomSheet(
                 unitPreference = unitPreference,
             )
 
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(16.dp))
+
+            val focusManager = LocalFocusManager.current
+            OutlinedTextField(
+                value = textInput,
+                onValueChange = { textInput = it },
+                label = { Text(stringResource(R.string.settings_stepper_custom_hint)) },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Done,
+                ),
+                keyboardActions = KeyboardActions(onDone = {
+                    applyTextInput()
+                    focusManager.clearFocus()
+                }),
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            Spacer(Modifier.height(16.dp))
 
             DwPrimaryButton(
                 text = stringResource(R.string.action_save),
                 onClick = {
+                    applyTextInput()
                     onGoalChanged(value)
                     dismissWithAnimation()
                 },
