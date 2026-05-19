@@ -124,13 +124,16 @@ private fun RingSection(state: DrinkState.Data) {
             .fillMaxWidth()
             .padding(horizontal = 24.dp, vertical = 4.dp),
     ) {
-        ProgressRing(
-            current = state.drinkStats?.drinkAmount ?: 0f,
-            goal = state.drinkStats?.goalAmount ?: 0f,
-            displayZeroPercentage = false,
-            onClick = {},
-            unitPreference = state.unitPreference,
-        )
+        Box {
+            ProgressRing(
+                current = state.drinkStats?.drinkAmount ?: 0f,
+                goal = state.drinkStats?.goalAmount ?: 0f,
+                displayZeroPercentage = false,
+                onClick = {},
+                unitPreference = state.unitPreference,
+            )
+            WaterRisingAnimation(trigger = state.drinkAnimationTrigger)
+        }
 
         Spacer(modifier = Modifier.height(10.dp))
 

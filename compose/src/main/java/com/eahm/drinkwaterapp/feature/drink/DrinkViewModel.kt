@@ -159,6 +159,7 @@ internal class DrinkViewModel(
     )
 
     private val _firstDrinkDialogVisible = MutableStateFlow(false)
+    private val _drinkAnimationTrigger = MutableStateFlow(0)
 
     // Polls the alarm scheduler every second so the countdown is always fresh,
     // even after the alarm fires and reschedules to a new slot.
@@ -215,6 +216,9 @@ internal class DrinkViewModel(
     }.combine(_firstDrinkDialogVisible) { drinkState, showDialog ->
         if (drinkState is DrinkState.Data) drinkState.copy(showFirstDrinkDialog = showDialog)
         else drinkState
+    }.combine(_drinkAnimationTrigger) { drinkState, trigger ->
+        if (drinkState is DrinkState.Data) drinkState.copy(drinkAnimationTrigger = trigger)
+        else drinkState
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
@@ -242,6 +246,8 @@ internal class DrinkViewModel(
 
                 drinkAlarmManagerV2.restoreAlarm(source = "drink-button")
             }
+
+            _drinkAnimationTrigger.value += 1
 
             if (isFirstDrink) {
                 prefsStorage.setFirstDrinkDialogSeen()

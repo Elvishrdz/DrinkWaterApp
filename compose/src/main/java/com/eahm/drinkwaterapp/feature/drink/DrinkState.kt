@@ -22,6 +22,7 @@ internal sealed interface DrinkState {
         val unitPreference: UnitPreference = UnitPreference.ML,
         val isOutsideActiveHours: Boolean = false,
         val showFirstDrinkDialog: Boolean = false,
+        val drinkAnimationTrigger: Int = 0,
     ) : DrinkState
 }
 
