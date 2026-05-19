@@ -149,18 +149,12 @@ internal class StatsViewModel(
             return Summary(avgMl = 0, trendPercent = 0, isTrendPositive = true, showTrend = false)
         }
 
-        // avgMl: average across all days in the period, but only counting elapsed days
-        // for the current (in-progress) period so future days don't drag the average down.
-        val isCurrentPeriod = pages[pageIndex].entries.any { it.isToday }
-        val periodEntries = if (isCurrentPeriod) {
-            // Only count days from the start of the period up to and including today.
-            val todayIdx = pages[pageIndex].entries.indexOfFirst { it.isToday }
-            pages[pageIndex].entries.take(todayIdx + 1)
-        } else {
-            pages[pageIndex].entries
-        }
-        val avg = if (periodEntries.isEmpty()) 0
-        else periodEntries.sumOf { it.amountMl } / periodEntries.size
+        // avgMl: average across all days in the full period (7 days for week, etc.)
+        // Divides by the total period size, not just elapsed days, so the weekly average
+        // is consistent regardless of which day of the week it is.
+        val allEntries = pages[pageIndex].entries
+        val avg = if (allEntries.isEmpty()) 0
+        else allEntries.sumOf { it.amountMl } / allEntries.size
 
         // showTrend: only show when at least one prior page has recorded data
         val showTrend = pageIndex > 0 && (0 until pageIndex).any { i ->
