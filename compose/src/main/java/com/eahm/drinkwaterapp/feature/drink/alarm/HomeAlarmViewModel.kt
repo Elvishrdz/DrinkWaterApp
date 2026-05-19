@@ -1,6 +1,9 @@
 package com.eahm.drinkwaterapp.feature.drink.alarm
 
 import android.app.Application
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
@@ -17,6 +20,7 @@ import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import com.eahm.drinkwaterapp.feature.drink.ClockGranularity
 import com.eahm.drinkwaterapp.feature.drink.ClockTickObserver
 import com.eahm.drinkwaterapp.system.alarm.AlarmSchedulerV3
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
@@ -33,6 +37,24 @@ internal class HomeAlarmViewModel(
 
     private val calculator = DrinkAlarmCalculator2()
 
+    // Increments each time the app comes to the foreground, forcing the state
+    // to recompute alarm status (exact vs inexact) without waiting for the next minute tick.
+    private val refreshTrigger = MutableStateFlow(0L)
+    private val foregroundObserver = object : DefaultLifecycleObserver {
+        override fun onResume(owner: LifecycleOwner) {
+            refreshTrigger.value = System.currentTimeMillis()
+        }
+    }
+
+    init {
+        ProcessLifecycleOwner.get().lifecycle.addObserver(foregroundObserver)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        ProcessLifecycleOwner.get().lifecycle.removeObserver(foregroundObserver)
+    }
+
     private val alarmPrefs = combine(
         prefsStorage.getInterval(),
         prefsStorage.getStartTime(),
@@ -43,7 +65,8 @@ internal class HomeAlarmViewModel(
         notificationPermissionObserver.hasPermission,
         clockTickObserver.observe(ClockGranularity.MINUTE),
         alarmPrefs,
-    ) { hasPermission, now, prefs ->
+        refreshTrigger,
+    ) { hasPermission, now, prefs, _ ->
         if (!hasPermission) return@combine HomeAlarmState.NoPermission
 
         val (intervalPref, startTimePref, endTimePref) = prefs
@@ -51,8 +74,10 @@ internal class HomeAlarmViewModel(
         val endTime = endTimePref.toLocalDateTime()
         val alarmInterval = AlarmInterval(intervalPref.hour, intervalPref.minute)
 
-        val isExactActive = AlarmSchedulerV3.isExactAlarmActive(application, DrinkAlarmManagerV2.EXACT_ALARM_ID)
-        val isInexactActive = AlarmSchedulerV3.isInexactAlarmActive(application, DrinkAlarmManagerV2.INEXACT_ALARM_ID)
+        val isExactActive =
+            AlarmSchedulerV3.isExactAlarmActive(application, DrinkAlarmManagerV2.EXACT_ALARM_ID)
+        val isInexactActive =
+            AlarmSchedulerV3.isInexactAlarmActive(application, DrinkAlarmManagerV2.INEXACT_ALARM_ID)
         if (!isExactActive && !isInexactActive) return@combine HomeAlarmState.NotConfigured
 
         val goalMl = database.getDailyGoalDao()

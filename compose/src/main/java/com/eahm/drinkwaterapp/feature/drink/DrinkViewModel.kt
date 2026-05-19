@@ -158,16 +158,22 @@ internal class DrinkViewModel(
 
     // Polls the alarm scheduler every second so the countdown is always fresh,
     // even after the alarm fires and reschedules to a new slot.
-    private val alarmCountdownFlow: Flow<Long?> = flow {
+    // Emits (millisRemaining, isExact): millisRemaining = 0 means the alarm is firing right now.
+    private val alarmCountdownFlow: Flow<Pair<Long?, Boolean>> = flow {
         while (true) {
-            val ms = AlarmSchedulerV3.getMillisUntilExactTrigger(
+            val exactMs = AlarmSchedulerV3.getMillisUntilExactTrigger(
                 application,
                 DrinkAlarmManagerV2.EXACT_ALARM_ID,
-            ) ?: AlarmSchedulerV3.getMillisUntilInexactTrigger(
-                application,
-                DrinkAlarmManagerV2.INEXACT_ALARM_ID,
             )
-            emit(ms)
+            if (exactMs != null) {
+                emit(Pair(exactMs, true))
+            } else {
+                val inexactMs = AlarmSchedulerV3.getMillisUntilInexactTrigger(
+                    application,
+                    DrinkAlarmManagerV2.INEXACT_ALARM_ID,
+                )
+                emit(Pair(inexactMs, false))
+            }
             delay(1_000)
         }
     }
@@ -193,8 +199,11 @@ internal class DrinkViewModel(
     }.combine(prefsStorage.getUnitPreference()) { drinkState, unitPref ->
         if (drinkState is DrinkState.Data) drinkState.copy(unitPreference = unitPref)
         else drinkState
-    }.combine(alarmCountdownFlow) { drinkState, alarmCountdownMs ->
-        if (drinkState is DrinkState.Data) drinkState.copy(alarmCountdownMs = alarmCountdownMs)
+    }.combine(alarmCountdownFlow) { drinkState, (alarmCountdownMs, alarmIsExact) ->
+        if (drinkState is DrinkState.Data) drinkState.copy(
+            alarmCountdownMs = alarmCountdownMs,
+            alarmIsExact = alarmIsExact,
+        )
         else drinkState
     }.stateIn(
         scope = viewModelScope,

@@ -49,7 +49,7 @@ object AlarmSchedulerV3 {
                     pendingIntent,
                 )
 
-            saveToStorage(context, alarmId, prefix = "exact", hour, minute)
+            saveToStorage(context, alarmId, prefix = "exact", hour, minute, triggerAtMs)
 
         } else {
             throw Exception("This should never happen")
@@ -69,7 +69,7 @@ object AlarmSchedulerV3 {
                 pendingIntent,
             )
 
-        saveToStorage(context, alarmId, prefix = "inexact", hour, minute)
+        saveToStorage(context, alarmId, prefix = "inexact", hour, minute, triggerAtMs)
     }
 
     // endregion
@@ -141,25 +141,28 @@ object AlarmSchedulerV3 {
         readFromStorage(context, alarmId, prefix = "inexact")
 
     /**
-     * Returns milliseconds until the stored exact alarm target time fires,
-     * or null if no slot has been stored. Always returns a positive value
-     * (rolls over to next day if the stored time has already passed today).
+     * Returns milliseconds until the exact alarm fires, based on the elapsedRealtime trigger
+     * saved when the alarm was scheduled. Returns 0 if the alarm has already fired but not yet
+     * rescheduled (avoids the ~24 h rollover artefact). Returns null if no trigger is stored.
      */
-    fun getMillisUntilExactTrigger(context: Context, alarmId: Int): Long? =
-        readFromStorage(context, alarmId, prefix = "exact")?.let { (h, m) -> delayUntilNext(h, m) }
+    fun getMillisUntilExactTrigger(context: Context, alarmId: Int): Long? {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val triggerElapsed = prefs.getLong("exact_trigger_elapsed_$alarmId", -1L)
+        if (triggerElapsed == -1L) return null
+        return (triggerElapsed - SystemClock.elapsedRealtime()).coerceAtLeast(0L)
+    }
 
     /**
-     * Returns milliseconds until the stored inexact alarm target time fires,
-     * or null if no slot has been stored. Always returns a positive value
-     * (rolls over to next day if the stored time has already passed today).
+     * Returns milliseconds until the inexact alarm fires, based on the elapsedRealtime trigger
+     * saved when the alarm was scheduled. Returns 0 if the alarm has already fired but not yet
+     * rescheduled. Returns null if no trigger is stored.
      */
-    fun getMillisUntilInexactTrigger(context: Context, alarmId: Int): Long? =
-        readFromStorage(context, alarmId, prefix = "inexact")?.let { (h, m) ->
-            delayUntilNext(
-                h,
-                m
-            )
-        }
+    fun getMillisUntilInexactTrigger(context: Context, alarmId: Int): Long? {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val triggerElapsed = prefs.getLong("inexact_trigger_elapsed_$alarmId", -1L)
+        if (triggerElapsed == -1L) return null
+        return (triggerElapsed - SystemClock.elapsedRealtime()).coerceAtLeast(0L)
+    }
 
     // endregion
 
@@ -269,10 +272,12 @@ object AlarmSchedulerV3 {
         prefix: String,
         hour: Int,
         minute: Int,
+        triggerElapsedMs: Long,
     ) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit {
             putInt("${prefix}_hour_$alarmId", hour)
             putInt("${prefix}_minute_$alarmId", minute)
+            putLong("${prefix}_trigger_elapsed_$alarmId", triggerElapsedMs)
         }
     }
 
@@ -280,6 +285,7 @@ object AlarmSchedulerV3 {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit {
             remove("${prefix}_hour_$alarmId")
             remove("${prefix}_minute_$alarmId")
+            remove("${prefix}_trigger_elapsed_$alarmId")
         }
     }
 

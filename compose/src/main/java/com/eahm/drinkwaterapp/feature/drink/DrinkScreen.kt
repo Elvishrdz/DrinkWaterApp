@@ -137,6 +137,7 @@ private fun RingSection(state: DrinkState.Data) {
         RotatingInfoPill(
             remaining = state.drinkStats?.remainingAmount ?: 0f,
             alarmCountdownMs = state.alarmCountdownMs,
+            alarmIsExact = state.alarmIsExact,
         )
     }
 }
@@ -244,9 +245,10 @@ private enum class PillMessage { Remaining, NextAlarm }
 private fun RotatingInfoPill(
     remaining: Float,
     alarmCountdownMs: Long?,
+    alarmIsExact: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val hasAlarm = alarmCountdownMs != null && alarmCountdownMs > 0L
+    val hasAlarm = alarmCountdownMs != null
     val messages = remember(hasAlarm) {
         if (hasAlarm) listOf(PillMessage.NextAlarm, PillMessage.Remaining)
         else listOf(PillMessage.Remaining)
@@ -343,19 +345,38 @@ private fun RotatingInfoPill(
 
                 PillMessage.NextAlarm -> {
                     val ms = alarmCountdownMs ?: 0L
-                    Text(
-                        text = buildAnnotatedString {
-                            append(nextAlarmPrefix)
-                            append(" ")
-                            withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = DwWater)) {
-                                append(formatAlarmCountdown(ms))
-                            }
-                        },
-                        fontFamily = PlusJakartaSans,
-                        fontSize = 13.sp,
-                        color = DwInk400,
-                        modifier = Modifier.scale(scale.value),
-                    )
+                    if (ms == 0L) {
+                        val firingText = stringResource(
+                            if (alarmIsExact) R.string.drink_alarm_firing_now
+                            else R.string.drink_alarm_firing_approx
+                        )
+                        Text(
+                            text = firingText,
+                            fontFamily = PlusJakartaSans,
+                            fontSize = 13.sp,
+                            color = DwInk400,
+                            modifier = Modifier.scale(scale.value),
+                        )
+                    } else {
+                        Text(
+                            text = buildAnnotatedString {
+                                append(nextAlarmPrefix)
+                                append(" ")
+                                withStyle(
+                                    SpanStyle(
+                                        fontWeight = FontWeight.Bold,
+                                        color = DwWater
+                                    )
+                                ) {
+                                    append(formatAlarmCountdown(ms))
+                                }
+                            },
+                            fontFamily = PlusJakartaSans,
+                            fontSize = 13.sp,
+                            color = DwInk400,
+                            modifier = Modifier.scale(scale.value),
+                        )
+                    }
                 }
             }
         }
