@@ -21,6 +21,7 @@ internal sealed interface DrinkState {
         val alarmIsExact: Boolean = true,
         val unitPreference: UnitPreference = UnitPreference.ML,
         val isOutsideActiveHours: Boolean = false,
+        val showFirstDrinkDialog: Boolean = false,
     ) : DrinkState
 }
 

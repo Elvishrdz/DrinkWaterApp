@@ -49,5 +49,8 @@ interface PrefsStorage {
     fun getUnitPreference(): Flow<UnitPreference>
     suspend fun setUnitPreference(pref: UnitPreference)
 
+    fun getFirstDrinkDialogSeen(): Flow<Boolean>
+    suspend fun setFirstDrinkDialogSeen()
+
     suspend fun clear()
 }

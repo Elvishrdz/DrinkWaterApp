@@ -3,6 +3,7 @@ package com.eahm.drinkwaterapp.feature.drink
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.eahm.drinkwaterapp.feature.drink.ui.FirstDrinkDialog
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -30,6 +31,10 @@ internal fun DrinkRoot(
                 onNavigateToHistory = onNavigateToHistory,
                 onNavigateToSettings = onNavigateToSettings,
             )
+
+            if (data.showFirstDrinkDialog) {
+                FirstDrinkDialog(onDismiss = viewModel::onFirstDrinkDialogDismissed)
+            }
         }
     }
 }

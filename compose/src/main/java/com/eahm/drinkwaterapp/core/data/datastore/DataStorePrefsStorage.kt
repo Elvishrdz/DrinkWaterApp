@@ -54,6 +54,7 @@ private class DataStorePrefsStorage(
     private val bestDrinkStreakKey = intPreferencesKey("BEST_DRINK_STREAK")
     private val timeFormatPreferenceKey = stringPreferencesKey("TIME_FORMAT_PREFERENCE")
     private val unitPreferenceKey = stringPreferencesKey("UNIT_PREFERENCE")
+    private val firstDrinkDialogSeenKey = booleanPreferencesKey("FIRST_DRINK_DIALOG_SEEN")
 
     private val json = Json {
         ignoreUnknownKeys = true
@@ -271,6 +272,15 @@ private class DataStorePrefsStorage(
     override suspend fun setUnitPreference(pref: UnitPreference) {
         dataStore.updateData { prefs ->
             prefs.toMutablePreferences().also { it[unitPreferenceKey] = pref.name }
+        }
+    }
+
+    override fun getFirstDrinkDialogSeen(): Flow<Boolean> =
+        dataStore.data.map { prefs -> prefs[firstDrinkDialogSeenKey] ?: false }
+
+    override suspend fun setFirstDrinkDialogSeen() {
+        dataStore.updateData { prefs ->
+            prefs.toMutablePreferences().also { it[firstDrinkDialogSeenKey] = true }
         }
     }
 

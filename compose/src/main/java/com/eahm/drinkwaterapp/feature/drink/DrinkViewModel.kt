@@ -33,6 +33,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
@@ -157,6 +158,8 @@ internal class DrinkViewModel(
         initialValue = null,
     )
 
+    private val _firstDrinkDialogVisible = MutableStateFlow(false)
+
     // Polls the alarm scheduler every second so the countdown is always fresh,
     // even after the alarm fires and reschedules to a new slot.
     // Emits (millisRemaining, isExact): millisRemaining = 0 means the alarm is firing right now.
@@ -209,6 +212,9 @@ internal class DrinkViewModel(
     }.combine(activeHoursObserver.inActiveHours) { drinkState, inActiveHours ->
         if (drinkState is DrinkState.Data) drinkState.copy(isOutsideActiveHours = !inActiveHours)
         else drinkState
+    }.combine(_firstDrinkDialogVisible) { drinkState, showDialog ->
+        if (drinkState is DrinkState.Data) drinkState.copy(showFirstDrinkDialog = showDialog)
+        else drinkState
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
@@ -224,6 +230,8 @@ internal class DrinkViewModel(
         trackingService.trackDrinkRecorded(sourceKey, amount)
 
         viewModelScope.launch {
+            val isFirstDrink = !prefsStorage.getFirstDrinkDialogSeen().first()
+
             withContext(Dispatchers.IO) {
                 val record = HistoryEntity(
                     amount = amount,
@@ -234,7 +242,19 @@ internal class DrinkViewModel(
 
                 drinkAlarmManagerV2.restoreAlarm(source = "drink-button")
             }
+
+            if (isFirstDrink) {
+                prefsStorage.setFirstDrinkDialogSeen()
+                val currentState = state.value
+                if (currentState is DrinkState.Data) {
+                    _firstDrinkDialogVisible.value = true
+                }
+            }
         }
+    }
+
+    fun onFirstDrinkDialogDismissed() {
+        _firstDrinkDialogVisible.value = false
     }
 
     fun onBottomSheetOpened(presetCount: Int) {

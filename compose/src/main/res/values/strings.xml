@@ -353,6 +353,9 @@
     <!-- Drink — Log section -->
     <string name="drink_log_see_all">SEE ALL</string>
     <string name="drink_log_empty_state">Log a drink to see it here.</string>
+    <string name="first_drink_dialog_title">First drink logged!</string>
+    <string name="first_drink_dialog_body">Your drink has been added to today\'s log.\n\nMistake? Swipe the entry left in the log below to delete it.</string>
+    <string name="first_drink_dialog_cta">Got it</string>
     <string name="drink_log_entry_amount">%1$s mL</string>
 
     <!-- Drink — Add drink bottom sheet -->
