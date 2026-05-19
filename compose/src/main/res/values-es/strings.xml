@@ -387,6 +387,7 @@
     <string name="stats_summary_first_year">Mi primer año</string>
 
     <!-- Estadísticas — Gráfico de barras -->
+    <string name="stats_chart_no_data">Sin datos para este período</string>
     <string name="stats_chart_daily_intake">Ingesta diaria</string>
     <string name="stats_chart_monthly_intake">Ingesta mensual</string>
     <string name="stats_chart_prev_period_desc">Período anterior</string>

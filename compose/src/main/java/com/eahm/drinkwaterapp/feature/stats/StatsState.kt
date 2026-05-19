@@ -34,4 +34,9 @@ data class DayEntry(
 data class PeriodPage(
     val rangeLabel: String,
     val entries: List<DayEntry>,
+    /**
+     * True when this page is entirely before the user's first daily-goal record.
+     * The chart shows a "no data" placeholder instead of bars for these pages.
+     */
+    val isBeforeFirstRecord: Boolean = false,
 )

@@ -159,11 +159,28 @@ fun WeeklyBarChart(
             pageSpacing = 8.dp,
             modifier = Modifier.fillMaxWidth(),
         ) { pageIndex ->
-            BarChartPage(
-                entries = pages[pageIndex].entries,
-                isCurrentPage = pageIndex == pagerState.currentPage,
-                unitPreference = unitPreference,
-            )
+            val page = pages[pageIndex]
+            if (page.isBeforeFirstRecord) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(140.dp),
+                ) {
+                    Text(
+                        text = stringResource(R.string.stats_chart_no_data),
+                        fontSize = 13.sp,
+                        color = DwInk300,
+                        fontFamily = PlusJakartaSans,
+                    )
+                }
+            } else {
+                BarChartPage(
+                    entries = page.entries,
+                    isCurrentPage = pageIndex == pagerState.currentPage,
+                    unitPreference = unitPreference,
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(12.dp))

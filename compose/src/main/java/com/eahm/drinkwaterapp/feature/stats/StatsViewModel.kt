@@ -148,9 +148,18 @@ internal class StatsViewModel(
             return Summary(avgMl = 0, trendPercent = 0, isTrendPositive = true, showTrend = false)
         }
 
-        // avgMl: average on days/months where something was recorded
-        val activeAmounts = pages[pageIndex].entries.map { it.amountMl }.filter { it > 0 }
-        val avg = if (activeAmounts.isNotEmpty()) activeAmounts.average().toInt() else 0
+        // avgMl: average across all days in the period, but only counting elapsed days
+        // for the current (in-progress) period so future days don't drag the average down.
+        val isCurrentPeriod = pages[pageIndex].entries.any { it.isToday }
+        val periodEntries = if (isCurrentPeriod) {
+            // Only count days from the start of the period up to and including today.
+            val todayIdx = pages[pageIndex].entries.indexOfFirst { it.isToday }
+            pages[pageIndex].entries.take(todayIdx + 1)
+        } else {
+            pages[pageIndex].entries
+        }
+        val avg = if (periodEntries.isEmpty()) 0
+        else periodEntries.sumOf { it.amountMl } / periodEntries.size
 
         // showTrend: only show when at least one prior page has recorded data
         val showTrend = pageIndex > 0 && (0 until pageIndex).any { i ->
@@ -191,9 +200,14 @@ internal class StatsViewModel(
             goalDao.getAllGoals(),
         ) { records, allGoals ->
             val dailyTotals = records.toDailyTotals()
+            // The earliest day the user ever set a goal — used to detect pre-app pages.
+            val firstGoalDate = allGoals.minByOrNull { it.effectiveDate }?.effectiveDate
             (0 until NUM_WEEKS).map { weekIndex ->
                 val monday = thisMonday.minus(weekIndex * 7, DateTimeUnit.DAY)
                 val sunday = monday.plus(6, DateTimeUnit.DAY)
+                // A page is "before first record" when the entire week ends before the
+                // user's first daily-goal entry (i.e. the user hadn't installed the app yet).
+                val isBeforeFirstRecord = firstGoalDate != null && sunday < firstGoalDate
                 PeriodPage(
                     rangeLabel = buildWeekRangeLabel(monday, sunday),
                     entries = (0..6).map { dayOffset ->
@@ -205,6 +219,7 @@ internal class StatsViewModel(
                             goalMl = allGoals.effectiveGoalForDate(date),
                         )
                     },
+                    isBeforeFirstRecord = isBeforeFirstRecord,
                 )
             }.reversed() // pages[0] = oldest, pages[N] = most recent
         }

@@ -387,6 +387,7 @@
     <string name="stats_summary_first_year">My first year</string>
 
     <!-- Stats — Bar chart -->
+    <string name="stats_chart_no_data">No data for this period</string>
     <string name="stats_chart_daily_intake">Daily intake</string>
     <string name="stats_chart_monthly_intake">Monthly intake</string>
     <string name="stats_chart_prev_period_desc">Previous period</string>
