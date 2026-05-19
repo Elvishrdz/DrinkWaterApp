@@ -95,6 +95,7 @@ import com.eahm.drinkwaterapp.core.domain.extension.sanitizeZeroDecimals
 import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.core.presentation.composable.BuildInfoFooter
+import com.eahm.drinkwaterapp.feature.settings.extension.startAppShareIntent
 import com.eahm.drinkwaterapp.feature.settings.ui.EditButton
 import com.eahm.drinkwaterapp.feature.settings.ui.GoalBottomSheet
 import com.eahm.drinkwaterapp.feature.settings.ui.IntervalBottomSheet
@@ -221,20 +222,6 @@ internal fun SettingsScreen(
         context.startActivity(intent)
     }
 
-    fun handleShare() {
-        val shareIntent = Intent.createChooser(
-            Intent(Intent.ACTION_SEND).apply {
-                putExtra(
-                    Intent.EXTRA_TEXT,
-                    context.getString(R.string.settings_share_text)
-                )
-                type = "text/plain"
-            },
-            null,
-        )
-        context.startActivity(shareIntent)
-    }
-
     fun handleRate() {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com"))
         context.startActivity(intent)
@@ -250,7 +237,7 @@ internal fun SettingsScreen(
         onNotificationAmountChanged = viewModel::onNotificationAmountChanged,
         onStartTimeChanged = viewModel::onStartTimeChanged,
         onEndTimeChanged = viewModel::onEndTimeChanged,
-        onShareTap = ::handleShare,
+        onShareTap = { context.startAppShareIntent() },
         onRateTap = ::handleRate,
         onRequestFeatureTap = ::handleRequestFeature,
         onReportProblemTap = ::handleReportProblem,

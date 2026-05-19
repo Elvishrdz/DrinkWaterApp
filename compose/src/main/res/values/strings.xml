@@ -221,7 +221,7 @@
     <string name="settings_notification_amount_value">+%1$d mL</string>
 
     <!-- Settings — Share -->
-    <string name="settings_share_text">Stay hydrated! I use DrinkWater to track my daily water intake. Check it out!</string>
+    <string name="settings_share_text">Stay hydrated! I use %1$s to track my daily water intake. Check it out!\n%2$s</string>
 
     <!-- Settings — Reset data dialog -->
     <string name="settings_clear_data_body">This will permanently delete all your drink history, daily goals, and settings. The app will restart afterwards.\n\nThis action cannot be undone.</string>
