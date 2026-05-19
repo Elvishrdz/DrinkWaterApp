@@ -67,10 +67,9 @@ import com.eahm.drinkwaterapp.feature.onboarding.totalSteps
 import com.eahm.drinkwaterapp.feature.onboarding.ui.components.DwPrimaryButtonAnimated
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbArtCircle
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbShell
-
-private const val AMOUNT_STEP = 50
-private const val AMOUNT_MIN = 50
-private const val AMOUNT_MAX = 500
+import com.eahm.drinkwaterapp.feature.settings.ui.AMOUNT_MAX
+import com.eahm.drinkwaterapp.feature.settings.ui.AMOUNT_MIN
+import com.eahm.drinkwaterapp.feature.settings.ui.AMOUNT_STEP
 
 /**
  * Unified notification onboarding step — two designs in one composable.

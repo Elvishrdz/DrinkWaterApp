@@ -48,9 +48,9 @@ import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.ui.bottomsheet.AppBottomSheet
 import kotlinx.coroutines.launch
 
-private const val AMOUNT_STEP = 50
-private const val AMOUNT_MIN = 50
-private const val AMOUNT_MAX = 500
+internal const val AMOUNT_STEP = 50
+internal const val AMOUNT_MIN = 50
+internal const val AMOUNT_MAX = 99999
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
