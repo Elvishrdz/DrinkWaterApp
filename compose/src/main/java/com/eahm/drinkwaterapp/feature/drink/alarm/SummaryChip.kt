@@ -26,21 +26,28 @@ internal fun SummaryChip(label: String, value: String) {
         modifier = Modifier
             .clip(RoundedCornerShape(14.dp))
             .background(DwTintWater)
-            .padding(horizontal = 14.dp, vertical = 9.dp),
+            .padding(
+                start = 14.dp,
+                end = 14.dp,
+                top = 7.dp,
+                bottom = 10.dp,
+            ),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        Text(
+            text = label,
+            fontFamily = PlusJakartaSans,
+            fontSize = 10.sp,
+            lineHeight = 14.sp,
+            color = DwInk500,
+        )
+
         Text(
             text = value,
             fontFamily = Nunito,
             fontWeight = FontWeight.ExtraBold,
             fontSize = 20.sp,
             color = DwWaterDeep,
-        )
-        Text(
-            text = label,
-            fontFamily = PlusJakartaSans,
-            fontSize = 10.sp,
-            color = DwInk500,
         )
     }
 }
