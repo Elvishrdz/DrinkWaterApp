@@ -124,7 +124,7 @@ internal class SettingsViewModel(
             username = username,
             dailyGoalMl = goal,
             notificationsEnabled = hasNotificationPermission,
-            intervalMinutes = reminderInfo?.second?.minute ?: 0,
+            intervalMinutes = reminderInfo?.second?.let { it.hour * 60 + it.minute } ?: 0,
             startTime = reminderInfo?.first?.start,
             endTime = reminderInfo?.first?.end,
             notificationAmountMl = reminderInfo?.third ?: 150f,
@@ -176,7 +176,7 @@ internal class SettingsViewModel(
     fun onIntervalChanged(minutes: Int) {
         viewModelScope.launch {
             _state.update { it.copy(intervalMinutes = minutes) }
-            prefsStorage.setInterval(ActiveTime(0, minutes))
+            prefsStorage.setInterval(ActiveTime(hour = minutes / 60, minute = minutes % 60))
             drinkAlarmManagerV2.restoreAlarm(source = "settings-interval-changed")
         }
     }
