@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.text.format.DateFormat
@@ -95,6 +94,7 @@ import com.eahm.drinkwaterapp.core.domain.extension.sanitizeZeroDecimals
 import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.core.presentation.composable.BuildInfoFooter
+import com.eahm.drinkwaterapp.feature.settings.extension.openPlayStoreUrl
 import com.eahm.drinkwaterapp.feature.settings.extension.startAppShareIntent
 import com.eahm.drinkwaterapp.feature.settings.ui.EditButton
 import com.eahm.drinkwaterapp.feature.settings.ui.GoalBottomSheet
@@ -222,11 +222,6 @@ internal fun SettingsScreen(
         context.startActivity(intent)
     }
 
-    fun handleRate() {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com"))
-        context.startActivity(intent)
-    }
-
     SettingsContent(
         state = state,
         onNotificationsToggled = ::handleNotificationToggle,
@@ -237,8 +232,8 @@ internal fun SettingsScreen(
         onNotificationAmountChanged = viewModel::onNotificationAmountChanged,
         onStartTimeChanged = viewModel::onStartTimeChanged,
         onEndTimeChanged = viewModel::onEndTimeChanged,
-        onShareTap = { context.startAppShareIntent() },
-        onRateTap = ::handleRate,
+        onShareTap = context::startAppShareIntent,
+        onRateTap = context::openPlayStoreUrl,
         onRequestFeatureTap = ::handleRequestFeature,
         onReportProblemTap = ::handleReportProblem,
         onGoalCelebrationsToggled = { handleDrawOverlayToggle() },

@@ -8,7 +8,7 @@ Fixes
 [] goal overlay: traducir textos 
 [] goal overlay: randomize with new texts
 [x] settings: traducir texto de compartir con amigos
-[] settings: poner url correcta para calificar la app
+[x] settings: poner url correcta para calificar la app
 [] settings: traducir texto para solicitar funcion
 [] settings: traducir texto para reportar problema
 [] consent: traducir textos de pantalas
