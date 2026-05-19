@@ -206,6 +206,14 @@
     <string name="onb_exact_alarm_benefit_habit_label">Builds a consistent habit</string>
     <string name="onb_exact_alarm_benefit_habit_description">Steady timing makes it easier to remember and track your hydration throughout the day.</string>
 
+    <!-- Onboarding — Units -->
+    <string name="onb_units_title">Choose your units</string>
+    <string name="onb_units_subtitle">Pick how you want to see your water intake displayed throughout the app.</string>
+    <string name="onb_units_ml_title">Milliliters (mL)</string>
+    <string name="onb_units_ml_subtitle">Used worldwide</string>
+    <string name="onb_units_fl_oz_title">Fluid Ounces (fl oz)</string>
+    <string name="onb_units_fl_oz_subtitle">Common in the US</string>
+
     <!-- Onboarding — Done -->
     <string name="onb_done_title">You\'re all set!</string>
     <string name="onb_done_title_with_name">You\'re all set, %1$s</string>

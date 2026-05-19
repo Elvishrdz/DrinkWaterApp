@@ -204,6 +204,14 @@
     <string name="onb_exact_alarm_benefit_habit_description">Un horario estable hace más fácil recordar y registrar tu hidratación durante el día.</string>
 
     <!-- Onboarding — Listo -->
+    <!-- Onboarding — Unidades -->
+    <string name="onb_units_title">Elige tus unidades</string>
+    <string name="onb_units_subtitle">Elige cómo quieres ver tu consumo de agua en toda la app.</string>
+    <string name="onb_units_ml_title">Mililitros (mL)</string>
+    <string name="onb_units_ml_subtitle">Usado en todo el mundo</string>
+    <string name="onb_units_fl_oz_title">Onzas fluidas (fl oz)</string>
+    <string name="onb_units_fl_oz_subtitle">Común en EE. UU.</string>
+
     <string name="onb_done_title">¡Todo listo!</string>
     <string name="onb_done_title_with_name">¡Todo listo, %1$s!</string>
     <string name="onb_done_subtitle">Aquí está tu configuración, puedes cambiarla cuando quieras en los ajustes.</string>

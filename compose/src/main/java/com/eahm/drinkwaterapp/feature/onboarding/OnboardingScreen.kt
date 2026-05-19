@@ -23,6 +23,7 @@ import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps.DailyGoal
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps.Intro
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps.RemindersSteps
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps.Summary
+import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps.Units
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.LocalOnboardingProgress
 import com.eahm.drinkwaterapp.feature.onboarding.ui.steps.StepActivity
 import com.eahm.drinkwaterapp.feature.onboarding.ui.steps.StepDone
@@ -35,6 +36,7 @@ import com.eahm.drinkwaterapp.feature.onboarding.ui.steps.StepNotifs
 import com.eahm.drinkwaterapp.feature.onboarding.ui.steps.StepOverlay
 import com.eahm.drinkwaterapp.feature.onboarding.ui.steps.StepSetGoal
 import com.eahm.drinkwaterapp.feature.onboarding.ui.steps.StepSleep
+import com.eahm.drinkwaterapp.feature.onboarding.ui.steps.StepUnits
 import com.eahm.drinkwaterapp.feature.onboarding.ui.steps.StepWake
 import com.eahm.drinkwaterapp.feature.onboarding.ui.steps.StepWeight
 import org.koin.compose.viewmodel.koinViewModel
@@ -117,6 +119,14 @@ internal fun OnboardingScreen(
                 step = state.step,
                 goalMl = state.goalMl,
                 onGoalChanged = viewModel::onGoalChanged,
+                onNext = { viewModel.nextStep() },
+                onBack = { viewModel.prevStep() },
+            )
+
+            Units -> StepUnits(
+                step = state.step,
+                selectedUnit = state.unitPreference,
+                onSelect = viewModel::onUnitPreferenceSelect,
                 onNext = { viewModel.nextStep() },
                 onBack = { viewModel.prevStep() },
             )

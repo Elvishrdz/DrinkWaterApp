@@ -9,6 +9,7 @@ import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManagerV2
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
 import com.eahm.drinkwaterapp.core.database.entity.DailyGoalEntity
+import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -51,6 +52,8 @@ internal class OnboardingViewModel(
         )
     }.combine(prefs.getTimeFormatPreference()) { state, timeFormat ->
         state.copy(timeFormatPreference = timeFormat)
+    }.combine(prefs.getUnitPreference()) { state, unitPref ->
+        state.copy(unitPreference = unitPref)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed((5_000)),
@@ -77,6 +80,11 @@ internal class OnboardingViewModel(
         viewModelScope.launch {
             prefs.setInterval(ActiveTime(hour = minutes / 60, minute = minutes % 60))
         }
+    }
+
+    fun onUnitPreferenceSelect(pref: UnitPreference) {
+        _state.update { it.copy(unitPreference = pref) }
+        viewModelScope.launch { prefs.setUnitPreference(pref) }
     }
 
     fun onNotifAmountChange(ml: Float) {

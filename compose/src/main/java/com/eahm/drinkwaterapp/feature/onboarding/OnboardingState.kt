@@ -2,6 +2,7 @@ package com.eahm.drinkwaterapp.feature.onboarding
 
 import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
 import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
+import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 
 
 internal enum class Gender { FEMALE, MALE, PREFER_NOT_TO_SAY }
@@ -43,12 +44,14 @@ internal data class OnboardingFormState(
     val goalMl: Float,
     val notifAmountMl: Float = 150f,
     val timeFormatPreference: TimeFormatPreference = TimeFormatPreference.SYSTEM,
+    val unitPreference: UnitPreference = UnitPreference.ML,
 )
 
 sealed interface OnboardingSteps {
 
     data object Intro : OnboardingSteps
     data object DailyGoal : OnboardingSteps
+    data object Units : OnboardingSteps
 
     sealed interface RemindersSteps : OnboardingSteps {
         data object StartTime : RemindersSteps
@@ -66,18 +69,19 @@ sealed interface OnboardingSteps {
 }
 
 
-internal val OnboardingSteps.Companion.totalSteps: Int get() = 9
+internal val OnboardingSteps.Companion.totalSteps: Int get() = 10
 
 fun OnboardingSteps.Companion.byStep(step: Int) = when (step) {
     1 -> OnboardingSteps.Intro
     2 -> OnboardingSteps.DailyGoal
+    3 -> OnboardingSteps.Units
 
-    3 -> OnboardingSteps.RemindersSteps.StartTime
-    4 -> OnboardingSteps.RemindersSteps.EndTime
-    5 -> OnboardingSteps.RemindersSteps.Interval
-    6 -> OnboardingSteps.RemindersSteps.Notification
-    7 -> OnboardingSteps.RemindersSteps.ExactAlarm
-    8 -> OnboardingSteps.Celebrations
+    4 -> OnboardingSteps.RemindersSteps.StartTime
+    5 -> OnboardingSteps.RemindersSteps.EndTime
+    6 -> OnboardingSteps.RemindersSteps.Interval
+    7 -> OnboardingSteps.RemindersSteps.Notification
+    8 -> OnboardingSteps.RemindersSteps.ExactAlarm
+    9 -> OnboardingSteps.Celebrations
 
     totalSteps -> OnboardingSteps.Summary
     else -> OnboardingSteps.Intro
