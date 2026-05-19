@@ -1,5 +1,37 @@
 Development
 
+Fixes
+[] stat graph, por debajo de la meta, cambiar a : cantidad alcanzada
+[] grafico: calcular bien el porcentaje.
+[] grafico: no mostrar primera semana antes del primer record de daily goal registrado.
+[] goal overlay: numero de vasos no esta bien
+[] goal overlay: traducir textos 
+[] goal overlay: randomize with new texts
+[] settings: traducir texto de compartir con amigos
+[] settings: poner url correcta para calificar la app
+[] settings: traducir texto para solicitar funcion
+[] settings: traducir texto para reportar problema
+[] consent: traducir textos de pantalas
+[] consent: agregar privacy policy final de release
+[] consent: agregar url a privacy policy
+[] consent: cambiar orden de botones en track screen
+[] settings: agregar row para cancelar el tracking en ajustes Privacy-> Usage data
+[] settings: agregar row para ir al privacy policy y terms of use 
+[] drink screen: al usar alarma inexacta: recordatorio mostrar hora aproximada! 
+[] drink screen: al usar alarma inexacta: mostrar alarma aproximada en el componente
+[] app nav: si presionamos atras desde otra screen, regresar a drink screen y luego salir de la app.
+[] app: agregar icono monochrome
+[] app: corregir splash screen
+[] listing: preparar capturas
+[] listing: preparar recursos de imagenes
+[] listing: preparar description y title en diferentes idiomas
+[] drink screen: logs: quitar guion en mensajes
+[] traducciones: revisar todas estan bien
+
+
+
+
+
 In-App final setup
 Proximos pasos:
 
