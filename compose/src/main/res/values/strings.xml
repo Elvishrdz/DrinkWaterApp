@@ -64,7 +64,7 @@
 
     <!-- Generic — notifications permission -->
     <string name="notif_disabled_title">Notifications disabled</string>
-    <string name="notif_disabled_body">To receive drink reminders, please enable notifications for DrinkWater in your phone\'s Settings.</string>
+    <string name="notif_disabled_body">To receive drink reminders, please enable notifications for %1$s in your phone\'s Settings.</string>
 
     <!-- Generic — overlay permission -->
     <string name="overlay_allow_over_other_apps">Allow display over other apps</string>
@@ -168,7 +168,7 @@
     <!-- Onboarding — Overlay: How-to steps -->
     <string name="onb_overlay_steps_header">How to enable</string>
     <string name="onb_overlay_step_1">Tap \"Allow display over other apps\" below.</string>
-    <string name="onb_overlay_step_2">Find DrinkWater app in the list.</string>
+    <string name="onb_overlay_step_2">Find %1$s in the list.</string>
     <string name="onb_overlay_step_3">Enable \"Allow display over other apps\".</string>
     <string name="onb_overlay_step_4">Press back, we\'ll continue automatically.</string>
 
@@ -195,7 +195,7 @@
     <!-- Onboarding — Exact Alarm: How-to steps -->
     <string name="onb_exact_alarm_steps_header">How to enable</string>
     <string name="onb_exact_alarm_step_1">Tap \"Allow exact alarms\" below.</string>
-    <string name="onb_exact_alarm_step_2">Find DrinkWater in the list.</string>
+    <string name="onb_exact_alarm_step_2">Find %1$s in the list.</string>
     <string name="onb_exact_alarm_step_3">Toggle \"Alarms &amp; reminders\" on.</string>
     <string name="onb_exact_alarm_step_4">Press back, we\'ll continue automatically.</string>
     <!-- Onboarding — Exact Alarm: Benefits -->
@@ -283,13 +283,13 @@
 
     <!-- Settings — Disable notifications dialog -->
     <string name="settings_notif_disable_title">Disable notifications</string>
-    <string name="settings_notif_disable_body">To turn off drink reminders, disable notifications for DrinkWater in your phone\'s Settings.\n\n1. Tap \"Continue to Settings\" below.\n2. Disable notifications for this app.\n3. Press back to return.</string>
+    <string name="settings_notif_disable_body">To turn off drink reminders, disable notifications for %1$s in your phone\'s Settings.\n\n1. Tap \"Continue to Settings\" below.\n2. Disable notifications for this app.\n3. Press back to return.</string>
 
     <!-- Settings — Exact reminders instructions dialog -->
     <string name="settings_reminder_type_enable_title">Enable exact reminders</string>
-    <string name="settings_reminder_type_enable_instructions">To get reminders that fire precisely on time, allow exact reminders for DrinkWater.\n\n1. Tap \"Continue to Settings\" below.\n2. Find DrinkWater in the list.\n3. Toggle \"Alarms &amp; reminders\" on.\n\nThen press back to return.</string>
+    <string name="settings_reminder_type_enable_instructions">To get reminders that fire precisely on time, allow exact reminders for %1$s.\n\n1. Tap \"Continue to Settings\" below.\n2. Find %1$s in the list.\n3. Toggle \"Alarms &amp; reminders\" on.\n\nThen press back to return.</string>
     <string name="settings_reminder_type_disable_title">Disable exact reminders</string>
-    <string name="settings_reminder_type_disable_instructions">To switch back to approximate timing, remove the exact reminder permission.\n\n1. Tap \"Continue to Settings\" below.\n2. Find DrinkWater in the list.\n3. Toggle \"Alarms &amp; reminders\" off.\n\nReminders will still arrive but may be slightly delayed.</string>
+    <string name="settings_reminder_type_disable_instructions">To switch back to approximate timing, remove the exact reminder permission.\n\n1. Tap \"Continue to Settings\" below.\n2. Find %1$s in the list.\n3. Toggle \"Alarms &amp; reminders\" off.\n\nReminders will still arrive but may be slightly delayed.</string>
 
     <!-- Settings — Overlay instructions dialog -->
     <string name="settings_overlay_disable_title">Disable display over other apps</string>

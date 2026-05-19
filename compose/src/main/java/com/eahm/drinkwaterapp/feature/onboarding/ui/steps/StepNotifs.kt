@@ -400,7 +400,7 @@ private fun NotifsDeniedDialog(
             )
             Spacer(Modifier.height(10.dp))
             Text(
-                text = stringResource(R.string.notif_disabled_body),
+                text = stringResource(R.string.notif_disabled_body, stringResource(R.string.app_name)),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Normal,
                 fontSize = 14.sp,

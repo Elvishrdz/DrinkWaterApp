@@ -219,7 +219,7 @@ private fun BenefitRow(
 private fun HowToStepsList() {
     val steps = listOf(
         stringResource(R.string.onb_exact_alarm_step_1),
-        stringResource(R.string.onb_exact_alarm_step_2),
+        stringResource(R.string.onb_exact_alarm_step_2, stringResource(R.string.app_name)),
         stringResource(R.string.onb_exact_alarm_step_3),
         stringResource(R.string.onb_exact_alarm_step_4),
     )

@@ -232,7 +232,7 @@ private fun StatCell(value: String, label: String) {
 private fun OverlayStepsList() {
     val steps = listOf(
         stringResource(R.string.onb_overlay_step_1),
-        stringResource(R.string.onb_overlay_step_2),
+        stringResource(R.string.onb_overlay_step_2, stringResource(R.string.app_name)),
         stringResource(R.string.onb_overlay_step_3),
         stringResource(R.string.onb_overlay_step_4),
     )

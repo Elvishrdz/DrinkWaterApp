@@ -936,7 +936,7 @@ private fun NotificationPermissionDeniedDialog(
             )
             Spacer(Modifier.height(10.dp))
             Text(
-                text = stringResource(R.string.notif_disabled_body),
+                text = stringResource(R.string.notif_disabled_body, stringResource(R.string.app_name)),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Normal,
                 fontSize = 14.sp,
@@ -980,7 +980,7 @@ private fun DisableNotificationsDialog(
             )
             Spacer(Modifier.height(10.dp))
             Text(
-                text = stringResource(R.string.settings_notif_disable_body),
+                text = stringResource(R.string.settings_notif_disable_body, stringResource(R.string.app_name)),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Normal,
                 fontSize = 14.sp,
@@ -1304,9 +1304,9 @@ private fun ExactAlarmInstructionsDialog(
     }
 
     val instructions = if (!isGranted) {
-        stringResource(R.string.settings_reminder_type_enable_instructions)
+        stringResource(R.string.settings_reminder_type_enable_instructions, stringResource(R.string.app_name))
     } else {
-        stringResource(R.string.settings_reminder_type_disable_instructions)
+        stringResource(R.string.settings_reminder_type_disable_instructions, stringResource(R.string.app_name))
     }
 
     BasicAlertDialog(onDismissRequest = onDismiss) {
