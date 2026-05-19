@@ -138,6 +138,7 @@ private fun RingSection(state: DrinkState.Data) {
             remaining = state.drinkStats?.remainingAmount ?: 0f,
             alarmCountdownMs = state.alarmCountdownMs,
             alarmIsExact = state.alarmIsExact,
+            isOutsideActiveHours = state.isOutsideActiveHours,
         )
     }
 }
@@ -239,19 +240,23 @@ private fun StreakBadge(
     }
 }
 
-private enum class PillMessage { Remaining, NextAlarm }
+private enum class PillMessage { Remaining, NextAlarm, OutsideActiveHours }
 
 @Composable
 private fun RotatingInfoPill(
     remaining: Float,
     alarmCountdownMs: Long?,
     alarmIsExact: Boolean,
+    isOutsideActiveHours: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val hasAlarm = alarmCountdownMs != null
-    val messages = remember(hasAlarm) {
-        if (hasAlarm) listOf(PillMessage.NextAlarm, PillMessage.Remaining)
-        else listOf(PillMessage.Remaining)
+    val messages = remember(hasAlarm, isOutsideActiveHours) {
+        when {
+            isOutsideActiveHours -> listOf(PillMessage.OutsideActiveHours, PillMessage.Remaining)
+            hasAlarm -> listOf(PillMessage.NextAlarm, PillMessage.Remaining)
+            else -> listOf(PillMessage.Remaining)
+        }
     }
 
     var currentIndex by remember { mutableIntStateOf(0) }
@@ -296,6 +301,7 @@ private fun RotatingInfoPill(
             val goalReached = stringResource(R.string.drink_goal_reached)
             val goalReachedSuffix = stringResource(R.string.drink_goal_reached_suffix)
             val nextAlarmPrefix = stringResource(R.string.drink_next_alarm_prefix)
+            val outsideActiveHoursText = stringResource(R.string.drink_outside_active_hours)
 
             when (message) {
                 PillMessage.Remaining -> {
@@ -341,6 +347,16 @@ private fun RotatingInfoPill(
                             modifier = Modifier.scale(scale.value),
                         )
                     }
+                }
+
+                PillMessage.OutsideActiveHours -> {
+                    Text(
+                        text = outsideActiveHoursText,
+                        fontFamily = PlusJakartaSans,
+                        fontSize = 13.sp,
+                        color = DwInk400,
+                        modifier = Modifier.scale(scale.value),
+                    )
                 }
 
                 PillMessage.NextAlarm -> {

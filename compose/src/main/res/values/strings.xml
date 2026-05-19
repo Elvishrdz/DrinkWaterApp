@@ -337,6 +337,7 @@
     <string name="drink_next_alarm_prefix">Next alarm in </string>
     <string name="drink_alarm_firing_now">Alarm will fire now</string>
     <string name="drink_alarm_firing_approx">Alarm will fire any moment</string>
+    <string name="drink_outside_active_hours">Reminders paused. You can still log manually.</string>
 
     <!-- Drink — Progress ring -->
     <string name="drink_progress_goal_label">of %1$s</string>

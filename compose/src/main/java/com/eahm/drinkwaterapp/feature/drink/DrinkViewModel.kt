@@ -54,6 +54,7 @@ internal class DrinkViewModel(
     val drinkStatsObserver: DrinkStatsObserver,
     val streakRepository: StreakRepository,
     val trackingService: TrackingService,
+    val activeHoursObserver: ActiveHoursObserver,
 ) : ViewModel() {
 
     private val dao = database.getHistoryDao()
@@ -204,6 +205,9 @@ internal class DrinkViewModel(
             alarmCountdownMs = alarmCountdownMs,
             alarmIsExact = alarmIsExact,
         )
+        else drinkState
+    }.combine(activeHoursObserver.inActiveHours) { drinkState, inActiveHours ->
+        if (drinkState is DrinkState.Data) drinkState.copy(isOutsideActiveHours = !inActiveHours)
         else drinkState
     }.stateIn(
         scope = viewModelScope,

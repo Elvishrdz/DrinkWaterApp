@@ -20,6 +20,7 @@ internal sealed interface DrinkState {
         val alarmCountdownMs: Long?,
         val alarmIsExact: Boolean = true,
         val unitPreference: UnitPreference = UnitPreference.ML,
+        val isOutsideActiveHours: Boolean = false,
     ) : DrinkState
 }
 
