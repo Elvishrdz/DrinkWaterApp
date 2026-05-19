@@ -67,19 +67,19 @@ internal fun UnitPreferenceBottomSheet(
 
             UnitPreferenceOption(
                 label = stringResource(R.string.settings_unit_ml),
-                description = "Always display in milliliters",
+                description = stringResource(R.string.settings_unit_ml_desc),
                 selected = current == UnitPreference.ML,
                 onClick = { selectAndDismiss(UnitPreference.ML) },
             )
             UnitPreferenceOption(
                 label = stringResource(R.string.settings_unit_auto_liters),
-                description = "Shows mL below 1000, L above",
+                description = stringResource(R.string.settings_unit_auto_liters_desc),
                 selected = current == UnitPreference.AUTO_LITERS,
                 onClick = { selectAndDismiss(UnitPreference.AUTO_LITERS) },
             )
             UnitPreferenceOption(
                 label = stringResource(R.string.settings_unit_fl_oz),
-                description = "US fluid ounces",
+                description = stringResource(R.string.settings_unit_fl_oz_desc),
                 selected = current == UnitPreference.FL_OZ,
                 onClick = { selectAndDismiss(UnitPreference.FL_OZ) },
             )

@@ -235,8 +235,11 @@
     <string name="settings_group_app">APP</string>
     <string name="settings_unit_preference_title">Volume Units</string>
     <string name="settings_unit_ml">Milliliters (mL)</string>
+    <string name="settings_unit_ml_desc">Always display in milliliters</string>
     <string name="settings_unit_auto_liters">Auto Liters (mL / L)</string>
+    <string name="settings_unit_auto_liters_desc">Shows mL below 1000, L above</string>
     <string name="settings_unit_fl_oz">Fluid Ounces (fl oz)</string>
+    <string name="settings_unit_fl_oz_desc">US fluid ounces</string>
     <string name="settings_row_goal_celebrations">Goal reached celebrations</string>
     <string name="settings_row_reminder_type">Reminder type</string>
     <string name="settings_row_reminder_status">Exact</string>
