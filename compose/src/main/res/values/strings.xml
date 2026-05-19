@@ -20,8 +20,8 @@
     <string name="consent_track_feature_private_title">Never linked to you</string>
     <string name="consent_track_feature_private_desc">We use a random generated id that is NOT linked to any of your information.</string>
     <string name="consent_track_feature_control_title">Off any time</string>
-    <string name="consent_track_feature_control_desc">Disable it anytime under Settings → Privacy → Usage data</string>
-    <string name="consent_track_active">Tracking is active. You can disable it in Settings → Privacy.</string>
+    <string name="consent_track_feature_control_desc">Disable it anytime under Settings → Privacy &amp; Legal → Share usage data</string>
+    <string name="consent_track_active">Tracking is active. You can disable it in Settings → Privacy &amp; Legal.</string>
     <string name="consent_track_cta_allow">Share anonymous data</string>
 
     <!-- Consent — Legal screen -->
@@ -209,6 +209,7 @@
     <string name="settings_section_hydration">HYDRATION</string>
     <string name="settings_section_reminders">REMINDERS</string>
     <string name="settings_section_overlays">OVERLAYS</string>
+    <string name="settings_section_privacy_legal">PRIVACY &amp; LEGAL</string>
     <string name="settings_section_premium">PREMIUM</string>
     <string name="settings_section_about">ABOUT</string>
 
@@ -236,6 +237,9 @@
     <string name="settings_row_rate">Rate the app</string>
     <string name="settings_row_request_feature">Request a feature</string>
     <string name="settings_row_report_problem">Report a problem</string>
+    <string name="settings_row_share_usage_data">Share usage data</string>
+    <string name="settings_row_privacy_policy">Privacy Policy</string>
+    <string name="settings_row_terms_of_use">Terms of Use</string>
     <string name="settings_row_reset_data">Reset all data</string>
 
     <!-- Settings — Row trailing values -->

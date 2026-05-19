@@ -17,8 +17,8 @@
     <string name="consent_track_feature_private_title">Nunca vinculado a ti</string>
     <string name="consent_track_feature_private_desc">Usamos un ID generado aleatoriamente que NO está vinculado a ninguna de tu información personal.</string>
     <string name="consent_track_feature_control_title">Desactívalo cuando quieras</string>
-    <string name="consent_track_feature_control_desc">Desactívalo en cualquier momento desde Ajustes → Privacidad → Datos de uso</string>
-    <string name="consent_track_active">El seguimiento está activo. Puedes desactivarlo en Ajustes → Privacidad.</string>
+    <string name="consent_track_feature_control_desc">Desactívalo en cualquier momento desde Ajustes → Privacidad y legal → Compartir datos de uso</string>
+    <string name="consent_track_active">El seguimiento está activo. Puedes desactivarlo en Ajustes → Privacidad y legal.</string>
     <string name="consent_track_cta_allow">Compartir datos anónimos</string>
 
     <!-- Consentimiento — Política de privacidad -->
@@ -209,6 +209,7 @@
     <string name="settings_section_hydration">HIDRATACIÓN</string>
     <string name="settings_section_reminders">RECORDATORIOS</string>
     <string name="settings_section_overlays">SUPERPOSICIÓN</string>
+    <string name="settings_section_privacy_legal">PRIVACIDAD Y LEGAL</string>
     <string name="settings_section_premium">PREMIUM</string>
     <string name="settings_section_about">ACERCA DE</string>
 
@@ -236,6 +237,9 @@
     <string name="settings_row_rate">Calificar la app</string>
     <string name="settings_row_request_feature">Solicitar una función</string>
     <string name="settings_row_report_problem">Reportar un problema</string>
+    <string name="settings_row_share_usage_data">Compartir datos de uso</string>
+    <string name="settings_row_privacy_policy">Política de privacidad</string>
+    <string name="settings_row_terms_of_use">Términos de uso</string>
     <string name="settings_row_reset_data">Restablecer todos los datos</string>
 
     <!-- Ajustes — Valores de filas -->

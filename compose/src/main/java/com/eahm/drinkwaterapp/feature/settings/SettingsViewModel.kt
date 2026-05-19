@@ -8,6 +8,8 @@ import android.os.Build
 import android.provider.Settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingService.Companion.OptOutSource
 import com.eahm.drinkwaterapp.core.billing.PurchaseManager
 import com.eahm.drinkwaterapp.core.config.AppInfoService
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
@@ -48,6 +50,7 @@ internal class SettingsViewModel(
     notificationPermissionObserver: NotificationPermissionObserver,
     appInfoService: AppInfoService,
     private val purchaseManager: PurchaseManager,
+    private val trackingService: TrackingService,
 ) : ViewModel() {
 
     private val dao = database.getDailyGoalDao()
@@ -94,6 +97,7 @@ internal class SettingsViewModel(
                 intervalMinutes = 0,
                 goalReachedCelebrationsEnabled = canDrawOverlay,
                 exactAlarmsEnabled = canScheduleExactAlarms,
+                isTrackingEnabled = trackingService.isTracking(),
                 appVersion = appInfoService.versionName,
                 buildVariant = appInfoService.buildVariant,
             )
@@ -231,6 +235,15 @@ internal class SettingsViewModel(
 
     fun onExactAlarmPermissionResult() {
         _state.update { it.copy(exactAlarmsEnabled = canScheduleExactAlarms) }
+    }
+
+    fun onTrackingToggled(enabled: Boolean) {
+        if (enabled) {
+            trackingService.startTracking()
+        } else {
+            trackingService.stopTracking(OptOutSource.Settings)
+        }
+        _state.update { it.copy(isTrackingEnabled = enabled) }
     }
 
     fun clearAllData() {

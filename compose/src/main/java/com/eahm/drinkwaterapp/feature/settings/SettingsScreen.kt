@@ -228,6 +228,23 @@ internal fun SettingsScreen(
         onRemoveAdsTap = viewModel::onFetchOfferings,
         onTimeFormatChanged = viewModel::onTimeFormatPreferenceChanged,
         onUnitPreferenceChanged = viewModel::onUnitPreferenceChanged,
+        onTrackingToggled = viewModel::onTrackingToggled,
+        onPrivacyPolicyTap = {
+            context.startActivity(
+                android.content.Intent(
+                    android.content.Intent.ACTION_VIEW,
+                    "https://www.freeprivacypolicy.com/privacy/view/04c015dc119a00b1ec8a21df46a9bfb1".toUri()
+                )
+            )
+        },
+        onTermsOfUseTap = {
+            context.startActivity(
+                android.content.Intent(
+                    android.content.Intent.ACTION_VIEW,
+                    "https://www.freeprivacypolicy.com/privacy/view/04c015dc119a00b1ec8a21df46a9bfb1".toUri()
+                )
+            )
+        },
         modifier = modifier,
     )
 
@@ -368,6 +385,9 @@ internal fun SettingsContent(
     onRemoveAdsTap: () -> Unit,
     onTimeFormatChanged: (TimeFormatPreference) -> Unit,
     onUnitPreferenceChanged: (UnitPreference) -> Unit,
+    onTrackingToggled: (Boolean) -> Unit,
+    onPrivacyPolicyTap: () -> Unit,
+    onTermsOfUseTap: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -586,6 +606,49 @@ internal fun SettingsContent(
                         ) {
                             RowChevronTrailing()
                         }
+                    }
+                }
+            }
+
+            item {
+                SettingsSection(title = stringResource(R.string.settings_section_privacy_legal)) {
+                    SettingRow(
+                        icon = DwIcons.ShieldCheck,
+                        iconBg = DwTintWater,
+                        iconTint = DwWater,
+                        label = stringResource(R.string.settings_row_share_usage_data),
+                    ) {
+                        Switch(
+                            checked = state.isTrackingEnabled,
+                            onCheckedChange = onTrackingToggled,
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = DwPaper,
+                                checkedTrackColor = DwMagenta,
+                                uncheckedThumbColor = DwPaper,
+                                uncheckedTrackColor = DwInk200,
+                                uncheckedBorderColor = DwInk200,
+                            ),
+                        )
+                    }
+                    HorizontalDivider(color = DwInk100)
+                    SettingRow(
+                        icon = DwIcons.Info,
+                        iconBg = DwInk100,
+                        iconTint = DwInk500,
+                        label = stringResource(R.string.settings_row_privacy_policy),
+                        onClick = onPrivacyPolicyTap,
+                    ) {
+                        RowChevronTrailing()
+                    }
+                    HorizontalDivider(color = DwInk100)
+                    SettingRow(
+                        icon = DwIcons.Info,
+                        iconBg = DwInk100,
+                        iconTint = DwInk500,
+                        label = stringResource(R.string.settings_row_terms_of_use),
+                        onClick = onTermsOfUseTap,
+                    ) {
+                        RowChevronTrailing()
                     }
                 }
             }
@@ -1501,6 +1564,9 @@ private fun SettingsScreenPreview() {
             onRemoveAdsTap = {},
             onTimeFormatChanged = {},
             onUnitPreferenceChanged = {},
+            onTrackingToggled = {},
+            onPrivacyPolicyTap = {},
+            onTermsOfUseTap = {},
         )
     }
 }

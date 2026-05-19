@@ -29,6 +29,7 @@ data class SettingsState(
     val timeRangeError: TimeRangeError? = null,
     val goalReachedCelebrationsEnabled: Boolean,
     val exactAlarmsEnabled: Boolean = false,
+    val isTrackingEnabled: Boolean = false,
     val notificationAmountMl: Float = 150f,
     val appVersion: String,
     val buildVariant: String,
