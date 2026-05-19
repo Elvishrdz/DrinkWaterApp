@@ -38,7 +38,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -53,6 +55,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterDeep
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterLight
 import com.eahm.drinkwaterapp.core.presentation.LayoutType
 import com.eahm.drinkwaterapp.core.presentation.getLayoutType
+import com.eahm.drinkwaterapp.feature.consent.extension.sanitizeHtml
 
 private val LegalWaveHeight = 248.dp
 private val LegalOverlapHeight = 25.dp
@@ -443,8 +446,10 @@ private fun ColumnScope.LegalScrollableContent() {
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp),
         ) {
+            val localContent = stringResource(R.string.privacy_policy_local_content)
+            val styledText = AnnotatedString.fromHtml(localContent.sanitizeHtml())
             Text(
-                text = stringResource(R.string.privacy_policy_local_content),
+                text = styledText,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
