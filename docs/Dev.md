@@ -11,7 +11,7 @@ Fixes
 [x] settings: poner url correcta para calificar la app
 [x] settings: traducir texto para solicitar funcion
 [x] settings: traducir texto para reportar problema
-[] consent: traducir textos de pantalas
+[x] consent: traducir textos de pantalas
 [] consent: agregar privacy policy final de release
 [] consent: agregar url a privacy policy
 [] consent: cambiar orden de botones en track screen

@@ -8,6 +8,31 @@
     <string name="notification_drink_amount_formatted">+%1$s%2$s</string>
     <string name="share_app_title">¡Comparte DrinkWater con tus amigos!</string>
 
+    <!-- Consentimiento — Pantalla de seguimiento -->
+    <string name="consent_track_step">Paso 2 de 2</string>
+    <string name="consent_track_title">Ayuda a mejorar la app</string>
+    <string name="consent_track_lede">Comparte el uso anónimo para que podamos ver qué funciones les gustan a los usuarios y cuáles necesitan mejoras. Solo métricas, sin nombre ni correo de tu parte.</string>
+    <string name="consent_track_feature_usage_title">Uso de funciones</string>
+    <string name="consent_track_feature_usage_desc">Queremos saber qué funciona y qué no desde una vista general.</string>
+    <string name="consent_track_feature_private_title">Nunca vinculado a ti</string>
+    <string name="consent_track_feature_private_desc">Usamos un ID generado aleatoriamente que NO está vinculado a ninguna de tu información personal.</string>
+    <string name="consent_track_feature_control_title">Desactívalo cuando quieras</string>
+    <string name="consent_track_feature_control_desc">Desactívalo en cualquier momento desde Ajustes → Privacidad → Datos de uso</string>
+    <string name="consent_track_active">El seguimiento está activo. Puedes desactivarlo en Ajustes → Privacidad.</string>
+    <string name="consent_track_cta_allow">Compartir datos anónimos</string>
+
+    <!-- Consentimiento — Política de privacidad -->
+    <string name="privacy_policy_local_content">DrinkWater recopila únicamente los datos necesarios para brindar y mejorar la experiencia de la app. No vendemos tu información personal a terceros.\n\nInformación que recopilamos:\n• Datos de uso que tú proporcionas (registros de ingesta de agua, metas diarias, recordatorios)\n• Información del dispositivo (versión del sistema operativo, versión de la app) para compatibilidad\n• Eventos de análisis anónimos cuando lo aceptas\n\nCómo usamos tus datos:\n• Para brindar las funciones principales de la app (seguimiento, recordatorios, estadísticas)\n• Para mejorar las funciones de la app con base en patrones de uso agregados y anónimos\n• Para enviar las notificaciones locales que hayas programado\n\nRetención de datos:\nTus registros de bebidas y ajustes se guardan localmente en tu dispositivo. Los datos de análisis anónimos se conservan hasta 24 meses.\n\nTus derechos:\nPuedes eliminar todos los datos guardados localmente en cualquier momento desde Ajustes → Restablecer todos los datos. Puedes desactivar el análisis en cualquier momento desde Ajustes.\n\nContacto:\nPara cualquier pregunta relacionada con la privacidad, contáctanos en drinkwater.app.</string>
+
+    <!-- Consentimiento — Pantalla legal -->
+    <string name="consent_legal_step">Paso 1 de 2</string>
+    <string name="consent_legal_title">Política de privacidad y términos de uso</string>
+    <string name="consent_legal_updated">Última actualización · 12 de mayo de 2026</string>
+    <string name="consent_legal_lede">Tómate un momento para leer nuestros términos de uso y política de privacidad para usar la app DrinkWater.</string>
+    <string name="consent_legal_web_link">Lee la versión más reciente en drinkwater.app</string>
+    <string name="consent_legal_agree">He leído y acepto la Política de privacidad y los Términos de uso.</string>
+    <string name="consent_legal_cta">Aceptar y continuar</string>
+
     <!-- Generic — acciones -->
     <string name="action_cancel">Cancelar</string>
     <string name="action_save">Guardar</string>

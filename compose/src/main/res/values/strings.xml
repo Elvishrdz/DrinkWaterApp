@@ -11,6 +11,28 @@
     <!-- Consent — Privacy policy -->
     <string name="privacy_policy_local_content">DrinkWater collects only the data necessary to provide and improve the app experience. We do not sell your personal information to third parties.\n\nInformation we collect:\n• Usage data you provide (water intake logs, daily goals, reminders)\n• Device information (OS version, app version) for compatibility\n• Anonymous analytics events when you opt in\n\nHow we use your data:\n• To deliver core app functionality (tracking, reminders, statistics)\n• To improve app features based on aggregated, anonymous usage patterns\n• To send local notifications you have scheduled\n\nData retention:\nYour drink logs and settings are stored locally on your device. Anonymous analytics data is retained for up to 24 months.\n\nYour rights:\nYou may delete all locally stored data at any time via Settings → Reset all data. You may opt out of analytics at any time via Settings.\n\nContact:\nFor any privacy-related questions, please reach out to us at drinkwater.app.</string>
 
+    <!-- Consent — Track request screen -->
+    <string name="consent_track_step">Step 2 of 2</string>
+    <string name="consent_track_title">Help shape the app</string>
+    <string name="consent_track_lede">Share anonymous usage so we can see which features people love and which need work. Metrics only, no name, no email from you.</string>
+    <string name="consent_track_feature_usage_title">Feature usage</string>
+    <string name="consent_track_feature_usage_desc">We want to know what works and what not from a general view.</string>
+    <string name="consent_track_feature_private_title">Never linked to you</string>
+    <string name="consent_track_feature_private_desc">We use a random generated id that is NOT linked to any of your information.</string>
+    <string name="consent_track_feature_control_title">Off any time</string>
+    <string name="consent_track_feature_control_desc">Disable it anytime under Settings → Privacy → Usage data</string>
+    <string name="consent_track_active">Tracking is active. You can disable it in Settings → Privacy.</string>
+    <string name="consent_track_cta_allow">Share anonymous data</string>
+
+    <!-- Consent — Legal screen -->
+    <string name="consent_legal_step">Step 1 of 2</string>
+    <string name="consent_legal_title">Privacy Policy &amp; Terms of use</string>
+    <string name="consent_legal_updated">Last updated · May 12, 2026</string>
+    <string name="consent_legal_lede">Take a moment to read our terms of use and privacy policy to use DrinkWater app.</string>
+    <string name="consent_legal_web_link">Read the latest version on drinkwater.app</string>
+    <string name="consent_legal_agree">I\'ve read and agree to the Privacy Policy &amp; Terms of Use.</string>
+    <string name="consent_legal_cta">Accept and continue</string>
+
     <!-- Generic — actions -->
     <string name="action_cancel">Cancel</string>
     <string name="action_save">Save</string>

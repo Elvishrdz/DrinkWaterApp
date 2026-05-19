@@ -28,7 +28,6 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -56,7 +55,7 @@ import com.eahm.drinkwaterapp.core.presentation.LayoutType
 import com.eahm.drinkwaterapp.core.presentation.getLayoutType
 
 private val LegalWaveHeight = 248.dp
-private val LegalOverlapHeight = 22.dp
+private val LegalOverlapHeight = 25.dp
 
 @Composable
 internal fun LegalScreen(
@@ -64,35 +63,33 @@ internal fun LegalScreen(
     showStepCounter: Boolean,
     onToggleChanged: (Boolean) -> Unit,
     onAccept: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
-    Scaffold(modifier = modifier) { innerPadding ->
-        when (getLayoutType()) {
-            LayoutType.PORTRAIT -> LegalPortraitLayout(
-                innerPadding = innerPadding,
-                privacyToggleChecked = privacyToggleChecked,
-                showStepCounter = showStepCounter,
-                onToggleChanged = onToggleChanged,
-                onAccept = onAccept,
-            )
+    val innerPadding = PaddingValues()
+    when (getLayoutType()) {
+        LayoutType.PORTRAIT -> LegalPortraitLayout(
+            innerPadding = innerPadding,
+            privacyToggleChecked = privacyToggleChecked,
+            showStepCounter = showStepCounter,
+            onToggleChanged = onToggleChanged,
+            onAccept = onAccept,
+        )
 
-            LayoutType.LANDSCAPE,
-            LayoutType.FOLDABLE_EXPANDED -> LegalLandscapeLayout(
-                innerPadding = innerPadding,
-                privacyToggleChecked = privacyToggleChecked,
-                showStepCounter = showStepCounter,
-                onToggleChanged = onToggleChanged,
-                onAccept = onAccept,
-            )
+        LayoutType.LANDSCAPE,
+        LayoutType.FOLDABLE_EXPANDED -> LegalLandscapeLayout(
+            innerPadding = innerPadding,
+            privacyToggleChecked = privacyToggleChecked,
+            showStepCounter = showStepCounter,
+            onToggleChanged = onToggleChanged,
+            onAccept = onAccept,
+        )
 
-            LayoutType.TABLE_TOP -> LegalTableTopLayout(
-                innerPadding = innerPadding,
-                privacyToggleChecked = privacyToggleChecked,
-                showStepCounter = showStepCounter,
-                onToggleChanged = onToggleChanged,
-                onAccept = onAccept,
-            )
-        }
+        LayoutType.TABLE_TOP -> LegalTableTopLayout(
+            innerPadding = innerPadding,
+            privacyToggleChecked = privacyToggleChecked,
+            showStepCounter = showStepCounter,
+            onToggleChanged = onToggleChanged,
+            onAccept = onAccept,
+        )
     }
 }
 
@@ -117,15 +114,16 @@ private fun LegalPortraitLayout(
             .fillMaxSize()
             .padding(innerPadding),
     ) {
+        // TODO: show background over the status bar
         val sheetHeight = maxHeight - (LegalWaveHeight - LegalOverlapHeight)
 
         // Wave header
         Box(
             Modifier
+                .align(Alignment.TopCenter)
                 .fillMaxWidth()
                 .height(LegalWaveHeight)
                 .zIndex(0f)
-                .clip(RoundedCornerShape(bottomStart = 36.dp, bottomEnd = 36.dp))
                 .background(waterGradient),
         ) {
             LegalBubbles()
@@ -201,27 +199,19 @@ private fun LegalLandscapeLayout(
             }
         }
 
-        // Right: white surface
-        Surface(
+        Column(
             modifier = Modifier
                 .weight(1f)
-                .fillMaxHeight(),
-            shape = RoundedCornerShape(topStart = 28.dp, bottomStart = 28.dp),
-            shadowElevation = 8.dp,
-            color = MaterialTheme.colorScheme.surface,
+                .fillMaxSize()
+                .padding(22.dp)
+                .background(color = MaterialTheme.colorScheme.surface),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(22.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp),
-            ) {
-                LegalBodyContent(
-                    privacyToggleChecked = privacyToggleChecked,
-                    onToggleChanged = onToggleChanged,
-                    onAccept = onAccept,
-                )
-            }
+            LegalBodyContent(
+                privacyToggleChecked = privacyToggleChecked,
+                onToggleChanged = onToggleChanged,
+                onAccept = onAccept,
+            )
         }
     }
 }
@@ -250,7 +240,6 @@ private fun LegalTableTopLayout(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .clip(RoundedCornerShape(bottomStart = 36.dp, bottomEnd = 36.dp))
                 .background(waterGradient),
         ) {
             LegalBubbles()
@@ -265,26 +254,46 @@ private fun LegalTableTopLayout(
             }
         }
 
-        // Bottom: white surface
+        // Bottom: white surface — left scrollable content, right controls
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f),
+                .weight(1f)
+                .offset(0.dp, (-25).dp),
             shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
             shadowElevation = 8.dp,
             color = MaterialTheme.colorScheme.surface,
         ) {
-            Column(
+            Row(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(22.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp),
+                    .padding(22.dp)
+                    .padding(top = 25.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                LegalBodyContent(
-                    privacyToggleChecked = privacyToggleChecked,
-                    onToggleChanged = onToggleChanged,
-                    onAccept = onAccept,
-                )
+                // Left: scrollable policy content
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    verticalArrangement = Arrangement.spacedBy(14.dp),
+                ) {
+                    LegalScrollableContent()
+                }
+
+                // Right: agree row + CTA, centered vertically
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    verticalArrangement = Arrangement.spacedBy(14.dp, Alignment.CenterVertically),
+                ) {
+                    LegalControls(
+                        privacyToggleChecked = privacyToggleChecked,
+                        onToggleChanged = onToggleChanged,
+                        onAccept = onAccept,
+                    )
+                }
             }
         }
     }
@@ -372,7 +381,7 @@ private fun LegalHeaderContent(
         }
         Spacer(Modifier.height(10.dp))
         Text(
-            text = "Step 1 of 2",
+            text = stringResource(R.string.consent_legal_step),
             color = Color.White.copy(alpha = 0.85f),
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
@@ -386,7 +395,7 @@ private fun LegalHeaderContent(
     }
 
     Text(
-        text = "Privacy Policy & Terms of use",
+        text = stringResource(R.string.consent_legal_title),
         color = Color.White,
         style = MaterialTheme.typography.headlineMedium,
         fontWeight = FontWeight.Bold,
@@ -395,7 +404,7 @@ private fun LegalHeaderContent(
     )
     Spacer(Modifier.height(8.dp))
     Text(
-        text = "Last updated · May 12, 2026",
+        text = stringResource(R.string.consent_legal_updated),
         color = Color.White.copy(alpha = 0.80f),
         style = MaterialTheme.typography.labelSmall,
         letterSpacing = 0.04.em,
@@ -405,21 +414,16 @@ private fun LegalHeaderContent(
 }
 
 /**
- * Body content placed inside a Column in every layout variant.
- * The policy card uses [ColumnScope.weight] to absorb remaining vertical space
- * while keeping the agree row and button pinned at the bottom.
+ * Scrollable part of the body: lede text + policy card + web link.
+ * [ColumnScope] receiver enables [ColumnScope.weight] on the policy card.
  */
 @Composable
-private fun ColumnScope.LegalBodyContent(
-    privacyToggleChecked: Boolean,
-    onToggleChanged: (Boolean) -> Unit,
-    onAccept: () -> Unit,
-) {
+private fun ColumnScope.LegalScrollableContent() {
     val uriHandler = LocalUriHandler.current
 
     // Lede
     Text(
-        text = "Take a moment to read our terms of use and privacy policy to use DrinkWater app.",
+        text = stringResource(R.string.consent_legal_lede),
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -463,14 +467,24 @@ private fun ColumnScope.LegalBodyContent(
             tint = MaterialTheme.colorScheme.primary,
         )
         Text(
-            text = "Read the latest version on drinkwater.app",
+            text = stringResource(R.string.consent_legal_web_link),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Bold,
             letterSpacing = 0.04.em,
         )
     }
+}
 
+/**
+ * Controls: agree row + CTA button.
+ */
+@Composable
+private fun LegalControls(
+    privacyToggleChecked: Boolean,
+    onToggleChanged: (Boolean) -> Unit,
+    onAccept: () -> Unit,
+) {
     // Agree row
     Row(
         modifier = Modifier
@@ -492,7 +506,7 @@ private fun ColumnScope.LegalBodyContent(
             ),
         )
         Text(
-            text = "I've read and agree to the Privacy Policy & Terms of Use.",
+            text = stringResource(R.string.consent_legal_agree),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onPrimaryContainer,
             fontWeight = FontWeight.Medium,
@@ -501,10 +515,29 @@ private fun ColumnScope.LegalBodyContent(
     }
 
     DwPrimaryButton(
-        text = "Accept and continue",
+        text = stringResource(R.string.consent_legal_cta),
         onClick = onAccept,
         enabled = privacyToggleChecked,
         modifier = Modifier.fillMaxWidth(),
+    )
+}
+
+/**
+ * Body content for portrait and landscape layouts — places scrollable content
+ * and controls in a single column. The [ColumnScope] receiver enables
+ * [ColumnScope.weight] on the policy card via [LegalScrollableContent].
+ */
+@Composable
+private fun ColumnScope.LegalBodyContent(
+    privacyToggleChecked: Boolean,
+    onToggleChanged: (Boolean) -> Unit,
+    onAccept: () -> Unit,
+) {
+    LegalScrollableContent()
+    LegalControls(
+        privacyToggleChecked = privacyToggleChecked,
+        onToggleChanged = onToggleChanged,
+        onAccept = onAccept,
     )
 }
 

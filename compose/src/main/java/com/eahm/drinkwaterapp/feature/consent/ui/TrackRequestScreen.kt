@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -26,7 +28,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,12 +37,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.zIndex
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwTertiaryButton
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
@@ -51,7 +55,7 @@ import com.eahm.drinkwaterapp.core.presentation.LayoutType
 import com.eahm.drinkwaterapp.core.presentation.getLayoutType
 
 private val TrackWaveHeight = 220.dp
-private val TrackOverlapHeight = 22.dp
+private val TrackOverlapHeight = 25.dp
 
 @Composable
 internal fun TrackRequestScreen(
@@ -59,35 +63,33 @@ internal fun TrackRequestScreen(
     showStepCounter: Boolean,
     onAllow: () -> Unit,
     onDecline: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
-    Scaffold(modifier = modifier) { innerPadding ->
-        when (getLayoutType()) {
-            LayoutType.PORTRAIT -> TrackPortraitLayout(
-                innerPadding = innerPadding,
-                isTrackingEnabled = isTrackingEnabled,
-                showStepCounter = showStepCounter,
-                onAllow = onAllow,
-                onDecline = onDecline,
-            )
+    val innerPadding = PaddingValues()
+    when (getLayoutType()) {
+        LayoutType.PORTRAIT -> TrackPortraitLayout(
+            innerPadding = innerPadding,
+            isTrackingEnabled = isTrackingEnabled,
+            showStepCounter = showStepCounter,
+            onAllow = onAllow,
+            onDecline = onDecline,
+        )
 
-            LayoutType.LANDSCAPE,
-            LayoutType.FOLDABLE_EXPANDED -> TrackLandscapeLayout(
-                innerPadding = innerPadding,
-                isTrackingEnabled = isTrackingEnabled,
-                showStepCounter = showStepCounter,
-                onAllow = onAllow,
-                onDecline = onDecline,
-            )
+        LayoutType.LANDSCAPE,
+        LayoutType.FOLDABLE_EXPANDED -> TrackLandscapeLayout(
+            innerPadding = innerPadding,
+            isTrackingEnabled = isTrackingEnabled,
+            showStepCounter = showStepCounter,
+            onAllow = onAllow,
+            onDecline = onDecline,
+        )
 
-            LayoutType.TABLE_TOP -> TrackTableTopLayout(
-                innerPadding = innerPadding,
-                isTrackingEnabled = isTrackingEnabled,
-                showStepCounter = showStepCounter,
-                onAllow = onAllow,
-                onDecline = onDecline,
-            )
-        }
+        LayoutType.TABLE_TOP -> TrackTableTopLayout(
+            innerPadding = innerPadding,
+            isTrackingEnabled = isTrackingEnabled,
+            showStepCounter = showStepCounter,
+            onAllow = onAllow,
+            onDecline = onDecline,
+        )
     }
 }
 
@@ -117,10 +119,10 @@ private fun TrackPortraitLayout(
         // Wave header
         Box(
             Modifier
+                .align(Alignment.TopCenter)
                 .fillMaxWidth()
                 .height(TrackWaveHeight)
                 .zIndex(0f)
-                .clip(RoundedCornerShape(bottomStart = 36.dp, bottomEnd = 36.dp))
                 .background(magentaGradient),
         ) {
             TrackBubbles()
@@ -387,7 +389,7 @@ private fun TrackHeaderContent(
         }
         Spacer(Modifier.height(10.dp))
         Text(
-            text = "Step 2 of 2",
+            text = stringResource(R.string.consent_track_step),
             color = Color.White.copy(alpha = 0.85f),
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
@@ -401,7 +403,7 @@ private fun TrackHeaderContent(
     }
 
     Text(
-        text = "Help shape the app",
+        text = stringResource(R.string.consent_track_title),
         color = Color.White,
         style = MaterialTheme.typography.headlineMedium,
         fontWeight = FontWeight.Bold,
@@ -414,7 +416,7 @@ private fun TrackHeaderContent(
 @Composable
 private fun TrackMainContent() {
     Text(
-        text = "Share anonymous usage so we can see which features people love and which need work. Metrics only, no name, no email from you.",
+        text = stringResource(R.string.consent_track_lede),
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
@@ -430,8 +432,8 @@ private fun TrackMainContent() {
                 imageVector = DwIcons.Lightbulb,
                 iconContainerColor = MaterialTheme.colorScheme.primaryContainer,
                 iconTint = MaterialTheme.colorScheme.onPrimaryContainer,
-                title = "Feature usage",
-                description = "We want to know what works and what not from a general view.",
+                title = stringResource(R.string.consent_track_feature_usage_title),
+                description = stringResource(R.string.consent_track_feature_usage_desc),
             )
             HorizontalDivider(
                 modifier = Modifier.padding(horizontal = 12.dp),
@@ -441,8 +443,8 @@ private fun TrackMainContent() {
                 imageVector = DwIcons.Star,
                 iconContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                 iconTint = MaterialTheme.colorScheme.onSecondaryContainer,
-                title = "Never linked to you",
-                description = "We use a random generated id that is NOT linked to any of your information.",
+                title = stringResource(R.string.consent_track_feature_private_title),
+                description = stringResource(R.string.consent_track_feature_private_desc),
             )
             HorizontalDivider(
                 modifier = Modifier.padding(horizontal = 12.dp),
@@ -452,8 +454,8 @@ private fun TrackMainContent() {
                 imageVector = DwIcons.Settings,
                 iconContainerColor = MaterialTheme.colorScheme.primaryContainer,
                 iconTint = MaterialTheme.colorScheme.onPrimaryContainer,
-                title = "Off any time",
-                description = "Disable it anytime under Settings → Privacy → Usage data",
+                title = stringResource(R.string.consent_track_feature_control_title),
+                description = stringResource(R.string.consent_track_feature_control_desc),
             )
         }
     }
@@ -470,25 +472,25 @@ private fun TrackButtons(
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             if (tracking) {
                 Text(
-                    text = "Tracking is active. You can disable it in Settings → Privacy.",
+                    text = stringResource(R.string.consent_track_active),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Spacer(Modifier.height(8.dp))
                 DwPrimaryButton(
-                    text = "Continue",
+                    text = stringResource(R.string.onb_cta_continue),
                     onClick = onAllow,
                     modifier = Modifier.fillMaxWidth(),
                 )
             } else {
-                DwPrimaryButton(
-                    text = "Share anonymous data",
-                    onClick = onAllow,
+                DwTertiaryButton(
+                    text = stringResource(R.string.action_not_now),
+                    onClick = onDecline,
                     modifier = Modifier.fillMaxWidth(),
                 )
-                DwTertiaryButton(
-                    text = "Not now",
-                    onClick = onDecline,
+                DwPrimaryButton(
+                    text = stringResource(R.string.consent_track_cta_allow),
+                    onClick = onAllow,
                     modifier = Modifier.fillMaxWidth(),
                 )
             }

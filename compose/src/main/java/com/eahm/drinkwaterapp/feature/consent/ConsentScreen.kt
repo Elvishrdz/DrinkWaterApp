@@ -1,6 +1,5 @@
 package com.eahm.drinkwaterapp.feature.consent
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.runtime.Composable
 import com.eahm.drinkwaterapp.feature.consent.ui.LegalScreen
 import com.eahm.drinkwaterapp.feature.consent.ui.TrackRequestScreen
@@ -18,24 +17,20 @@ internal fun ConsentScreen(
         }
 
         is ConsentState.Data -> {
-            AnimatedContent(
-                targetState = state.step,
-            ) { step ->
-                when (step) {
-                    ConsentStep.PRIVACY_POLICY -> LegalScreen(
-                        privacyToggleChecked = state.privacyToggleChecked,
-                        showStepCounter = state.showStepCounter,
-                        onToggleChanged = { onAction(ConsentAction.SetPrivacyToggle(it)) },
-                        onAccept = { onAction(ConsentAction.AcceptPrivacyPolicy) },
-                    )
+            when (state.step) {
+                ConsentStep.PRIVACY_POLICY -> LegalScreen(
+                    privacyToggleChecked = state.privacyToggleChecked,
+                    showStepCounter = state.showStepCounter,
+                    onToggleChanged = { onAction(ConsentAction.SetPrivacyToggle(it)) },
+                    onAccept = { onAction(ConsentAction.AcceptPrivacyPolicy) },
+                )
 
-                    ConsentStep.TRACKING -> TrackRequestScreen(
-                        isTrackingEnabled = state.isTrackingEnabled,
-                        showStepCounter = state.showStepCounter,
-                        onAllow = { onAction(ConsentAction.AllowTracking) },
-                        onDecline = { onAction(ConsentAction.DeclineTracking) },
-                    )
-                }
+                ConsentStep.TRACKING -> TrackRequestScreen(
+                    isTrackingEnabled = state.isTrackingEnabled,
+                    showStepCounter = state.showStepCounter,
+                    onAllow = { onAction(ConsentAction.AllowTracking) },
+                    onDecline = { onAction(ConsentAction.DeclineTracking) },
+                )
             }
         }
     }
