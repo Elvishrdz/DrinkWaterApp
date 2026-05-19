@@ -337,7 +337,7 @@
 
     <!-- Drink — Sección de registros -->
     <string name="drink_log_see_all">VER TODO</string>
-    <string name="drink_log_empty_state">Aún no registraste bebidas. Toca Agregar agua para empezar.</string>
+    <string name="drink_log_empty_state">Registra una bebida para mostrarla aquí.</string>
     <string name="drink_log_entry_amount">%1$s mL</string>
 
     <!-- Drink — Hoja inferior para agregar bebida -->
