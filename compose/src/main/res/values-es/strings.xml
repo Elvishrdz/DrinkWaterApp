@@ -346,6 +346,7 @@
 
     <!-- Drink — Tarjetas de alarma -->
     <string name="drink_alarm_reminders_title">Recordatorios</string>
+    <string name="drink_alarm_reminders_title_approx">Recordatorios aproximados</string>
     <string name="drink_alarm_no_permission_body">Actívalas para recibir tus recordatorios de hidratación a tiempo.</string>
     <string name="drink_alarm_not_configured_title">Sin horario de alarma</string>
     <string name="drink_alarm_not_configured_body">Configura tu ventana activa en Ajustes para recibir recordatorios.</string>
@@ -353,7 +354,9 @@
     <string name="drink_alarm_status_resting">En descanso</string>
     <string name="drink_alarm_summary_drinks">Bebidas</string>
     <string name="drink_alarm_summary_every">Cada</string>
+    <string name="drink_alarm_summary_every_approx">Aprox. cada</string>
     <string name="drink_alarm_summary_next">Próxima</string>
+    <string name="drink_alarm_summary_next_approx">Próxima aprox.</string>
     <string name="drink_alarm_summary_starts">Inicia</string>
 
     <!-- Drink — Eliminar preset -->

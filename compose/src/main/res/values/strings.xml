@@ -346,6 +346,7 @@
 
     <!-- Drink — Alarm cards -->
     <string name="drink_alarm_reminders_title">Reminders</string>
+    <string name="drink_alarm_reminders_title_approx">Approximate reminders</string>
     <string name="drink_alarm_no_permission_body">Enable them to receive your drink reminders on time.</string>
     <string name="drink_alarm_not_configured_title">No alarm schedule</string>
     <string name="drink_alarm_not_configured_body">Configure your active hours in Settings to get reminders.</string>
@@ -353,7 +354,9 @@
     <string name="drink_alarm_status_resting">Resting</string>
     <string name="drink_alarm_summary_drinks">Drinks</string>
     <string name="drink_alarm_summary_every">Every</string>
+    <string name="drink_alarm_summary_every_approx">Approx. every</string>
     <string name="drink_alarm_summary_next">Next</string>
+    <string name="drink_alarm_summary_next_approx">Next approx.</string>
     <string name="drink_alarm_summary_starts">Starts</string>
 
     <!-- Drink — Delete preset -->

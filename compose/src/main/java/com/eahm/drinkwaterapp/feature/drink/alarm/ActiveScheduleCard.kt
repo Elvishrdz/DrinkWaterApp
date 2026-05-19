@@ -56,7 +56,10 @@ internal fun ActiveScheduleCard(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = stringResource(R.string.drink_alarm_reminders_title),
+                text = stringResource(
+                    if (state.isInexact) R.string.drink_alarm_reminders_title_approx
+                    else R.string.drink_alarm_reminders_title
+                ),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
@@ -81,6 +84,7 @@ internal fun ActiveScheduleCard(
             interval = state.interval,
             nextAlarmSlot = state.nextAlarmSlot,
             isInActiveHours = state.isInActiveHours,
+            isInexact = state.isInexact,
             is24Hour = is24Hour,
         )
     }

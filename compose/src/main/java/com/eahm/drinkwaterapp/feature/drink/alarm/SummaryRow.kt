@@ -18,6 +18,7 @@ internal fun SummaryRow(
     interval: AlarmInterval,
     nextAlarmSlot: LocalDateTime?,
     isInActiveHours: Boolean,
+    isInexact: Boolean = false,
     is24Hour: Boolean = true,
 ) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -35,16 +36,20 @@ internal fun SummaryRow(
                 if (m > 0 || h == 0) append("${m}m")
             }.trim()
             SummaryChip(
-                label = stringResource(R.string.drink_alarm_summary_every),
+                label = stringResource(
+                    if (isInexact) R.string.drink_alarm_summary_every_approx
+                    else R.string.drink_alarm_summary_every
+                ),
                 value = intervalLabel
             )
         }
 
         nextAlarmSlot?.let { next ->
-            val label =
-                if (isInActiveHours) stringResource(R.string.drink_alarm_summary_next) else stringResource(
-                    R.string.drink_alarm_summary_starts
-                )
+            val label = when {
+                !isInActiveHours -> stringResource(R.string.drink_alarm_summary_starts)
+                isInexact -> stringResource(R.string.drink_alarm_summary_next_approx)
+                else -> stringResource(R.string.drink_alarm_summary_next)
+            }
             SummaryChip(
                 label = label,
                 value = next.formatTime(is24Hour),

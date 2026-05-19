@@ -51,13 +51,9 @@ internal class HomeAlarmViewModel(
         val endTime = endTimePref.toLocalDateTime()
         val alarmInterval = AlarmInterval(intervalPref.hour, intervalPref.minute)
 
-        val isAlarmActive =
-            AlarmSchedulerV3.isExactAlarmActive(application, DrinkAlarmManagerV2.EXACT_ALARM_ID) ||
-                    AlarmSchedulerV3.isInexactAlarmActive(
-                        application,
-                        DrinkAlarmManagerV2.INEXACT_ALARM_ID
-                    )
-        if (!isAlarmActive) return@combine HomeAlarmState.NotConfigured
+        val isExactActive = AlarmSchedulerV3.isExactAlarmActive(application, DrinkAlarmManagerV2.EXACT_ALARM_ID)
+        val isInexactActive = AlarmSchedulerV3.isInexactAlarmActive(application, DrinkAlarmManagerV2.INEXACT_ALARM_ID)
+        if (!isExactActive && !isInexactActive) return@combine HomeAlarmState.NotConfigured
 
         val goalMl = database.getDailyGoalDao()
             .getGoalForDate(now.date.toEpochDays())
@@ -76,6 +72,7 @@ internal class HomeAlarmViewModel(
             nextAlarmSlot = nextAlarmSlot,
             isInActiveHours = computeIsInActiveHours(now, startTime, endTime),
             now = now,
+            isInexact = isInexactActive && !isExactActive,
         )
     }.combine(prefsStorage.getTimeFormatPreference()) { alarmState, timeFormat ->
         if (alarmState is HomeAlarmState.Active) alarmState.copy(timeFormatPreference = timeFormat)
