@@ -287,9 +287,6 @@
     <string name="settings_overlay_allow_instructions">Para mostrar la celebración cuando alcanzas tu meta, necesitamos permiso para mostrar sobre otras apps.\n\n1. Encuentra la app en la lista al continuar a los ajustes.\n2. Finaliza activando \"Permitir mostrar sobre otras apps\".\n\nLuego presiona atrás y regresa a la app.</string>
     <string name="settings_overlay_disable_instructions">Para desactivar la celebración al alcanzar la meta, debes retirar el permiso manualmente.\n\n1. Encuentra la app en la lista al continuar a los ajustes.\n2. Desactiva \"Permitir mostrar sobre otras apps\".\n\nPresiona atrás y regresa a la app.</string>
 
-    <!-- Ajustes — Sheet de meta -->
-    <string name="settings_goal_range">Mín %1$d mL · Máx %2$d mL</string>
-
     <!-- Ajustes — Sheet de intervalo -->
     <string name="settings_interval_sheet_title">Intervalo de recordatorio</string>
     <string name="settings_interval_window_hint">Ventana activa: %1$s · Máx: %2$dm</string>

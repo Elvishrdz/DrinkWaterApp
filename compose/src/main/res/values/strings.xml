@@ -309,9 +309,6 @@
     <string name="settings_restore_success_body">Your ad-free purchase has been restored.\nEnjoy DrinkWater without any ads!</string>
     <string name="settings_restore_success_cta">Got it!</string>
 
-    <!-- Settings — Goal sheet -->
-    <string name="settings_goal_range">Min %1$d mL · Max %2$d mL</string>
-
     <!-- Settings — Interval sheet -->
     <string name="settings_interval_sheet_title">Reminder interval</string>
     <string name="settings_interval_window_hint">Active window: %1$s · Max: %2$dm</string>

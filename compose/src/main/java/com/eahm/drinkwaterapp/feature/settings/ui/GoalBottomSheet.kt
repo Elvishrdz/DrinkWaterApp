@@ -36,7 +36,6 @@ import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
@@ -48,7 +47,7 @@ import kotlinx.coroutines.launch
 
 internal const val GOAL_STEP = 100f
 internal const val GOAL_MIN = 100f
-internal const val GOAL_MAX = 5_000f
+internal const val GOAL_MAX = 100_000f
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -161,14 +160,6 @@ internal fun GoalStepperRow(
         }
 
         Spacer(Modifier.height(8.dp))
-
-        Text(
-            text = stringResource(R.string.settings_goal_range, GOAL_MIN.toInt(), GOAL_MAX.toInt()),
-            fontFamily = PlusJakartaSans,
-            fontWeight = FontWeight.Normal,
-            fontSize = 12.sp,
-            color = DwInk500,
-        )
     }
 }
 
