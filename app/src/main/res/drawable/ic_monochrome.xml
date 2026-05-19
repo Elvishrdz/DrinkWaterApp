@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Monochrome adaptive-icon layer for themed icons (Android 13+).
+    A filled water drop with a small wave highlight inside, rendered
+    as a single-color vector so the system can tint it correctly.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Drop body — filled silhouette centered in the 108×108 safe zone -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="
+            M54,18
+            C54,18 28,50 28,66
+            A26,26 0 0 0 80,66
+            C80,50 54,18 54,18
+            Z" />
+
+    <!-- Small highlight wave inside the drop (cut-out style via even-odd or overlay) -->
+    <path
+        android:fillColor="#000000"
+        android:fillAlpha="0.35"
+        android:pathData="
+            M44,68
+            Q49,62 54,68
+            Q59,74 64,68" />
+</vector>
