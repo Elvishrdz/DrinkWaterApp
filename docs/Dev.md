@@ -10,7 +10,7 @@ Fixes
 [x] settings: traducir texto de compartir con amigos
 [x] settings: poner url correcta para calificar la app
 [x] settings: traducir texto para solicitar funcion
-[] settings: traducir texto para reportar problema
+[x] settings: traducir texto para reportar problema
 [] consent: traducir textos de pantalas
 [] consent: agregar privacy policy final de release
 [] consent: agregar url a privacy policy

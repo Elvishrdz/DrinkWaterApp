@@ -97,6 +97,7 @@ import com.eahm.drinkwaterapp.core.presentation.composable.BuildInfoFooter
 import com.eahm.drinkwaterapp.feature.settings.extension.openPlayStoreUrl
 import com.eahm.drinkwaterapp.feature.settings.extension.startAppShareIntent
 import com.eahm.drinkwaterapp.feature.settings.extension.startFeatureRequestIntent
+import com.eahm.drinkwaterapp.feature.settings.extension.startReportProblemIntent
 import com.eahm.drinkwaterapp.feature.settings.ui.EditButton
 import com.eahm.drinkwaterapp.feature.settings.ui.GoalBottomSheet
 import com.eahm.drinkwaterapp.feature.settings.ui.IntervalBottomSheet
@@ -207,14 +208,6 @@ internal fun SettingsScreen(
         showExactAlarmInstructionsDialog = true
     }
 
-    fun handleReportProblem() {
-        val intent = Intent(Intent.ACTION_SENDTO).apply {
-            data =
-                "mailto:drink@gmail.com?subject=Problem%20report%20for%20DrinkWater%20App&body=Hi%20developers%20at%20DrinkWaterApp%20I%20would%20like%20to%20report%20the%20following%20problem%3A%0A%0A".toUri()
-        }
-        context.startActivity(intent)
-    }
-
     SettingsContent(
         state = state,
         onNotificationsToggled = ::handleNotificationToggle,
@@ -228,7 +221,7 @@ internal fun SettingsScreen(
         onShareTap = context::startAppShareIntent,
         onRateTap = context::openPlayStoreUrl,
         onRequestFeatureTap = context::startFeatureRequestIntent,
-        onReportProblemTap = ::handleReportProblem,
+        onReportProblemTap = context::startReportProblemIntent,
         onGoalCelebrationsToggled = { handleDrawOverlayToggle() },
         onExactAlarmTap = ::handleExactAlarmTap,
         onClearDataTap = { showClearDataDialog = true },

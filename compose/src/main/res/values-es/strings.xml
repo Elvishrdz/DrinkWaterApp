@@ -224,6 +224,10 @@
     <string name="feature_request_subject">Solicitud de nueva función para %1$s</string>
     <string name="feature_request_body">Hola desarrolladores de %1$s.\nMe gustaría solicitar la siguiente función para una futura nueva version de la app:\n\n</string>
 
+    <!-- Ajustes — Reportar problema -->
+    <string name="problem_report_subject">Reporte de problema en %1$s</string>
+    <string name="problem_report_body">Hola desarroladores de %1$s.\nQuiero reportar el siguiente problema en la app:\n\n</string>
+
     <!-- Ajustes — Diálogo de restablecer datos -->
     <string name="settings_clear_data_body">Esto eliminará permanentemente todo tu historial de bebidas, metas diarias y ajustes. La app se reiniciará después.\n\nEsta acción no se puede deshacer.</string>
     <string name="settings_clear_data_cta_countdown">ELIMINAR TODOS LOS DATOS (%1$d)</string>
