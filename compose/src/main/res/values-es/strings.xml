@@ -239,7 +239,7 @@
     <string name="settings_unit_auto_liters">Litros automático (mL / L)</string>
     <string name="settings_unit_auto_liters_desc">Muestra mL debajo de 1 000, L encima</string>
     <string name="settings_unit_fl_oz">Onzas fluidas (fl oz)</string>
-    <string name="settings_unit_fl_oz_desc">Onzas fluidas de EE. UU.</string>
+    <string name="settings_unit_fl_oz_desc">Onzas fluidas</string>
     <string name="settings_row_goal_celebrations">Celebraciones al alcanzar la meta</string>
     <string name="settings_row_reminder_type">Tipo de recordatorio</string>
     <string name="settings_row_reminder_status">Exacta</string>
