@@ -556,6 +556,23 @@
     <string name="notif_big_h20_b">Tómatelo con calma esta noche. Un vaso suave de agua es todo lo que tu cuerpo necesita para descansar.</string>
     <string name="notif_big_h22_b">Pronto a dormir. Un pequeño vaso de agua ayuda a tu cuerpo a mantenerse equilibrado durante la noche. ¡Buenas noches!</string>
 
+    <!-- Goal Overlay — Ocean style (3 variantes aleatorias de texto, usadas para todas las celebraciones ocean) -->
+    <string name="goal_overlay_ocean_eyebrow">Meta diaria</string>
+    <string name="goal_overlay_ocean_v1_headline">¡Lo lograste!\nHoy pertenece a tu yo del futuro.</string>
+    <string name="goal_overlay_ocean_v1_sub">Cada vaso sumó, y con él la concentración, la energía, la calma.</string>
+    <string name="goal_overlay_ocean_v1_cta">¡Salud por eso!</string>
+    <string name="goal_overlay_ocean_v2_headline">¡Hidratación completa!\nBuen trabajo hoy.</string>
+    <string name="goal_overlay_ocean_v2_sub">Te cuidaste — un vaso a la vez. Así se forman los hábitos.</string>
+    <string name="goal_overlay_ocean_v2_cta">¡Sigue así!</string>
+    <string name="goal_overlay_ocean_v3_headline">¡Meta alcanzada!\nTu cuerpo te lo agradece.</string>
+    <string name="goal_overlay_ocean_v3_sub">La hidratación es la base de cada gran día. Tú la construiste.</string>
+    <string name="goal_overlay_ocean_v3_cta">Genial</string>
+    <!-- Goal Overlay — Etiquetas de estadísticas -->
+    <string name="goal_overlay_stat_reached">Alcanzado</string>
+    <string name="goal_overlay_stat_glasses">Vasos</string>
+    <string name="goal_overlay_stat_streak">Racha</string>
+    <string name="goal_overlay_share_progress">Compartir progreso</string>
+
     <!-- Validation errors -->
     <string name="validation_error_empty">El campo no puede estar vacío</string>
     <string name="validation_error_invalid_number">Ingresa un número válido</string>

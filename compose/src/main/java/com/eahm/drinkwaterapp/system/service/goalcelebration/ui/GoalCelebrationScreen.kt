@@ -38,6 +38,7 @@ import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.system.service.goalcelebration.data.CelebrationStyle
 import com.eahm.drinkwaterapp.system.service.goalcelebration.data.CelebrationVariant
 import com.eahm.drinkwaterapp.system.service.goalcelebration.data.getStyle
+import com.eahm.drinkwaterapp.system.service.goalcelebration.data.rememberLocalizedOceanVariant
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
@@ -79,6 +80,9 @@ fun GoalCelebrationScreen(
     onClose: () -> Unit,
     onShare: (Bitmap) -> Unit,
 ) {
+    // For ocean style use a localized, randomly-selected text variant.
+    val resolvedVariant = if (variant.id == "ocean") rememberLocalizedOceanVariant() else variant
+
     var visible by remember { mutableStateOf(false) }
     var dragEnabled by remember { mutableStateOf(false) }
     var dragOffset by remember { mutableStateOf(Offset.Zero) }
@@ -166,7 +170,7 @@ fun GoalCelebrationScreen(
                 .align(Alignment.Center),
         ) {
             GoalCelebrationCard(
-                variant = variant,
+                variant = resolvedVariant,
                 goalMl = goalMl,
                 drinkCount = drinkCount,
                 streakDays = streakDays,

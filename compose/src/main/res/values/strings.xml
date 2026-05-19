@@ -556,6 +556,23 @@
     <string name="notif_big_h20_b">Take it easy tonight. A gentle glass of water is all your body needs to wind down.</string>
     <string name="notif_big_h22_b">Bedtime soon. A small glass of water helps your body stay balanced through the night. Sleep well!</string>
 
+    <!-- Goal Overlay — Ocean style (3 randomized text variants, used for all ocean celebrations) -->
+    <string name="goal_overlay_ocean_eyebrow">Daily Goal</string>
+    <string name="goal_overlay_ocean_v1_headline">You did it!\nToday belongs to your future self.</string>
+    <string name="goal_overlay_ocean_v1_sub">Every glass added up, and so did the focus, the energy, the calm.</string>
+    <string name="goal_overlay_ocean_v1_cta">Cheers to that</string>
+    <string name="goal_overlay_ocean_v2_headline">Hydration complete!\nWell done today.</string>
+    <string name="goal_overlay_ocean_v2_sub">You took care of yourself — one glass at a time. That\'s what habits are made of.</string>
+    <string name="goal_overlay_ocean_v2_cta">Keep it up</string>
+    <string name="goal_overlay_ocean_v3_headline">Goal reached!\nYour body thanks you.</string>
+    <string name="goal_overlay_ocean_v3_sub">Hydration is the foundation of every great day. You built yours.</string>
+    <string name="goal_overlay_ocean_v3_cta">Awesome</string>
+    <!-- Goal Overlay — Stat cell labels -->
+    <string name="goal_overlay_stat_reached">Reached</string>
+    <string name="goal_overlay_stat_glasses">Glasses</string>
+    <string name="goal_overlay_stat_streak">Streak</string>
+    <string name="goal_overlay_share_progress">Share progress</string>
+
     <!-- Validation errors -->
     <string name="validation_error_empty">Field cannot be empty</string>
     <string name="validation_error_invalid_number">Provide a valid number</string>

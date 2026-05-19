@@ -57,6 +57,7 @@ import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -314,20 +315,20 @@ fun GoalCelebrationCard(
                         StatCell(
                             value = goalMl.formatVolume(unitPreference),
                             unit = "",
-                            label = "Reached",
+                            label = stringResource(R.string.goal_overlay_stat_reached),
                             modifier = Modifier.weight(1f),
                         )
                         StatCell(
                             value = "$drinkCount",
                             unit = "",
-                            label = "Glasses",
+                            label = stringResource(R.string.goal_overlay_stat_glasses),
                             modifier = Modifier.weight(1f),
                         )
                         if (showStreakDays) {
                             StatCell(
                                 value = "$streakDays",
                                 unit = "d",
-                                label = "Streak",
+                                label = stringResource(R.string.goal_overlay_stat_streak),
                                 modifier = Modifier.weight(1f),
                             )
                         }
@@ -357,7 +358,7 @@ fun GoalCelebrationCard(
                         }
                     }) {
                         Text(
-                            text = "Share progress",
+                            text = stringResource(R.string.goal_overlay_share_progress),
                             color = DwInk500,
                             fontSize = 14.sp,
                         )

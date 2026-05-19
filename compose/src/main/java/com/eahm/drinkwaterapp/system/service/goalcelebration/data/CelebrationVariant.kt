@@ -1,9 +1,12 @@
 package com.eahm.drinkwaterapp.system.service.goalcelebration.data
 
 import androidx.annotation.DrawableRes
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import com.eahm.drinkwaterapp.R
 
 enum class DecorKind { BUBBLES, CONFETTI, SPARKLES, DRIPS, RAYS, RINGS }
@@ -159,4 +162,41 @@ fun getStyle(value: CelebrationStyle?): CelebrationVariant {
         CelebrationStyle.Carnival -> carnivalStyle
         null -> CELEBRATIONS.random()
     }
+}
+
+/**
+ * Returns a [CelebrationVariant] based on [oceanStyle] with localized texts
+ * randomly selected from 3 variants. The selection is stable for the lifetime
+ * of the composition (not reselected on recomposition).
+ *
+ * Only for Ocean style — as requested by task 7.
+ */
+@Composable
+fun rememberLocalizedOceanVariant(): CelebrationVariant {
+    val variantIndex = remember { (0..2).random() }
+
+    val eyebrow = stringResource(R.string.goal_overlay_ocean_eyebrow)
+
+    val v1Headline = stringResource(R.string.goal_overlay_ocean_v1_headline)
+    val v1Sub = stringResource(R.string.goal_overlay_ocean_v1_sub)
+    val v1Cta = stringResource(R.string.goal_overlay_ocean_v1_cta)
+
+    val v2Headline = stringResource(R.string.goal_overlay_ocean_v2_headline)
+    val v2Sub = stringResource(R.string.goal_overlay_ocean_v2_sub)
+    val v2Cta = stringResource(R.string.goal_overlay_ocean_v2_cta)
+
+    val v3Headline = stringResource(R.string.goal_overlay_ocean_v3_headline)
+    val v3Sub = stringResource(R.string.goal_overlay_ocean_v3_sub)
+    val v3Cta = stringResource(R.string.goal_overlay_ocean_v3_cta)
+
+    val headlines = listOf(v1Headline, v2Headline, v3Headline)
+    val subs = listOf(v1Sub, v2Sub, v3Sub)
+    val ctas = listOf(v1Cta, v2Cta, v3Cta)
+
+    return oceanStyle.copy(
+        eyebrow = "•••••• $eyebrow ••••••",
+        headline = headlines[variantIndex],
+        sub = subs[variantIndex],
+        cta = ctas[variantIndex],
+    )
 }
