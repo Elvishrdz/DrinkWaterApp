@@ -352,7 +352,7 @@
     <string name="stats_chart_prev_period_desc">Período anterior</string>
     <string name="stats_chart_next_period_desc">Período siguiente</string>
     <string name="stats_chart_goal_met">Meta alcanzada</string>
-    <string name="stats_chart_below_goal">Por debajo de la meta</string>
+    <string name="stats_chart_below_goal">Cantidad alcanzada</string>
     <string name="stats_chart_tooltip_amount">%1$d mL</string>
     <string name="stats_chart_tooltip_goal">/ %1$d mL</string>
 

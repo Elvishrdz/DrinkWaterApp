@@ -355,7 +355,7 @@
     <string name="stats_chart_prev_period_desc">Previous period</string>
     <string name="stats_chart_next_period_desc">Next period</string>
     <string name="stats_chart_goal_met">Goal met</string>
-    <string name="stats_chart_below_goal">Below goal</string>
+    <string name="stats_chart_below_goal">Reached amount</string>
     <string name="stats_chart_tooltip_amount">%1$d mL</string>
     <string name="stats_chart_tooltip_goal">/ %1$d mL</string>
 

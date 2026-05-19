@@ -1,7 +1,7 @@
 Development
 
 Fixes
-[] stat graph, por debajo de la meta, cambiar a : cantidad alcanzada
+[x] stat graph, por debajo de la meta, cambiar a : cantidad alcanzada
 [] grafico: calcular bien el porcentaje.
 [] grafico: no mostrar primera semana antes del primer record de daily goal registrado.
 [] goal overlay: numero de vasos no esta bien
