@@ -412,4 +412,115 @@
         <item quantity="other">%1$d bebidas · %2$d%% de la meta</item>
     </plurals>
 
+    <!-- Notificaciones — Mensajes de texto de recordatorios programados -->
+    <!-- Mensajes de inicio de día (a la hora de inicio configurada) -->
+    <string name="notif_msg_start_1">Listos para empezar un vaso a la vez</string>
+    <string name="notif_msg_start_2">Un nuevo periodo empieza ahora</string>
+    <string name="notif_msg_start_3">Empecemos con un refrescante vaso de agua</string>
+
+    <!-- Mensajes de fin de día (a la hora de fin configurada) -->
+    <string name="notif_msg_end_1">Este es el último recordatorio</string>
+    <string name="notif_msg_end_2">Terminemos con un vaso de agua más</string>
+    <string name="notif_msg_end_3">Periodo completado, abre la app para ver cómo van tus registros</string>
+
+    <!-- Mensajes por rango horario — variante A (tono funcional/motivacional) -->
+    <string name="notif_msg_h0_a">Incluso de noche, tu cuerpo necesita agua</string>
+    <string name="notif_msg_h4_a">Empieza tu mañana con un vaso de agua</string>
+    <string name="notif_msg_h6_a">Un vaso de agua activa tu metabolismo</string>
+    <string name="notif_msg_h8_a">Hidratate antes de que el día se ponga intenso</string>
+    <string name="notif_msg_h9_a">Sigue bebiendo para mantenerte enfocado</string>
+    <string name="notif_msg_h10_a">No dejes pasar la mañana sin hidratarte</string>
+    <string name="notif_msg_h12_a">Acompaña tu almuerzo con un vaso de agua</string>
+    <string name="notif_msg_h13_a">Mantente enfocado en la tarde con agua</string>
+    <string name="notif_msg_h15_a">Un vaso de agua puede darte energía ahora mismo</string>
+    <string name="notif_msg_h16_a">¿Terminando? Bebe agua antes de salir</string>
+    <string name="notif_msg_h18_a">Relájate y rehidratate después de un día ocupado</string>
+    <string name="notif_msg_h20_a">Un vaso más ayuda a tu cuerpo a descansar</string>
+    <string name="notif_msg_h22_a">Un vasito antes de dormir te mantiene fresco durante la noche</string>
+
+    <!-- Mensajes por rango horario — variante B (tono casual/conversacional) -->
+    <string name="notif_msg_h0_b">¿Sed a estas horas? Vamos por un sip</string>
+    <string name="notif_msg_h4_b">A estas horas tempranas, un poco de agua puede ser refrescante</string>
+    <string name="notif_msg_h6_b">¿El cafecito o un vaso de agua? Difícil decisión</string>
+    <string name="notif_msg_h8_b">Hidratarse a horas tempranas puede ayudarte en tu inicio del día</string>
+    <string name="notif_msg_h9_b">Recuerda mantenerte hidratado</string>
+    <string name="notif_msg_h10_b">¿Otro vaso antes del almuerzo?</string>
+    <string name="notif_msg_h12_b">¡A mitad del día vamos por más registros!</string>
+    <string name="notif_msg_h13_b">A estas horas de la tarde recuerda mantenerte hidratado</string>
+    <string name="notif_msg_h15_b">¿Qué tal otro vaso de agua antes que termine la tarde?</string>
+    <string name="notif_msg_h16_b">No se trata de alcanzar una meta, se trata de recordar tomar agua</string>
+    <string name="notif_msg_h18_b">Hora de relajarse y de ir por otro vaso</string>
+    <string name="notif_msg_h20_b">En la noche toma agua de forma moderada</string>
+    <string name="notif_msg_h22_b">¿Ya cenaste? Un vaso de agua ayuda a tu digestión</string>
+
+    <!-- Notificaciones — Mensajes de título -->
+    <!-- Inicio / Fin del día -->
+    <string name="notif_title_start_a">¡Buenos días! Empecemos hidratados.</string>
+    <string name="notif_title_start_b">¡Hola! ¿Listo para empezar con agua?</string>
+    <string name="notif_title_end_a">¡Gran trabajo hoy! Mira tu progreso.</string>
+    <string name="notif_title_end_b">¡Eso es todo por hoy, buen trabajo!</string>
+    <!-- Variante A — motivacional / enérgico -->
+    <string name="notif_title_h0_a">¿Aún despierto? ¡Mantente hidratado!</string>
+    <string name="notif_title_h4_a">¡Madrugador! Hora de hidratarse.</string>
+    <string name="notif_title_h6_a">¡Buenos días! Empieza bien el día.</string>
+    <string name="notif_title_h8_a">¡Hora del impulso matutino!</string>
+    <string name="notif_title_h9_a">¡Control de media mañana!</string>
+    <string name="notif_title_h10_a">¡Sigue el impulso!</string>
+    <string name="notif_title_h12_a">¡Hidratación al mediodía!</string>
+    <string name="notif_title_h13_a">¡Recordatorio de la tarde!</string>
+    <string name="notif_title_h15_a">¡Vence el bajón de la tarde!</string>
+    <string name="notif_title_h16_a">¡Casi allí, sigue bebiendo!</string>
+    <string name="notif_title_h18_a">¡Control de hidratación vespertino!</string>
+    <string name="notif_title_h20_a">¿Descansando? Sigue tomando agua.</string>
+    <string name="notif_title_h22_a">¡Último sorbo del día!</string>
+    <!-- Variante B — conversacional / amigable -->
+    <string name="notif_title_h0_b">¿Noche larga? No olvides el agua.</string>
+    <string name="notif_title_h4_b">¡Madrugada activa, hidratate!</string>
+    <string name="notif_title_h6_b">¡Mañana! ¿Un vaso antes que nada?</string>
+    <string name="notif_title_h8_b">¿Cómo va tu agua esta mañana?</string>
+    <string name="notif_title_h9_b">¿A media mañana, cómo vas con el agua?</string>
+    <string name="notif_title_h10_b">¿Casi al mediodía, toma un descanso?</string>
+    <string name="notif_title_h12_b">¡Mediodía! ¿Un vaso con tu almuerzo?</string>
+    <string name="notif_title_h13_b">¿Tarde ocupada? El agua ayuda.</string>
+    <string name="notif_title_h15_b">¡Media tarde, control de agua!</string>
+    <string name="notif_title_h16_b">¡Casi termina el día, un vaso más!</string>
+    <string name="notif_title_h18_b">¿Tarde tranquila? ¿Un poco de agua?</string>
+    <string name="notif_title_h20_b">¡Hora de relajarse y tomar agua!</string>
+    <string name="notif_title_h22_b">¿Casi hora de dormir? ¡Último vaso!</string>
+
+    <!-- Notificaciones — Mensajes de texto largo -->
+    <!-- Inicio / Fin del día -->
+    <string name="notif_big_start_a">Después de una noche de sueño completa, tu cuerpo tiene pocas reservas de líquidos. Comenzar la mañana con agua rehidrata tus células, activa tu metabolismo y establece un tono saludable para el resto del día. ¡Tú puedes!</string>
+    <string name="notif_big_start_b">¿Despertando? Tu cuerpo acaba de pasar horas sin agua mientras dormías. Un vaso ahora es el logro más fácil de tu día.</string>
+    <string name="notif_big_end_a">¡Lo lograste durante todo el día! Abre la app para ver un resumen de tu hidratación. Celebra los logros y encuentra oportunidades para hacerlo aún mejor mañana.</string>
+    <string name="notif_big_end_b">¡Lo lograste al final del día! Abre la app para ver cómo te fue, cada vaso cuenta.</string>
+    <!-- Variante A — educativo / informativo -->
+    <string name="notif_big_h0_a">Aún estás despierto y tu cuerpo sigue trabajando duro. Un vaso de agua ahora ayuda a mantener tu concentración, apoya tus órganos y repone líquidos incluso durante la noche.</string>
+    <string name="notif_big_h4_a">Las madrugadas son poderosas. Después de horas de sueño, tu cuerpo está listo para refrescarse. Comenzar con un vaso de agua rehidrata tus células y establece un tono energizante para todo el día.</string>
+    <string name="notif_big_h6_a">¡Buenos días! Después de 7–8 horas de sueño, tu cuerpo se despierta naturalmente deshidratado. Beber agua primero activa tu metabolismo, estimula tus órganos y te ayuda a sentirte alerta y listo.</string>
+    <string name="notif_big_h8_a">¡Tu mañana está en marcha! Mantenerse hidratado agudiza el enfoque, mantiene la energía estable y ayuda a tu cerebro a rendir al máximo. Toma un vaso y aprovecha tu mañana.</string>
+    <string name="notif_big_h9_a">¿Sabías que incluso una deshidratación leve, del 1–2%, puede reducir notablemente la concentración y el estado de ánimo? Sigue bebiendo agua durante la mañana para mantenerte al tope.</string>
+    <string name="notif_big_h10_a">La mañana tardía es el momento perfecto para crear hábitos saludables. La hidratación regular ayuda a eliminar toxinas, apoya el sistema inmunitario y mantiene tu piel en buen estado. ¡Hora de otro vaso!</string>
+    <string name="notif_big_h12_a">¡Mediodía! El agua ayuda a la digestión y permite que tu cuerpo absorba mejor los nutrientes de tu comida. Bebe un vaso antes o durante el almuerzo para mejores resultados.</string>
+    <string name="notif_big_h13_a">La tarde temprana puede sentirse lenta. Mantenerse bien hidratado ayuda a regular la temperatura corporal y mantiene la mente alerta. ¡Bebe agua y sigue adelante!</string>
+    <string name="notif_big_h15_a">¿Te sientes un poco lento esta tarde? Puede ser deshidratación. Un vaso de agua suele ser todo lo que necesitas para refrescarte y continuar el día con energía.</string>
+    <string name="notif_big_h16_a">¡Ya casi terminas! La hidratación constante durante el día previene dolores de cabeza, mantiene la energía y cuida tus riñones. ¡No olvides tu agua, casi lo logras!</string>
+    <string name="notif_big_h18_a">La tarde es un momento ideal para reflexionar y recargar. Beber agua después de cenar ayuda a la digestión, permite que tu cuerpo se recupere del día y te prepara para un sueño reparador.</string>
+    <string name="notif_big_h20_a">Mientras te relajas para la noche, una hidratación suave ayuda a tu cuerpo a recuperarse de todo lo que hiciste hoy. Un vaso ahora está perfecto, tu cuerpo te lo agradecerá mañana.</string>
+    <string name="notif_big_h22_a">Antes de dormir, un pequeño vaso de agua ayuda a tu cuerpo a mantenerse hidratado durante la noche. Hiciste un gran trabajo hoy, descansa bien y despierta fresco.</string>
+    <!-- Variante B — casual / breve -->
+    <string name="notif_big_h0_b">¿Aún despierto? Tu cuerpo trabaja incluso cuando descansas. Un sorbo rápido mantiene todo funcionando bien.</string>
+    <string name="notif_big_h4_b">¿Despierto antes del amanecer? Empieza con agua y notarás la diferencia durante toda la mañana.</string>
+    <string name="notif_big_h6_b">¡Mañana! Tu cuerpo acaba de pasar horas sin agua. Un vaso ahora es tu logro más fácil del día.</string>
+    <string name="notif_big_h8_b">Las mañanas van mejor con agua. Solo lo decimos.</string>
+    <string name="notif_big_h9_b">Recordatorio rápido de media mañana: el agua mantiene tu mente aguda y tu energía estable.</string>
+    <string name="notif_big_h10_b">¡Casi mediodía! Un vaso de agua ahora te ayuda a llegar sintiéndote bien.</string>
+    <string name="notif_big_h12_b">El almuerzo es mejor con agua. Ayuda a digerir más rápido y mantiene el bajón de la tarde a raya.</string>
+    <string name="notif_big_h13_b">¿Bajón post-almuerzo? Podría ser deshidratación. Un vaso de agua suele resolver el problema.</string>
+    <string name="notif_big_h15_b">¿Bajón de tarde? Bebe agua antes de buscar algo para picar, quizás solo necesitas hidratación.</string>
+    <string name="notif_big_h16_b">¿En el tramo final? El agua mantiene tu energía y concentración hasta el final.</string>
+    <string name="notif_big_h18_b">El día se acaba. Un vaso de agua ahora ayuda a tu cuerpo a recuperarse y te prepara para una buena noche.</string>
+    <string name="notif_big_h20_b">Tómatelo con calma esta noche. Un vaso suave de agua es todo lo que tu cuerpo necesita para descansar.</string>
+    <string name="notif_big_h22_b">Pronto a dormir. Un pequeño vaso de agua ayuda a tu cuerpo a mantenerse equilibrado durante la noche. ¡Buenas noches!</string>
+
 </resources>
