@@ -223,6 +223,10 @@
     <!-- Settings — Share -->
     <string name="settings_share_text">Stay hydrated! I use %1$s to track my daily water intake. Check it out!\n%2$s</string>
 
+    <!-- Settings — Feature request -->
+    <string name="feature_request_subject">New feature request for %1$s</string>
+    <string name="feature_request_body">Hi developers of %1$s.\nI would like to request the following feature for a future app release:\n\n</string>
+
     <!-- Settings — Reset data dialog -->
     <string name="settings_clear_data_body">This will permanently delete all your drink history, daily goals, and settings. The app will restart afterwards.\n\nThis action cannot be undone.</string>
     <string name="settings_clear_data_cta_countdown">DELETE ALL DATA (%1$d)</string>
