@@ -119,7 +119,7 @@ android {
             buildConfigField("boolean", "IS_STAGING", "false")
             buildConfigField("boolean", "IS_QA", "false")
             buildConfigField("boolean", "LOGS_ENABLED", "false")
-            buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "false")
+            buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "true")
             buildConfigField("boolean", "FEATURE_STREAKS", "false")
 
             buildConfigField("String", "REVENUECAT_API_KEY", "\"$revenuecatApiKeyProd\"")
