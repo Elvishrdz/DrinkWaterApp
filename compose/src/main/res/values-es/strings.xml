@@ -380,10 +380,6 @@
     <string name="stats_summary_consistent_week">¡Excelente! Igualaste tus registros de la semana pasada. ¡Sigue así!</string>
     <string name="stats_summary_consistent_month">¡Excelente! Igualaste tus registros del mes pasado. ¡Sigue así!</string>
     <string name="stats_summary_consistent_year">¡Excelente! Igualaste tus registros del año pasado. ¡Sigue así!</string>
-    <string name="stats_summary_first_week">Mi primera semana</string>
-    <string name="stats_summary_first_month">Mi primer mes</string>
-    <string name="stats_summary_first_year">Mi primer año</string>
-
     <!-- Estadísticas — Gráfico de barras -->
     <string name="stats_chart_no_data">Sin datos para este período</string>
     <string name="stats_chart_daily_intake">Ingesta diaria</string>

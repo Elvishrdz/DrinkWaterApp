@@ -76,16 +76,15 @@ fun SummaryCard(
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        if (overrideLabel != null) {
-            Text(
+        when {
+            overrideLabel != null && overrideLabel.isNotEmpty() -> Text(
                 text = overrideLabel,
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Medium,
                 fontSize = 12.sp,
                 color = TrendUpColor
             )
-        } else {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            overrideLabel == null -> Row(verticalAlignment = Alignment.CenterVertically) {
                 val arrow = if (isTrendPositive) "▲" else "▼"
                 val trendColor = if (isTrendPositive) TrendUpColor else TrendDownColor
                 val vsLabel = stringResource(R.string.stats_summary_vs_previous)
@@ -97,6 +96,7 @@ fun SummaryCard(
                     color = trendColor
                 )
             }
+            // overrideLabel == "" → first period, show nothing
         }
     }
 }

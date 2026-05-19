@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -189,108 +190,119 @@ internal class StatsViewModel(
         StatsPeriod.YEAR -> loadYearPages()
     }
 
-    /** 8 pages, oldest first. Each page = Mon–Sun of a calendar week. */
+    /** Pages from the first goal's week to today, oldest first. Each page = Mon–Sun. */
     private fun loadWeekPages(): Flow<List<PeriodPage>> {
         val daysFromMonday = today.dayOfWeek.ordinal  // MONDAY=0 … SUNDAY=6
         val thisMonday = today.minus(daysFromMonday, DateTimeUnit.DAY)
-        val rangeStart = thisMonday.minus((NUM_WEEKS - 1) * 7, DateTimeUnit.DAY)
 
-        return combine(
-            historyDao.findByTimestamp(rangeStart.atStartOfDay(), today.atEndOfDay()),
-            goalDao.getAllGoals(),
-        ) { records, allGoals ->
-            val dailyTotals = records.toDailyTotals()
-            // The earliest day the user ever set a goal — used to detect pre-app pages.
+        return goalDao.getAllGoals().flatMapLatest { allGoals ->
+            // Start from the Monday of the week that contains the first daily-goal entry.
             val firstGoalDate = allGoals.minByOrNull { it.effectiveDate }?.effectiveDate
-            (0 until NUM_WEEKS).map { weekIndex ->
-                val monday = thisMonday.minus(weekIndex * 7, DateTimeUnit.DAY)
-                val sunday = monday.plus(6, DateTimeUnit.DAY)
-                // A page is "before first record" when the entire week ends before the
-                // user's first daily-goal entry (i.e. the user hadn't installed the app yet).
-                val isBeforeFirstRecord = firstGoalDate != null && sunday < firstGoalDate
-                PeriodPage(
-                    rangeLabel = buildWeekRangeLabel(monday, sunday),
-                    entries = (0..6).map { dayOffset ->
-                        val date = monday.plus(dayOffset, DateTimeUnit.DAY)
-                        DayEntry(
-                            shortLabel = DAY_SHORT_LABELS[dayOffset],
-                            amountMl = (dailyTotals[date] ?: 0f).toInt(),
-                            isToday = date == today,
-                            goalMl = allGoals.effectiveGoalForDate(date),
+            val firstMonday = if (firstGoalDate != null) {
+                firstGoalDate.minus(firstGoalDate.dayOfWeek.ordinal, DateTimeUnit.DAY)
+            } else thisMonday
+
+            historyDao.findByTimestamp(firstMonday.atStartOfDay(), today.atEndOfDay())
+                .map { records ->
+                    val dailyTotals = records.toDailyTotals()
+                    // Collect all Mondays from thisMonday back to firstMonday.
+                    val weeks = mutableListOf<LocalDate>()
+                    var monday = thisMonday
+                    while (monday >= firstMonday) {
+                        weeks.add(monday)
+                        monday = monday.minus(7, DateTimeUnit.DAY)
+                    }
+                    weeks.map { mon ->
+                        val sunday = mon.plus(6, DateTimeUnit.DAY)
+                        PeriodPage(
+                            rangeLabel = buildWeekRangeLabel(mon, sunday),
+                            entries = (0..6).map { dayOffset ->
+                                val date = mon.plus(dayOffset, DateTimeUnit.DAY)
+                                DayEntry(
+                                    shortLabel = DAY_SHORT_LABELS[dayOffset],
+                                    amountMl = (dailyTotals[date] ?: 0f).toInt(),
+                                    isToday = date == today,
+                                    goalMl = allGoals.effectiveGoalForDate(date),
+                                )
+                            },
                         )
-                    },
-                    isBeforeFirstRecord = isBeforeFirstRecord,
-                )
-            }.reversed() // pages[0] = oldest, pages[N] = most recent
+                    }.reversed() // pages[0] = oldest week, pages[N] = current week
+                }
         }
     }
 
-    /** 6 pages, oldest first. Each page = all days of a calendar month. */
+    /** Pages from the first goal's month to today, oldest first. Each page = all days of a month. */
     private fun loadMonthPages(): Flow<List<PeriodPage>> {
-        val monthStarts = (0 until NUM_MONTHS).map { offset ->
-            var year = today.year
-            var month = today.monthNumber - offset
-            while (month <= 0) {
-                month += 12; year--
-            }
-            LocalDate(year, month, 1)
-        }
-        val rangeStart = monthStarts.last()
+        return goalDao.getAllGoals().flatMapLatest { allGoals ->
+            val firstGoalDate = allGoals.minByOrNull { it.effectiveDate }?.effectiveDate
+            val firstMonthStart = if (firstGoalDate != null) {
+                LocalDate(firstGoalDate.year, firstGoalDate.monthNumber, 1)
+            } else LocalDate(today.year, today.monthNumber, 1)
 
-        return combine(
-            historyDao.findByTimestamp(rangeStart.atStartOfDay(), today.atEndOfDay()),
-            goalDao.getAllGoals(),
-        ) { records, allGoals ->
-            val dailyTotals = records.toDailyTotals()
-            monthStarts.map { monthStart ->
-                val year = monthStart.year
-                val month = monthStart.month
-                val daysCount = daysInMonth(year, monthStart.monthNumber)
-                PeriodPage(
-                    rangeLabel = buildMonthLabel(month, year),
-                    entries = (1..daysCount).map { day ->
-                        val date = LocalDate(year, month, day)
-                        DayEntry(
-                            shortLabel = day.toString(),
-                            amountMl = (dailyTotals[date] ?: 0f).toInt(),
-                            isToday = date == today,
-                            goalMl = allGoals.effectiveGoalForDate(date),
+            // Build list of month starts from firstMonthStart to current month.
+            val monthStarts = mutableListOf<LocalDate>()
+            var y = firstMonthStart.year
+            var m = firstMonthStart.monthNumber
+            while (y < today.year || (y == today.year && m <= today.monthNumber)) {
+                monthStarts.add(LocalDate(y, m, 1))
+                m++
+                if (m > 12) { m = 1; y++ }
+            }
+
+            historyDao.findByTimestamp(firstMonthStart.atStartOfDay(), today.atEndOfDay())
+                .map { records ->
+                    val dailyTotals = records.toDailyTotals()
+                    monthStarts.map { monthStart ->
+                        val year = monthStart.year
+                        val month = monthStart.month
+                        val daysCount = daysInMonth(year, monthStart.monthNumber)
+                        PeriodPage(
+                            rangeLabel = buildMonthLabel(month, year),
+                            entries = (1..daysCount).map { day ->
+                                val date = LocalDate(year, month, day)
+                                DayEntry(
+                                    shortLabel = day.toString(),
+                                    amountMl = (dailyTotals[date] ?: 0f).toInt(),
+                                    isToday = date == today,
+                                    goalMl = allGoals.effectiveGoalForDate(date),
+                                )
+                            },
                         )
-                    },
-                )
-            }.reversed() // pages[0] = oldest, pages[N] = most recent
+                    } // monthStarts is already oldest-first
+                }
         }
     }
 
-    /** 3 pages, oldest first. Each page = 12 months of a calendar year. */
+    /** Pages from the first goal's year to today, oldest first. Each page = 12 months. */
     private fun loadYearPages(): Flow<List<PeriodPage>> {
-        val years = (0 until NUM_YEARS).map { today.year - it }
-        val rangeStart = LocalDate(years.last(), 1, 1)
+        return goalDao.getAllGoals().flatMapLatest { allGoals ->
+            val firstGoalDate = allGoals.minByOrNull { it.effectiveDate }?.effectiveDate
+            val firstYear = firstGoalDate?.year ?: today.year
+            val rangeStart = LocalDate(firstYear, 1, 1)
 
-        return combine(
-            historyDao.findByTimestamp(rangeStart.atStartOfDay(), today.atEndOfDay()),
-            goalDao.getAllGoals(),
-        ) { records, allGoals ->
-            val monthlyTotals = records
-                .filter { it.amount > 0f }
-                .groupBy { Pair(it.timestamp.year, it.timestamp.monthNumber) }
-                .mapValues { (_, entries) -> entries.sumOf { it.amount.toDouble() }.toFloat() }
+            historyDao.findByTimestamp(rangeStart.atStartOfDay(), today.atEndOfDay())
+                .map { records ->
+                    val monthlyTotals = records
+                        .filter { it.amount > 0f }
+                        .groupBy { Pair(it.timestamp.year, it.timestamp.monthNumber) }
+                        .mapValues { (_, entries) -> entries.sumOf { it.amount.toDouble() }.toFloat() }
 
-            years.map { year ->
-                PeriodPage(
-                    rangeLabel = year.toString(),
-                    entries = (1..12).map { monthNum ->
-                        val daysCount = daysInMonth(year, monthNum)
-                        val lastDay = LocalDate(year, monthNum, daysCount)
-                        DayEntry(
-                            shortLabel = MONTH_SHORT_LABELS[monthNum - 1],
-                            amountMl = (monthlyTotals[Pair(year, monthNum)] ?: 0f).toInt(),
-                            isToday = year == today.year && monthNum == today.monthNumber,
-                            goalMl = allGoals.effectiveGoalForDate(lastDay) * daysCount,
+                    (firstYear..today.year).map { year ->
+                        PeriodPage(
+                            rangeLabel = year.toString(),
+                            entries = (1..12).map { monthNum ->
+                                val daysCount = daysInMonth(year, monthNum)
+                                val lastDay = LocalDate(year, monthNum, daysCount)
+                                DayEntry(
+                                    shortLabel = MONTH_SHORT_LABELS[monthNum - 1],
+                                    amountMl = (monthlyTotals[Pair(year, monthNum)] ?: 0f).toInt(),
+                                    isToday = year == today.year && monthNum == today.monthNumber,
+                                    goalMl = allGoals.effectiveGoalForDate(lastDay) * daysCount,
+                                )
+                            },
                         )
-                    },
-                )
-            }.reversed() // pages[0] = oldest, pages[N] = most recent
+                    } // firstYear..today.year is already oldest-first
+                }
         }
     }
 
@@ -339,10 +351,6 @@ internal class StatsViewModel(
         (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
 
     companion object {
-        private const val NUM_WEEKS = 8
-        private const val NUM_MONTHS = 6
-        private const val NUM_YEARS = 3
-
         private val DAY_SHORT_LABELS: List<String> =
             DateFormatSymbols(Locale.getDefault()).shortWeekdays.let { dfs ->
                 listOf(dfs[2], dfs[3], dfs[4], dfs[5], dfs[6], dfs[7], dfs[1]) // Mon–Sun
