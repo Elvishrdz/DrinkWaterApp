@@ -455,7 +455,7 @@ private fun ColumnScope.LegalScrollableContent() {
     Row(
         modifier = Modifier
             .align(Alignment.CenterHorizontally)
-            .clickable { uriHandler.openUri("https://google.com") }
+            .clickable { uriHandler.openUri("https://www.freeprivacypolicy.com/privacy/view/04c015dc119a00b1ec8a21df46a9bfb1") }
             .padding(horizontal = 4.dp, vertical = 4.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
         verticalAlignment = Alignment.CenterVertically,
