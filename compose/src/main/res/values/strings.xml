@@ -201,8 +201,8 @@
     <!-- Onboarding — Exact Alarm: Benefits -->
     <string name="onb_exact_alarm_benefit_timing_label">Fires at the right moment</string>
     <string name="onb_exact_alarm_benefit_timing_description">Reminders arrive exactly when scheduled, not delayed by the system.</string>
-    <string name="onb_exact_alarm_benefit_reliable_label">Battery-safe and reliable</string>
-    <string name="onb_exact_alarm_benefit_reliable_description">Works even with battery optimization, so you never miss a reminder.</string>
+    <string name="onb_exact_alarm_benefit_reliable_label">Reliable and consistent</string>
+    <string name="onb_exact_alarm_benefit_reliable_description">Reminds you exactly on schedule, even when other apps are running in the background.</string>
     <string name="onb_exact_alarm_benefit_habit_label">Builds a consistent habit</string>
     <string name="onb_exact_alarm_benefit_habit_description">Steady timing makes it easier to remember and track your hydration throughout the day.</string>
 

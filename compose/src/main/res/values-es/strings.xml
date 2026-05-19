@@ -198,8 +198,8 @@
     <!-- Onboarding — Alarma exacta: Beneficios -->
     <string name="onb_exact_alarm_benefit_timing_label">Suena en el momento exacto</string>
     <string name="onb_exact_alarm_benefit_timing_description">Los recordatorios llegan exactamente cuando se programan, sin retrasos del sistema.</string>
-    <string name="onb_exact_alarm_benefit_reliable_label">Confiable y sin gastar batería</string>
-    <string name="onb_exact_alarm_benefit_reliable_description">Funciona incluso con la optimización de batería activa, para que nunca te pierdas un recordatorio.</string>
+    <string name="onb_exact_alarm_benefit_reliable_label">Confiable y consistente</string>
+    <string name="onb_exact_alarm_benefit_reliable_description">Te recuerda exactamente a la hora programada, incluso cuando otras aplicaciones están en segundo plano.</string>
     <string name="onb_exact_alarm_benefit_habit_label">Construye un hábito constante</string>
     <string name="onb_exact_alarm_benefit_habit_description">Un horario estable hace más fácil recordar y registrar tu hidratación durante el día.</string>
 
