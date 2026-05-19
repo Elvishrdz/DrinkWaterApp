@@ -542,6 +542,7 @@ internal fun SettingsContent(
                         iconTint = DwWater,
                         label = stringResource(R.string.label_start_time),
                         is24HourFormat = is24Hour,
+                        message = stringResource(R.string.time_selector_message_start_time),
                         onStartTimeTap = onStartTimeChanged,
                     )
                     HorizontalDivider(color = DwInk100)
@@ -552,6 +553,7 @@ internal fun SettingsContent(
                         iconTint = DwMagenta,
                         label = stringResource(R.string.label_end_time),
                         is24HourFormat = is24Hour,
+                        message = stringResource(R.string.time_selector_message_end_time),
                         onStartTimeTap = onEndTimeChanged,
                     )
                     HorizontalDivider(color = DwInk100)
@@ -1011,6 +1013,7 @@ fun SettingRowTimeSelector(
     label: String,
     modifier: Modifier = Modifier,
     is24HourFormat: Boolean = rememberTimePickerState().is24hour,
+    message: String? = null,
     onStartTimeTap: (TimeSelected) -> Unit,
 ) {
     var showModal by rememberSaveable { mutableStateOf(false) }
@@ -1033,6 +1036,8 @@ fun SettingRowTimeSelector(
             time = time,
             is24HourFormat = is24HourFormat,
             onTimeSelected = onStartTimeTap,
+            canChangeTimeFormat = false,
+            message = message,
             onDismiss = { showModal = false },
         )
     }

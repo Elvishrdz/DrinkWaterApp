@@ -52,6 +52,13 @@
     <string name="label_start_time">Hora de inicio</string>
     <string name="label_end_time">Hora de fin</string>
 
+    <!-- Selector de hora -->
+    <string name="time_selector_title_hour">Seleccionar hora</string>
+    <string name="time_selector_title_minute">Seleccionar minutos</string>
+    <string name="time_selector_title_time">Seleccionar hora</string>
+    <string name="time_selector_message_start_time">Los recordatorios comenzarán a esta hora cada día.</string>
+    <string name="time_selector_message_end_time">Los recordatorios se detendrán después de esta hora cada día.</string>
+
     <!-- Generic — permiso de notificaciones -->
     <string name="notif_disabled_title">Notificaciones desactivadas</string>
     <string name="notif_disabled_body">Para recibir recordatorios de hidratación, habilita las notificaciones de DrinkWater en los Ajustes de tu teléfono.</string>

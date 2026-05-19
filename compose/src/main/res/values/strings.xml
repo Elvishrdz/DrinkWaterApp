@@ -53,6 +53,15 @@
     <string name="label_start_time">Start time</string>
     <string name="label_end_time">End time</string>
 
+    <!-- Time Selector Dialog -->
+    <string name="time_selector_title_hour">Select hour</string>
+    <string name="time_selector_title_minute">Select minute</string>
+    <string name="time_selector_title_time">Select time</string>
+    <string name="time_selector_format_ampm" translatable="false">am/pm</string>
+    <string name="time_selector_format_24h" translatable="false">24h</string>
+    <string name="time_selector_message_start_time">Reminders will begin at this time each day.</string>
+    <string name="time_selector_message_end_time">Reminders will stop after this time each day.</string>
+
     <!-- Generic — notifications permission -->
     <string name="notif_disabled_title">Notifications disabled</string>
     <string name="notif_disabled_body">To receive drink reminders, please enable notifications for DrinkWater in your phone\'s Settings.</string>

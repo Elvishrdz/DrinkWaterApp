@@ -14,7 +14,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TimePicker
-import androidx.compose.material3.TimePickerDefaults
 import androidx.compose.material3.TimePickerSelectionMode
 import androidx.compose.material3.isPm
 import androidx.compose.material3.rememberTimePickerState
@@ -26,10 +25,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.eahm.drinkwaterapp.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,7 +42,9 @@ fun AppTimeSelectorDialog(
     is24HourResult: Boolean = true,
     onTimeSelected: (TimeSelected) -> Unit,
     onDismiss: () -> Unit,
-    debug: Boolean = true,
+    canChangeTimeFormat: Boolean = true,
+    message: String? = null,
+    debug: Boolean = false,
 ) {
     var is24Hour by rememberSaveable { mutableStateOf(is24HourFormat) }
 
@@ -80,61 +85,69 @@ fun AppTimeSelectorDialog(
             ) {
                 if (debug) {
                     Column {
-                        Text(
-                            text = "is24HourFormat: $is24HourFormat",
-                        )
-                        Text(
-                            text = "is24Hour: $is24Hour",
-                        )
-                        Text(
-                            text = "is24Hour (timeState): ${timeState.is24hour}",
-                        )
+                        Text(text = "is24HourFormat: $is24HourFormat")
+                        Text(text = "is24Hour: $is24Hour")
+                        Text(text = "is24Hour (timeState): ${timeState.is24hour}")
                     }
+                }
+
+                if (message != null) {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        text = message,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                 }
 
                 Text(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
                     text = when (timeState.selection) {
-                        TimePickerSelectionMode.Hour -> "Select hour"
-                        TimePickerSelectionMode.Minute -> "Select minute"
-                        else -> "Select time"
+                        TimePickerSelectionMode.Hour -> stringResource(R.string.time_selector_title_hour)
+                        TimePickerSelectionMode.Minute -> stringResource(R.string.time_selector_title_minute)
+                        else -> stringResource(R.string.time_selector_title_time)
                     },
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
 
                 TimePicker(
                     state = timeState,
-                    layoutType = TimePickerDefaults.layoutType(),
                 )
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    OutlinedButton(
-                        modifier = Modifier.padding(end = 8.dp),
-                        onClick = {
-                            is24Hour = !is24Hour
-                            timeState.is24hour = is24Hour
+                    if (canChangeTimeFormat) {
+                        OutlinedButton(
+                            modifier = Modifier.padding(end = 8.dp),
+                            onClick = {
+                                is24Hour = !is24Hour
+                                timeState.is24hour = is24Hour
+                            }
+                        ) {
+                            Text(
+                                text = if (is24Hour) {
+                                    stringResource(R.string.time_selector_format_ampm)
+                                } else {
+                                    stringResource(R.string.time_selector_format_24h)
+                                },
+                            )
                         }
-                    ) {
-                        Text(
-                            text = if (is24Hour) {
-                                "am/pm"
-                            } else {
-                                "24h"
-                            },
-                        )
                     }
 
                     Button(
                         modifier = Modifier.padding(end = 8.dp),
                         onClick = onDismiss,
                     ) {
-                        Text(
-                            text = "Cancel"
-                        )
+                        Text(text = stringResource(R.string.action_cancel))
                     }
                     Button(
                         modifier = Modifier.padding(start = 8.dp),
@@ -158,7 +171,7 @@ fun AppTimeSelectorDialog(
                             onDismiss()
                         }
                     ) {
-                        Text(text = "OK")
+                        Text(text = stringResource(R.string.action_ok))
                     }
                 }
             }
