@@ -57,6 +57,7 @@ internal fun IntervalBottomSheet(
     windowMinutes: Int,
     onIntervalChanged: (Int) -> Unit,
     onDismiss: () -> Unit,
+    showActiveWindowInfo: Boolean = false,
 ) {
     val maxMinutes = (windowMinutes - INTERVAL_STEP).coerceAtLeast(INTERVAL_MIN)
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -145,19 +146,21 @@ internal fun IntervalBottomSheet(
                 }
             }
 
-            Spacer(Modifier.height(12.dp))
+            if (showActiveWindowInfo) {
+                Spacer(Modifier.height(12.dp))
 
-            Text(
-                text = stringResource(
-                    R.string.settings_interval_window_hint,
-                    formatWindowHint(windowMinutes),
-                    maxMinutes
-                ),
-                fontFamily = PlusJakartaSans,
-                fontWeight = FontWeight.Normal,
-                fontSize = 12.sp,
-                color = if (isAtMax) DwWarning else DwInk500,
-            )
+                Text(
+                    text = stringResource(
+                        R.string.settings_interval_window_hint,
+                        formatWindowHint(windowMinutes),
+                        maxMinutes
+                    ),
+                    fontFamily = PlusJakartaSans,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 12.sp,
+                    color = if (isAtMax) DwWarning else DwInk500,
+                )
+            }
 
             Spacer(Modifier.height(32.dp))
 
