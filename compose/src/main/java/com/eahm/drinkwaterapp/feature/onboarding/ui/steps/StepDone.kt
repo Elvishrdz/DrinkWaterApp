@@ -113,7 +113,7 @@ private fun SummaryCard(
             iconBg = DwTintMagenta,
             iconTint = DwMagenta,
             label = stringResource(R.string.onb_done_row_reminder),
-            value = formatInterval(state.intervalMinutes),
+            value = formatIntervalLocalized(state.intervalMinutes),
         ),
         SummaryRowData(
             icon = DwIcons.Sun,
@@ -221,10 +221,15 @@ private fun SummaryRow(
     }
 }
 
-private fun formatInterval(minutes: Int): String = when {
-    minutes < 60 -> "every $minutes min"
-    minutes % 60 == 0 -> "every ${minutes / 60}h"
-    else -> "every ${minutes / 60}h ${minutes % 60}min"
+@Composable
+private fun formatIntervalLocalized(minutes: Int): String {
+    val h = minutes / 60
+    val m = minutes % 60
+    return when {
+        h == 0 -> stringResource(R.string.onb_done_interval_min, m)
+        m == 0 -> stringResource(R.string.onb_done_interval_hour, h)
+        else -> stringResource(R.string.onb_done_interval_hour_min, h, m)
+    }
 }
 
 private fun OnbTimeSelection.formatTime(is24Hour: Boolean): String {

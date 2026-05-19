@@ -212,6 +212,9 @@
     <string name="onb_done_subtitle">Here\'s your setup, change any of it later in app settings.</string>
     <string name="onb_done_cta">Start drinking</string>
     <string name="onb_done_row_reminder">Reminder</string>
+    <string name="onb_done_interval_min">every %1$d min</string>
+    <string name="onb_done_interval_hour">every %1$dh</string>
+    <string name="onb_done_interval_hour_min">every %1$dh %2$dmin</string>
 
     <!-- Settings — Screen -->
     <string name="settings_title">Settings</string>

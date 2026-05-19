@@ -209,6 +209,9 @@
     <string name="onb_done_subtitle">Aquí está tu configuración, puedes cambiarla cuando quieras en los ajustes.</string>
     <string name="onb_done_cta">Empezar</string>
     <string name="onb_done_row_reminder">Recordatorio</string>
+    <string name="onb_done_interval_min">cada %1$d min</string>
+    <string name="onb_done_interval_hour">cada %1$dh</string>
+    <string name="onb_done_interval_hour_min">cada %1$dh %2$dmin</string>
 
     <!-- Ajustes — Pantalla -->
     <string name="settings_title">Ajustes</string>
