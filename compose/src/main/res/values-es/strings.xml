@@ -531,4 +531,12 @@
     <string name="notif_big_h20_b">Tómatelo con calma esta noche. Un vaso suave de agua es todo lo que tu cuerpo necesita para descansar.</string>
     <string name="notif_big_h22_b">Pronto a dormir. Un pequeño vaso de agua ayuda a tu cuerpo a mantenerse equilibrado durante la noche. ¡Buenas noches!</string>
 
+    <!-- Validation errors -->
+    <string name="validation_error_empty">El campo no puede estar vacío</string>
+    <string name="validation_error_invalid_number">Ingresa un número válido</string>
+    <string name="validation_error_min_value">El valor debe ser mayor que %s</string>
+    <string name="validation_error_max_value">El valor debe ser menor que %s</string>
+    <string name="validation_error_min_length">La longitud debe ser mayor que %s</string>
+    <string name="validation_error_max_length">La longitud debe ser menor que %s</string>
+
 </resources>

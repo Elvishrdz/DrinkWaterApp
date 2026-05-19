@@ -534,4 +534,12 @@
     <string name="notif_big_h20_b">Take it easy tonight. A gentle glass of water is all your body needs to wind down.</string>
     <string name="notif_big_h22_b">Bedtime soon. A small glass of water helps your body stay balanced through the night. Sleep well!</string>
 
+    <!-- Validation errors -->
+    <string name="validation_error_empty">Field cannot be empty</string>
+    <string name="validation_error_invalid_number">Provide a valid number</string>
+    <string name="validation_error_min_value">Value must be greater than %s</string>
+    <string name="validation_error_max_value">Value must be less than %s</string>
+    <string name="validation_error_min_length">Length must be greater than %s</string>
+    <string name="validation_error_max_length">Length must be less than %s</string>
+
 </resources>

@@ -14,8 +14,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.ui.inputfield.data.ValidationResult
 
 @Composable
@@ -25,6 +27,7 @@ fun AmountInputField(
     onValueSaved: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     var focused by rememberSaveable { mutableStateOf(false) }
     var inputValue by rememberSaveable { mutableStateOf(value) }
     var errorMessage by rememberSaveable { mutableStateOf("") }
@@ -48,7 +51,7 @@ fun AmountInputField(
                             clearErrorMessage()
                             onValueSaved(inputValue)
                         } else {
-                            errorMessage = validationResult.message
+                            errorMessage = validationResult.resolveMessage(context)
                         }
                     }
 
@@ -83,11 +86,11 @@ fun validateAmountInput(value: String): ValidationResult {
     val trimmed = value.trim()
 
     if (trimmed.isEmpty()) {
-        return ValidationResult(false, "Field can not be empty")
+        return ValidationResult(false, R.string.validation_error_empty)
     }
 
     val amount = trimmed.toFloatOrNull()
-        ?: return ValidationResult(false, "Provide a valid number")
+        ?: return ValidationResult(false, R.string.validation_error_invalid_number)
 
     return validateAmount(amount, maxValue = 99999f)
 }
@@ -98,14 +101,22 @@ fun validateAmount(
     maxValue: Float = Float.MAX_VALUE,
 ): ValidationResult {
     if (amount < minValue) {
-        return ValidationResult(false, "Value must be greater than $minValue")
+        return ValidationResult(
+            false,
+            R.string.validation_error_min_value,
+            minValue.toDigitString()
+        )
     }
 
     if (amount > maxValue) {
-        return ValidationResult(false, "Value must be less than $maxValue")
+        return ValidationResult(
+            false,
+            R.string.validation_error_max_value,
+            maxValue.toDigitString()
+        )
     }
 
-    return ValidationResult(true, "")
+    return ValidationResult(true)
 }
 
 fun Float.toDigitString(): String {

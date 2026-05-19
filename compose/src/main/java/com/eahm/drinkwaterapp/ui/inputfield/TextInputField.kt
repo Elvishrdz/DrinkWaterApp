@@ -14,8 +14,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.ui.inputfield.data.ValidationResult
 
 @Composable
@@ -25,6 +27,7 @@ fun TextInputField(
     onValueSaved: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     var focused by rememberSaveable { mutableStateOf(false) }
     var inputValue by rememberSaveable { mutableStateOf(value) }
     var errorMessage by rememberSaveable { mutableStateOf("") }
@@ -48,7 +51,7 @@ fun TextInputField(
                             clearErrorMessage()
                             onValueSaved(inputValue)
                         } else {
-                            errorMessage = validationResult.message
+                            errorMessage = validationResult.resolveMessage(context)
                         }
                     }
 
@@ -83,7 +86,7 @@ private fun validateTextInput(value: String): ValidationResult {
     val trimmed = value.trim()
 
     if (trimmed.isEmpty()) {
-        return ValidationResult(false, "Field can not be empty")
+        return ValidationResult(false, R.string.validation_error_empty)
     }
 
     return validateText(
@@ -100,12 +103,12 @@ fun validateText(
     maxLength: Int = Int.MAX_VALUE,
 ): ValidationResult {
     if (value.length < minLength) {
-        return ValidationResult(false, "Length must be greater than $minLength")
+        return ValidationResult(false, R.string.validation_error_min_length, minLength.toString())
     }
 
     if (value.length > maxLength) {
-        return ValidationResult(false, "Length must be less than $maxLength")
+        return ValidationResult(false, R.string.validation_error_max_length, maxLength.toString())
     }
 
-    return ValidationResult(true, "")
+    return ValidationResult(true)
 }

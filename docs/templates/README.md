@@ -83,7 +83,30 @@ Android Studio cycles through each `$VARIABLE$` placeholder as you press Tab.
 
 ---
 
-## 2. Feature Scaffolding Script (`create-feature.sh`)
+## 2. Managing Templates (`manage-templates.sh`)
+
+List all templates and delete obsolete ones. Deletions are automatically propagated to every installed Android Studio version.
+
+```bash
+bash docs/templates/manage-templates.sh              # list all templates
+bash docs/templates/manage-templates.sh delete       # interactive: pick by number or name
+bash docs/templates/manage-templates.sh delete dwcomp            # delete one by name
+bash docs/templates/manage-templates.sh delete dwcomp dwshared   # delete multiple
+```
+
+**Typical rename workflow:**
+1. Edit `DrinkWaterApp.xml` — change `name="dwroot"` to `name="dwfeatureroot"`
+2. `bash docs/templates/install-templates.sh` — the old `dwroot` is gone, new name is live
+3. No extra steps needed; the install script always overwrites the full file
+
+**Delete an obsolete abbreviation** (e.g. after a rename, to clean up):
+```bash
+bash docs/templates/manage-templates.sh delete dwroot
+```
+
+---
+
+## 3. Feature Scaffolding Script (`create-feature.sh`)
 
 Generates the complete file structure for a new feature in one command.
 

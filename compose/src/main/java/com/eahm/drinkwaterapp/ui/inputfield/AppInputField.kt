@@ -15,6 +15,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -28,6 +29,7 @@ fun AppInputField(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
 ) {
+    val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     var inputValue by rememberSaveable { mutableStateOf(value) }
     var errorMessage by rememberSaveable { mutableStateOf("") }
@@ -51,7 +53,7 @@ fun AppInputField(
             clearErrorMessage()
             onValueChanged(newValue)
         } else {
-            onError(validationResult.message)
+            onError(validationResult.resolveMessage(context))
         }
 
         if (newValue.isEmpty()) {
