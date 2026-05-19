@@ -1,4 +1,19 @@
 Development
+Claude fixes
+[] grafico: calcular bien el porcentaje tomando todos los dias de la semana anterior (incluso si emprezamos a usar la app un miercoles, considerar desde lunes).
+[] grafico: no mostrar primera semana antes del primer record de daily goal registrado (primer dia de la app) en ese caso mostrar un texto vacio.
+[] goal overlay: numero de vasos no esta bien, debe coincidir con la cantidad de agua registrada en el dia hasta el momento 
+[] goal overlay: traducir textos en y es.
+[] goal overlay: randomize with new texts, crear 3 variantes de textos SOLO para ocean style.
+[] consent: agregar url a privacy policy: https://www.freeprivacypolicy.com/privacy/view/04c015dc119a00b1ec8a21df46a9bfb1
+[] settings: agregar row para cancelar el tracking en ajustes Privacy-> Share usage data (tambien actualizar consent screen text para ir a este menu)
+[] settings: agregar row para ir al privacy policy y terms of use. agrupado en el mismo grupo de privacy and legal
+[] drink screen: al usar alarma inexacta: recordatorio mostrar texto que dice: proxima aprox.
+[] drink screen: al usar alarma inexacta: mostrar titulo: recordatorios aproximados. y decir "aprox. cada" para el intervalo.
+[] app: agregar icono monochrome
+[] listing: traducir listing en diferentes idiomas (description, title, app name, etc)
+[] drink screen: logs: quitar guion en mensaje de no hay registros.
+[] traducciones: revisar todas estan bien y eliminar warnings.
 
 Fixes
 [x] stat graph, por debajo de la meta, cambiar a : cantidad alcanzada
@@ -14,7 +29,7 @@ Fixes
 [x] consent: traducir textos de pantalas
 [] consent: agregar privacy policy final de release
 [] consent: agregar url a privacy policy
-[] consent: cambiar orden de botones en track screen
+[x] consent: cambiar orden de botones en track screen
 [] settings: agregar row para cancelar el tracking en ajustes Privacy-> Usage data
 [] settings: agregar row para ir al privacy policy y terms of use 
 [] drink screen: al usar alarma inexacta: recordatorio mostrar hora aproximada! 
