@@ -1,0 +1,181 @@
+<templateSet group="DrinkWaterApp">
+
+  <!-- ───────────────────────────────────────────────
+       COMPOSABLE  |  dwcomp → basic @Composable fun
+       ─────────────────────────────────────────────── -->
+  <template name="dwcomp"
+            value="@Composable&#10;fun $NAME$(&#10;    $PARAMS$&#10;    modifier: Modifier = Modifier,&#10;) {&#10;    $END$&#10;}"
+            description="Basic @Composable function"
+            toReformat="true" toShortenFQNames="true">
+    <variable name="NAME"   expression="" defaultValue="&quot;MyComposable&quot;" alwaysStopAt="true" />
+    <variable name="PARAMS" expression="" defaultValue=""                        alwaysStopAt="true" />
+    <context><option name="KOTLIN" value="true" /></context>
+  </template>
+
+  <!-- ───────────────────────────────────────────────
+       PREVIEW  |  dwprev → @Preview with theme
+       ─────────────────────────────────────────────── -->
+  <template name="dwprev"
+            value="@Preview(showBackground = true, backgroundColor = 0xFFF2F6F9)&#10;@Composable&#10;private fun $NAME$Preview() {&#10;    DrinkWaterAppTheme {&#10;        $NAME$($END$)&#10;    }&#10;}"
+            description="@Preview composable with DrinkWaterAppTheme"
+            toReformat="true" toShortenFQNames="true">
+    <variable name="NAME" expression="" defaultValue="&quot;MyComposable&quot;" alwaysStopAt="true" />
+    <context><option name="KOTLIN" value="true" /></context>
+  </template>
+
+  <!-- ───────────────────────────────────────────────
+       FEATURE STATE  |  dwstate → sealed interface Loading + Data
+       ─────────────────────────────────────────────── -->
+  <template name="dwstate"
+            value="internal sealed interface $NAME$State {&#10;&#10;    data object Loading : $NAME$State&#10;&#10;    @Immutable&#10;    data class Data(&#10;        $END$&#10;    ) : $NAME$State&#10;}"
+            description="Feature State sealed interface (Loading + Data)"
+            toReformat="true" toShortenFQNames="true">
+    <variable name="NAME" expression="" defaultValue="&quot;Feature&quot;" alwaysStopAt="true" />
+    <context><option name="KOTLIN" value="true" /></context>
+  </template>
+
+  <!-- ───────────────────────────────────────────────
+       FEATURE ACTION  |  dwaction → sealed interface
+       ─────────────────────────────────────────────── -->
+  <template name="dwaction"
+            value="internal sealed interface $NAME$Action {&#10;    $END$&#10;}"
+            description="Feature Action sealed interface"
+            toReformat="true" toShortenFQNames="true">
+    <variable name="NAME" expression="" defaultValue="&quot;Feature&quot;" alwaysStopAt="true" />
+    <context><option name="KOTLIN" value="true" /></context>
+  </template>
+
+  <!-- ───────────────────────────────────────────────
+       FEATURE EVENT  |  dwevent → sealed interface
+       ─────────────────────────────────────────────── -->
+  <template name="dwevent"
+            value="internal sealed interface $NAME$Event {&#10;    $END$&#10;}"
+            description="Feature Event (one-shot side effects) sealed interface"
+            toReformat="true" toShortenFQNames="true">
+    <variable name="NAME" expression="" defaultValue="&quot;Feature&quot;" alwaysStopAt="true" />
+    <context><option name="KOTLIN" value="true" /></context>
+  </template>
+
+  <!-- ───────────────────────────────────────────────
+       FEATURE VIEW MODEL  |  dwvm → ViewModel skeleton
+       ─────────────────────────────────────────────── -->
+  <template name="dwvm"
+            value="internal class $NAME$ViewModel(&#10;    private val prefsStorage: PrefsStorage,&#10;) : ViewModel() {&#10;&#10;    val state: StateFlow&lt;$NAME$State&gt; = $FLOW$&#10;        .stateIn(&#10;            scope = viewModelScope,&#10;            started = SharingStarted.Lazily,&#10;            initialValue = $NAME$State.Loading,&#10;        )&#10;&#10;    $END$&#10;}"
+            description="Feature ViewModel with StateFlow pattern"
+            toReformat="true" toShortenFQNames="true">
+    <variable name="NAME" expression="" defaultValue="&quot;Feature&quot;" alwaysStopAt="true" />
+    <variable name="FLOW" expression="" defaultValue="&quot;flowOf($NAME$State.Loading)&quot;" alwaysStopAt="true" />
+    <context><option name="KOTLIN" value="true" /></context>
+  </template>
+
+  <!-- ───────────────────────────────────────────────
+       FEATURE ROOT  |  dwroot → koinViewModel + when(state)
+       ─────────────────────────────────────────────── -->
+  <template name="dwroot"
+            value="@Composable&#10;internal fun $NAME$Root(&#10;    $PARAMS$&#10;    viewModel: $NAME$ViewModel = koinViewModel(),&#10;) {&#10;    val state by viewModel.state.collectAsStateWithLifecycle()&#10;&#10;    when (val data = state) {&#10;        $NAME$State.Loading -> { /* Idle */ }&#10;&#10;        is $NAME$State.Data -> {&#10;            $NAME$Screen(&#10;                state = data,&#10;                $END$&#10;            )&#10;        }&#10;    }&#10;}"
+            description="Feature Root: koinViewModel + collectAsStateWithLifecycle + when(state)"
+            toReformat="true" toShortenFQNames="true">
+    <variable name="NAME"   expression="" defaultValue="&quot;Feature&quot;" alwaysStopAt="true" />
+    <variable name="PARAMS" expression="" defaultValue=""                   alwaysStopAt="true" />
+    <context><option name="KOTLIN" value="true" /></context>
+  </template>
+
+  <!-- ───────────────────────────────────────────────
+       FEATURE SCREEN  |  dwscreen → Scaffold skeleton
+       ─────────────────────────────────────────────── -->
+  <template name="dwscreen"
+            value="@Composable&#10;internal fun $NAME$Screen(&#10;    state: $NAME$State.Data,&#10;    $PARAMS$&#10;) {&#10;    Scaffold(&#10;        modifier = Modifier.fillMaxSize(),&#10;    ) { innerPadding ->&#10;        $END$&#10;    }&#10;}"
+            description="Feature Screen with Scaffold + innerPadding"
+            toReformat="true" toShortenFQNames="true">
+    <variable name="NAME"   expression="" defaultValue="&quot;Feature&quot;" alwaysStopAt="true" />
+    <variable name="PARAMS" expression="" defaultValue=""                   alwaysStopAt="true" />
+    <context><option name="KOTLIN" value="true" /></context>
+  </template>
+
+  <!-- ───────────────────────────────────────────────
+       UNIT TEST METHOD  |  dwtest → @Test with AAA
+       ─────────────────────────────────────────────── -->
+  <template name="dwtest"
+            value="@Test&#10;fun `$DESCRIPTION$`() {&#10;    // Given&#10;    $END$&#10;&#10;    // When&#10;&#10;    // Then&#10;}"
+            description="JUnit4 @Test method with AAA pattern (backtick name)"
+            toReformat="true" toShortenFQNames="true">
+    <variable name="DESCRIPTION" expression="" defaultValue="&quot;should do something when condition&quot;" alwaysStopAt="true" />
+    <context><option name="KOTLIN" value="true" /></context>
+  </template>
+
+  <!-- ───────────────────────────────────────────────
+       UNIT TEST CLASS  |  dwtestclass → JUnit4 class
+       ─────────────────────────────────────────────── -->
+  <template name="dwtestclass"
+            value="class $NAME$Test {&#10;&#10;    @Before&#10;    fun setUp() {&#10;        $END$&#10;    }&#10;&#10;    @Test&#10;    fun `should $ACTION$ when $CONDITION$`() {&#10;        // Given&#10;&#10;        // When&#10;&#10;        // Then&#10;        assertEquals(expected, actual)&#10;    }&#10;}"
+            description="JUnit4 unit test class (kotlin.test assertions)"
+            toReformat="true" toShortenFQNames="true">
+    <variable name="NAME"      expression="" defaultValue="&quot;MyClass&quot;"       alwaysStopAt="true" />
+    <variable name="ACTION"    expression="" defaultValue="&quot;do something&quot;"   alwaysStopAt="true" />
+    <variable name="CONDITION" expression="" defaultValue="&quot;condition is met&quot;" alwaysStopAt="true" />
+    <context><option name="KOTLIN" value="true" /></context>
+  </template>
+
+  <!-- ───────────────────────────────────────────────
+       COMPOSE UI TEST CLASS  |  dwtestui → createComposeRule
+       ─────────────────────────────────────────────── -->
+  <template name="dwtestui"
+            value="@RunWith(AndroidJUnit4::class)&#10;class $NAME$ScreenTest {&#10;&#10;    @get:Rule&#10;    val composeTestRule = createComposeRule()&#10;&#10;    @Before&#10;    fun setUp() {&#10;        composeTestRule.setContent {&#10;            DrinkWaterAppTheme {&#10;                $NAME$Screen(&#10;                    $END$&#10;                )&#10;            }&#10;        }&#10;    }&#10;&#10;    @Test&#10;    fun `should display content when state is data`() {&#10;        composeTestRule&#10;            .onNodeWithText(&quot;$ASSERTION_TEXT$&quot;)&#10;            .assertIsDisplayed()&#10;    }&#10;}"
+            description="Compose UI instrumented test class with createComposeRule"
+            toReformat="true" toShortenFQNames="true">
+    <variable name="NAME"           expression="" defaultValue="&quot;Feature&quot;"    alwaysStopAt="true" />
+    <variable name="ASSERTION_TEXT" expression="" defaultValue="&quot;expected text&quot;" alwaysStopAt="true" />
+    <context><option name="KOTLIN" value="true" /></context>
+  </template>
+
+  <!-- ───────────────────────────────────────────────
+       INSTRUMENTED TEST CLASS  |  dwinst → AndroidJUnit4
+       ─────────────────────────────────────────────── -->
+  <template name="dwinst"
+            value="@RunWith(AndroidJUnit4::class)&#10;class $NAME$Test {&#10;&#10;    private val context = InstrumentationRegistry.getInstrumentation().targetContext&#10;&#10;    @Before&#10;    fun setUp() {&#10;        $END$&#10;    }&#10;&#10;    @After&#10;    fun tearDown() {}&#10;&#10;    @Test&#10;    fun `should $ACTION$ when $CONDITION$`() {&#10;        // Given&#10;&#10;        // When&#10;&#10;        // Then&#10;        assertTrue(true)&#10;    }&#10;}"
+            description="Instrumented test class with @RunWith(AndroidJUnit4::class)"
+            toReformat="true" toShortenFQNames="true">
+    <variable name="NAME"      expression="" defaultValue="&quot;Feature&quot;"         alwaysStopAt="true" />
+    <variable name="ACTION"    expression="" defaultValue="&quot;do something&quot;"     alwaysStopAt="true" />
+    <variable name="CONDITION" expression="" defaultValue="&quot;condition is met&quot;" alwaysStopAt="true" />
+    <context><option name="KOTLIN" value="true" /></context>
+  </template>
+
+  <!-- ───────────────────────────────────────────────
+       NAVIGATION ENTRY  |  dwnav → HomeDestination enum entry
+       ─────────────────────────────────────────────── -->
+  <template name="dwnav"
+            value="$NAME$(R.string.$LABEL_RES$, DwIcons.$ICON$, DwIcons.$ICON$Filled),"
+            description="HomeDestination enum entry (state-based navigation)"
+            toReformat="false" toShortenFQNames="true">
+    <variable name="NAME"      expression="" defaultValue="&quot;NEW_SCREEN&quot;"  alwaysStopAt="true" />
+    <variable name="LABEL_RES" expression="" defaultValue="&quot;label_new&quot;"   alwaysStopAt="true" />
+    <variable name="ICON"      expression="" defaultValue="&quot;MyIcon&quot;"      alwaysStopAt="true" />
+    <context><option name="KOTLIN" value="true" /></context>
+  </template>
+
+  <!-- ───────────────────────────────────────────────
+       SHARED ELEMENT MODIFIER  |  dwshared → sharedElement()
+       ─────────────────────────────────────────────── -->
+  <template name="dwshared"
+            value=".sharedElement(&#10;    state = rememberSharedContentState(key = &quot;$KEY$&quot;),&#10;    animatedVisibilityScope = $SCOPE$,&#10;)"
+            description="sharedElement() Modifier for Compose transitions"
+            toReformat="true" toShortenFQNames="true">
+    <variable name="KEY"   expression="" defaultValue="&quot;element-key&quot;"         alwaysStopAt="true" />
+    <variable name="SCOPE" expression="" defaultValue="&quot;animatedVisibilityScope&quot;" alwaysStopAt="true" />
+    <context><option name="KOTLIN" value="true" /></context>
+  </template>
+
+  <!-- ───────────────────────────────────────────────
+       SHARED ELEMENT LAYOUT  |  dwsharedlayout → SharedTransitionLayout scaffold
+       ─────────────────────────────────────────────── -->
+  <template name="dwsharedlayout"
+            value="SharedTransitionLayout {&#10;    AnimatedContent(&#10;        targetState = $STATE$,&#10;        label = &quot;$LABEL$&quot;,&#10;    ) { target ->&#10;        if (target) {&#10;            $END$&#10;        } else {&#10;&#10;        }&#10;    }&#10;}"
+            description="SharedTransitionLayout + AnimatedContent scaffold for shared element transitions"
+            toReformat="true" toShortenFQNames="true">
+    <variable name="STATE" expression="" defaultValue="&quot;showDetail&quot;"          alwaysStopAt="true" />
+    <variable name="LABEL" expression="" defaultValue="&quot;shared-transition&quot;"   alwaysStopAt="true" />
+    <context><option name="KOTLIN" value="true" /></context>
+  </template>
+
+</templateSet>
