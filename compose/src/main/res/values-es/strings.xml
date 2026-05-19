@@ -361,7 +361,7 @@
     <string name="stats_mini_best_streak">Mejor racha</string>
     <string name="stats_mini_goal_streak">Racha de metas</string>
     <string name="stats_mini_best_goal_streak">Mejor racha de metas</string>
-    <string name="stats_mini_personal_best">Récord personal (mL)</string>
+    <string name="stats_mini_personal_best">Récord personal</string>
 
     <!-- Historial — Pantalla -->
     <string name="history_title">Historial</string>

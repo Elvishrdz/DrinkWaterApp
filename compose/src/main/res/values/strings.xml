@@ -364,7 +364,7 @@
     <string name="stats_mini_best_streak">Best streak</string>
     <string name="stats_mini_goal_streak">Goal streak</string>
     <string name="stats_mini_best_goal_streak">Best goal streak</string>
-    <string name="stats_mini_personal_best">Personal best (mL)</string>
+    <string name="stats_mini_personal_best">Personal best</string>
 
     <!-- History — Screen -->
     <string name="history_title">History</string>
