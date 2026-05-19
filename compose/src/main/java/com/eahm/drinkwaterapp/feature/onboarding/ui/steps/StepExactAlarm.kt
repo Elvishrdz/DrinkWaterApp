@@ -247,7 +247,7 @@ private fun HowToStepsList() {
 @Composable
 private fun HowToStepRow(number: Int, text: String, isLast: Boolean) {
     Row(
-        verticalAlignment = Alignment.Top,
+        verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Box(
