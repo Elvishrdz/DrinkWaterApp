@@ -126,6 +126,7 @@ internal fun SettingsScreen(
     val context = LocalContext.current
 
     var showClearDataDialog by rememberSaveable { mutableStateOf(false) }
+    var showRevokeTrackingDialog by rememberSaveable { mutableStateOf(false) }
 
     // ── Remove Ads purchase sheet ─────────────────────────────────────────────
     var showPurchaseSuccessDialog by rememberSaveable { mutableStateOf(false) }
@@ -229,7 +230,10 @@ internal fun SettingsScreen(
         onRemoveAdsTap = viewModel::onFetchOfferings,
         onTimeFormatChanged = viewModel::onTimeFormatPreferenceChanged,
         onUnitPreferenceChanged = viewModel::onUnitPreferenceChanged,
-        onTrackingToggled = viewModel::onTrackingToggled,
+        onTrackingToggled = { enabled ->
+            if (enabled) viewModel.onTrackingToggled(true)
+            else showRevokeTrackingDialog = true
+        },
         onPrivacyPolicyAndTermsOfUseTap = context::openPrivacyPolicyAndTermsOfUse,
         modifier = modifier,
     )
@@ -287,6 +291,17 @@ internal fun SettingsScreen(
             onConfirm = {
                 showClearDataDialog = false
                 viewModel.clearAllData()
+            },
+        )
+    }
+
+    // ── Revoke tracking dialog ────────────────────────────────────────────────
+    if (showRevokeTrackingDialog) {
+        RevokeTrackingDialog(
+            onDismiss = { showRevokeTrackingDialog = false },
+            onConfirm = {
+                showRevokeTrackingDialog = false
+                viewModel.onTrackingToggled(false)
             },
         )
     }
@@ -777,6 +792,52 @@ internal fun SettingsContent(
             onPreferenceChanged = onUnitPreferenceChanged,
             onDismiss = { showUnitSheet = false },
         )
+    }
+}
+
+// ── Revoke tracking dialog ────────────────────────────────────────────────────
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun RevokeTrackingDialog(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+) {
+    BasicAlertDialog(onDismissRequest = onDismiss) {
+        Column(
+            modifier = Modifier
+                .clip(RoundedCornerShape(20.dp))
+                .background(color = MaterialTheme.colorScheme.background)
+                .padding(24.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.settings_revoke_tracking_title),
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+            Spacer(Modifier.height(10.dp))
+            Text(
+                text = stringResource(R.string.settings_revoke_tracking_body),
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp,
+                color = DwInk500,
+            )
+            Spacer(Modifier.height(24.dp))
+            DwPrimaryButton(
+                text = stringResource(R.string.settings_revoke_tracking_cta_confirm),
+                onClick = onConfirm,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(Modifier.height(8.dp))
+            DwSecondaryButton(
+                text = stringResource(R.string.action_cancel),
+                onClick = onDismiss,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
     }
 }
 

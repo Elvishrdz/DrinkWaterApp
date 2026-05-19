@@ -262,6 +262,11 @@
     <string name="problem_report_subject">Reporte de problema en %1$s</string>
     <string name="problem_report_body">Hola desarroladores de %1$s.\nQuiero reportar el siguiente problema en la app:\n\n</string>
 
+    <!-- Ajustes — Diálogo de revocar seguimiento -->
+    <string name="settings_revoke_tracking_title">¿Dejar de compartir datos de uso?</string>
+    <string name="settings_revoke_tracking_body">Los datos de uso nos ayudan a mejorar tu experiencia en la app al entender cómo se utiliza. ¿Seguro que deseas desactivarlos?</string>
+    <string name="settings_revoke_tracking_cta_confirm">Desactivar</string>
+
     <!-- Ajustes — Diálogo de restablecer datos -->
     <string name="settings_clear_data_body">Esto eliminará permanentemente todo tu historial de bebidas, metas diarias y ajustes. La app se reiniciará después.\n\nEsta acción no se puede deshacer.</string>
     <string name="settings_clear_data_cta_countdown">ELIMINAR TODOS LOS DATOS (%1$d)</string>

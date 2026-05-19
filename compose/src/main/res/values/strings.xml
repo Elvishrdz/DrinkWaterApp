@@ -265,6 +265,11 @@
     <string name="problem_report_subject">Problem report in %1$s</string>
     <string name="problem_report_body">Hi developers of %1$s.\nI want to report the following app problem:\n\n</string>
 
+    <!-- Settings — Revoke tracking dialog -->
+    <string name="settings_revoke_tracking_title">Stop sharing usage data?</string>
+    <string name="settings_revoke_tracking_body">Usage data helps us improve your app experience by understanding how the app is used. Are you sure you want to disable it?</string>
+    <string name="settings_revoke_tracking_cta_confirm">Disable</string>
+
     <!-- Settings — Reset data dialog -->
     <string name="settings_clear_data_body">This will permanently delete all your drink history, daily goals, and settings. The app will restart afterwards.\n\nThis action cannot be undone.</string>
     <string name="settings_clear_data_cta_countdown">DELETE ALL DATA (%1$d)</string>
