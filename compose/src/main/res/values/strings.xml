@@ -298,7 +298,7 @@
     <string name="drink_add_more_label">More</string>
     <string name="drink_suggestions_title">Drink Suggestions</string>
     <string name="drink_suggestions_close_desc">Close</string>
-    <string name="drink_custom_amount_label">Custom Amount</string>
+    <string name="drink_custom_amount_label">Custom amount in mililiters</string>
     <string name="drink_suggestion_removed">Suggestion removed</string>
     <string name="drink_action_create">Create</string>
     <string name="drink_action_drink">Drink</string>

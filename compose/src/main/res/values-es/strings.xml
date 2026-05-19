@@ -295,7 +295,7 @@
     <string name="drink_add_more_label">Más</string>
     <string name="drink_suggestions_title">Sugerencias de bebida</string>
     <string name="drink_suggestions_close_desc">Cerrar</string>
-    <string name="drink_custom_amount_label">Cantidad personalizada</string>
+    <string name="drink_custom_amount_label">Cantidad personalizada en mililitros</string>
     <string name="drink_suggestion_removed">Sugerencia eliminada</string>
     <string name="drink_action_create">Crear</string>
     <string name="drink_action_drink">Beber</string>
