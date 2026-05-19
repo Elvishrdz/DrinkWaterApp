@@ -39,7 +39,7 @@ internal class CelebrationsViewModel(
             val intent = GoalCelebrationOverlay.createIntent(
                 context = application,
                 style = style,
-                goalMl = 2400f,
+                amountMl = 2400f,
                 drinkCount = 15,
                 streakDays = 5,
             )

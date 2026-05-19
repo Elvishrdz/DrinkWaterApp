@@ -147,16 +147,17 @@ class AlarmReceiver : BroadcastReceiver() {
 
             if (goalJustReached && Settings.canDrawOverlays(context)) {
                 val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-                val drinkCount = dao.findByTimestamp(
+                val records = dao.findByTimestamp(
                     start = today.toStartOfDayTime,
                     end = today.toEndOfDayTime,
-                ).first().size
+                ).first()
+                val amountMl = records.sumOf { it.amount.toDouble() }.toFloat().coerceAtLeast(1f)
 
                 val intent = GoalCelebrationOverlay.createIntent(
                     context = context,
                     style = CelebrationStyle.Ocean,
-                    goalMl = statsBefore.goalAmount,
-                    drinkCount = drinkCount.coerceAtLeast(1),
+                    amountMl = amountMl,
+                    drinkCount = records.size.coerceAtLeast(1),
                     streakDays = 0,
                 )
 
