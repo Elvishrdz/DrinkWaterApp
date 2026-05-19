@@ -6,7 +6,6 @@ data class StatsState(
     val selectedPeriod: StatsPeriod = StatsPeriod.WEEK,
     val chartPage: Int = 0,
     val pages: List<PeriodPage> = emptyList(),
-    val goalMl: Int = 2400,
     val avgMl: Int = 0,
     val avgTrendPercent: Int = 0,
     val isTrendPositive: Boolean = true,
@@ -29,6 +28,7 @@ data class DayEntry(
     val shortLabel: String,
     val amountMl: Int,
     val isToday: Boolean = false,
+    val goalMl: Int = 0,
 )
 
 data class PeriodPage(

@@ -1,6 +1,5 @@
 package com.eahm.drinkwaterapp.feature.drink
 
-import android.os.SystemClock
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Animatable
@@ -30,7 +29,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -138,7 +136,7 @@ private fun RingSection(state: DrinkState.Data) {
 
         RotatingInfoPill(
             remaining = state.drinkStats?.remainingAmount ?: 0f,
-            alarmTriggerAtMs = state.alarmTriggerAtMs,
+            alarmCountdownMs = state.alarmCountdownMs,
         )
     }
 }
@@ -245,28 +243,10 @@ private enum class PillMessage { Remaining, NextAlarm }
 @Composable
 private fun RotatingInfoPill(
     remaining: Float,
-    alarmTriggerAtMs: Long?,
+    alarmCountdownMs: Long?,
     modifier: Modifier = Modifier,
 ) {
-    val alarmRemainingMs by produceState(
-        initialValue = alarmTriggerAtMs?.let {
-            (it - SystemClock.elapsedRealtime()).coerceAtLeast(0L)
-        },
-        key1 = alarmTriggerAtMs,
-    ) {
-        if (alarmTriggerAtMs == null) {
-            value = null
-            return@produceState
-        }
-        while (true) {
-            val rem = (alarmTriggerAtMs - SystemClock.elapsedRealtime()).coerceAtLeast(0L)
-            value = rem
-            if (rem == 0L) break
-            delay(1_000L)
-        }
-    }
-
-    val hasAlarm = alarmRemainingMs != null && alarmRemainingMs!! > 0L
+    val hasAlarm = alarmCountdownMs != null && alarmCountdownMs > 0L
     val messages = remember(hasAlarm) {
         if (hasAlarm) listOf(PillMessage.NextAlarm, PillMessage.Remaining)
         else listOf(PillMessage.Remaining)
@@ -362,7 +342,7 @@ private fun RotatingInfoPill(
                 }
 
                 PillMessage.NextAlarm -> {
-                    val ms = alarmRemainingMs ?: 0L
+                    val ms = alarmCountdownMs ?: 0L
                     Text(
                         text = buildAnnotatedString {
                             append(nextAlarmPrefix)
@@ -490,5 +470,5 @@ private val stateMock = DrinkState.Data(
     quickDrinkSuggestions = drinkSuggestionsMocks.take(3),
     allDrinkSuggestions = drinkSuggestionsMocks,
     todayLogs = previewLogEntries.take(4),
-    alarmTriggerAtMs = null,
+    alarmCountdownMs = null,
 )

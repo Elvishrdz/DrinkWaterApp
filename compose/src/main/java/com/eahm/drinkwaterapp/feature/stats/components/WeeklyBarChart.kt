@@ -88,14 +88,13 @@ private val belowGoalBrush = Brush.verticalGradient(
  * Swiping / navigating LEFT  → older dates (retroceder)
  *
  * @param pages          Ordered list of period data. pages[0] = oldest, pages[N] = most recent.
- * @param goalMl         Daily goal used to calculate bar fill ratios.
+ *                       Each [DayEntry] carries its own [DayEntry.goalMl] for that specific day.
  * @param onPageChanged  Callback fired when the visible page changes.
  */
 @Composable
 fun WeeklyBarChart(
     period: StatsPeriod,
     pages: List<PeriodPage>,
-    goalMl: Int,
     onPageChanged: (page: Int) -> Unit,
     modifier: Modifier = Modifier,
     unitPreference: UnitPreference = UnitPreference.ML,
@@ -162,7 +161,7 @@ fun WeeklyBarChart(
         ) { pageIndex ->
             BarChartPage(
                 entries = pages[pageIndex].entries,
-                goalMl = goalMl,
+                isCurrentPage = pageIndex == pagerState.currentPage,
                 unitPreference = unitPreference,
             )
         }
@@ -267,11 +266,16 @@ private fun ChartHeader(
 @Composable
 private fun BarChartPage(
     entries: List<DayEntry>,
-    goalMl: Int,
+    isCurrentPage: Boolean,
     modifier: Modifier = Modifier,
     unitPreference: UnitPreference = UnitPreference.ML,
 ) {
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
+
+    // Close the tooltip whenever this page is swiped away
+    LaunchedEffect(isCurrentPage) {
+        if (!isCurrentPage) selectedIndex = null
+    }
 
     // Monthly view: 28–31 bars. Show sparse labels to avoid vertical text stacking.
     // Show label only for day 1, multiples of 10 (10, 20, 30), and today.
@@ -293,7 +297,6 @@ private fun BarChartPage(
 
             BarColumn(
                 entry = entry,
-                goalMl = goalMl,
                 displayLabel = if (showLabel) entry.shortLabel else "",
                 isMonthly = isMonthly,
                 isSelected = selectedIndex == index,
@@ -310,7 +313,6 @@ private fun BarChartPage(
 @Composable
 private fun BarColumn(
     entry: DayEntry,
-    goalMl: Int,
     displayLabel: String,
     isMonthly: Boolean,
     isSelected: Boolean,
@@ -321,8 +323,8 @@ private fun BarColumn(
     var triggered by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { triggered = true }
 
-    val fillRatio = if (goalMl > 0 && entry.amountMl > 0) {
-        (entry.amountMl.toFloat() / goalMl).coerceIn(0f, 1f)
+    val fillRatio = if (entry.goalMl > 0 && entry.amountMl > 0) {
+        (entry.amountMl.toFloat() / entry.goalMl).coerceIn(0f, 1f)
     } else 0f
 
     val animatedFill by animateFloatAsState(
@@ -331,7 +333,7 @@ private fun BarColumn(
         label = "bar_${entry.shortLabel}",
     )
 
-    val goalMet = entry.amountMl >= goalMl
+    val goalMet = entry.amountMl >= entry.goalMl
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -362,7 +364,7 @@ private fun BarColumn(
                 Popup(alignment = Alignment.TopCenter) {
                     BarTooltip(
                         amountMl = entry.amountMl,
-                        goalMl = goalMl,
+                        goalMl = entry.goalMl,
                         unitPreference = unitPreference
                     )
                 }
@@ -452,17 +454,20 @@ private val previewPages = listOf(
     PeriodPage(
         rangeLabel = "Apr 20 – Apr 26",
         entries = listOf(
-            DayEntry("Mon", 2300), DayEntry("Tue", 2200),
-            DayEntry("Wed", 2550), DayEntry("Thu", 2100),
-            DayEntry("Fri", 2400), DayEntry("Sat", 1900), DayEntry("Sun", 2600),
+            DayEntry("Mon", 2300, goalMl = 2400), DayEntry("Tue", 2200, goalMl = 2400),
+            DayEntry("Wed", 2550, goalMl = 2400), DayEntry("Thu", 2100, goalMl = 2400),
+            DayEntry("Fri", 2400, goalMl = 2400), DayEntry("Sat", 1900, goalMl = 2400),
+            DayEntry("Sun", 2600, goalMl = 2400),
         ),
     ),
     PeriodPage(
         rangeLabel = "Apr 27 – May 3",
         entries = listOf(
-            DayEntry("Mon", 2200), DayEntry("Tue", 1500, isToday = true),
-            DayEntry("Wed", 0), DayEntry("Thu", 0),
-            DayEntry("Fri", 0), DayEntry("Sat", 0), DayEntry("Sun", 0),
+            DayEntry("Mon", 2200, goalMl = 2400),
+            DayEntry("Tue", 1500, isToday = true, goalMl = 2400),
+            DayEntry("Wed", 0, goalMl = 2400), DayEntry("Thu", 0, goalMl = 2400),
+            DayEntry("Fri", 0, goalMl = 2400), DayEntry("Sat", 0, goalMl = 2400),
+            DayEntry("Sun", 0, goalMl = 2400),
         ),
     ),
 )
@@ -474,7 +479,6 @@ private fun WeeklyBarChartPreview() {
         WeeklyBarChart(
             period = StatsPeriod.WEEK,
             pages = previewPages,
-            goalMl = 2400,
             onPageChanged = {},
             modifier = Modifier.padding(16.dp),
         )

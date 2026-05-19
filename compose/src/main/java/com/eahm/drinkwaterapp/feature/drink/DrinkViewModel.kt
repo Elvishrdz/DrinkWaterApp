@@ -28,11 +28,14 @@ import com.eahm.drinkwaterapp.system.service.goalcelebration.data.CelebrationSty
 import com.eahm.drinkwaterapp.system.service.goalcelebration.extension.createIntent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -153,32 +156,30 @@ internal class DrinkViewModel(
         initialValue = null,
     )
 
-    // Emits Unit whenever the alarm slot may have changed (settings updated).
-    private val alarmSlotSignal = combine(
-        prefsStorage.getInterval(),
-        prefsStorage.getStartTime(),
-    ) { _, _ -> Unit }
+    // Polls the alarm scheduler every second so the countdown is always fresh,
+    // even after the alarm fires and reschedules to a new slot.
+    private val alarmCountdownFlow: Flow<Long?> = flow {
+        while (true) {
+            val ms = AlarmSchedulerV3.getMillisUntilExactTrigger(
+                application,
+                DrinkAlarmManagerV2.EXACT_ALARM_ID,
+            ) ?: AlarmSchedulerV3.getMillisUntilInexactTrigger(
+                application,
+                DrinkAlarmManagerV2.INEXACT_ALARM_ID,
+            )
+            emit(ms)
+            delay(1_000)
+        }
+    }
 
     val state = combine(
         extras,
         history,
         drinkStatsObserver.drinkStats,
-        alarmSlotSignal,
-    ) { extras, history, drinkStats, _ ->
+    ) { extras, history, drinkStats ->
         if (history == null || extras == null) {
             DrinkState.Loading
         } else {
-            // Prefer the exact alarm slot; fall back to inexact when exact permission is denied.
-            val alarmTriggerAtMs = (
-                    AlarmSchedulerV3.getMillisUntilExactTrigger(
-                        application,
-                        DrinkAlarmManagerV2.EXACT_ALARM_ID
-                    )
-                        ?: AlarmSchedulerV3.getMillisUntilInexactTrigger(
-                            application,
-                            DrinkAlarmManagerV2.INEXACT_ALARM_ID
-                        )
-                    )?.let { android.os.SystemClock.elapsedRealtime() + it }
             DrinkState.Data(
                 drinkStreakDays = extras.streakData.drinkStreakDays,
                 showStreakBadge = extras.streakData.drinkStreakDays > 0,
@@ -186,11 +187,14 @@ internal class DrinkViewModel(
                 allDrinkSuggestions = extras.allDrinkSuggestions,
                 todayLogs = history.todayLogs,
                 drinkStats = drinkStats,
-                alarmTriggerAtMs = alarmTriggerAtMs,
+                alarmCountdownMs = null,
             )
         }
     }.combine(prefsStorage.getUnitPreference()) { drinkState, unitPref ->
         if (drinkState is DrinkState.Data) drinkState.copy(unitPreference = unitPref)
+        else drinkState
+    }.combine(alarmCountdownFlow) { drinkState, alarmCountdownMs ->
+        if (drinkState is DrinkState.Data) drinkState.copy(alarmCountdownMs = alarmCountdownMs)
         else drinkState
     }.stateIn(
         scope = viewModelScope,

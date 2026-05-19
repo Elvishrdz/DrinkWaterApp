@@ -1532,6 +1532,7 @@ private fun SettingsScreenPreview() {
             onClearDataTap = {},
             onRemoveAdsTap = {},
             onTimeFormatChanged = {},
+            onUnitPreferenceChanged = {},
         )
     }
 }

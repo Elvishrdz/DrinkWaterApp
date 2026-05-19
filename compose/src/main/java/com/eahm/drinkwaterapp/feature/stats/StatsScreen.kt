@@ -170,7 +170,6 @@ internal fun StatsContent(
             WeeklyBarChart(
                 period = state.selectedPeriod,
                 pages = state.pages,
-                goalMl = state.goalMl,
                 onPageChanged = onChartPageChanged,
                 unitPreference = state.unitPreference,
                 modifier = Modifier.padding(horizontal = 18.dp)
@@ -278,7 +277,6 @@ private val previewState = StatsState(
             )
         ),
     ),
-    goalMl = 2400,
     avgMl = 1850,
     avgTrendPercent = 12,
     isTrendPositive = true,

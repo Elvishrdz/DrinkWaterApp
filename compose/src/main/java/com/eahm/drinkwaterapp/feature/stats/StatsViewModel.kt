@@ -7,6 +7,7 @@ import com.eahm.drinkwaterapp.core.data.streak.StreakData
 import com.eahm.drinkwaterapp.core.data.streak.StreakRepository
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
+import com.eahm.drinkwaterapp.core.database.entity.DailyGoalEntity
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -15,7 +16,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -48,11 +48,6 @@ internal class StatsViewModel(
     private val _selectedPeriod = MutableStateFlow(StatsPeriod.WEEK)
     private val _chartPage = MutableStateFlow(0)
 
-    private val todayGoalMl: StateFlow<Int> = goalDao
-        .getGoalForDate(today.toEpochDays())
-        .map { it?.goalMl?.toInt() ?: DEFAULT_GOAL_ML.toInt() }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, DEFAULT_GOAL_ML.toInt())
-
     private val pages: StateFlow<List<PeriodPage>> = _selectedPeriod
         .flatMapLatest { period -> loadPagesFlow(period) }
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
@@ -65,19 +60,13 @@ internal class StatsViewModel(
             _selectedPeriod,
             _chartPage,
             pages,
-            todayGoalMl
-        ) { period, page, pages, dailyGoalMl ->
-            val chartGoal = when (period) {
-                StatsPeriod.YEAR -> dailyGoalMl * 30
-                else -> dailyGoalMl
-            }
+        ) { period, page, pages ->
             val safeIndex = page.coerceIn(0, (pages.size - 1).coerceAtLeast(0))
             val summary = computeSummary(pages, safeIndex)
             StatsState(
                 selectedPeriod = period,
                 chartPage = page,
                 pages = pages,
-                goalMl = chartGoal,
                 avgMl = summary.avgMl,
                 avgTrendPercent = summary.trendPercent,
                 isTrendPositive = summary.isTrendPositive,
@@ -197,25 +186,28 @@ internal class StatsViewModel(
         val thisMonday = today.minus(daysFromMonday, DateTimeUnit.DAY)
         val rangeStart = thisMonday.minus((NUM_WEEKS - 1) * 7, DateTimeUnit.DAY)
 
-        return historyDao.findByTimestamp(rangeStart.atStartOfDay(), today.atEndOfDay())
-            .map { records ->
-                val dailyTotals = records.toDailyTotals()
-                (0 until NUM_WEEKS).map { weekIndex ->
-                    val monday = thisMonday.minus(weekIndex * 7, DateTimeUnit.DAY)
-                    val sunday = monday.plus(6, DateTimeUnit.DAY)
-                    PeriodPage(
-                        rangeLabel = buildWeekRangeLabel(monday, sunday),
-                        entries = (0..6).map { dayOffset ->
-                            val date = monday.plus(dayOffset, DateTimeUnit.DAY)
-                            DayEntry(
-                                shortLabel = DAY_SHORT_LABELS[dayOffset],
-                                amountMl = (dailyTotals[date] ?: 0f).toInt(),
-                                isToday = date == today,
-                            )
-                        },
-                    )
-                }.reversed() // pages[0] = oldest, pages[N] = most recent
-            }
+        return combine(
+            historyDao.findByTimestamp(rangeStart.atStartOfDay(), today.atEndOfDay()),
+            goalDao.getAllGoals(),
+        ) { records, allGoals ->
+            val dailyTotals = records.toDailyTotals()
+            (0 until NUM_WEEKS).map { weekIndex ->
+                val monday = thisMonday.minus(weekIndex * 7, DateTimeUnit.DAY)
+                val sunday = monday.plus(6, DateTimeUnit.DAY)
+                PeriodPage(
+                    rangeLabel = buildWeekRangeLabel(monday, sunday),
+                    entries = (0..6).map { dayOffset ->
+                        val date = monday.plus(dayOffset, DateTimeUnit.DAY)
+                        DayEntry(
+                            shortLabel = DAY_SHORT_LABELS[dayOffset],
+                            amountMl = (dailyTotals[date] ?: 0f).toInt(),
+                            isToday = date == today,
+                            goalMl = allGoals.effectiveGoalForDate(date),
+                        )
+                    },
+                )
+            }.reversed() // pages[0] = oldest, pages[N] = most recent
+        }
     }
 
     /** 6 pages, oldest first. Each page = all days of a calendar month. */
@@ -230,26 +222,29 @@ internal class StatsViewModel(
         }
         val rangeStart = monthStarts.last()
 
-        return historyDao.findByTimestamp(rangeStart.atStartOfDay(), today.atEndOfDay())
-            .map { records ->
-                val dailyTotals = records.toDailyTotals()
-                monthStarts.map { monthStart ->
-                    val year = monthStart.year
-                    val month = monthStart.month
-                    val daysCount = daysInMonth(year, monthStart.monthNumber)
-                    PeriodPage(
-                        rangeLabel = buildMonthLabel(month, year),
-                        entries = (1..daysCount).map { day ->
-                            val date = LocalDate(year, month, day)
-                            DayEntry(
-                                shortLabel = day.toString(),
-                                amountMl = (dailyTotals[date] ?: 0f).toInt(),
-                                isToday = date == today,
-                            )
-                        },
-                    )
-                }.reversed() // pages[0] = oldest, pages[N] = most recent
-            }
+        return combine(
+            historyDao.findByTimestamp(rangeStart.atStartOfDay(), today.atEndOfDay()),
+            goalDao.getAllGoals(),
+        ) { records, allGoals ->
+            val dailyTotals = records.toDailyTotals()
+            monthStarts.map { monthStart ->
+                val year = monthStart.year
+                val month = monthStart.month
+                val daysCount = daysInMonth(year, monthStart.monthNumber)
+                PeriodPage(
+                    rangeLabel = buildMonthLabel(month, year),
+                    entries = (1..daysCount).map { day ->
+                        val date = LocalDate(year, month, day)
+                        DayEntry(
+                            shortLabel = day.toString(),
+                            amountMl = (dailyTotals[date] ?: 0f).toInt(),
+                            isToday = date == today,
+                            goalMl = allGoals.effectiveGoalForDate(date),
+                        )
+                    },
+                )
+            }.reversed() // pages[0] = oldest, pages[N] = most recent
+        }
     }
 
     /** 3 pages, oldest first. Each page = 12 months of a calendar year. */
@@ -257,26 +252,31 @@ internal class StatsViewModel(
         val years = (0 until NUM_YEARS).map { today.year - it }
         val rangeStart = LocalDate(years.last(), 1, 1)
 
-        return historyDao.findByTimestamp(rangeStart.atStartOfDay(), today.atEndOfDay())
-            .map { records ->
-                val monthlyTotals = records
-                    .filter { it.amount > 0f }
-                    .groupBy { Pair(it.timestamp.year, it.timestamp.monthNumber) }
-                    .mapValues { (_, entries) -> entries.sumOf { it.amount.toDouble() }.toFloat() }
+        return combine(
+            historyDao.findByTimestamp(rangeStart.atStartOfDay(), today.atEndOfDay()),
+            goalDao.getAllGoals(),
+        ) { records, allGoals ->
+            val monthlyTotals = records
+                .filter { it.amount > 0f }
+                .groupBy { Pair(it.timestamp.year, it.timestamp.monthNumber) }
+                .mapValues { (_, entries) -> entries.sumOf { it.amount.toDouble() }.toFloat() }
 
-                years.map { year ->
-                    PeriodPage(
-                        rangeLabel = year.toString(),
-                        entries = (1..12).map { monthNum ->
-                            DayEntry(
-                                shortLabel = MONTH_SHORT_LABELS[monthNum - 1],
-                                amountMl = (monthlyTotals[Pair(year, monthNum)] ?: 0f).toInt(),
-                                isToday = year == today.year && monthNum == today.monthNumber,
-                            )
-                        },
-                    )
-                }.reversed() // pages[0] = oldest, pages[N] = most recent
-            }
+            years.map { year ->
+                PeriodPage(
+                    rangeLabel = year.toString(),
+                    entries = (1..12).map { monthNum ->
+                        val daysCount = daysInMonth(year, monthNum)
+                        val lastDay = LocalDate(year, monthNum, daysCount)
+                        DayEntry(
+                            shortLabel = MONTH_SHORT_LABELS[monthNum - 1],
+                            amountMl = (monthlyTotals[Pair(year, monthNum)] ?: 0f).toInt(),
+                            isToday = year == today.year && monthNum == today.monthNumber,
+                            goalMl = allGoals.effectiveGoalForDate(lastDay) * daysCount,
+                        )
+                    },
+                )
+            }.reversed() // pages[0] = oldest, pages[N] = most recent
+        }
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
@@ -285,6 +285,16 @@ internal class StatsViewModel(
         filter { it.amount > 0f }
             .groupBy { it.timestamp.date }
             .mapValues { (_, entries) -> entries.sumOf { it.amount.toDouble() }.toFloat() }
+
+    /**
+     * Returns the effective daily goal for [date]: the most recent goal whose
+     * effective_date is on or before [date], or [DEFAULT_GOAL_ML] if none exists.
+     */
+    private fun List<DailyGoalEntity>.effectiveGoalForDate(date: LocalDate): Int =
+        filter { it.effectiveDate <= date }
+            .maxByOrNull { it.effectiveDate }
+            ?.goalMl?.toInt()
+            ?: DEFAULT_GOAL_ML.toInt()
 
     private fun LocalDate.atStartOfDay() = LocalDateTime(year, monthNumber, dayOfMonth, 0, 0, 0, 0)
     private fun LocalDate.atEndOfDay() =
