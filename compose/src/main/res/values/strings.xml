@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Drink Water App</string>
+    <string name="app_name" translatable="false">Drink Water App</string>
     <string name="channel_description">Notifications to drink water</string>
 
     <string name="volume_unit_mililiters">mL</string>

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Drink Water App</string>
     <string name="channel_description">Recordatorios para tomar agua</string>
 
     <string name="volume_unit_mililiters">mL</string>
@@ -224,10 +223,10 @@
     <string name="settings_time_format_12h_description">Muestra siempre AM / PM</string>
     <string name="settings_time_format_24h_description">Muestra siempre el reloj de 24 horas</string>
     <string name="settings_group_app">APP</string>
-    <string name="settings_unit_preference_title">Volume Units</string>
-    <string name="settings_unit_ml">Milliliters (mL)</string>
-    <string name="settings_unit_auto_liters">Auto Liters (mL / L)</string>
-    <string name="settings_unit_fl_oz">Fluid Ounces (fl oz)</string>
+    <string name="settings_unit_preference_title">Unidades de volumen</string>
+    <string name="settings_unit_ml">Mililitros (mL)</string>
+    <string name="settings_unit_auto_liters">Litros automático (mL / L)</string>
+    <string name="settings_unit_fl_oz">Onzas fluidas (fl oz)</string>
     <string name="settings_row_goal_celebrations">Celebraciones al alcanzar la meta</string>
     <string name="settings_row_reminder_type">Tipo de recordatorio</string>
     <string name="settings_row_reminder_status">Exacta</string>
