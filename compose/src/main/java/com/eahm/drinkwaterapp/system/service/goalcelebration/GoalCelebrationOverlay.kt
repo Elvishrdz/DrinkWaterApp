@@ -42,7 +42,7 @@ class GoalCelebrationOverlay : Service(),
     private var widgetView: View? = null
 
     private val style = mutableStateOf<CelebrationStyle?>(null)
-    private val goalMlState = mutableFloatStateOf(2400f)
+    private val amountMlState = mutableFloatStateOf(0f)
     private val drinkCountState = mutableIntStateOf(1)
     private val streakDaysState = mutableIntStateOf(1)
     private val unitPreferenceState = mutableStateOf(UnitPreference.ML)
@@ -62,7 +62,7 @@ class GoalCelebrationOverlay : Service(),
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         intent?.let {
             style.value = it.getSerializableCelebrationStyle(OVERLAY_STYLE)
-            goalMlState.floatValue = it.getFloatExtra(OVERLAY_GOAL_ML, goalMlState.floatValue)
+            amountMlState.floatValue = it.getFloatExtra(OVERLAY_AMOUNT_ML, amountMlState.floatValue)
             drinkCountState.intValue = it.getIntExtra(OVERLAY_DRINK_COUNT, drinkCountState.intValue)
             streakDaysState.intValue = it.getIntExtra(OVERLAY_STREAK_DAYS, streakDaysState.intValue)
             unitPreferenceState.value = it.getStringExtra(OVERLAY_UNIT_PREFERENCE)
@@ -98,7 +98,7 @@ class GoalCelebrationOverlay : Service(),
                     DrinkWaterAppTheme {
                         GoalCelebrationScreen(
                             variant = getStyle(style.value),
-                            goalMl = goalMlState.floatValue,
+                            amountMl = amountMlState.floatValue,
                             drinkCount = drinkCountState.intValue,
                             streakDays = streakDaysState.intValue,
                             draggable = true,
@@ -128,7 +128,7 @@ class GoalCelebrationOverlay : Service(),
     }
 
     private fun shareGoalCelebration(bitmap: Bitmap) {
-        val liters = "%.1f".format(goalMlState.floatValue / 1000f)
+        val liters = "%.1f".format(amountMlState.floatValue / 1000f)
         val shareText =
             "I just hit my daily water goal! ${liters}L in ${drinkCountState.intValue} glasses — day ${streakDaysState.intValue} streak!\n\nGet DrinkWater: https://drinkwaterapp.page.link/isR1"
 
@@ -142,7 +142,7 @@ class GoalCelebrationOverlay : Service(),
     companion object {
 
         const val OVERLAY_STYLE = "OVERLAY_STYLE"
-        const val OVERLAY_GOAL_ML = "OVERLAY_GOAL_ML"
+        const val OVERLAY_AMOUNT_ML = "OVERLAY_AMOUNT_ML"
         const val OVERLAY_DRINK_COUNT = "OVERLAY_DRINK_COUNT"
         const val OVERLAY_STREAK_DAYS = "OVERLAY_STREAK_DAYS"
         const val OVERLAY_UNIT_PREFERENCE = "OVERLAY_UNIT_PREFERENCE"

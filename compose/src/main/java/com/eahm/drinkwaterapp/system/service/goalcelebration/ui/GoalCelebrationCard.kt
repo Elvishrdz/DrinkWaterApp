@@ -79,7 +79,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun GoalCelebrationCard(
     variant: CelebrationVariant,
-    goalMl: Float,
+    amountMl: Float,
     drinkCount: Int,
     streakDays: Int,
     onClose: () -> Unit,
@@ -313,7 +313,7 @@ fun GoalCelebrationCard(
                         horizontalArrangement = Arrangement.SpaceEvenly,
                     ) {
                         StatCell(
-                            value = goalMl.formatVolume(unitPreference),
+                            value = amountMl.formatVolume(unitPreference),
                             unit = "",
                             label = stringResource(R.string.goal_overlay_stat_reached),
                             modifier = Modifier.weight(1f),
@@ -412,7 +412,7 @@ private fun PreviewOcean() {
     DrinkWaterAppTheme {
         GoalCelebrationCard(
             variant = CELEBRATIONS[0],
-            goalMl = 2400f,
+            amountMl = 2500f,
             drinkCount = 8,
             streakDays = 3,
             onClose = {},
@@ -427,7 +427,7 @@ private fun PreviewCarnival() {
     DrinkWaterAppTheme {
         GoalCelebrationCard(
             variant = CELEBRATIONS[1],
-            goalMl = 2400f,
+            amountMl = 2500f,
             drinkCount = 8,
             streakDays = 3,
             onClose = {},
@@ -442,7 +442,7 @@ private fun PreviewStarlight() {
     DrinkWaterAppTheme {
         GoalCelebrationCard(
             variant = CELEBRATIONS[2],
-            goalMl = 2400f,
+            amountMl = 2500f,
             drinkCount = 8,
             streakDays = 3,
             onClose = {},
@@ -457,7 +457,7 @@ private fun PreviewRain() {
     DrinkWaterAppTheme {
         GoalCelebrationCard(
             variant = CELEBRATIONS[3],
-            goalMl = 2400f,
+            amountMl = 2500f,
             drinkCount = 8,
             streakDays = 3,
             onClose = {},
@@ -472,7 +472,7 @@ private fun PreviewSunset() {
     DrinkWaterAppTheme {
         GoalCelebrationCard(
             variant = CELEBRATIONS[4],
-            goalMl = 2400f,
+            amountMl = 2500f,
             drinkCount = 8,
             streakDays = 3,
             onClose = {},
@@ -487,7 +487,7 @@ private fun PreviewMoonlit() {
     DrinkWaterAppTheme {
         GoalCelebrationCard(
             variant = CELEBRATIONS[5],
-            goalMl = 2400f,
+            amountMl = 2500f,
             drinkCount = 8,
             streakDays = 3,
             onClose = {},

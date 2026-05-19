@@ -67,7 +67,7 @@ private data class DragLimits(
 @Composable
 fun GoalCelebrationScreen(
     variant: CelebrationVariant,
-    goalMl: Float,
+    amountMl: Float,
     drinkCount: Int,
     streakDays: Int,
     draggable: Boolean = false,
@@ -171,7 +171,7 @@ fun GoalCelebrationScreen(
         ) {
             GoalCelebrationCard(
                 variant = resolvedVariant,
-                goalMl = goalMl,
+                amountMl = amountMl,
                 drinkCount = drinkCount,
                 streakDays = streakDays,
                 onClose = onClose,
@@ -246,7 +246,7 @@ private fun GoalCelebrationScreenPreview() {
     DrinkWaterAppTheme {
         GoalCelebrationScreen(
             variant = getStyle(value = CelebrationStyle.Ocean),
-            goalMl = 10f,
+            amountMl = 2500f,
             drinkCount = 5,
             streakDays = 1,
             onClose = {},

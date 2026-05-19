@@ -15,14 +15,14 @@ import java.io.FileOutputStream
 fun GoalCelebrationOverlay.Companion.createIntent(
     context: Context,
     style: CelebrationStyle,
-    goalMl: Float,
+    amountMl: Float,
     drinkCount: Int,
     streakDays: Int,
     unitPreference: UnitPreference = UnitPreference.ML,
 ): Intent {
     return Intent(context, GoalCelebrationOverlay::class.java).apply {
         putExtra(OVERLAY_STYLE, style)
-        putExtra(OVERLAY_GOAL_ML, goalMl)
+        putExtra(OVERLAY_AMOUNT_ML, amountMl)
         putExtra(OVERLAY_DRINK_COUNT, drinkCount)
         putExtra(OVERLAY_STREAK_DAYS, streakDays)
         putExtra(OVERLAY_UNIT_PREFERENCE, unitPreference.name)

@@ -300,17 +300,18 @@ internal class DrinkViewModel(
         if (Settings.canDrawOverlays(application)) {
             val currentState = state.value as? DrinkState.Data
             val today = historyDate.value
-            val count = withContext(Dispatchers.IO) {
+            val records = withContext(Dispatchers.IO) {
                 dao.findByTimestamp(
                     start = today.toStartOfDayTime,
                     end = today.toEndOfDayTime,
-                ).firstOrNull()?.size ?: 1
+                ).firstOrNull() ?: emptyList()
             }
+            val amountMl = records.sumOf { it.amount.toDouble() }.toFloat().coerceAtLeast(1f)
             val intent = GoalCelebrationOverlay.createIntent(
                 context = application,
                 style = CelebrationStyle.Ocean,
-                goalMl = currentState?.drinkStats?.goalAmount ?: 2400f,
-                drinkCount = count.coerceAtLeast(1),
+                amountMl = amountMl,
+                drinkCount = records.size.coerceAtLeast(1),
                 streakDays = streakRepository.streakData.firstOrNull()?.goalStreakDays ?: 0,
                 unitPreference = currentState?.unitPreference ?: UnitPreference.ML,
             )
