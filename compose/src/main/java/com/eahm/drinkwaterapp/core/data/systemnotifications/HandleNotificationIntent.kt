@@ -3,6 +3,7 @@ package com.eahm.drinkwaterapp.core.data.systemnotifications
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import com.eahm.drinkwaterapp.ads.BuildConfig
 import com.eahm.drinkwaterapp.core.data.systemnotifications.model.NotificationClicked
 import com.eahm.drinkwaterapp.core.data.systemnotifications.model.NotificationIntentOrigin
 import com.eahm.drinkwaterapp.core.data.systemnotifications.notification.DrinkNotification
@@ -24,8 +25,11 @@ private fun Context.handleNotificationIntent(
         NotificationClicked.action -> {
             if (notificationId == DrinkNotification.NOTIFICATION_ID) {
                 intent.action = null
-                // TODO: connect to history
-                Toast.makeText(this, "¡hello! $origin", Toast.LENGTH_SHORT).show()
+                // TODO: redirect to history
+
+                if (BuildConfig.DEBUG) {
+                    Toast.makeText(this, "¡hello! $origin", Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
