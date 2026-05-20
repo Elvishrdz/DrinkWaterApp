@@ -14,7 +14,8 @@ import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import java.util.Locale
+import android.icu.util.LocaleData
+import android.icu.util.ULocale
 import kotlinx.serialization.json.Json
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
@@ -265,9 +266,13 @@ private class DataStorePrefsStorage(
                 ?: localeDefaultUnitPreference()
         }
 
-    private fun localeDefaultUnitPreference(): UnitPreference =
-        if (Locale.getDefault().country.equals("US", ignoreCase = true)) UnitPreference.FL_OZ
-        else UnitPreference.ML
+    private fun localeDefaultUnitPreference(): UnitPreference {
+        val system = LocaleData.getMeasurementSystem(ULocale.getDefault())
+        return when (system) {
+            LocaleData.MeasurementSystem.US -> UnitPreference.FL_OZ
+            else -> UnitPreference.ML
+        }
+    }
 
     override suspend fun setUnitPreference(pref: UnitPreference) {
         dataStore.updateData { prefs ->
