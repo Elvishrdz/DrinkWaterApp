@@ -168,16 +168,20 @@ enum class BuildVariant(val buildTypeName: String) {
 ```kotlin
 BuildVariant.entries.forEach { variant ->
     val handled: Unit = when (variant) {
-        BuildVariant.DEBUG   -> { /* configure debug */   }
-        BuildVariant.STAGING -> { /* configure staging */ }
-        BuildVariant.QA      -> { /* configure qa */      }
-        BuildVariant.RELEASE -> { /* configure release */ }
+        BuildVariant.DEBUG -> { /* configure debug */
+        }
+        BuildVariant.STAGING -> { /* configure staging */
+        }
+        BuildVariant.QA -> { /* configure qa */
+        }
+        BuildVariant.RELEASE -> { /* configure release */
+        }
         // Adding a new BuildVariant entry without a branch here → compile error
     }
 }
 ```
 
-The `val handled: Unit = when (variant) { ... }` assignment turns the `when` into an expression, which Kotlin requires to be exhaustive. No annotation or helper extension needed.
+The `@Suppress("UNUSED_VARIABLE") val handled = when (variant) { ... }` assignment turns the `when` into an expression, which Kotlin requires to be exhaustive. The type is inferred as `ApplicationBuildType` (the return type of `getByName`/`create`), so `: Unit` must NOT be declared — that causes a compile error. The suppress annotation prevents the unused variable warning.
 
 ---
 
