@@ -312,12 +312,101 @@ still appear in the totals when they fall within a rendered week page.
 
 ---
 
+## Task 5 — Progress ring: hold-to-compress, release-to-bounce
+
+### Problem
+
+`bounceTap` in `RingAnimations.kt` uses `.clickable`, which fires the compress + bounce sequence
+atomically the moment a tap is detected. The user cannot "feel" the hold state — pressing and
+holding yields no visual feedback; the ring springs back before the finger is lifted.
+
+### Desired behaviour
+
+- **Press** → ring immediately compresses to 93 % scale.
+- **Hold** → ring stays at 93 % for as long as the finger is down.
+- **Release** → ring springs back with the bouncy animation; `onClick()` fires.
+- **Cancel** (e.g. finger dragged off) → ring snaps back quickly; `onClick()` does **not** fire.
+
+### Fix — `RingAnimations.kt`
+
+Replace `.clickable` + `RingAnimationEvent` / `LaunchedEffect` + `MutableSharedFlow` with
+`pointerInput` + `detectTapGestures(onPress)`:
+
+```kotlin
+fun Modifier.bounceTap(
+    onClick: () -> Unit,
+    shape: Shape = CircleShape,
+    enabled: Boolean = true,
+    rippleEnabled: Boolean = false,
+): Modifier = composed {
+    val scale = remember { Animatable(1f) }
+    val currentEnabled = rememberUpdatedState(enabled)
+    val currentOnClick = rememberUpdatedState(onClick)
+
+    this
+        .scale(scale.value)
+        .clip(shape)
+        .pointerInput(Unit) {
+            detectTapGestures(
+                onPress = { _ ->
+                    if (!currentEnabled.value) {
+                        // still consume the press so the click fires via tryAwaitRelease
+                        val released = tryAwaitRelease()
+                        if (released) currentOnClick.value()
+                        return@detectTapGestures
+                    }
+                    // Compress immediately on press
+                    scale.animateTo(0.93f, spring(stiffness = Spring.StiffnessHigh))
+                    // Suspend until finger lifts or gesture is cancelled
+                    val released = tryAwaitRelease()
+                    if (released) {
+                        // Bouncy spring-back + fire callback
+                        scale.animateTo(
+                            targetValue = 1f,
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessMedium,
+                            ),
+                        )
+                        currentOnClick.value()
+                    } else {
+                        // Gesture cancelled — snap back without callback
+                        scale.animateTo(1f, spring(stiffness = Spring.StiffnessHigh))
+                    }
+                },
+            )
+        }
+}
+```
+
+**Remove entirely:**
+- `RingAnimationEvent` class
+- `bounceEvent` / `interactions` `MutableSharedFlow`
+- `LaunchedEffect(bounceEvent)` block
+- `MutableInteractionSource` (no longer needed)
+
+**Imports to add:** `androidx.compose.foundation.gestures.detectTapGestures`,
+`androidx.compose.ui.input.pointer.pointerInput`
+
+**Imports to remove:** `androidx.compose.foundation.clickable`,
+`androidx.compose.foundation.LocalIndication`,
+`androidx.compose.foundation.interaction.MutableInteractionSource`,
+`kotlinx.coroutines.channels.BufferOverflow`,
+`kotlinx.coroutines.flow.MutableSharedFlow`,
+`kotlinx.coroutines.launch`
+
+> `RingAnimationEvent` is only instantiated inside `bounceTap`'s `composed` block, so removing
+> it has no effect on other files.
+
+---
+
 ## Commit plan
 
 1. `fix: pass unitPreference to GoalBottomSheet and NotificationAmountBottomSheet in SettingsScreen`
 2. `fix: unit-aware inline validation in goal and notification amount steppers`
 3. `feat(dev): history inject screen — bulk insert, clear all, clear by day`
 4. `fix(stats): default chart to newest page; include pre-goal drink records in query`
+5. `fix(ui): hold-to-compress, release-to-bounce on progress ring tap`
 
 ---
 
@@ -328,3 +417,4 @@ still appear in the totals when they fall within a rendered week page.
 - **T2 (L):** Change to Auto(L). Goal is 2000mL → displayed "2.0 L". Tap → type "2.5" → valid, saves 2500mL. Type "200" → error (exceeds L max ~100).
 - **T3:** Open dev menu → History tab. Add 3 rows with different dates. Tap Insert All → records appear in the app's History screen on those dates. Tap Clear Selected Day for one date → records for that day only are removed. Tap Clear All → full DB cleared.
 - **T4:** Open Stats screen → chart immediately shows the current week (not an older empty week). Previous weeks' pages (if any) show correct bar heights for logged drinks.
+- **T5:** Press and hold the progress ring → it stays compressed at ~93 % while held. Release → bouncy spring-back plays and a drink is logged. Drag finger off during hold → ring snaps back, no drink logged.
