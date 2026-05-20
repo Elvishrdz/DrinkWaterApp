@@ -11,7 +11,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -61,7 +60,6 @@ import com.eahm.drinkwaterapp.feature.drink.alarm.HomeAlarmCard
 import com.eahm.drinkwaterapp.feature.drink.ui.ProgressRing
 import com.eahm.drinkwaterapp.feature.drink.ui.QuickAddRow
 import com.eahm.drinkwaterapp.feature.drink.ui.TodayLogSection
-import com.eahm.drinkwaterapp.feature.drink.ui.WaterRisingAnimation
 import com.eahm.drinkwaterapp.feature.drink.ui.previewLogEntries
 import com.eahm.drinkwaterapp.ui.inputfield.toDigitString
 import kotlinx.coroutines.delay
@@ -125,16 +123,13 @@ private fun RingSection(state: DrinkState.Data) {
             .fillMaxWidth()
             .padding(horizontal = 24.dp, vertical = 4.dp),
     ) {
-        Box {
-            ProgressRing(
-                current = state.drinkStats?.drinkAmount ?: 0f,
-                goal = state.drinkStats?.goalAmount ?: 0f,
-                displayZeroPercentage = false,
-                onClick = {},
-                unitPreference = state.unitPreference,
-            )
-            WaterRisingAnimation(trigger = state.drinkAnimationTrigger)
-        }
+        ProgressRing(
+            current = state.drinkStats?.drinkAmount ?: 0f,
+            goal = state.drinkStats?.goalAmount ?: 0f,
+            displayZeroPercentage = false,
+            onClick = {},
+            unitPreference = state.unitPreference,
+        )
 
         Spacer(modifier = Modifier.height(10.dp))
 

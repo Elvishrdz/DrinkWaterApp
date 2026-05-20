@@ -247,7 +247,12 @@ internal class DrinkViewModel(
                 drinkAlarmManagerV2.restoreAlarm(source = "drink-button")
             }
 
-            _drinkAnimationTrigger.value += 1
+            val animEnabled = prefsStorage.getWaterAnimationEnabled().first()
+            if (animEnabled &&
+                (source == DrinkSource.QUICK_SUGGESTION || source == DrinkSource.BOTTOM_SHEET_SUGGESTION)
+            ) {
+                _drinkAnimationTrigger.value += 1
+            }
 
             if (isFirstDrink) {
                 prefsStorage.setFirstDrinkDialogSeen()

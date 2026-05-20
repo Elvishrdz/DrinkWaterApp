@@ -64,6 +64,7 @@ import com.eahm.drinkwaterapp.feature.dev.notifications.NotificationsRoot
 import com.eahm.drinkwaterapp.feature.dev.onboarding.OnboardingDevRoot
 import com.eahm.drinkwaterapp.feature.dev.streak.StreakDevRoot
 import com.eahm.drinkwaterapp.feature.dev.tracking.TrackingDevRoot
+import com.eahm.drinkwaterapp.feature.dev.wateranimation.WaterAnimationDevRoot
 import com.eahm.drinkwaterapp.feature.dev.ui.Adaptive
 import com.eahm.drinkwaterapp.ui.drinkbutton.DrinkButton
 import com.eahm.drinkwaterapp.ui.drinks.BubbleConfig
@@ -100,6 +101,7 @@ enum class DevDestination(
     TRACKING("Tracking", DwIcons.Wave),
     ALARMS("Alarms", DwIcons.Bell),
     ALARMS_V2("Alarms V2", DwIcons.Bell),
+    WATER_ANIMATION("Water Anim", DwIcons.Wave),
 }
 
 
@@ -213,6 +215,10 @@ internal fun DevRoot(onBackClicked: () -> Unit) {
             )
 
             DevDestination.ALARMS_V2 -> AlarmsV2Root(
+                onBackClicked = onBackClicked,
+            )
+
+            DevDestination.WATER_ANIMATION -> WaterAnimationDevRoot(
                 onBackClicked = onBackClicked,
             )
         }

@@ -52,5 +52,8 @@ interface PrefsStorage {
     fun getFirstDrinkDialogSeen(): Flow<Boolean>
     suspend fun setFirstDrinkDialogSeen()
 
+    fun getWaterAnimationEnabled(): Flow<Boolean>
+    suspend fun setWaterAnimationEnabled(enabled: Boolean)
+
     suspend fun clear()
 }

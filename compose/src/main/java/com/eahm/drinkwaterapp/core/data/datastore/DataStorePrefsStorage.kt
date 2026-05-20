@@ -56,6 +56,7 @@ private class DataStorePrefsStorage(
     private val timeFormatPreferenceKey = stringPreferencesKey("TIME_FORMAT_PREFERENCE")
     private val unitPreferenceKey = stringPreferencesKey("UNIT_PREFERENCE")
     private val firstDrinkDialogSeenKey = booleanPreferencesKey("FIRST_DRINK_DIALOG_SEEN")
+    private val waterAnimationEnabledKey = booleanPreferencesKey("WATER_ANIMATION_ENABLED")
 
     private val json = Json {
         ignoreUnknownKeys = true
@@ -286,6 +287,15 @@ private class DataStorePrefsStorage(
     override suspend fun setFirstDrinkDialogSeen() {
         dataStore.updateData { prefs ->
             prefs.toMutablePreferences().also { it[firstDrinkDialogSeenKey] = true }
+        }
+    }
+
+    override fun getWaterAnimationEnabled(): Flow<Boolean> =
+        dataStore.data.map { prefs -> prefs[waterAnimationEnabledKey] ?: true }
+
+    override suspend fun setWaterAnimationEnabled(enabled: Boolean) {
+        dataStore.updateData { prefs ->
+            prefs.toMutablePreferences().also { it[waterAnimationEnabledKey] = enabled }
         }
     }
 
