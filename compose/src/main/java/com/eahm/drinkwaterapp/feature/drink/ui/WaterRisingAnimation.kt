@@ -1,6 +1,8 @@
 package com.eahm.drinkwaterapp.feature.drink.ui
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -13,6 +15,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
@@ -46,6 +49,7 @@ data class WaterRisingConfig(
 internal fun WaterRisingAnimation(
     playing: Boolean,
     onAnimationDone: () -> Unit = {},
+    consumeClicks: Boolean = false,
     modifier: Modifier = Modifier,
     config: WaterRisingConfig = WaterRisingConfig(),
 ) {
@@ -118,7 +122,26 @@ internal fun WaterRisingAnimation(
         }
     }
 
-    Canvas(modifier = modifier) {
+    // While the animation is playing and consumeClicks is enabled, intercept ALL pointer
+    // events (down, move, up) before they can reach any element stacked below, preventing
+    // accidental double-taps on the drink button or other interactive elements.
+    val touchBarrier = if (playing && consumeClicks) {
+        Modifier.pointerInput(Unit) {
+            awaitEachGesture {
+                awaitFirstDown(requireUnconsumed = false).also { it.consume() }
+                var consuming = true
+                while (consuming) {
+                    val event = awaitPointerEvent()
+                    event.changes.forEach { it.consume() }
+                    consuming = event.changes.any { it.pressed }
+                }
+            }
+        }
+    } else {
+        Modifier
+    }
+
+    Canvas(modifier = modifier.then(touchBarrier)) {
         if (animAlpha <= 0f) return@Canvas
 
         val waterTopY = size.height * (1f - fillFraction) - overflowPx

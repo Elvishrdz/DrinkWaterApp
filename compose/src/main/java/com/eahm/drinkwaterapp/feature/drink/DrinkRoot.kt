@@ -44,6 +44,7 @@ internal fun DrinkRoot(
                 WaterRisingAnimation(
                     playing = data.drinkAnimationPending,
                     onAnimationDone = viewModel::onAnimationDone,
+                    consumeClicks = true,
                     modifier = Modifier.fillMaxSize(),
                 )
             }
