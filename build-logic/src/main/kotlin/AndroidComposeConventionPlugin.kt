@@ -7,6 +7,7 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
 
+@Suppress("unused")
 class AndroidComposeConventionPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
