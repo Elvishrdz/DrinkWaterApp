@@ -507,6 +507,72 @@ plugins {
 
 ---
 
+## Step 8 — Apply plugins to `:compose` and verify
+
+With all three plugins created, apply them to the `:compose` app module and confirm the project assembles cleanly.
+
+### 8.1 — Update `compose/build.gradle.kts`
+
+Replace the inline config that each plugin now owns. The result should be significantly shorter.
+
+**Plugins block** — replace the current `plugins {}` block:
+
+```kotlin
+plugins {
+    id("com.android.application")
+    id("com.android.built-in-kotlin")
+    id("drinkwater.android.buildtypes")    // creates staging + qa, signing, proguard
+    id("drinkwater.android.buildconfig")   // buildConfigFields per variant
+    id("drinkwater.android.compose")       // Compose compiler + all Compose deps
+
+    // These stay inline — not in scope for this plan
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.3.20"
+    id("com.google.devtools.ksp")
+    id("androidx.room")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
+}
+```
+
+**`android {}` block** — remove what the plugins now own:
+
+- Remove `signingConfigs { }` entirely (owned by `buildtypes` plugin)
+- Remove `buildTypes { }` entirely (owned by `buildtypes` + `buildconfig` plugins)
+- Remove `buildFeatures.compose = true` (owned by `compose` plugin)
+- Remove `buildFeatures.buildConfig = true` (owned by `buildconfig` plugin)
+- Keep `namespace`, `compileSdk`, `defaultConfig`, `compileOptions`, `room { }`
+
+**`dependencies {}` block** — remove what the Compose plugin now provides:
+
+- Remove the `compose-bom` platform import and all `androidx.compose.*` entries
+- Remove `androidx.activity:activity-compose`
+- Keep everything else (Room, DataStore, Koin, RevenueCat, Firebase, ViewModel, etc.)
+
+Also remove the top-level `localProps` / `revenuecatApiKey*` variable declarations — they are now inside the plugins.
+
+### 8.2 — Verify the build
+
+Run a full assemble for each variant to confirm no regressions:
+
+```bash
+./gradlew :compose:assembleDebug
+./gradlew :compose:assembleStaging
+./gradlew :compose:assembleQa
+./gradlew :compose:assembleRelease
+```
+
+All four must succeed. If any fails, compare the generated `BuildConfig.java` and the AGP build type list against the original `compose/build.gradle.kts` to find the discrepancy.
+
+### 8.3 — Smoke-test on device / emulator
+
+Install the `debug` variant and confirm the app launches without crashes:
+
+```bash
+./gradlew :compose:installDebug
+```
+
+---
+
 ## Decisions resolved
 
 | # | Decision | Resolution |
