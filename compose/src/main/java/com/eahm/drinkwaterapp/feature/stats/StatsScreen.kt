@@ -27,7 +27,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.eahm.drinkwaterapp.R
+import com.eahm.drinkwaterapp.ads.banner.InlineBannerAd
+import com.eahm.drinkwaterapp.core.billing.PurchaseManager
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk50
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
@@ -38,6 +41,7 @@ import com.eahm.drinkwaterapp.feature.stats.components.MiniStatsCards
 import com.eahm.drinkwaterapp.feature.stats.components.SummaryCard
 import com.eahm.drinkwaterapp.feature.stats.components.WeeklyBarChart
 import com.eahm.drinkwaterapp.ui.calendar.CalendarViewMode
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -47,11 +51,14 @@ internal fun StatsScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val calendarState by calendarViewModel.state.collectAsState()
+    val purchaseManager = koinInject<PurchaseManager>()
+    val isAdFree by purchaseManager.isAdFree.collectAsStateWithLifecycle()
 
     Scaffold { innerPadding ->
         StatsContent(
             state = state,
             calendarState = calendarState,
+            isAdFree = isAdFree,
             onPeriodSelected = { period ->
                 viewModel.onPeriodSelected(period)
                 // Keep calendar view mode in sync: year toggle → year calendar, else → month
@@ -73,6 +80,7 @@ internal fun StatsScreen(
 internal fun StatsContent(
     state: StatsState,
     calendarState: CalendarState,
+    isAdFree: Boolean = true,
     onPeriodSelected: (StatsPeriod) -> Unit,
     onChartPageChanged: (Int) -> Unit,
     onCalendarPrevious: () -> Unit,
@@ -164,6 +172,12 @@ internal fun StatsContent(
                 unitPreference = state.unitPreference,
                 modifier = Modifier.padding(horizontal = 18.dp)
             )
+        }
+
+        if (!isAdFree) {
+            item {
+                InlineBannerAd(modifier = Modifier.padding(horizontal = 18.dp))
+            }
         }
 
         item {
@@ -300,6 +314,7 @@ private fun StatsScreenPreview() {
                 today = kotlinx.datetime.LocalDate(2026, 5, 7),
                 rangeLabel = "May 2026",
             ),
+            isAdFree = false,
             onPeriodSelected = {},
             onChartPageChanged = {},
             onCalendarPrevious = {},

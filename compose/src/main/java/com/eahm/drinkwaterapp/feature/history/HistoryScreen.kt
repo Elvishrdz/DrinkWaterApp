@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.R
+import com.eahm.drinkwaterapp.ads.banner.InlineBannerAd
 import com.eahm.drinkwaterapp.core.bindings.toEntity
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -52,6 +53,7 @@ import kotlinx.datetime.LocalDateTime
 @Composable
 internal fun HistoryScreen(
     state: HistoryState.Data,
+    isAdFree: Boolean,
     onDelete: (HistoryEntity) -> Unit,
     onDateChanged: (LocalDateTime) -> Unit,
     onGoToToday: () -> Unit,
@@ -77,6 +79,7 @@ internal fun HistoryScreen(
             consumedMl = state.consumedMl,
             isToday = state.isToday,
             is24Hour = is24Hour,
+            isAdFree = isAdFree,
             unitPreference = state.unitPreference,
             onDelete = onDelete,
             onDateChanged = onDateChanged,
@@ -93,6 +96,7 @@ private fun Content(
     consumedMl: Float,
     isToday: Boolean,
     is24Hour: Boolean,
+    isAdFree: Boolean,
     modifier: Modifier = Modifier,
     unitPreference: UnitPreference = UnitPreference.ML,
     onDelete: (HistoryEntity) -> Unit,
@@ -168,6 +172,9 @@ private fun Content(
                 is24Hour = is24Hour,
                 unitPreference = unitPreference,
                 onDelete = { onDelete(it.toEntity()) },
+                secondItemContent = if (!isAdFree) {
+                    { InlineBannerAd() }
+                } else null,
             )
         } else {
             val text = if (isToday) {
@@ -187,6 +194,10 @@ private fun Content(
                     .fillMaxWidth()
                     .padding(vertical = 12.dp)
             )
+
+            if (!isAdFree) {
+                InlineBannerAd(modifier = Modifier.padding(horizontal = 18.dp))
+            }
         }
     }
 }
@@ -271,6 +282,7 @@ private fun HistoryScreenPreview() {
             consumedMl = 750f,
             isToday = false,
             is24Hour = false,
+            isAdFree = false,
             onDelete = {},
             onDateChanged = {},
             onGoToToday = {},

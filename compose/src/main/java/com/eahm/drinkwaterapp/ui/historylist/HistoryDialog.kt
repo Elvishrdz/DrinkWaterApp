@@ -168,6 +168,8 @@ fun HistoryTimeline(
     modifier: Modifier = Modifier,
     is24Hour: Boolean = true,
     unitPreference: UnitPreference = UnitPreference.ML,
+    // Rendered right after the first group (second list position). Null = no injection.
+    secondItemContent: (@Composable () -> Unit)? = null,
 ) {
     Column(
         modifier = modifier
@@ -179,7 +181,7 @@ fun HistoryTimeline(
             ),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        historyRecords.forEach { hourGroup ->
+        historyRecords.forEachIndexed { index, hourGroup ->
             TimelineHourGroup(
                 hourGroup = hourGroup,
                 isCurrentHour = hourGroup.isCurrentHour,
@@ -187,6 +189,9 @@ fun HistoryTimeline(
                 unitPreference = unitPreference,
                 onDelete = onDelete,
             )
+            if (index == 0 && secondItemContent != null) {
+                secondItemContent()
+            }
         }
     }
 }
