@@ -1,42 +1,29 @@
 plugins {
     id("com.android.application")
     id("com.android.built-in-kotlin")
+    id("drinkwater.android.application")
     id("drinkwater.android.buildtypes")
     id("drinkwater.android.buildconfig")
     id("drinkwater.android.compose")
+    id("drinkwater.android.room")
 
     id("org.jetbrains.kotlin.plugin.serialization") version "2.3.20"
-    id("com.google.devtools.ksp")
-    id("androidx.room")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
 }
 
 android {
     namespace = "com.eahm.drinkwaterapp"
-    compileSdk {
-        version = release(37)
-    }
 
     defaultConfig {
         applicationId = "com.eahm.drinkwaterapp"
-        minSdk = 24
-        targetSdk = 37
         versionCode = 23
         versionName = "2.0.0-alpha06"
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
     }
-}
-
-room {
-    schemaDirectory("$projectDir/schemas")
 }
 
 dependencies {
@@ -70,14 +57,6 @@ dependencies {
     implementation(libs.androidx.datastore)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.kotlinx.serialization.json)
-
-    // Room
-    implementation(libs.androidx.room.runtime)
-    ksp(libs.androidx.room.compiler)
-    annotationProcessor(libs.androidx.room.compiler)
-    implementation(libs.androidx.room.ktx)
-    implementation(libs.androidx.room.paging)
-    testImplementation(libs.androidx.room.testing)
 
     // Kotlin DateTime
     implementation(libs.kotlinx.datetime)

@@ -8,6 +8,7 @@ dependencies {
     compileOnly(libs.gradle)
     compileOnly(libs.kotlin.gradle.plugin)
     compileOnly(libs.compose.compiler.gradle.plugin)
+    compileOnly(libs.room.gradle.plugin)
 }
 
 gradlePlugin {
@@ -23,6 +24,14 @@ gradlePlugin {
         register("androidBuildConfig") {
             id = "drinkwater.android.buildconfig"
             implementationClass = "AndroidBuildConfigConventionPlugin"
+        }
+        register("androidApplication") {
+            id = "drinkwater.android.application"
+            implementationClass = "AndroidApplicationConventionPlugin"
+        }
+        register("androidRoom") {
+            id = "drinkwater.android.room"
+            implementationClass = "AndroidRoomConventionPlugin"
         }
     }
 }
