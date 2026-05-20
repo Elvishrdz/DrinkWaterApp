@@ -1,6 +1,6 @@
 package com.eahm.drinkwaterapp.buildlogic.domain
 
-enum class BuildVariant(val buildTypeName: String) {
+internal enum class BuildVariant(val buildTypeName: String) {
     DEBUG("debug"),
     STAGING("staging"),
     QA("qa"),
