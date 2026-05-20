@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.ads.banner.InlineBannerAd
+import com.eahm.drinkwaterapp.ads.banner.rememberInlineBannerAdState
 import com.eahm.drinkwaterapp.core.bindings.toEntity
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -103,6 +104,11 @@ private fun Content(
     onDateChanged: (LocalDateTime) -> Unit,
     onGoToToday: () -> Unit,
 ) {
+    // Hoisted here — survives date changes, item deletions, and group structural shifts.
+    // The AdView is created and loadAd fired once per screen visit regardless of how many
+    // times the list below recomposes or the banner moves between inside-group / between-group.
+    val bannerAdState = rememberInlineBannerAdState(enabled = !isAdFree)
+
     Column(modifier = modifier) {
         Column(
             modifier = Modifier
@@ -173,7 +179,7 @@ private fun Content(
                 unitPreference = unitPreference,
                 onDelete = { onDelete(it.toEntity()) },
                 secondItemContent = if (!isAdFree) {
-                    { InlineBannerAd() }
+                    { InlineBannerAd(state = bannerAdState) }
                 } else null,
             )
         } else {
@@ -196,7 +202,10 @@ private fun Content(
             )
 
             if (!isAdFree) {
-                InlineBannerAd(modifier = Modifier.padding(horizontal = 18.dp))
+                InlineBannerAd(
+                    state = bannerAdState,
+                    modifier = Modifier.padding(horizontal = 18.dp)
+                )
             }
         }
     }

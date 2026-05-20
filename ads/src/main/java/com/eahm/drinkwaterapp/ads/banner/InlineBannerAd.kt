@@ -7,6 +7,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -24,67 +26,95 @@ import com.google.android.gms.ads.LoadAdError
 private const val INLINE_TAG = "DrinkWaterInlineAd"
 
 /**
- * An inline banner ad for use inside scrollable lists or content areas.
+ * Holds the [AdView] and its loaded state so they can be hoisted to a level that survives
+ * structural list changes (date changes, item deletions, group splits).
  *
- * Improvements over [DrinkWaterBannerAd]:
- * - Loads the ad exactly once (the [DisposableEffect] key is the stable remembered [AdView]),
- *   so navigating away and back, or any recomposition, does not fire a new ad request.
- * - The ad view is only rendered after [AdListener.onAdLoaded] fires, preventing a blank
- *   placeholder from showing before the creative arrives.
- * - [AdView.destroy] is called when the composable leaves the composition, releasing resources.
+ * Create via [rememberInlineBannerAdState] at the screen/content composable level and pass the
+ * resulting instance down to [InlineBannerAd].  This ensures the AdView is created and the ad
+ * request is fired exactly once per screen visit, regardless of how many times the list below
+ * recomposes or changes structure.
+ */
+@Stable
+class InlineBannerAdState internal constructor(
+    internal val adView: AdView,
+    internal val isAdLoaded: MutableState<Boolean> = mutableStateOf(false),
+)
+
+/**
+ * Creates and remembers an [InlineBannerAdState].
+ *
+ * Must be called at a stable level in the composition (e.g. the screen's Content composable),
+ * NOT inside a list loop or a slot lambda — that would defeat the purpose of hoisting.
+ *
+ * @param enabled When false the AdView is created but [AdView.loadAd] is never called.
+ *   Pass `!isAdFree` here so that ad-free users do not trigger any network requests.
  */
 @Composable
-fun InlineBannerAd(modifier: Modifier = Modifier) {
+fun rememberInlineBannerAdState(enabled: Boolean = true): InlineBannerAdState {
     val context = LocalContext.current
     val isInPreview = LocalInspectionMode.current
 
-    // Tracks whether the ad has finished loading.
-    val isAdLoaded = remember { mutableStateOf(false) }
-
-    // The AdView instance is created once and survives recompositions.
-    val adView = remember {
-        AdView(context).apply {
-            adUnitId = BuildConfig.ADS_BANNER_UNIT_ID
-            setAdSize(AdSize.getLargeAnchoredAdaptiveBannerAdSize(context, 360))
-        }
+    val state = remember {
+        InlineBannerAdState(
+            adView = AdView(context).apply {
+                adUnitId = BuildConfig.ADS_BANNER_UNIT_ID
+                setAdSize(AdSize.getLargeAnchoredAdaptiveBannerAdSize(context, 360))
+            }
+        )
     }
 
-    // adView is stable (created via remember), so this DisposableEffect runs exactly once:
-    // on first composition it sets up the listener and fires the ad request;
-    // on disposal it cleans up to avoid memory leaks.
-    DisposableEffect(adView) {
-        adView.adListener = object : AdListener() {
-            override fun onAdLoaded() {
-                isAdLoaded.value = true
-                Log.d(INLINE_TAG, "Inline banner ad loaded.")
-            }
+    // Key is state.adView (stable via remember): runs exactly once on first composition,
+    // disposes when the calling composable leaves the composition tree (screen nav-away).
+    // enabled is captured from the first composition — sufficient because isAdFree almost
+    // never flips during a single screen visit.
+    DisposableEffect(state.adView) {
+        if (enabled && !isInPreview) {
+            state.adView.adListener = object : AdListener() {
+                override fun onAdLoaded() {
+                    state.isAdLoaded.value = true
+                    Log.d(INLINE_TAG, "Inline banner ad loaded.")
+                }
 
-            override fun onAdFailedToLoad(error: LoadAdError) {
-                Log.e(INLINE_TAG, "Inline banner ad failed to load: ${error.message}")
-            }
+                override fun onAdFailedToLoad(error: LoadAdError) {
+                    Log.e(INLINE_TAG, "Inline banner ad failed to load: ${error.message}")
+                }
 
-            override fun onAdImpression() {
-                Log.d(INLINE_TAG, "Inline banner ad impression.")
-            }
+                override fun onAdImpression() {
+                    Log.d(INLINE_TAG, "Inline banner ad impression.")
+                }
 
-            override fun onAdClicked() {
-                Log.d(INLINE_TAG, "Inline banner ad clicked.")
+                override fun onAdClicked() {
+                    Log.d(INLINE_TAG, "Inline banner ad clicked.")
+                }
             }
-        }
-
-        if (!isInPreview) {
-            adView.loadAd(AdRequest.Builder().build())
+            state.adView.loadAd(AdRequest.Builder().build())
         }
 
         onDispose {
-            adView.destroy()
+            state.adView.destroy()
         }
     }
 
-    // Render the ad only once it has loaded (or immediately in preview for tooling feedback).
-    if (isAdLoaded.value || isInPreview) {
+    return state
+}
+
+/**
+ * Renders the inline banner ad described by [state].
+ *
+ * This composable is intentionally thin — it only displays the already-loaded [AdView] held by
+ * [state].  All creation, loading, and lifecycle logic lives in [rememberInlineBannerAdState],
+ * which must be called at a higher, structurally stable level so the AdView survives list
+ * recompositions without being destroyed and re-requested.
+ */
+@Composable
+fun InlineBannerAd(
+    state: InlineBannerAdState,
+    modifier: Modifier = Modifier,
+) {
+    // Show only after the ad has loaded (or immediately in the IDE for tooling feedback).
+    if (state.isAdLoaded.value || LocalInspectionMode.current) {
         Box(modifier = modifier.fillMaxWidth()) {
-            BannerAd(adView)
+            BannerAd(state.adView)
         }
     }
 }
@@ -92,5 +122,8 @@ fun InlineBannerAd(modifier: Modifier = Modifier) {
 @Preview(apiLevel = 33)
 @Composable
 private fun InlineBannerAdPreview() {
-    Surface(color = MaterialTheme.colorScheme.background) { InlineBannerAd() }
+    Surface(color = MaterialTheme.colorScheme.background) {
+        val state = rememberInlineBannerAdState()
+        InlineBannerAd(state = state)
+    }
 }

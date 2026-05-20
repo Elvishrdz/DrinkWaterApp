@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.ads.banner.InlineBannerAd
+import com.eahm.drinkwaterapp.ads.banner.rememberInlineBannerAdState
 import com.eahm.drinkwaterapp.core.billing.PurchaseManager
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk50
@@ -88,6 +89,8 @@ internal fun StatsContent(
     onCalendarViewModeToggle: (CalendarViewMode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val bannerAdState = rememberInlineBannerAdState(enabled = !isAdFree)
+
     val periodLabelWeek = stringResource(R.string.stats_period_label_week)
     val periodLabelMonth = stringResource(R.string.stats_period_label_month)
     val periodLabelYear = stringResource(R.string.stats_period_label_year)
@@ -176,7 +179,10 @@ internal fun StatsContent(
 
         if (!isAdFree) {
             item {
-                InlineBannerAd(modifier = Modifier.padding(horizontal = 18.dp))
+                InlineBannerAd(
+                    state = bannerAdState,
+                    modifier = Modifier.padding(horizontal = 18.dp)
+                )
             }
         }
 
