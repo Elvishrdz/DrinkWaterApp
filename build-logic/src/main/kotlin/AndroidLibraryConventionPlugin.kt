@@ -1,7 +1,7 @@
 import com.android.build.api.dsl.LibraryExtension
 import com.eahm.drinkwaterapp.buildlogic.extension.JAVA_VERSION
-import com.eahm.drinkwaterapp.buildlogic.extension.MIN_SDK
 import com.eahm.drinkwaterapp.buildlogic.extension.TEST_INSTRUMENTATION_RUNNER
+import com.eahm.drinkwaterapp.buildlogic.extension.androidMinSdk
 import com.eahm.drinkwaterapp.buildlogic.extension.applyAndroidCommonConfig
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -13,18 +13,17 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             extensions.configure<LibraryExtension> {
-                applyAndroidCommonConfig()
-
-                applyDefaultConfig()
+                applyAndroidCommonConfig(target)
+                applyDefaultConfig(target)
                 applyCompileOptions()
             }
         }
     }
 }
 
-private fun LibraryExtension.applyDefaultConfig() {
+private fun LibraryExtension.applyDefaultConfig(project: Project) {
     defaultConfig {
-        minSdk = MIN_SDK
+        minSdk = project.androidMinSdk
         testInstrumentationRunner = TEST_INSTRUMENTATION_RUNNER
         consumerProguardFiles("consumer-rules.pro")
     }

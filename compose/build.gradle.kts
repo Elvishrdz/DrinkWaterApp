@@ -17,8 +17,6 @@ android {
 
     defaultConfig {
         applicationId = "com.eahm.drinkwaterapp"
-        versionCode = 23
-        versionName = "2.0.0-alpha06"
     }
 
     compileOptions {
