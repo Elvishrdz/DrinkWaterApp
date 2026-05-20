@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons.Clock
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons.Settings
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 
@@ -968,6 +969,194 @@ object DwIcons {
             ) {
                 moveTo(18f, 6f); lineTo(6f, 18f)
                 moveTo(6f, 6f); lineTo(18f, 18f)
+            }
+        }.build()
+    }
+
+    /**
+     * Alarm clock — circle body with two diagonal bell-feet at upper-left and upper-right.
+     * Visually distinct from [Clock] thanks to the bell indicators.
+     * Used for the Reminder Type setting.
+     */
+    val Alarm: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "DwAlarm",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).apply {
+            // Clock body (r=9, center 12,12)
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(12f, 3f)
+                curveToRelative(4.97f, 0f, 9f, 4.03f, 9f, 9f)
+                curveToRelative(0f, 4.97f, -4.03f, 9f, -9f, 9f)
+                curveToRelative(-4.97f, 0f, -9f, -4.03f, -9f, -9f)
+                curveToRelative(0f, -4.97f, 4.03f, -9f, 9f, -9f)
+                close()
+            }
+            // Hands: 12 o'clock → center → ~3 o'clock
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(12f, 7f)
+                verticalLineTo(12f)
+                lineTo(16f, 14f)
+            }
+            // Bell feet — diagonal lines at upper-left and upper-right
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round
+            ) {
+                moveTo(5.6f, 5.6f); lineTo(3.5f, 3.5f)
+                moveTo(18.4f, 5.6f); lineTo(20.5f, 3.5f)
+            }
+        }.build()
+    }
+
+    /**
+     * Repeat / loop arrows — two arcs with arrowheads forming a closed oval cycle.
+     * Used for the Reminder Interval setting.
+     */
+    val Repeat: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "DwRepeat",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).apply {
+            // Top-right arrowhead
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(17f, 2f)
+                lineToRelative(4f, 4f)
+                lineToRelative(-4f, 4f)
+            }
+            // Top path: left side → rounded corner → right
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round
+            ) {
+                moveTo(3f, 11f)
+                verticalLineTo(9f)
+                arcToRelative(4f, 4f, 0f, false, true, 4f, -4f)
+                horizontalLineTo(21f)
+            }
+            // Bottom-left arrowhead
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(7f, 22f)
+                lineToRelative(-4f, -4f)
+                lineToRelative(4f, -4f)
+            }
+            // Bottom path: right side → rounded corner → left
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round
+            ) {
+                moveTo(21f, 13f)
+                verticalLineTo(15f)
+                arcToRelative(4f, 4f, 0f, false, true, -4f, 4f)
+                horizontalLineTo(3f)
+            }
+        }.build()
+    }
+
+    /**
+     * Four-pointed sparkle star — N/E/S/W outer points with concave inner corners.
+     * Used for the Goal Reached Celebrations setting.
+     */
+    val Sparkle: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "DwSparkle",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).apply {
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(12f, 3f)
+                lineTo(13.5f, 10.5f)
+                lineTo(21f, 12f)
+                lineTo(13.5f, 13.5f)
+                lineTo(12f, 21f)
+                lineTo(10.5f, 13.5f)
+                lineTo(3f, 12f)
+                lineTo(10.5f, 10.5f)
+                close()
+            }
+        }.build()
+    }
+
+    /**
+     * Bar chart — three ascending rounded bars (left short, center medium, right tall).
+     * Used as the unselected-state icon for the Stats nav item.
+     */
+    val BarChart: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "DwBarChart",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).apply {
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 4f,
+                strokeLineCap = StrokeCap.Round
+            ) {
+                moveTo(5f, 20f); lineTo(5f, 16f)
+                moveTo(12f, 20f); lineTo(12f, 11f)
+                moveTo(19f, 20f); lineTo(19f, 5f)
+            }
+        }.build()
+    }
+
+    /**
+     * Bold bar chart — same three ascending bars with a heavier stroke.
+     * Used as the selected-state icon for the Stats nav item.
+     */
+    val BarChartFilled: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "DwBarChartFilled",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).apply {
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 5f,
+                strokeLineCap = StrokeCap.Round
+            ) {
+                moveTo(5f, 20f); lineTo(5f, 15f)
+                moveTo(12f, 20f); lineTo(12f, 10f)
+                moveTo(19f, 20f); lineTo(19f, 4f)
             }
         }.build()
     }

@@ -524,7 +524,7 @@ internal fun SettingsContent(
                 SettingsSection(title = stringResource(R.string.settings_section_reminders)) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                         SettingRow(
-                            icon = DwIcons.Clock,
+                            icon = DwIcons.Alarm,
                             iconBg = DwTintWater,
                             iconTint = DwWater,
                             label = stringResource(R.string.settings_row_reminder_type),
@@ -588,7 +588,7 @@ internal fun SettingsContent(
                     )
                     HorizontalDivider(color = DwInk100)
                     SettingRow(
-                        icon = DwIcons.Clock,
+                        icon = DwIcons.Repeat,
                         iconBg = DwTintWater,
                         iconTint = DwWater,
                         label = stringResource(R.string.settings_row_interval),
@@ -607,7 +607,7 @@ internal fun SettingsContent(
             item {
                 SettingsSection(title = stringResource(R.string.settings_section_overlays)) {
                     SettingRow(
-                        icon = DwIcons.Bell,
+                        icon = DwIcons.Sparkle,
                         iconBg = DwTintMagenta,
                         iconTint = DwMagenta,
                         label = stringResource(R.string.settings_row_goal_celebrations),
