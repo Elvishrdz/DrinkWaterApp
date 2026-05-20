@@ -54,7 +54,7 @@ fun DateTimePickerButton(
     label: String = "Selecciona fecha",
 ) {
     var showDatePicker by remember { mutableStateOf(false) }
-    var selectedDate by remember { mutableStateOf(selectedDateTime?.date) }
+    var selectedDate by remember(selectedDateTime) { mutableStateOf(selectedDateTime?.date) }
 
     Row(
         modifier = modifier
