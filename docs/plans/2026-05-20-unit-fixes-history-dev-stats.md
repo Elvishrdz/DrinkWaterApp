@@ -79,21 +79,51 @@ val (minDisplay, maxDisplay) = when (displayUnit) {
     DisplayUnit.FL_OZ -> Pair(GOAL_MIN / 29.574f, GOAL_MAX / 29.574f)
     DisplayUnit.L     -> Pair(GOAL_MIN / 1000f, GOAL_MAX / 1000f)
 }
+```
 
-// Convert back to mL on valid save:
+### Decimal precision — preventing round-trip divergence
+
+**Problem:** `formatVolume` rounds fl oz and L to 1 decimal place. If a user types "8.53 fl oz":
+- stored as `8.53 × 29.574 = 252.37 mL`
+- displayed back as `"%.1f".format(252.37 / 29.574)` = `"8.5 fl oz"` ← differs from input
+
+The user sees a different value after saving, which is confusing.
+
+**Fix: normalise the parsed input to the same precision as `formatVolume` BEFORE converting to mL.**
+
+```kotlin
+// Round to the precision that formatVolume uses for this unit, so the stored mL
+// value always round-trips back to exactly what the user typed (at display precision).
+val normalisedDisplay: Float = when (displayUnit) {
+    DisplayUnit.ML    -> parsed.roundToInt().toFloat()      // mL shown as integer
+    DisplayUnit.FL_OZ -> (parsed * 10).roundToInt() / 10f  // 1 decimal place
+    DisplayUnit.L     -> (parsed * 10).roundToInt() / 10f  // 1 decimal place
+}
+
 val amountMl = when (displayUnit) {
-    DisplayUnit.ML    -> parsed
-    DisplayUnit.FL_OZ -> parsed * 29.574f
-    DisplayUnit.L     -> parsed * 1000f
+    DisplayUnit.ML    -> normalisedDisplay
+    DisplayUnit.FL_OZ -> normalisedDisplay * 29.574f
+    DisplayUnit.L     -> normalisedDisplay * 1000f
 }
 onValueSet(amountMl)
 ```
 
-The `OutlinedTextField` label (hint) should also reflect the display unit so the user knows
-what to type. Change `settings_stepper_custom_hint` to be unit-aware, or add a suffix label:
+Examples after fix:
+- "8.53 fl oz" → normalised "8.5 fl oz" → stored 251.379 mL → displayed "8.5 fl oz" ✓
+- "1.52 L"    → normalised "1.5 L"     → stored 1500 mL   → displayed "1.5 L" ✓
+- "500.7 mL"  → normalised "501 mL"    → stored 501 mL    → displayed "501 mL" ✓
+
+The remaining float error after normalisation is always < 0.05 in the display unit, which
+`%.1f` absorbs by rounding, so the displayed value is guaranteed to match what was typed
+(at the precision `formatVolume` uses).
+
+### Text field label and unit hint
+
+The `OutlinedTextField` label should reflect the active unit and precision so the user knows
+exactly what to type:
 
 ```kotlin
-label = { Text(stringResource(R.string.settings_stepper_custom_hint) + " (${displayUnit.label})") }
+label = { Text("${stringResource(R.string.settings_stepper_custom_hint)} (${displayUnit.label})") }
 ```
 
 Add `val label: String` to `DisplayUnit`:
@@ -101,8 +131,9 @@ Add `val label: String` to `DisplayUnit`:
 enum class DisplayUnit(val label: String) { ML("mL"), L("L"), FL_OZ("fl oz") }
 ```
 
-> **Note:** The `effectiveDisplayUnit` helper and `DisplayUnit` enum can be placed in a shared
-> `UnitConversionUtils.kt` inside `core/domain/extension/` since all four files need it.
+> **Note:** The `effectiveDisplayUnit` helper, `DisplayUnit` enum, and `normalisedDisplay`
+> logic can be placed in a shared `UnitConversionUtils.kt` inside `core/domain/extension/`
+> since all four files need them.
 
 ### Onboarding note
 
