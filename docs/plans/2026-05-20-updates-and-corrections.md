@@ -191,9 +191,26 @@ Each stepper center value `Text` becomes `clickable`. Tapping it sets `isEditing
 - **Editing view**: `[OutlinedTextField]` + Row with `[Cancel] [Save]`
 
 Cancel → `isEditing = false`, clear text input, value unchanged.
-Save → parse + validate text, if valid call `onValueSet(parsed)`, `isEditing = false`.
+Save → parse + validate text, if valid call `onValueSet(parsed)`, `isEditing = false`. If invalid,
+show an inline error message below the field (do not close editing mode).
 
 No outer Save button coordination needed — the inline Save is self-contained.
+
+#### Input validation (per stepper)
+
+Reuse the existing constants already defined in each bottom sheet file and follow the same
+`toFloatOrNull()` / `toIntOrNull()` + range-check pattern from `AmountInputField.kt`:
+
+| Stepper | Parse as | Min | Max | Error behaviour |
+|---------|----------|-----|-----|-----------------|
+| Goal (GoalBottomSheet / StepSetGoal) | `Float` | `GOAL_MIN` (100f) | `GOAL_MAX` (100_000f) | show error text, stay in editing mode |
+| Interval (IntervalBottomSheet) | `Int` | existing `STEP_MIN` | existing `STEP_MAX` | show error text, stay in editing mode |
+| Notif amount (NotificationAmountBottomSheet / StepNotifs) | `Int` | `AMOUNT_MIN` (50) | `AMOUNT_MAX` (99999) | show error text, stay in editing mode |
+
+Validation steps for each Save tap:
+1. `toFloatOrNull()` / `toIntOrNull()` — if null, show "Invalid number" error.
+2. Range check against min/max — if out of range, show e.g. "Must be between X and Y".
+3. If valid → call `onValueSet(parsed)`, `isEditing = false`, clear error.
 
 #### Files affected
 
