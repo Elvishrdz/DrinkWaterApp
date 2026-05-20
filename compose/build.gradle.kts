@@ -1,28 +1,16 @@
-import java.util.Properties
-
 plugins {
     id("com.android.application")
     id("com.android.built-in-kotlin")
-    id("org.jetbrains.kotlin.plugin.compose")
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.3.20"
+    id("drinkwater.android.buildtypes")
+    id("drinkwater.android.buildconfig")
+    id("drinkwater.android.compose")
 
-    // Room
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.3.20"
     id("com.google.devtools.ksp")
     id("androidx.room")
-
-    // Crashlytics
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
 }
-
-val localProps = Properties().apply {
-    val file = rootProject.file("local.properties")
-    if (file.exists()) load(file.inputStream())
-}
-
-val revenuecatApiKeyDev: String = localProps.getProperty("revenuecat.api.key.dev", "")
-val revenuecatApiKeyProd: String = System.getenv("REVENUECAT_API_KEY")
-    ?: localProps.getProperty("revenuecat.api.key.prod", "")
 
 android {
     namespace = "com.eahm.drinkwaterapp"
@@ -40,99 +28,11 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    signingConfigs {
-        create("release") {
-
-            storeFile = System.getenv("KEYSTORE_PATH")
-                .takeIf { !it.isNullOrBlank() }
-                ?.let { file(it) }
-                ?: rootProject.file("keystore/drink_water_app_keystore.jks")
-
-            storePassword = System.getenv("KEYSTORE_PASSWORD")
-                ?: localProps.getProperty("keystore.password", "")
-
-            keyAlias = System.getenv("KEY_ALIAS")
-                ?: localProps.getProperty("key.alias", "")
-
-            keyPassword = System.getenv("KEY_PASSWORD")
-                ?: localProps.getProperty("key.password", "")
-        }
-    }
-
-    buildTypes {
-        // Local development only — all dev tools visible, never uploaded.
-        debug {
-            applicationIdSuffix = ".dev"
-            versionNameSuffix = "-dev"
-            buildConfigField("boolean", "IS_DEV", "true")
-            buildConfigField("boolean", "IS_STAGING", "false")
-            buildConfigField("boolean", "IS_QA", "false")
-            buildConfigField("boolean", "LOGS_ENABLED", "true")
-            buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "true")
-            buildConfigField("boolean", "FEATURE_STREAKS", "false")
-
-            buildConfigField("String", "REVENUECAT_API_KEY", "\"$revenuecatApiKeyDev\"")
-        }
-
-        // Internal / Open Testing track — beta features on, NO dev tools.
-        create("staging") {
-            initWith(getByName("release"))
-            matchingFallbacks += listOf("release")
-            applicationIdSuffix = ".staging"
-            versionNameSuffix = "-staging"
-            buildConfigField("boolean", "IS_DEV", "false")
-            buildConfigField("boolean", "IS_STAGING", "true")
-            buildConfigField("boolean", "IS_QA", "false")
-            buildConfigField("boolean", "LOGS_ENABLED", "true")
-            buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "true")
-            buildConfigField("boolean", "FEATURE_STREAKS", "false")
-
-            buildConfigField("String", "REVENUECAT_API_KEY", "\"$revenuecatApiKeyDev\"")
-        }
-
-        // Internal QA — semi-production build with dev tooling visible.
-        create("qa") {
-            initWith(getByName("debug"))
-            matchingFallbacks += listOf("debug")
-            signingConfig = signingConfigs.getByName("debug")
-            applicationIdSuffix = ".qa"
-            versionNameSuffix = "-qa"
-            buildConfigField("boolean", "IS_DEV", "false")
-            buildConfigField("boolean", "IS_STAGING", "false")
-            buildConfigField("boolean", "IS_QA", "true")
-            buildConfigField("boolean", "LOGS_ENABLED", "true")
-            buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "true")
-            buildConfigField("boolean", "FEATURE_STREAKS", "false")
-
-            // TODO: Uses prod key. QA validates the full purchase flow. Testers must use prod test accounts to avoid real charges.
-            buildConfigField("String", "REVENUECAT_API_KEY", "\"$revenuecatApiKeyDev\"")
-        }
-
-        release {
-            signingConfig = signingConfigs.getByName("release")
-            isMinifyEnabled = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-            buildConfigField("boolean", "IS_DEV", "false")
-            buildConfigField("boolean", "IS_STAGING", "false")
-            buildConfigField("boolean", "IS_QA", "false")
-            buildConfigField("boolean", "LOGS_ENABLED", "false")
-            buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "true")
-            buildConfigField("boolean", "FEATURE_STREAKS", "false")
-
-            buildConfigField("String", "REVENUECAT_API_KEY", "\"$revenuecatApiKeyProd\"")
-        }
-    }
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-
-    buildFeatures.compose = true
-    buildFeatures.buildConfig = true
 }
 
 room {
@@ -144,33 +44,16 @@ dependencies {
     implementation(project(":ads"))
     implementation(project(":analytics"))
 
-    implementation("androidx.core:core-ktx:1.18.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.10.0")
-
-    // compose
-    implementation("androidx.activity:activity-compose:1.13.0")
-    implementation(platform("androidx.compose:compose-bom:2025.12.00"))
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-graphics")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.ui:ui-text-google-fonts")
-    implementation("androidx.compose.material3:material3")
-    implementation("androidx.compose.material3:material3-adaptive-navigation-suite")
-    implementation("androidx.compose.material3.adaptive:adaptive")
-    implementation("androidx.compose.material3.adaptive:adaptive-layout")
-    implementation("androidx.compose.material3.adaptive:adaptive-navigation")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2025.12.00"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    implementation("androidx.compose.ui:ui-tooling")
-    implementation("androidx.compose.ui:ui-test-manifest")
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.lifecycle.runtime.ktx)
 
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.cardview)
     implementation(libs.androidx.core.splashscreen)
-    testImplementation("junit:junit:4.13.2")
+    testImplementation(libs.junit)
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
-    androidTestImplementation("androidx.test.ext:junit:1.3.0")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 
     // Koin
     implementation(platform(libs.koin.bom))

@@ -1,4 +1,6 @@
 [versions]
+composeBom = "2025.12.00"
+activityCompose = "1.13.0"
 composeCompilerGradlePlugin = "2.2.10"
 googleServices = "4.4.2"
 firebaseCrashlyticsGradle = "3.0.3"
@@ -75,6 +77,22 @@ androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-co
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugarJdkLibs" }
+
+# Compose
+compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+compose-ui = { group = "androidx.compose.ui", name = "ui" }
+compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+compose-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts" }
+compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+compose-material3-adaptive-nav-suite = { group = "androidx.compose.material3", name = "material3-adaptive-navigation-suite" }
+compose-material3-adaptive = { group = "androidx.compose.material3.adaptive", name = "adaptive" }
+compose-material3-adaptive-layout = { group = "androidx.compose.material3.adaptive", name = "adaptive-layout" }
+compose-material3-adaptive-navigation = { group = "androidx.compose.material3.adaptive", name = "adaptive-navigation" }
 
 [plugins]
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
