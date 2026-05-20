@@ -159,7 +159,7 @@ internal class DrinkViewModel(
     )
 
     private val _firstDrinkDialogVisible = MutableStateFlow(false)
-    private val _drinkAnimationTrigger = MutableStateFlow(0)
+    private val _animationPending = MutableStateFlow(false)
 
     // Polls the alarm scheduler every second so the countdown is always fresh,
     // even after the alarm fires and reschedules to a new slot.
@@ -216,8 +216,8 @@ internal class DrinkViewModel(
     }.combine(_firstDrinkDialogVisible) { drinkState, showDialog ->
         if (drinkState is DrinkState.Data) drinkState.copy(showFirstDrinkDialog = showDialog)
         else drinkState
-    }.combine(_drinkAnimationTrigger) { drinkState, trigger ->
-        if (drinkState is DrinkState.Data) drinkState.copy(drinkAnimationTrigger = trigger)
+    }.combine(_animationPending) { drinkState, pending ->
+        if (drinkState is DrinkState.Data) drinkState.copy(drinkAnimationPending = pending)
         else drinkState
     }.stateIn(
         scope = viewModelScope,
@@ -249,9 +249,10 @@ internal class DrinkViewModel(
 
             val animEnabled = prefsStorage.getWaterAnimationEnabled().first()
             if (animEnabled &&
+                !_animationPending.value &&
                 (source == DrinkSource.QUICK_SUGGESTION || source == DrinkSource.BOTTOM_SHEET_SUGGESTION)
             ) {
-                _drinkAnimationTrigger.value += 1
+                _animationPending.value = true
             }
 
             if (isFirstDrink) {
@@ -266,6 +267,10 @@ internal class DrinkViewModel(
 
     fun onFirstDrinkDialogDismissed() {
         _firstDrinkDialogVisible.value = false
+    }
+
+    fun onAnimationDone() {
+        _animationPending.value = false
     }
 
     fun onBottomSheetOpened(presetCount: Int) {

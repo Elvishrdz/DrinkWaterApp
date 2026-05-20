@@ -361,6 +361,9 @@
     <string name="drink_suggestions_title">Sugerencias de bebida</string>
     <string name="drink_suggestions_close_desc">Cerrar</string>
     <string name="drink_custom_amount_label">Cantidad personalizada en mililitros</string>
+    <string name="drink_custom_amount_label_ml">Cantidad (mL)</string>
+    <string name="drink_custom_amount_label_l">Cantidad (L)</string>
+    <string name="drink_custom_amount_label_fl_oz">Cantidad (fl oz)</string>
     <string name="drink_suggestion_removed">Sugerencia eliminada</string>
     <string name="drink_action_create">Crear</string>
     <string name="drink_action_drink">Beber</string>

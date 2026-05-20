@@ -20,6 +20,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -57,7 +60,6 @@ import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.feature.drink.drinkSuggestionsMocks
 import com.eahm.drinkwaterapp.ui.bottomsheet.AppBottomSheet
 import com.eahm.drinkwaterapp.ui.inputfield.AppInputField
-import com.eahm.drinkwaterapp.ui.inputfield.toDigitString
 import kotlinx.coroutines.launch
 
 /** Maximum number of suggestions the user can save. */
@@ -197,6 +199,7 @@ internal fun AddDrinkButton(
                                     }
                                 },
                                 canCreatePreset = canCreatePreset,
+                                unitPreference = unitPreference,
                             )
                             if (isDragging) {
                                 Box(
@@ -294,6 +297,8 @@ private fun InfoBullet(text: String) {
     }
 }
 
+private enum class SubUnit { ML, L, FL_OZ }
+
 @Composable
 fun InputFieldArea(
     onCreatePreset: (Float) -> Unit,
@@ -301,27 +306,84 @@ fun InputFieldArea(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     canCreatePreset: Boolean = true,
+    unitPreference: UnitPreference = UnitPreference.ML,
 ) {
-    var customAmount by rememberSaveable { mutableStateOf<Float?>(null) }
+    // For AUTO_LITERS the user can switch between mL and L; other units are fixed.
+    var selectedSubUnit by remember(unitPreference) {
+        mutableStateOf(
+            when (unitPreference) {
+                UnitPreference.FL_OZ -> SubUnit.FL_OZ
+                else -> SubUnit.ML
+            }
+        )
+    }
+
+    val effectiveUnit = when (unitPreference) {
+        UnitPreference.ML -> SubUnit.ML
+        UnitPreference.FL_OZ -> SubUnit.FL_OZ
+        UnitPreference.AUTO_LITERS -> selectedSubUnit
+    }
+
+    val label = when (effectiveUnit) {
+        SubUnit.ML -> stringResource(R.string.drink_custom_amount_label_ml)
+        SubUnit.L -> stringResource(R.string.drink_custom_amount_label_l)
+        SubUnit.FL_OZ -> stringResource(R.string.drink_custom_amount_label_fl_oz)
+    }
+    val minVal = when (effectiveUnit) {
+        SubUnit.ML -> 1f
+        SubUnit.L -> 0.001f
+        SubUnit.FL_OZ -> 0.1f
+    }
+    val maxVal = when (effectiveUnit) {
+        SubUnit.ML -> 99_999f
+        SubUnit.L -> 99.999f
+        SubUnit.FL_OZ -> 99_999f / 29.574f
+    }
+
+    // Raw text typed by the user in the display unit
+    var inputText by rememberSaveable(effectiveUnit) { mutableStateOf("") }
     var disableButtons by rememberSaveable { mutableStateOf(false) }
+
+    // Convert validated display-unit value to mL for callers
+    fun toMl(displayValue: Float): Float = when (effectiveUnit) {
+        SubUnit.ML -> displayValue
+        SubUnit.L -> displayValue * 1000f
+        SubUnit.FL_OZ -> displayValue * 29.574f
+    }
 
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(7.dp),
     ) {
-        AppInputField(
-            modifier = Modifier
-                .fillMaxWidth(),
-            label = stringResource(R.string.drink_custom_amount_label),
-            value = customAmount?.toDigitString().orEmpty(),
-            onValueChanged = {
-                customAmount = it.toFloatOrNull()
-            },
-            onHasError = {
-                disableButtons = it
-            },
-            enabled = enabled,
-        )
+        if (unitPreference == UnitPreference.AUTO_LITERS) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                AppInputField(
+                    modifier = Modifier.weight(1f),
+                    label = label,
+                    value = inputText,
+                    onValueChanged = { inputText = it },
+                    onHasError = { disableButtons = it },
+                    enabled = enabled,
+                )
+                SingleChoiceSubUnitToggle(
+                    selected = selectedSubUnit,
+                    onSelect = { selectedSubUnit = it },
+                )
+            }
+        } else {
+            AppInputField(
+                modifier = Modifier.fillMaxWidth(),
+                label = label,
+                value = inputText,
+                onValueChanged = { inputText = it },
+                onHasError = { disableButtons = it },
+                enabled = enabled,
+            )
+        }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -330,11 +392,10 @@ fun InputFieldArea(
         ) {
             DwSecondaryButton(
                 text = stringResource(R.string.drink_action_create),
-                enabled = !disableButtons && enabled && canCreatePreset,
+                enabled = !disableButtons && enabled && canCreatePreset && inputText.isNotBlank(),
                 onClick = {
-                    customAmount?.let {
-                        onCreatePreset(it)
-                    }
+                    val parsed = inputText.trim().toFloatOrNull() ?: return@DwSecondaryButton
+                    if (parsed in minVal..maxVal) onCreatePreset(toMl(parsed))
                 },
             )
 
@@ -342,13 +403,46 @@ fun InputFieldArea(
 
             DwPrimaryButton(
                 text = stringResource(R.string.drink_action_drink),
-                enabled = !disableButtons && enabled,
+                enabled = !disableButtons && enabled && inputText.isNotBlank(),
                 onClick = {
-                    customAmount?.let {
-                        onDrink(it)
-                    }
+                    val parsed = inputText.trim().toFloatOrNull() ?: return@DwPrimaryButton
+                    if (parsed in minVal..maxVal) onDrink(toMl(parsed))
                 },
             )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SingleChoiceSubUnitToggle(
+    selected: SubUnit,
+    onSelect: (SubUnit) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val options = listOf(SubUnit.ML, SubUnit.L)
+    SingleChoiceSegmentedButtonRow(modifier = modifier) {
+        options.forEachIndexed { index, unit ->
+            SegmentedButton(
+                selected = unit == selected,
+                onClick = { onSelect(unit) },
+                shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
+                colors = SegmentedButtonDefaults.colors(
+                    activeContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    activeContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    inactiveContainerColor = MaterialTheme.colorScheme.surface,
+                    inactiveContentColor = MaterialTheme.colorScheme.onSurface,
+                ),
+            ) {
+                Text(
+                    text = when (unit) {
+                        SubUnit.ML -> "mL"
+                        SubUnit.L -> "L"
+                        SubUnit.FL_OZ -> "fl oz"
+                    },
+                    style = MaterialTheme.typography.labelMedium,
+                )
+            }
         }
     }
 }

@@ -39,11 +39,13 @@ data class WaterRisingConfig(
     val bubbleCount: Int = 8,
     val waterColor: Color = DwWater,
     val bubbleColor: Color = Color.White.copy(alpha = 0.35f),
+    val overflowDp: Float = 24f,
 )
 
 @Composable
 internal fun WaterRisingAnimation(
-    trigger: Int,
+    playing: Boolean,
+    onAnimationDone: () -> Unit = {},
     modifier: Modifier = Modifier,
     config: WaterRisingConfig = WaterRisingConfig(),
 ) {
@@ -66,9 +68,10 @@ internal fun WaterRisingAnimation(
 
     val density = LocalDensity.current
     val waveAmplitudePx = with(density) { config.waveAmplitudeDp.dp.toPx() }
+    val overflowPx = with(density) { config.overflowDp.dp.toPx() }
 
-    LaunchedEffect(trigger) {
-        if (trigger == 0) return@LaunchedEffect
+    LaunchedEffect(playing) {
+        if (!playing) return@LaunchedEffect
 
         fillFraction = 0f
         animAlpha = 1f
@@ -89,18 +92,22 @@ internal fun WaterRisingAnimation(
                     fillFraction = elapsed.toFloat() / config.riseMs.toFloat()
                     animAlpha = 1f
                 }
+
                 elapsed <= config.riseMs + config.holdMs -> {
                     fillFraction = 1f
                     animAlpha = 1f
                 }
+
                 elapsed <= totalMs -> {
                     fillFraction = 1f
                     val fadeElapsed = elapsed - config.riseMs - config.holdMs
                     animAlpha = 1f - fadeElapsed.toFloat() / config.fadeMs.toFloat()
                 }
+
                 else -> {
                     animAlpha = 0f
                     fillFraction = 0f
+                    onAnimationDone()
                     break
                 }
             }
@@ -110,7 +117,7 @@ internal fun WaterRisingAnimation(
     Canvas(modifier = modifier) {
         if (animAlpha <= 0f) return@Canvas
 
-        val waterTopY = size.height * (1f - fillFraction)
+        val waterTopY = size.height * (1f - fillFraction) - overflowPx
         val wavePhase = (timeMs / 1_000f) * config.waveSpeed
 
         // Draw water body with sine-wave top edge
@@ -146,7 +153,8 @@ internal fun WaterRisingAnimation(
             for (bubble in bubbles) {
                 val t = ((timeMs.toLong() + bubble.startOffset) % bubble.cycleDuration)
                     .toFloat() / bubble.cycleDuration.toFloat()
-                val bx = size.width * (bubble.xFraction + bubble.wobble * sin(t * 4f * PI.toFloat()))
+                val bx =
+                    size.width * (bubble.xFraction + bubble.wobble * sin(t * 4f * PI.toFloat()))
                 val by = size.height - t * waterHeight
 
                 if (by >= waterTopY) {
