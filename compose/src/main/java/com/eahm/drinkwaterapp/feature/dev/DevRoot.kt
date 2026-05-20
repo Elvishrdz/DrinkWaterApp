@@ -5,25 +5,35 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.WideNavigationRailDefaults
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -42,13 +52,14 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk200
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTeal
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTealDark
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 import com.eahm.drinkwaterapp.core.domain.mock.Mock
 import com.eahm.drinkwaterapp.core.domain.mock.drinkStatsMock
 import com.eahm.drinkwaterapp.core.domain.mock.hourGroupMock
 import com.eahm.drinkwaterapp.core.domain.mock.localDateTimeMock
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
+import com.eahm.drinkwaterapp.core.presentation.LayoutType
+import com.eahm.drinkwaterapp.core.presentation.getLayoutType
 import com.eahm.drinkwaterapp.feature.dev.adaptive.AdaptiveScreen
 import com.eahm.drinkwaterapp.feature.dev.alarmcalculator.AlarmCalculatorRoot
 import com.eahm.drinkwaterapp.feature.dev.alarmintervals.AlarmIntervalsRoot
@@ -65,8 +76,8 @@ import com.eahm.drinkwaterapp.feature.dev.notifications.NotificationsRoot
 import com.eahm.drinkwaterapp.feature.dev.onboarding.OnboardingDevRoot
 import com.eahm.drinkwaterapp.feature.dev.streak.StreakDevRoot
 import com.eahm.drinkwaterapp.feature.dev.tracking.TrackingDevRoot
-import com.eahm.drinkwaterapp.feature.dev.wateranimation.WaterAnimationDevRoot
 import com.eahm.drinkwaterapp.feature.dev.ui.Adaptive
+import com.eahm.drinkwaterapp.feature.dev.wateranimation.WaterAnimationDevRoot
 import com.eahm.drinkwaterapp.ui.drinkbutton.DrinkButton
 import com.eahm.drinkwaterapp.ui.drinks.BubbleConfig
 import com.eahm.drinkwaterapp.ui.drinks.DrinkAppearance
@@ -119,42 +130,7 @@ internal fun DevRoot(onBackClicked: () -> Unit) {
         currentDestination = DevDestination.MENU
     }
 
-    val itemColors = NavigationSuiteDefaults.itemColors(
-        navigationBarItemColors = NavigationBarItemDefaults.colors(
-            selectedIconColor = DwTealDark,
-            selectedTextColor = DwTeal,
-            indicatorColor = DwTintMagenta,
-            unselectedIconColor = DwInk400,
-            unselectedTextColor = DwInk400,
-        )
-    )
-
-    val suiteColors = NavigationSuiteDefaults.colors(
-        navigationBarContainerColor = DwInk200,
-        wideNavigationRailColors = WideNavigationRailDefaults.colors(
-            containerColor = DwInk200,
-        ),
-    )
-
-    NavigationSuiteScaffold(
-        navigationSuiteColors = suiteColors,
-        navigationSuiteItems = {
-            DevDestination.entries.forEach { destination ->
-                item(
-                    icon = {
-                        Icon(
-                            imageVector = destination.icon,
-                            contentDescription = destination.label
-                        )
-                    },
-                    label = { Text(destination.label) },
-                    selected = destination == currentDestination,
-                    onClick = { currentDestination = destination },
-                    colors = itemColors,
-                )
-            }
-        }
-    ) {
+    val content: @Composable () -> Unit = {
         when (currentDestination) {
             DevDestination.MENU -> DevMenuRoot(
                 onMenuSelected = { currentDestination = it },
@@ -228,6 +204,109 @@ internal fun DevRoot(onBackClicked: () -> Unit) {
                 onBackClicked = onBackClicked,
             )
         }
+    }
+
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(currentDestination) {
+        val index = DevDestination.entries.indexOf(currentDestination)
+        if (index >= 0) listState.animateScrollToItem(index)
+    }
+
+    DevNavLayout(
+        layoutType = getLayoutType(),
+        listState = listState,
+        menuContent = {
+            items(DevDestination.entries) { destination ->
+                DevMenuItem(
+                    destination = destination,
+                    selected = destination == currentDestination,
+                    onClick = { currentDestination = destination },
+                )
+            }
+        },
+        content = content,
+    )
+}
+
+@Composable
+private fun DevNavLayout(
+    layoutType: LayoutType,
+    listState: LazyListState,
+    menuContent: LazyListScope.() -> Unit,
+    content: @Composable () -> Unit,
+) {
+    when (layoutType) {
+        LayoutType.TABLE_TOP,
+        LayoutType.LANDSCAPE,
+        LayoutType.FOLDABLE_EXPANDED,
+            -> {
+            Row(modifier = Modifier.fillMaxSize()) {
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .background(color = DwInk200),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    content = menuContent,
+                )
+
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxSize(),
+                ) {
+                    content()
+                }
+            }
+        }
+
+        LayoutType.PORTRAIT,
+            -> {
+            Column(modifier = Modifier.fillMaxSize()) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxSize(),
+                ) {
+                    content()
+                }
+
+                LazyRow(
+                    state = listState,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(color = DwInk200),
+                    verticalAlignment = Alignment.CenterVertically,
+                    content = menuContent,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DevMenuItem(
+    destination: DevDestination,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .clickable(onClick = onClick)
+            .padding(10.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Icon(
+            imageVector = destination.icon,
+            contentDescription = destination.label,
+            tint = if (selected) DwTealDark else DwInk400,
+        )
+        Text(
+            text = destination.label,
+            color = if (selected) DwTeal else DwInk400,
+        )
     }
 }
 
