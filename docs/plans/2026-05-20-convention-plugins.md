@@ -14,7 +14,7 @@ Three plugins are in scope for this plan:
 
 | Plugin ID | Purpose |
 |---|---|
-| `drinkwater.android.compose` | Configures Compose for both app and library modules |
+| `drinkwater.android.compose` | Configures Compose compiler, feature flag, and all Compose dependencies |
 | `drinkwater.android.buildtypes` | Defines the four build types for the `:compose` app module |
 | `drinkwater.android.buildconfig` | Enables `buildFeatures.buildConfig` and defines all `buildConfigField` entries per variant |
 
@@ -23,10 +23,11 @@ Three plugins are in scope for this plan:
 ## Project Constraints
 
 - Gradle 9.4.1 / AGP 9.1.1 / Kotlin 2.2.20
-- Root `build.gradle` is still **Groovy DSL**; `settings.gradle` is also Groovy.
+- Root `build.gradle` and `settings.gradle` are **Groovy DSL** — they stay as-is. `pluginManagement` in a Groovy `settings.gradle` supports `includeBuild`, so no migration is needed for this plan.
 - Module build files (`:compose`, `:ads`, `:analytics`) already use **Kotlin DSL**.
 - No existing `build-logic` or `includeBuild` setup.
 - Version catalog lives at `gradle/libs.versions.toml`.
+- `local.properties` stays at the project root. The `LocalProperties` helper inside `build-logic` reads it via `rootProject.file("local.properties")`. The file is never moved.
 
 ---
 
@@ -38,10 +39,11 @@ Create the composite build that will host all convention plugins.
 
 ```
 build-logic/
-  settings.gradle.kts          ← names the includeBuild, declares no extra repos
-  build.gradle.kts             ← applies `kotlin-dsl`, declares dependencies on AGP + Kotlin gradle plugins
+  settings.gradle.kts
+  build.gradle.kts
   src/main/kotlin/
-    BuildVariant.kt            ← shared enum (see Step 2)
+    BuildVariant.kt
+    LocalProperties.kt
     AndroidComposeConventionPlugin.kt
     AndroidBuildTypesConventionPlugin.kt
     AndroidBuildConfigConventionPlugin.kt
@@ -63,8 +65,8 @@ plugins {
 group = "com.eahm.drinkwaterapp.buildlogic"
 
 dependencies {
-    compileOnly(libs.gradle)                      // AGP
-    compileOnly(libs.kotlin.gradle.plugin)        // Kotlin Gradle Plugin
+    compileOnly(libs.gradle)                        // AGP
+    compileOnly(libs.kotlin.gradle.plugin)          // Kotlin Gradle Plugin
     compileOnly(libs.compose.compiler.gradle.plugin)
 }
 
@@ -86,9 +88,9 @@ gradlePlugin {
 }
 ```
 
-> **Note on version catalog access inside `build-logic`:** AGP 9 supports accessing the root project's version catalog from a composite build via `libs` in `build.gradle.kts`. We use this for the `compileOnly` deps above. The same catalog will NOT be auto-available inside the plugin source files — dependencies declared inside plugins must use string coordinates or be looked up explicitly. See Step 4.
+> **Version catalog access:** In `build-logic/build.gradle.kts`, `libs` refers to the root project's version catalog automatically (Gradle 9 composite build support). Inside plugin source files (`.kt`), the catalog is NOT auto-available — it must be accessed via `VersionCatalogsExtension`. See the Compose plugin step for the pattern.
 
-### Wire into root `settings.gradle`
+### Wire into root `settings.gradle` (Groovy)
 
 Add at the top of the existing `settings.gradle`:
 
@@ -105,9 +107,50 @@ pluginManagement {
 
 ---
 
-## Step 2 — `BuildVariant` enum
+## Step 2 — Version Catalog Updates (`gradle/libs.versions.toml`)
 
-Shared enum visible to all plugins. Lets each plugin safely identify the active variant without magic strings.
+The Compose plugin will add Compose dependencies programmatically. Since plugin source files access the catalog via `VersionCatalogsExtension`, all Compose libraries need to be in the catalog first.
+
+### Versions to add
+
+```toml
+[versions]
+composeBom = "2025.12.00"
+activityCompose = "1.13.0"
+```
+
+### Libraries to add
+
+```toml
+[libraries]
+# Compose BOM
+compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+
+# Compose — no version needed, managed by BOM
+compose-ui                              = { group = "androidx.compose.ui", name = "ui" }
+compose-ui-graphics                     = { group = "androidx.compose.ui", name = "ui-graphics" }
+compose-ui-tooling-preview              = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+compose-ui-tooling                      = { group = "androidx.compose.ui", name = "ui-tooling" }
+compose-ui-test-manifest                = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+compose-ui-test-junit4                  = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+compose-ui-text-google-fonts            = { group = "androidx.compose.ui", name = "ui-text-google-fonts" }
+compose-material3                       = { group = "androidx.compose.material3", name = "material3" }
+compose-material3-adaptive-nav-suite    = { group = "androidx.compose.material3", name = "material3-adaptive-navigation-suite" }
+compose-material3-adaptive              = { group = "androidx.compose.material3.adaptive", name = "adaptive" }
+compose-material3-adaptive-layout       = { group = "androidx.compose.material3.adaptive", name = "adaptive-layout" }
+compose-material3-adaptive-navigation   = { group = "androidx.compose.material3.adaptive", name = "adaptive-navigation" }
+
+# Activity Compose
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+```
+
+> TOML key `compose-bom` becomes `compose.bom` when accessed via `libs.findLibrary("compose.bom")` in plugin source.
+
+---
+
+## Step 3 — `BuildVariant` enum
+
+Single source of truth for the four variants. All plugins iterate over `BuildVariant.entries` and use an **exhaustive `when` expression** — assigning the result to a `val` forces the Kotlin compiler to error if a new entry is added but not handled. This is the static analysis guarantee.
 
 ```kotlin
 // build-logic/src/main/kotlin/BuildVariant.kt
@@ -117,40 +160,70 @@ enum class BuildVariant(val buildTypeName: String) {
     STAGING("staging"),
     QA("qa"),
     RELEASE("release");
+}
+```
 
-    companion object {
-        fun from(name: String): BuildVariant =
-            entries.firstOrNull { it.buildTypeName == name }
-                ?: error("Unknown build variant: '$name'. Expected one of: ${entries.map { it.buildTypeName }}")
+### Exhaustive `when` pattern used in all plugins
+
+```kotlin
+BuildVariant.entries.forEach { variant ->
+    val handled: Unit = when (variant) {
+        BuildVariant.DEBUG   -> { /* configure debug */   }
+        BuildVariant.STAGING -> { /* configure staging */ }
+        BuildVariant.QA      -> { /* configure qa */      }
+        BuildVariant.RELEASE -> { /* configure release */ }
+        // Adding a new BuildVariant entry without a branch here → compile error
     }
 }
 ```
 
-This enum lives in `build-logic` source, so it is compiled into the plugins and not exported to the app's runtime classpath.
+The `val handled: Unit = when (variant) { ... }` assignment turns the `when` into an expression, which Kotlin requires to be exhaustive. No annotation or helper extension needed.
 
 ---
 
-## Step 3 — `AndroidComposeConventionPlugin`
+## Step 4 — `LocalProperties` helper
 
-Configures Compose compiler plugin + `buildFeatures.compose = true`. Works for both an `applicationExtension` (app module) and a `libraryExtension` (library module) by checking which extension is present.
+Shared `Project` extension read by both `AndroidBuildTypesConventionPlugin` and `AndroidBuildConfigConventionPlugin`. Reads `local.properties` from the project root (its current location).
 
 ```kotlin
-// AndroidComposeConventionPlugin.kt
+// build-logic/src/main/kotlin/LocalProperties.kt
+
+import org.gradle.api.Project
+import java.util.Properties
+
+val Project.localProperties: Properties
+    get() = Properties().apply {
+        val file = rootProject.file("local.properties")
+        if (file.exists()) load(file.inputStream())
+    }
+```
+
+---
+
+## Step 5 — `AndroidComposeConventionPlugin`
+
+Applies the Kotlin Compose compiler plugin, sets `buildFeatures.compose = true`, and adds all Compose dependencies (BOM + libraries). Works for both app and library modules.
+
+```kotlin
+// build-logic/src/main/kotlin/AndroidComposeConventionPlugin.kt
 
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.LibraryExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.dependencies
+import org.gradle.kotlin.dsl.getByType
 
 class AndroidComposeConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            // Apply the Kotlin Compose compiler plugin (required for Compose 1.5+/K2)
             pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
 
-            // Configure whichever Android extension is present
-            val isApp = pluginManager.hasPlugin("com.android.application")
+            val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
+
+            val isApp     = pluginManager.hasPlugin("com.android.application")
             val isLibrary = pluginManager.hasPlugin("com.android.library")
 
             when {
@@ -165,26 +238,43 @@ class AndroidComposeConventionPlugin : Plugin<Project> {
                     "'com.android.application' or 'com.android.library' to be applied first."
                 )
             }
+
+            dependencies {
+                val bom = platform(libs.findLibrary("compose.bom").get())
+                add("implementation", bom)
+                add("androidTestImplementation", bom)
+
+                add("implementation", libs.findLibrary("androidx.activity.compose").get())
+                add("implementation", libs.findLibrary("compose.ui").get())
+                add("implementation", libs.findLibrary("compose.ui.graphics").get())
+                add("implementation", libs.findLibrary("compose.ui.tooling.preview").get())
+                add("implementation", libs.findLibrary("compose.ui.text.google.fonts").get())
+                add("implementation", libs.findLibrary("compose.material3").get())
+                add("implementation", libs.findLibrary("compose.material3.adaptive.nav.suite").get())
+                add("implementation", libs.findLibrary("compose.material3.adaptive").get())
+                add("implementation", libs.findLibrary("compose.material3.adaptive.layout").get())
+                add("implementation", libs.findLibrary("compose.material3.adaptive.navigation").get())
+                add("implementation", libs.findLibrary("compose.ui.tooling").get())
+                add("implementation", libs.findLibrary("compose.ui.test.manifest").get())
+                add("androidTestImplementation", libs.findLibrary("compose.ui.test.junit4").get())
+            }
         }
     }
 }
 ```
 
-**Design notes:**
-- The plugin does not add any Compose BOM or dependencies. Dependency declarations stay in each module's `build.gradle.kts` — the plugin only handles *compiler/feature flag* concerns.
-- If a future module uses `com.android.library`, this same plugin applies without changes.
+> The catalog key lookup uses the TOML alias with `-` replaced by `.`. For example `compose-ui-graphics` → `"compose.ui.graphics"`. The exact strings depend on the aliases defined in Step 2.
 
-User updates: agrega las dependencias de compose aqui, incluyendo el bom de compose. aqui todo lo necesario para correr compose. 
 ---
 
-## Step 4 — `AndroidBuildTypesConventionPlugin`
+## Step 6 — `AndroidBuildTypesConventionPlugin`
 
-Defines the four build types (`debug`, `staging`, `qa`, `release`) for the **app** module. Includes signing config setup, `applicationIdSuffix`, `versionNameSuffix`, `isMinifyEnabled`, and `proguardFiles`.
+Defines all four build types by iterating `BuildVariant.entries` with an exhaustive `when`. The enum is the single source of truth for which variants exist — adding a fifth entry without handling it here is a **compile error**.
 
-This plugin does **not** add `buildConfigField` entries — that belongs to the BuildConfig plugin.
+This plugin handles: `applicationIdSuffix`, `versionNameSuffix`, `initWith`, `matchingFallbacks`, signing config, `isMinifyEnabled`, and `proguardFiles`. No `buildConfigField` here.
 
 ```kotlin
-// AndroidBuildTypesConventionPlugin.kt
+// build-logic/src/main/kotlin/AndroidBuildTypesConventionPlugin.kt
 
 import com.android.build.api.dsl.ApplicationExtension
 import org.gradle.api.Plugin
@@ -194,6 +284,8 @@ import org.gradle.kotlin.dsl.configure
 class AndroidBuildTypesConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
+            val props = localProperties
+
             extensions.configure<ApplicationExtension> {
 
                 signingConfigs {
@@ -204,44 +296,57 @@ class AndroidBuildTypesConventionPlugin : Plugin<Project> {
                             ?: rootProject.file("keystore/drink_water_app_keystore.jks")
 
                         storePassword = System.getenv("KEYSTORE_PASSWORD")
-                            ?: localProperties["keystore.password"] as? String ?: ""
+                            ?: props.getProperty("keystore.password", "")
 
                         keyAlias = System.getenv("KEY_ALIAS")
-                            ?: localProperties["key.alias"] as? String ?: ""
+                            ?: props.getProperty("key.alias", "")
 
                         keyPassword = System.getenv("KEY_PASSWORD")
-                            ?: localProperties["key.password"] as? String ?: ""
+                            ?: props.getProperty("key.password", "")
                     }
                 }
 
                 buildTypes {
-                    debug {
-                        applicationIdSuffix = ".dev"
-                        versionNameSuffix = "-dev"
-                    }
+                    BuildVariant.entries.forEach { variant ->
+                        val handled: Unit = when (variant) {
 
-                    create("staging") {
-                        initWith(getByName("release"))
-                        matchingFallbacks += listOf("release")
-                        applicationIdSuffix = ".staging"
-                        versionNameSuffix = "-staging"
-                    }
+                            BuildVariant.DEBUG -> {
+                                getByName(variant.buildTypeName) {
+                                    applicationIdSuffix = ".dev"
+                                    versionNameSuffix = "-dev"
+                                }
+                            }
 
-                    create("qa") {
-                        initWith(getByName("debug"))
-                        matchingFallbacks += listOf("debug")
-                        signingConfig = signingConfigs.getByName("debug")
-                        applicationIdSuffix = ".qa"
-                        versionNameSuffix = "-qa"
-                    }
+                            BuildVariant.STAGING -> {
+                                create(variant.buildTypeName) {
+                                    initWith(getByName(BuildVariant.RELEASE.buildTypeName))
+                                    matchingFallbacks += listOf(BuildVariant.RELEASE.buildTypeName)
+                                    applicationIdSuffix = ".staging"
+                                    versionNameSuffix = "-staging"
+                                }
+                            }
 
-                    release {
-                        signingConfig = signingConfigs.getByName("release")
-                        isMinifyEnabled = true
-                        proguardFiles(
-                            getDefaultProguardFile("proguard-android-optimize.txt"),
-                            "proguard-rules.pro"
-                        )
+                            BuildVariant.QA -> {
+                                create(variant.buildTypeName) {
+                                    initWith(getByName(BuildVariant.DEBUG.buildTypeName))
+                                    matchingFallbacks += listOf(BuildVariant.DEBUG.buildTypeName)
+                                    signingConfig = signingConfigs.getByName(BuildVariant.DEBUG.buildTypeName)
+                                    applicationIdSuffix = ".qa"
+                                    versionNameSuffix = "-qa"
+                                }
+                            }
+
+                            BuildVariant.RELEASE -> {
+                                getByName(variant.buildTypeName) {
+                                    signingConfig = signingConfigs.getByName("release")
+                                    isMinifyEnabled = true
+                                    proguardFiles(
+                                        getDefaultProguardFile("proguard-android-optimize.txt"),
+                                        "proguard-rules.pro"
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -250,31 +355,16 @@ class AndroidBuildTypesConventionPlugin : Plugin<Project> {
 }
 ```
 
-**`localProperties` helper:** The plugin needs to read `local.properties` at configuration time. Rather than duplicating the `Properties().apply { load(...) }` pattern in every plugin, we can define a small extension at the top of `build-logic/src/main/kotlin/`:
-
-```kotlin
-// LocalProperties.kt  (shared helper inside build-logic)
-import org.gradle.api.Project
-import java.util.Properties
-
-val Project.localProperties: Properties
-    get() = Properties().apply {
-        val file = rootProject.file("local.properties")
-        if (file.exists()) load(file.inputStream())
-    }
-```
-
-user update: hay que usar en build variant enum para crear cada build variant. me imagino hacer loop y crear cada variante. la idea es restringir la cantidad de variantes con analisis de codigo statico para evitar que otro convention plugin cree una variante que otros plugins no soporten. 
-
+> `DEBUG` and `RELEASE` use `getByName()` because AGP creates them automatically. `STAGING` and `QA` use `create()` because they are custom build types.
 
 ---
 
-## Step 5 — `AndroidBuildConfigConventionPlugin`
+## Step 7 — `AndroidBuildConfigConventionPlugin`
 
-Enables `buildFeatures.buildConfig = true` and adds all `buildConfigField` entries per variant. This plugin also reads secrets from `local.properties` / environment variables.
+Enables `buildFeatures.buildConfig = true` and defines all `buildConfigField` entries. Uses the same exhaustive `when` over `BuildVariant.entries` — if a new variant is added to the enum, this file must be updated or the build fails.
 
 ```kotlin
-// AndroidBuildConfigConventionPlugin.kt
+// build-logic/src/main/kotlin/AndroidBuildConfigConventionPlugin.kt
 
 import com.android.build.api.dsl.ApplicationExtension
 import org.gradle.api.Plugin
@@ -286,7 +376,7 @@ class AndroidBuildConfigConventionPlugin : Plugin<Project> {
         with(target) {
             val props = localProperties
 
-            val revenuecatDev = props.getProperty("revenuecat.api.key.dev", "")
+            val revenuecatDev  = props.getProperty("revenuecat.api.key.dev", "")
             val revenuecatProd = System.getenv("REVENUECAT_API_KEY")
                 ?: props.getProperty("revenuecat.api.key.prod", "")
 
@@ -294,46 +384,49 @@ class AndroidBuildConfigConventionPlugin : Plugin<Project> {
                 buildFeatures.buildConfig = true
 
                 buildTypes {
-                    debug {
-                        buildConfigField("boolean", "IS_DEV",    "true")
-                        buildConfigField("boolean", "IS_STAGING","false")
-                        buildConfigField("boolean", "IS_QA",     "false")
-                        buildConfigField("boolean", "LOGS_ENABLED",            "true")
-                        buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "true")
-                        buildConfigField("boolean", "FEATURE_STREAKS",         "false")
-                        buildConfigField("String",  "REVENUECAT_API_KEY", "\"$revenuecatDev\"")
-                    }
+                    BuildVariant.entries.forEach { variant ->
+                        val handled: Unit = when (variant) {
 
-                    // staging / qa / release are referenced by name because they are
-                    // created by AndroidBuildTypesConventionPlugin which must be applied first.
-                    getByName(BuildVariant.STAGING.buildTypeName) {
-                        buildConfigField("boolean", "IS_DEV",    "false")
-                        buildConfigField("boolean", "IS_STAGING","true")
-                        buildConfigField("boolean", "IS_QA",     "false")
-                        buildConfigField("boolean", "LOGS_ENABLED",            "true")
-                        buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "true")
-                        buildConfigField("boolean", "FEATURE_STREAKS",         "false")
-                        buildConfigField("String",  "REVENUECAT_API_KEY", "\"$revenuecatDev\"")
-                    }
+                            BuildVariant.DEBUG -> getByName(variant.buildTypeName) {
+                                buildConfigField("boolean", "IS_DEV",    "true")
+                                buildConfigField("boolean", "IS_STAGING","false")
+                                buildConfigField("boolean", "IS_QA",     "false")
+                                buildConfigField("boolean", "LOGS_ENABLED",            "true")
+                                buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "true")
+                                buildConfigField("boolean", "FEATURE_STREAKS",         "false")
+                                buildConfigField("String",  "REVENUECAT_API_KEY", "\"$revenuecatDev\"")
+                            }
 
-                    getByName(BuildVariant.QA.buildTypeName) {
-                        buildConfigField("boolean", "IS_DEV",    "false")
-                        buildConfigField("boolean", "IS_STAGING","false")
-                        buildConfigField("boolean", "IS_QA",     "true")
-                        buildConfigField("boolean", "LOGS_ENABLED",            "true")
-                        buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "true")
-                        buildConfigField("boolean", "FEATURE_STREAKS",         "false")
-                        buildConfigField("String",  "REVENUECAT_API_KEY", "\"$revenuecatDev\"")
-                    }
+                            BuildVariant.STAGING -> getByName(variant.buildTypeName) {
+                                buildConfigField("boolean", "IS_DEV",    "false")
+                                buildConfigField("boolean", "IS_STAGING","true")
+                                buildConfigField("boolean", "IS_QA",     "false")
+                                buildConfigField("boolean", "LOGS_ENABLED",            "true")
+                                buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "true")
+                                buildConfigField("boolean", "FEATURE_STREAKS",         "false")
+                                buildConfigField("String",  "REVENUECAT_API_KEY", "\"$revenuecatDev\"")
+                            }
 
-                    release {
-                        buildConfigField("boolean", "IS_DEV",    "false")
-                        buildConfigField("boolean", "IS_STAGING","false")
-                        buildConfigField("boolean", "IS_QA",     "false")
-                        buildConfigField("boolean", "LOGS_ENABLED",            "false")
-                        buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "true")
-                        buildConfigField("boolean", "FEATURE_STREAKS",         "false")
-                        buildConfigField("String",  "REVENUECAT_API_KEY", "\"$revenuecatProd\"")
+                            BuildVariant.QA -> getByName(variant.buildTypeName) {
+                                buildConfigField("boolean", "IS_DEV",    "false")
+                                buildConfigField("boolean", "IS_STAGING","false")
+                                buildConfigField("boolean", "IS_QA",     "true")
+                                buildConfigField("boolean", "LOGS_ENABLED",            "true")
+                                buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "true")
+                                buildConfigField("boolean", "FEATURE_STREAKS",         "false")
+                                buildConfigField("String",  "REVENUECAT_API_KEY", "\"$revenuecatDev\"")
+                            }
+
+                            BuildVariant.RELEASE -> getByName(variant.buildTypeName) {
+                                buildConfigField("boolean", "IS_DEV",    "false")
+                                buildConfigField("boolean", "IS_STAGING","false")
+                                buildConfigField("boolean", "IS_QA",     "false")
+                                buildConfigField("boolean", "LOGS_ENABLED",            "false")
+                                buildConfigField("boolean", "FEATURE_REQUEST_FEATURE", "true")
+                                buildConfigField("boolean", "FEATURE_STREAKS",         "false")
+                                buildConfigField("String",  "REVENUECAT_API_KEY", "\"$revenuecatProd\"")
+                            }
+                        }
                     }
                 }
             }
@@ -342,31 +435,21 @@ class AndroidBuildConfigConventionPlugin : Plugin<Project> {
 }
 ```
 
-**Important ordering constraint:** `AndroidBuildConfigConventionPlugin` calls `getByName("staging")` and `getByName("qa")`, which means those build types must already exist when this plugin is applied. Therefore in `compose/build.gradle.kts`, the application order must be:
-
-```
-drinkwater.android.buildtypes   ← creates staging + qa
-drinkwater.android.buildconfig  ← configures fields on them
-```
-
-This is safe and explicit. Both plugins only touch build type configuration — they do not conflict.
-
-
-user update: usando en enum podremos restringir la creacion de variantes y explicitamente definir aqui la configuracion necesaria si otro enum se agrega en el futuro. 
+> `STAGING` and `QA` use `getByName()` here (not `create()`) because `AndroidBuildTypesConventionPlugin` must be applied first and has already created them. See plugin application order below.
 
 ---
 
 ## Plugin application order (future reference)
 
-When the plugins are eventually applied to `:compose`, the recommended order is:
+When the plugins are eventually applied to `:compose`, the required order is:
 
 ```kotlin
 plugins {
     id("com.android.application")
     id("com.android.built-in-kotlin")
-    id("drinkwater.android.buildtypes")    // must be before buildconfig
-    id("drinkwater.android.buildconfig")
-    id("drinkwater.android.compose")
+    id("drinkwater.android.buildtypes")    // creates staging + qa first
+    id("drinkwater.android.buildconfig")   // then configures fields on all four
+    id("drinkwater.android.compose")       // compiler plugin + deps
     // ... other plugins (ksp, room, firebase, serialization)
 }
 ```
@@ -382,22 +465,13 @@ plugins {
 
 ---
 
-## Open Questions / Decisions to confirm
+## Decisions resolved
 
-1. **`BuildVariant` scope:** The enum is defined in `build-logic` source. It is available to all plugin files but not to the app's production code. If the app itself ever needs to branch on build variant at runtime, it already has `BuildConfig.IS_DEV` etc. — the enum is build-time only. This is intentional.
-
-update: el enum estara solo disponible para los plugins no hay problema.
-
-2. **`signingConfigs` inside plugin vs inline:** Moving signing config into the plugin means the plugin file will be the single source of truth for keystore resolution logic. The `compose/build.gradle.kts` will no longer need the `localProps` boilerplate for signing. Confirm this is acceptable.
-
-update: todavia quiero mantener las api keys y secrets en local.properties, tendriamos que configurar para apuntar al archivo de forma correcta. no quiero moverlo tampoco.
-
-3. **`local.properties` helper placement:** The `LocalProperties.kt` helper could go directly in one of the plugin files or as a shared `Project` extension. Shared extension is cleaner and avoids duplication across the three plugins.
-
-update: prefiero que se quede donde esta el archivo original local.properties, el helper puede estar ubicado donde mejor este. pero el local.properties lo quiero siempre donde esta ahora.
-
-4. **Feature flags in BuildConfig plugin:** Currently `FEATURE_STREAKS` and `FEATURE_REQUEST_FEATURE` are hardcoded per variant. If they vary per release cycle, having them in one plugin file makes them easy to update. Confirm the flags defined above match the intended defaults.
-
-5. **Groovy root build files:** The root `build.gradle` and `settings.gradle` are still Groovy. Migrating them to Kotlin DSL is not in scope for this plan but is a natural next step.
-
-update: si podemos trabajar con groovy y luego migrar el codigo que vamos a generar con este plan, entonces no hay problema. de lo contrario vamos a migrar si se necesita algo especifico de kotlin dsl.
+| # | Decision | Resolution |
+|---|---|---|
+| 1 | `BuildVariant` scope | Enum lives in `build-logic`, compile-time only, not on app runtime classpath. |
+| 2 | Secrets location | `local.properties` stays at project root. Plugin reads via `rootProject.file("local.properties")`. |
+| 3 | `LocalProperties` helper location | Shared `Project` extension in `build-logic/src/main/kotlin/LocalProperties.kt`. |
+| 4 | Feature flags defaults | `FEATURE_REQUEST_FEATURE = true` on all variants. `FEATURE_STREAKS = false` on all variants. Update in one place when they change. |
+| 5 | Groovy root build files | No migration needed. `pluginManagement { includeBuild("build-logic") }` works in Groovy `settings.gradle`. Migrate only if a future step specifically requires Kotlin DSL. |
+| 6 | Compose deps scope | Compose plugin owns all Compose dependencies. Modules applying it do not need to re-declare them. |
