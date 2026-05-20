@@ -1,3 +1,5 @@
+package com.eahm.drinkwaterapp.buildlogic.extension
+
 import org.gradle.api.Project
 import java.util.Properties
 
