@@ -6,6 +6,8 @@ import android.app.Application
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
@@ -140,7 +142,11 @@ internal class SettingsViewModel(
             state.copy(timeFormatPreference = timeFormatPreference)
         }
         .combine(prefsStorage.getUnitPreference()) { state, unitPref ->
-            state.copy(unitPreference = unitPref)
+            val rawTag = AppCompatDelegate.getApplicationLocales().toLanguageTags()
+            state.copy(
+                unitPreference = unitPref,
+                currentLocaleTag = if (rawTag == "und" || rawTag.isBlank()) "" else rawTag,
+            )
         }
         .stateIn(
             scope = viewModelScope,
@@ -227,6 +233,12 @@ internal class SettingsViewModel(
 
     fun onUnitPreferenceChanged(pref: UnitPreference) {
         viewModelScope.launch { prefsStorage.setUnitPreference(pref) }
+    }
+
+    fun onLanguageChanged(tag: String) {
+        val locales = if (tag.isEmpty()) LocaleListCompat.getEmptyLocaleList()
+        else LocaleListCompat.forLanguageTags(tag)
+        AppCompatDelegate.setApplicationLocales(locales)
     }
 
     fun onDrawOverlayPermissionResult() {

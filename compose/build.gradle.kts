@@ -164,6 +164,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling")
     implementation("androidx.compose.ui:ui-test-manifest")
 
+    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.cardview)
     implementation(libs.androidx.core.splashscreen)
     testImplementation("junit:junit:4.13.2")

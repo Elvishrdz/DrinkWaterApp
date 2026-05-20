@@ -239,6 +239,9 @@
     <string name="settings_row_interval">Interval</string>
     <string name="settings_row_notification_amount">Notification amount</string>
     <string name="settings_row_time_format">Time format</string>
+    <string name="settings_row_language">Language</string>
+    <string name="settings_language_system">System default</string>
+    <string name="settings_language_apply">Apply changes</string>
     <string name="settings_time_format_auto">Auto</string>
     <string name="settings_time_format_auto_description">Follows your device\'s locale setting</string>
     <string name="settings_time_format_12h_description">Always show AM / PM</string>

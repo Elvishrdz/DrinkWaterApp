@@ -102,6 +102,7 @@ import com.eahm.drinkwaterapp.feature.settings.extension.startReportProblemInten
 import com.eahm.drinkwaterapp.feature.settings.ui.EditButton
 import com.eahm.drinkwaterapp.feature.settings.ui.GoalBottomSheet
 import com.eahm.drinkwaterapp.feature.settings.ui.IntervalBottomSheet
+import com.eahm.drinkwaterapp.feature.settings.ui.LanguageDialog
 import com.eahm.drinkwaterapp.feature.settings.ui.NotificationAmountBottomSheet
 import com.eahm.drinkwaterapp.feature.settings.ui.RemoveAdsBottomSheet
 import com.eahm.drinkwaterapp.feature.settings.ui.TimeFormatBottomSheet
@@ -111,6 +112,7 @@ import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorDialog
 import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
 import kotlinx.coroutines.delay
 import org.koin.compose.viewmodel.koinViewModel
+import java.util.Locale
 
 private val gradientMagentaHero = Brush.verticalGradient(
     colors = listOf(Color(0xFFB83A95), DwMagentaDark)
@@ -230,6 +232,7 @@ internal fun SettingsScreen(
         onRemoveAdsTap = viewModel::onFetchOfferings,
         onTimeFormatChanged = viewModel::onTimeFormatPreferenceChanged,
         onUnitPreferenceChanged = viewModel::onUnitPreferenceChanged,
+        onLanguageChanged = viewModel::onLanguageChanged,
         onTrackingToggled = { enabled ->
             if (enabled) viewModel.onTrackingToggled(true)
             else showRevokeTrackingDialog = true
@@ -386,6 +389,7 @@ internal fun SettingsContent(
     onRemoveAdsTap: () -> Unit,
     onTimeFormatChanged: (TimeFormatPreference) -> Unit,
     onUnitPreferenceChanged: (UnitPreference) -> Unit,
+    onLanguageChanged: (String) -> Unit,
     onTrackingToggled: (Boolean) -> Unit,
     onPrivacyPolicyAndTermsOfUseTap: () -> Unit,
     modifier: Modifier = Modifier,
@@ -412,6 +416,7 @@ internal fun SettingsContent(
     var showNotificationAmountSheet by rememberSaveable { mutableStateOf(false) }
     var showTimeFormatSheet by rememberSaveable { mutableStateOf(false) }
     var showUnitSheet by rememberSaveable { mutableStateOf(false) }
+    var showLanguageDialog by rememberSaveable { mutableStateOf(false) }
 
     Scaffold { innerPadding ->
         LazyColumn(
@@ -501,6 +506,16 @@ internal fun SettingsContent(
                         onClick = { showTimeFormatSheet = true },
                     ) {
                         TimeFormatBadge(preference = state.timeFormatPreference)
+                    }
+                    HorizontalDivider(color = DwInk100)
+                    SettingRow(
+                        icon = DwIcons.Globe,
+                        iconBg = DwTintWater,
+                        iconTint = DwWater,
+                        label = stringResource(R.string.settings_row_language),
+                        onClick = { showLanguageDialog = true },
+                    ) {
+                        LanguageBadge(tag = state.currentLocaleTag)
                     }
                 }
             }
@@ -793,6 +808,15 @@ internal fun SettingsContent(
             onDismiss = { showUnitSheet = false },
         )
     }
+
+    // ── Language dialog ───────────────────────────────────────────────────────
+    if (showLanguageDialog) {
+        LanguageDialog(
+            current = state.currentLocaleTag,
+            onLanguageSelected = onLanguageChanged,
+            onDismiss = { showLanguageDialog = false },
+        )
+    }
 }
 
 // ── Revoke tracking dialog ────────────────────────────────────────────────────
@@ -936,7 +960,10 @@ private fun NotificationPermissionDeniedDialog(
             )
             Spacer(Modifier.height(10.dp))
             Text(
-                text = stringResource(R.string.notif_disabled_body, stringResource(R.string.app_name)),
+                text = stringResource(
+                    R.string.notif_disabled_body,
+                    stringResource(R.string.app_name)
+                ),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Normal,
                 fontSize = 14.sp,
@@ -980,7 +1007,10 @@ private fun DisableNotificationsDialog(
             )
             Spacer(Modifier.height(10.dp))
             Text(
-                text = stringResource(R.string.settings_notif_disable_body, stringResource(R.string.app_name)),
+                text = stringResource(
+                    R.string.settings_notif_disable_body,
+                    stringResource(R.string.app_name)
+                ),
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Normal,
                 fontSize = 14.sp,
@@ -1304,9 +1334,15 @@ private fun ExactAlarmInstructionsDialog(
     }
 
     val instructions = if (!isGranted) {
-        stringResource(R.string.settings_reminder_type_enable_instructions, stringResource(R.string.app_name))
+        stringResource(
+            R.string.settings_reminder_type_enable_instructions,
+            stringResource(R.string.app_name)
+        )
     } else {
-        stringResource(R.string.settings_reminder_type_disable_instructions, stringResource(R.string.app_name))
+        stringResource(
+            R.string.settings_reminder_type_disable_instructions,
+            stringResource(R.string.app_name)
+        )
     }
 
     BasicAlertDialog(onDismissRequest = onDismiss) {
@@ -1426,6 +1462,43 @@ private fun TimeFormatBadge(preference: TimeFormatPreference) {
         TimeFormatPreference.SYSTEM -> stringResource(R.string.settings_time_format_auto)
         TimeFormatPreference.HOUR_12 -> "12h"
         TimeFormatPreference.HOUR_24 -> "24h"
+    }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(999.dp))
+                .background(DwInk100)
+                .padding(horizontal = 8.dp, vertical = 3.dp),
+        ) {
+            Text(
+                text = text,
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 11.sp,
+                color = DwInk400,
+            )
+        }
+        Icon(
+            imageVector = DwIcons.ChevronRight,
+            contentDescription = null,
+            tint = DwInk400,
+            modifier = Modifier.size(16.dp),
+        )
+    }
+}
+
+@Composable
+private fun LanguageBadge(tag: String) {
+    val text = if (tag.isEmpty()) {
+        stringResource(R.string.settings_language_system)
+    } else {
+        Locale.forLanguageTag(tag)
+            .getDisplayLanguage(Locale.forLanguageTag(tag))
+            .replaceFirstChar { it.uppercase() }
     }
 
     Row(
@@ -1607,6 +1680,7 @@ private fun SettingsScreenPreview() {
             onUnitPreferenceChanged = {},
             onTrackingToggled = {},
             onPrivacyPolicyAndTermsOfUseTap = {},
+            onLanguageChanged = {},
         )
     }
 }

@@ -38,6 +38,7 @@ data class SettingsState(
     val offeringsState: OfferingsState? = null,
     val timeFormatPreference: TimeFormatPreference = TimeFormatPreference.SYSTEM,
     val unitPreference: UnitPreference = UnitPreference.ML,
+    val currentLocaleTag: String = "",  // "" = system default; "en-US", "es-Es" otherwise
 )
 
 enum class WaterUnit(val label: String) {
