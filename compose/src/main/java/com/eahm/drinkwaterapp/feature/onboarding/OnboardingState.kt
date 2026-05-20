@@ -73,8 +73,8 @@ internal val OnboardingSteps.Companion.totalSteps: Int get() = 10
 
 fun OnboardingSteps.Companion.byStep(step: Int) = when (step) {
     1 -> OnboardingSteps.Intro
-    2 -> OnboardingSteps.DailyGoal
-    3 -> OnboardingSteps.Units
+    2 -> OnboardingSteps.Units
+    3 -> OnboardingSteps.DailyGoal
 
     4 -> OnboardingSteps.RemindersSteps.StartTime
     5 -> OnboardingSteps.RemindersSteps.EndTime

@@ -212,7 +212,7 @@
     <string name="onb_units_ml_title">Milliliters (mL)</string>
     <string name="onb_units_ml_subtitle">Used worldwide</string>
     <string name="onb_units_fl_oz_title">Fluid Ounces (fl oz)</string>
-    <string name="onb_units_fl_oz_subtitle">Common in the US</string>
+    <string name="onb_units_fl_oz_subtitle">Used to measure liquids and beverages</string>
 
     <!-- Onboarding — Done -->
     <string name="onb_done_title">You\'re all set!</string>

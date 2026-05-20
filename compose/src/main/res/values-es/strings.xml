@@ -210,7 +210,7 @@
     <string name="onb_units_ml_title">Mililitros (mL)</string>
     <string name="onb_units_ml_subtitle">Usado en todo el mundo</string>
     <string name="onb_units_fl_oz_title">Onzas fluidas (fl oz)</string>
-    <string name="onb_units_fl_oz_subtitle">Común en EE. UU.</string>
+    <string name="onb_units_fl_oz_subtitle">Usado para medir líquidos y bebidas</string>
 
     <string name="onb_done_title">¡Todo listo!</string>
     <string name="onb_done_title_with_name">¡Todo listo, %1$s!</string>
