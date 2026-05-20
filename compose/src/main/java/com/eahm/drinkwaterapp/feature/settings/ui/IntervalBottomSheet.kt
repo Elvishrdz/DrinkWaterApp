@@ -1,5 +1,6 @@
 package com.eahm.drinkwaterapp.feature.settings.ui
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,14 +16,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -30,14 +32,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.R
@@ -72,17 +75,32 @@ internal fun IntervalBottomSheet(
     var value by remember {
         mutableIntStateOf(currentMinutes.coerceIn(INTERVAL_MIN, maxMinutes))
     }
+    var isEditing by remember { mutableStateOf(false) }
     var textInput by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
+    val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
 
     val isAtMax = value >= maxMinutes
     val isAtMin = value <= INTERVAL_MIN
 
-    fun applyTextInput() {
+    fun trySave() {
         val parsed = textInput.trim().toIntOrNull()
-        if (parsed != null && parsed >= INTERVAL_MIN && parsed <= maxMinutes) {
-            value = parsed
+        when {
+            parsed == null ->
+                errorMessage = context.getString(R.string.validation_error_invalid_number)
+            parsed < INTERVAL_MIN ->
+                errorMessage = context.getString(R.string.validation_error_min_value, INTERVAL_MIN.toString())
+            parsed > maxMinutes ->
+                errorMessage = context.getString(R.string.validation_error_max_value, maxMinutes.toString())
+            else -> {
+                value = parsed
+                isEditing = false
+                textInput = ""
+                errorMessage = ""
+                focusManager.clearFocus()
+            }
         }
-        textInput = ""
     }
 
     fun dismissWithAnimation() {
@@ -111,54 +129,100 @@ internal fun IntervalBottomSheet(
 
             Spacer(Modifier.height(32.dp))
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                IntervalStepperButton(
-                    enabled = !isAtMin,
-                    onClick = { value = (value - INTERVAL_STEP).coerceAtLeast(INTERVAL_MIN) },
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(width = 16.dp, height = 2.5.dp)
-                            .clip(RoundedCornerShape(2.dp))
-                            .background(if (!isAtMin) DwWater else DwWater.copy(alpha = 0.4f)),
-                    )
-                }
+            AnimatedContent(
+                targetState = isEditing,
+                label = "interval_stepper_edit",
+            ) { editing ->
+                if (!editing) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        IntervalStepperButton(
+                            enabled = !isAtMin,
+                            onClick = { value = (value - INTERVAL_STEP).coerceAtLeast(INTERVAL_MIN) },
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(width = 16.dp, height = 2.5.dp)
+                                    .clip(RoundedCornerShape(2.dp))
+                                    .background(if (!isAtMin) DwWater else DwWater.copy(alpha = 0.4f)),
+                            )
+                        }
 
-                Spacer(Modifier.width(28.dp))
+                        Spacer(Modifier.width(28.dp))
 
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = formatIntervalDisplay(value),
-                        fontFamily = Nunito,
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 48.sp,
-                        color = MaterialTheme.colorScheme.onBackground,
-                    )
-                    Text(
-                        text = formatIntervalUnit(value),
-                        fontFamily = PlusJakartaSans,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 16.sp,
-                        color = DwInk400,
-                    )
-                }
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = formatIntervalDisplay(value),
+                                fontFamily = Nunito,
+                                fontWeight = FontWeight.ExtraBold,
+                                fontSize = 48.sp,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                modifier = Modifier.clickable { isEditing = true },
+                            )
+                            Text(
+                                text = formatIntervalUnit(value),
+                                fontFamily = PlusJakartaSans,
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 16.sp,
+                                color = DwInk400,
+                            )
+                        }
 
-                Spacer(Modifier.width(28.dp))
+                        Spacer(Modifier.width(28.dp))
 
-                IntervalStepperButton(
-                    enabled = !isAtMax,
-                    onClick = { value = (value + INTERVAL_STEP).coerceAtMost(maxMinutes) },
-                ) {
-                    Icon(
-                        imageVector = DwIcons.Plus,
-                        contentDescription = "Increase",
-                        tint = if (!isAtMax) DwWater else DwWater.copy(alpha = 0.4f),
-                        modifier = Modifier.size(20.dp),
-                    )
+                        IntervalStepperButton(
+                            enabled = !isAtMax,
+                            onClick = { value = (value + INTERVAL_STEP).coerceAtMost(maxMinutes) },
+                        ) {
+                            Icon(
+                                imageVector = DwIcons.Plus,
+                                contentDescription = "Increase",
+                                tint = if (!isAtMax) DwWater else DwWater.copy(alpha = 0.4f),
+                                modifier = Modifier.size(20.dp),
+                            )
+                        }
+                    }
+                } else {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        OutlinedTextField(
+                            value = textInput,
+                            onValueChange = { textInput = it; errorMessage = "" },
+                            label = { Text(stringResource(R.string.settings_stepper_custom_hint)) },
+                            singleLine = true,
+                            isError = errorMessage.isNotEmpty(),
+                            supportingText = if (errorMessage.isNotEmpty()) {
+                                { Text(errorMessage) }
+                            } else null,
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Done,
+                            ),
+                            keyboardActions = KeyboardActions(onDone = { trySave() }),
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        Row(
+                            horizontalArrangement = Arrangement.End,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            TextButton(onClick = {
+                                isEditing = false
+                                textInput = ""
+                                errorMessage = ""
+                                focusManager.clearFocus()
+                            }) {
+                                Text(stringResource(R.string.action_cancel))
+                            }
+                            TextButton(onClick = { trySave() }) {
+                                Text(stringResource(R.string.action_save))
+                            }
+                        }
+                    }
                 }
             }
 
@@ -180,29 +244,9 @@ internal fun IntervalBottomSheet(
 
             Spacer(Modifier.height(16.dp))
 
-            val focusManager = LocalFocusManager.current
-            OutlinedTextField(
-                value = textInput,
-                onValueChange = { textInput = it },
-                label = { Text(stringResource(R.string.settings_stepper_custom_hint)) },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Done,
-                ),
-                keyboardActions = KeyboardActions(onDone = {
-                    applyTextInput()
-                    focusManager.clearFocus()
-                }),
-                modifier = Modifier.fillMaxWidth(),
-            )
-
-            Spacer(Modifier.height(16.dp))
-
             DwPrimaryButton(
                 text = stringResource(R.string.action_save),
                 onClick = {
-                    applyTextInput()
                     onIntervalChanged(value)
                     dismissWithAnimation()
                 },

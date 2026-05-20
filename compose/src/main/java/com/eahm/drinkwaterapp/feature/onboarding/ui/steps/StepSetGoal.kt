@@ -73,6 +73,10 @@ internal fun StepSetGoal(
                     currentGoal = next
                     onGoalChanged(next)
                 },
+                onValueSet = { next ->
+                    currentGoal = next
+                    onGoalChanged(next)
+                },
             )
         }
     }

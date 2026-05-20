@@ -1,5 +1,6 @@
 package com.eahm.drinkwaterapp.feature.settings.ui
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,29 +16,31 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.R
@@ -67,15 +70,6 @@ internal fun GoalBottomSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
     var value by remember { mutableFloatStateOf(goalMl.coerceIn(GOAL_MIN, GOAL_MAX)) }
-    var textInput by remember { mutableStateOf("") }
-
-    fun applyTextInput() {
-        val parsed = textInput.trim().toFloatOrNull()
-        if (parsed != null && parsed >= GOAL_MIN && parsed <= GOAL_MAX) {
-            value = parsed
-        }
-        textInput = ""
-    }
 
     fun dismissWithAnimation() {
         scope.launch { sheetState.hide() }.invokeOnCompletion { onDismiss() }
@@ -107,26 +101,8 @@ internal fun GoalBottomSheet(
                 value = value,
                 onDecrement = { value -= GOAL_STEP },
                 onIncrement = { value += GOAL_STEP },
+                onValueSet = { value = it },
                 unitPreference = unitPreference,
-            )
-
-            Spacer(Modifier.height(16.dp))
-
-            val focusManager = LocalFocusManager.current
-            OutlinedTextField(
-                value = textInput,
-                onValueChange = { textInput = it },
-                label = { Text(stringResource(R.string.settings_stepper_custom_hint)) },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Done,
-                ),
-                keyboardActions = KeyboardActions(onDone = {
-                    applyTextInput()
-                    focusManager.clearFocus()
-                }),
-                modifier = Modifier.fillMaxWidth(),
             )
 
             Spacer(Modifier.height(16.dp))
@@ -134,7 +110,6 @@ internal fun GoalBottomSheet(
             DwPrimaryButton(
                 text = stringResource(R.string.action_save),
                 onClick = {
-                    applyTextInput()
                     onGoalChanged(value)
                     dismissWithAnimation()
                 },
@@ -149,50 +124,122 @@ internal fun GoalStepperRow(
     value: Float,
     onDecrement: () -> Unit,
     onIncrement: () -> Unit,
+    onValueSet: (Float) -> Unit,
     modifier: Modifier = Modifier,
     unitPreference: UnitPreference = UnitPreference.ML,
 ) {
+    var isEditing by remember { mutableStateOf(false) }
+    var textInput by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
+    val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
+
+    fun trySave() {
+        val parsed = textInput.trim().toFloatOrNull()
+        when {
+            parsed == null ->
+                errorMessage = context.getString(R.string.validation_error_invalid_number)
+            parsed < GOAL_MIN ->
+                errorMessage = context.getString(R.string.validation_error_min_value, GOAL_MIN.toInt().toString())
+            parsed > GOAL_MAX ->
+                errorMessage = context.getString(R.string.validation_error_max_value, GOAL_MAX.toInt().toString())
+            else -> {
+                onValueSet(parsed)
+                isEditing = false
+                textInput = ""
+                errorMessage = ""
+                focusManager.clearFocus()
+            }
+        }
+    }
+
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            StepperCircleButton(
-                enabled = value > GOAL_MIN,
-                onClick = onDecrement,
-                icon = { MinusLine() },
-            )
-
-            Spacer(Modifier.width(28.dp))
-
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = value.formatVolume(unitPreference),
-                    fontFamily = Nunito,
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 48.sp,
-                    color = MaterialTheme.colorScheme.onBackground,
-                )
-            }
-
-            Spacer(Modifier.width(28.dp))
-
-            StepperCircleButton(
-                enabled = value < GOAL_MAX,
-                onClick = onIncrement,
-                icon = {
-                    Icon(
-                        imageVector = DwIcons.Plus,
-                        contentDescription = "Increase",
-                        tint = DwWater,
-                        modifier = Modifier.size(20.dp),
+        AnimatedContent(
+            targetState = isEditing,
+            label = "goal_stepper_edit",
+        ) { editing ->
+            if (!editing) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    StepperCircleButton(
+                        enabled = value > GOAL_MIN,
+                        onClick = onDecrement,
+                        icon = { MinusLine() },
                     )
-                },
-            )
+
+                    Spacer(Modifier.width(28.dp))
+
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = value.formatVolume(unitPreference),
+                            fontFamily = Nunito,
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 48.sp,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.clickable { isEditing = true },
+                        )
+                    }
+
+                    Spacer(Modifier.width(28.dp))
+
+                    StepperCircleButton(
+                        enabled = value < GOAL_MAX,
+                        onClick = onIncrement,
+                        icon = {
+                            Icon(
+                                imageVector = DwIcons.Plus,
+                                contentDescription = "Increase",
+                                tint = DwWater,
+                                modifier = Modifier.size(20.dp),
+                            )
+                        },
+                    )
+                }
+            } else {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    OutlinedTextField(
+                        value = textInput,
+                        onValueChange = { textInput = it; errorMessage = "" },
+                        label = { Text(stringResource(R.string.settings_stepper_custom_hint)) },
+                        singleLine = true,
+                        isError = errorMessage.isNotEmpty(),
+                        supportingText = if (errorMessage.isNotEmpty()) {
+                            { Text(errorMessage) }
+                        } else null,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Done,
+                        ),
+                        keyboardActions = KeyboardActions(onDone = { trySave() }),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Row(
+                        horizontalArrangement = Arrangement.End,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        TextButton(onClick = {
+                            isEditing = false
+                            textInput = ""
+                            errorMessage = ""
+                            focusManager.clearFocus()
+                        }) {
+                            Text(stringResource(R.string.action_cancel))
+                        }
+                        TextButton(onClick = { trySave() }) {
+                            Text(stringResource(R.string.action_save))
+                        }
+                    }
+                }
+            }
         }
 
         Spacer(Modifier.height(8.dp))

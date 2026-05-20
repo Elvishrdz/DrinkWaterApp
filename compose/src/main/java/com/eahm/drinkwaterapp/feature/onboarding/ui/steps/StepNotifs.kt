@@ -9,6 +9,7 @@ import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,6 +30,9 @@ import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -42,9 +46,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -137,6 +144,7 @@ internal fun StepNotifs(
             localAmount = localAmount,
             onDecrement = { localAmount = (localAmount - AMOUNT_STEP).coerceAtLeast(AMOUNT_MIN) },
             onIncrement = { localAmount = (localAmount + AMOUNT_STEP).coerceAtMost(AMOUNT_MAX) },
+            onValueSet = { localAmount = it },
             // Back from config: go to permission UI if we came from there, else prev step
             onBack = if (startedWithPermission) onBack else ({ showConfig = false }),
             onContinue = {
@@ -263,6 +271,7 @@ private fun NotifsConfigContent(
     localAmount: Int,
     onDecrement: () -> Unit,
     onIncrement: () -> Unit,
+    onValueSet: (Int) -> Unit,
     onBack: () -> Unit,
     onContinue: () -> Unit,
 ) {
@@ -293,6 +302,7 @@ private fun NotifsConfigContent(
                 isAtMax = localAmount >= AMOUNT_MAX,
                 onDecrement = onDecrement,
                 onIncrement = onIncrement,
+                onValueSet = onValueSet,
             )
             Spacer(Modifier.height(16.dp))
             Text(
@@ -312,49 +322,121 @@ private fun AmountStepper(
     isAtMax: Boolean,
     onDecrement: () -> Unit,
     onIncrement: () -> Unit,
+    onValueSet: (Int) -> Unit,
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        AmountStepperButton(enabled = !isAtMin, onClick = onDecrement) {
-            Box(
-                modifier = Modifier
-                    .size(width = 16.dp, height = 2.5.dp)
-                    .clip(RoundedCornerShape(2.dp))
-                    .background(if (!isAtMin) DwWater else DwWater.copy(alpha = 0.4f)),
-            )
+    var isEditing by remember { mutableStateOf(false) }
+    var textInput by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
+    val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
+
+    fun trySave() {
+        val parsed = textInput.trim().toIntOrNull()
+        when {
+            parsed == null ->
+                errorMessage = context.getString(R.string.validation_error_invalid_number)
+            parsed < AMOUNT_MIN ->
+                errorMessage = context.getString(R.string.validation_error_min_value, AMOUNT_MIN.toString())
+            parsed > AMOUNT_MAX ->
+                errorMessage = context.getString(R.string.validation_error_max_value, AMOUNT_MAX.toString())
+            else -> {
+                onValueSet(parsed)
+                isEditing = false
+                textInput = ""
+                errorMessage = ""
+                focusManager.clearFocus()
+            }
         }
+    }
 
-        Spacer(Modifier.width(32.dp))
+    AnimatedContent(
+        targetState = isEditing,
+        label = "notif_amount_stepper_edit",
+    ) { editing ->
+        if (!editing) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                AmountStepperButton(enabled = !isAtMin, onClick = onDecrement) {
+                    Box(
+                        modifier = Modifier
+                            .size(width = 16.dp, height = 2.5.dp)
+                            .clip(RoundedCornerShape(2.dp))
+                            .background(if (!isAtMin) DwWater else DwWater.copy(alpha = 0.4f)),
+                    )
+                }
 
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = "$value",
-                fontFamily = Nunito,
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 56.sp,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-            Text(
-                text = "ml",
-                fontFamily = PlusJakartaSans,
-                fontWeight = FontWeight.Normal,
-                fontSize = 16.sp,
-                color = DwInk400,
-            )
-        }
+                Spacer(Modifier.width(32.dp))
 
-        Spacer(Modifier.width(32.dp))
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "$value",
+                        fontFamily = Nunito,
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 56.sp,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.clickable { isEditing = true },
+                    )
+                    Text(
+                        text = "ml",
+                        fontFamily = PlusJakartaSans,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 16.sp,
+                        color = DwInk400,
+                    )
+                }
 
-        AmountStepperButton(enabled = !isAtMax, onClick = onIncrement) {
-            Icon(
-                imageVector = DwIcons.Plus,
-                contentDescription = "Increase",
-                tint = if (!isAtMax) DwWater else DwWater.copy(alpha = 0.4f),
-                modifier = Modifier.size(22.dp),
-            )
+                Spacer(Modifier.width(32.dp))
+
+                AmountStepperButton(enabled = !isAtMax, onClick = onIncrement) {
+                    Icon(
+                        imageVector = DwIcons.Plus,
+                        contentDescription = "Increase",
+                        tint = if (!isAtMax) DwWater else DwWater.copy(alpha = 0.4f),
+                        modifier = Modifier.size(22.dp),
+                    )
+                }
+            }
+        } else {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                OutlinedTextField(
+                    value = textInput,
+                    onValueChange = { textInput = it; errorMessage = "" },
+                    label = { Text(stringResource(R.string.settings_stepper_custom_hint)) },
+                    singleLine = true,
+                    isError = errorMessage.isNotEmpty(),
+                    supportingText = if (errorMessage.isNotEmpty()) {
+                        { Text(errorMessage) }
+                    } else null,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(onDone = { trySave() }),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Row(
+                    horizontalArrangement = Arrangement.End,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    TextButton(onClick = {
+                        isEditing = false
+                        textInput = ""
+                        errorMessage = ""
+                        focusManager.clearFocus()
+                    }) {
+                        Text(stringResource(R.string.action_cancel))
+                    }
+                    TextButton(onClick = { trySave() }) {
+                        Text(stringResource(R.string.action_save))
+                    }
+                }
+            }
         }
     }
 }
@@ -473,6 +555,7 @@ private fun StepNotifsConfigPreview() {
             localAmount = 150,
             onDecrement = {},
             onIncrement = {},
+            onValueSet = {},
             onBack = {},
             onContinue = {},
         )
@@ -488,6 +571,7 @@ private fun StepNotifsConfigAtMinPreview() {
             localAmount = AMOUNT_MIN,
             onDecrement = {},
             onIncrement = {},
+            onValueSet = {},
             onBack = {},
             onContinue = {},
         )
