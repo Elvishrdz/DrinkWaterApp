@@ -1,4 +1,9 @@
 Development
+ideas:
+mostrar en cada rango del history el tiempo que ha pasado desde el ultimo registro. por ejemplo ahora tomo agua y aparece cuandot hay desde este registro
+al anterior. tener algun threshold para mostrar el tiempo, por ejemplo, si es mayor a 30mins, mostrarlo. si es menor talvez no para no confundir mucho 
+visualmente. o solo mostrarlo al ultimo trago con el penuntino y no a todos los registros. (esta opcion suena mejor para la primera implementation.)
+
 Claude fixes
 [] grafico: calcular bien el porcentaje tomando todos los dias de la semana anterior (incluso si emprezamos a usar la app un miercoles, considerar desde lunes).
 [] grafico: no mostrar primera semana antes del primer record de daily goal registrado (primer dia de la app) en ese caso mostrar un texto vacio.
