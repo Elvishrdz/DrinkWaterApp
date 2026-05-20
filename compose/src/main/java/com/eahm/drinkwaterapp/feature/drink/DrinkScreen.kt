@@ -61,6 +61,7 @@ import com.eahm.drinkwaterapp.feature.drink.alarm.HomeAlarmCard
 import com.eahm.drinkwaterapp.feature.drink.ui.ProgressRing
 import com.eahm.drinkwaterapp.feature.drink.ui.QuickAddRow
 import com.eahm.drinkwaterapp.feature.drink.ui.TodayLogSection
+import com.eahm.drinkwaterapp.feature.drink.ui.WaterRisingAnimation
 import com.eahm.drinkwaterapp.feature.drink.ui.previewLogEntries
 import com.eahm.drinkwaterapp.ui.inputfield.toDigitString
 import kotlinx.coroutines.delay
