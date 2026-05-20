@@ -90,6 +90,12 @@ internal class SettingsViewModel(
             true
         }
 
+    private val _currentLocaleTag = MutableStateFlow(
+        AppCompatDelegate.getApplicationLocales().toLanguageTags().let {
+            if (it == "und" || it.isBlank()) "" else it
+        }
+    )
+
     private val _state =
         MutableStateFlow(
             SettingsState(
@@ -143,11 +149,10 @@ internal class SettingsViewModel(
             state.copy(timeFormatPreference = timeFormatPreference)
         }
         .combine(prefsStorage.getUnitPreference()) { state, unitPref ->
-            val rawTag = AppCompatDelegate.getApplicationLocales().toLanguageTags()
-            state.copy(
-                unitPreference = unitPref,
-                currentLocaleTag = if (rawTag == "und" || rawTag.isBlank()) "" else rawTag,
-            )
+            state.copy(unitPreference = unitPref)
+        }
+        .combine(_currentLocaleTag) { state, localeTag ->
+            state.copy(currentLocaleTag = localeTag)
         }
         .stateIn(
             scope = viewModelScope,
@@ -243,6 +248,7 @@ internal class SettingsViewModel(
         application
             .getSharedPreferences("locale_prefs", android.content.Context.MODE_PRIVATE)
             .edit { putString("locale_tag", tag) }
+        _currentLocaleTag.value = tag
     }
 
     fun onDrawOverlayPermissionResult() {
