@@ -46,7 +46,7 @@ class WhatToDoService(
         val goalMl = database.getDailyGoalDao()
             .getGoalForDate(todayEpoch)
             .firstOrNull()
-            ?.goalMl ?: DEFAULT_GOAL_ML
+            ?.goalMl?.takeIf { it > 0f } ?: DEFAULT_GOAL_ML
 
         return whatShouldIDo(
             localDateTime = currentDeviceDateTime,

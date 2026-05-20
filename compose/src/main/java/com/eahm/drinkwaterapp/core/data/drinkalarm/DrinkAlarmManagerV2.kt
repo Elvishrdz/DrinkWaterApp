@@ -306,8 +306,8 @@ class DrinkAlarmManagerV2(
         val startTime = prefsStorage.getStartTime().first().toLocalDateTime()
         val endTime = prefsStorage.getEndTime().first().toLocalDateTime()
         val todayEpoch = now.date.toEpochDays()
-        val goalMl = database.getDailyGoalDao().getGoalForDate(todayEpoch).first()?.goalMl
-            ?: DEFAULT_GOAL_ML
+        val goalMl = database.getDailyGoalDao().getGoalForDate(todayEpoch).first()
+            ?.goalMl?.takeIf { it > 0f } ?: DEFAULT_GOAL_ML
         val nextSlotTime = getNextAlarmSlot(now, startTime, endTime, goalMl, interval)
         return Pair(nextSlotTime.hour, nextSlotTime.minute)
     }
