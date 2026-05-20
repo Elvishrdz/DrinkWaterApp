@@ -28,6 +28,7 @@ class DwIconsPreviewProvider : PreviewParameterProvider<DwIconSample> {
         DwIconSample("Flag", DwIcons.Flag),
         DwIconSample("Lightbulb", DwIcons.Lightbulb),
         DwIconSample("Ruler", DwIcons.Ruler),
+        DwIconSample("Globe", DwIcons.Globe),
         DwIconSample("ShieldCheck", DwIcons.ShieldCheck),
         DwIconSample("PulseHeart", DwIcons.PulseHeart),
         DwIconSample("Info", DwIcons.Info),

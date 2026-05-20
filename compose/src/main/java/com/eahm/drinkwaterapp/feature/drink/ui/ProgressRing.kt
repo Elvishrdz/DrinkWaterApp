@@ -65,7 +65,7 @@ fun ProgressRing(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .size(size)
-            .idleShimmer(enabled = idleShimmerEnabled && current == 0f)
+            .idleShimmer(enabled = idleShimmerEnabled)
             .bounceTap(
                 onClick = { onClick?.invoke() },
                 enabled = bounceEnabled,

@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterLight
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 /**
  * Scales the composable down on press and springs back with a bounce on release.
@@ -89,15 +90,17 @@ fun Modifier.bounceTap(
  *
  * Intended for use when the ring is at 0% progress.
  *
- * @param enabled      Set to false to skip the animation entirely.
- * @param strokeWidth  Must match the ring's stroke width so the shimmer aligns with the arc track.
- * @param intervalMs   Milliseconds between each shimmer pass.
- * @param color        Shimmer highlight colour.
+ * @param enabled         Set to false to skip the animation entirely.
+ * @param strokeWidth     Must match the ring's stroke width so the shimmer aligns with the arc track.
+ * @param intervalMinMs   Minimum milliseconds between each shimmer pass.
+ * @param intervalMaxMs   Maximum milliseconds between each shimmer pass.
+ * @param color           Shimmer highlight colour.
  */
 fun Modifier.idleShimmer(
     enabled: Boolean = true,
     strokeWidth: Dp = 14.dp,
-    intervalMs: Long = 1200L,
+    intervalMinMs: Long = 4000L,
+    intervalMaxMs: Long = 10000L,
     color: Color = DwWaterLight.copy(alpha = 0.2f),
 ): Modifier = if (!enabled) this else composed {
     val sweepDurationMs = 900
@@ -106,7 +109,7 @@ fun Modifier.idleShimmer(
 
     LaunchedEffect(Unit) {
         while (true) {
-            delay(intervalMs)
+            delay(Random.nextLong(intervalMinMs, intervalMaxMs))
             angle.snapTo(-90f)
             alpha.snapTo(0f)
             // Fade in → hold → fade out in sync with the sweep

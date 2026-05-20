@@ -619,6 +619,60 @@ object DwIcons {
         }.build()
     }
 
+    /**
+     * Globe — outer circle, central meridian (vertical ellipse), and equator line.
+     * Standard symbol for language / locale selection.
+     * Geometry: r=9, center (12,12); meridian semi-axes a=4, b=9.
+     * Bezier coefficients: k = 0.5523 × radius.
+     */
+    val Globe: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "DwGlobe",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).apply {
+            // Outer circle — r=9, center (12,12)
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(12f, 3f)
+                curveToRelative(4.97f, 0f, 9f, 4.97f, 9f, 9f)
+                curveToRelative(0f, 4.97f, -4.03f, 9f, -9f, 9f)
+                curveToRelative(-4.97f, 0f, -9f, -4.97f, -9f, -9f)
+                curveToRelative(0f, -4.97f, 4.03f, -9f, 9f, -9f)
+                close()
+            }
+            // Central meridian — vertical ellipse, semi-axes a=4 (h), b=9 (v)
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(12f, 3f)
+                curveToRelative(2.21f, 0f, 4f, 4.03f, 4f, 9f)
+                curveToRelative(0f, 4.97f, -1.79f, 9f, -4f, 9f)
+                curveToRelative(-2.21f, 0f, -4f, -4.03f, -4f, -9f)
+                curveToRelative(0f, -4.97f, 1.79f, -9f, 4f, -9f)
+                close()
+            }
+            // Equator
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round
+            ) {
+                moveTo(3f, 12f)
+                lineTo(21f, 12f)
+            }
+        }.build()
+    }
+
     // ── Filled nav variants ───────────────────────────────────────────────────
 
     /** Filled water drop — used as the selected-state icon for the Today nav item. */
