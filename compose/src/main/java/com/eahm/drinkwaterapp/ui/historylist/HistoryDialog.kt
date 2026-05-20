@@ -188,8 +188,13 @@ fun HistoryTimeline(
                 is24Hour = is24Hour,
                 unitPreference = unitPreference,
                 onDelete = onDelete,
+                // Only inject the slot into the first group. TimelineHourGroup will render it
+                // internally between item[0] and item[1] when the group has >1 items.
+                afterFirstItemContent = if (index == 0) secondItemContent else null,
             )
-            if (index == 0 && secondItemContent != null) {
+            // If the first group had only 1 item the slot was NOT consumed inside the group,
+            // so we render the banner here — between the first and second group.
+            if (index == 0 && secondItemContent != null && hourGroup.items.size <= 1) {
                 secondItemContent()
             }
         }
@@ -204,6 +209,9 @@ private fun TimelineHourGroup(
     onDelete: (HistoryUI) -> Unit,
     modifier: Modifier = Modifier,
     unitPreference: UnitPreference = UnitPreference.ML,
+    // When provided and the group has >1 items, rendered between item[0] and item[1],
+    // splitting the card into two. Ignored when the group has only 1 item.
+    afterFirstItemContent: (@Composable () -> Unit)? = null,
 ) {
     val hourHeaderText = if (is24Hour) {
         String.format(Locale.getDefault(), "%02d:00", hourGroup.hour)
@@ -246,21 +254,59 @@ private fun TimelineHourGroup(
             }
         }
 
-        // Items grouped in an outline-bordered card, separated by dividers
-        Column(
-            modifier = Modifier
-                .outlineBorderStyle()
-                .background(MaterialTheme.colorScheme.surface)
-        ) {
-            hourGroup.items.forEachIndexed { index, item ->
+        if (afterFirstItemContent != null && hourGroup.items.size > 1) {
+            // Split layout: first item in its own card, then the injected content (e.g. a
+            // banner), then the remaining items in a second card — still under this hour header.
+            Column(
+                modifier = Modifier
+                    .outlineBorderStyle()
+                    .background(MaterialTheme.colorScheme.surface)
+            ) {
                 TimelineItemCard(
-                    item = item,
+                    item = hourGroup.items[0],
                     is24Hour = is24Hour,
                     unitPreference = unitPreference,
-                    onDelete = onDelete
+                    onDelete = onDelete,
                 )
-                if (index < hourGroup.items.lastIndex) {
-                    HorizontalDivider(color = DwInk100)
+            }
+
+            afterFirstItemContent()
+
+            val rest = hourGroup.items.drop(1)
+            Column(
+                modifier = Modifier
+                    .outlineBorderStyle()
+                    .background(MaterialTheme.colorScheme.surface)
+            ) {
+                rest.forEachIndexed { index, item ->
+                    TimelineItemCard(
+                        item = item,
+                        is24Hour = is24Hour,
+                        unitPreference = unitPreference,
+                        onDelete = onDelete,
+                    )
+                    if (index < rest.lastIndex) {
+                        HorizontalDivider(color = DwInk100)
+                    }
+                }
+            }
+        } else {
+            // Default: all items in a single card separated by dividers.
+            Column(
+                modifier = Modifier
+                    .outlineBorderStyle()
+                    .background(MaterialTheme.colorScheme.surface)
+            ) {
+                hourGroup.items.forEachIndexed { index, item ->
+                    TimelineItemCard(
+                        item = item,
+                        is24Hour = is24Hour,
+                        unitPreference = unitPreference,
+                        onDelete = onDelete
+                    )
+                    if (index < hourGroup.items.lastIndex) {
+                        HorizontalDivider(color = DwInk100)
+                    }
                 }
             }
         }
