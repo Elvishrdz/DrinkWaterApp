@@ -1,5 +1,8 @@
 import com.android.build.api.dsl.LibraryExtension
-import org.gradle.api.JavaVersion
+import com.eahm.drinkwaterapp.buildlogic.extension.JAVA_VERSION
+import com.eahm.drinkwaterapp.buildlogic.extension.MIN_SDK
+import com.eahm.drinkwaterapp.buildlogic.extension.TEST_INSTRUMENTATION_RUNNER
+import com.eahm.drinkwaterapp.buildlogic.extension.applyAndroidCommonConfig
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -10,6 +13,8 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             extensions.configure<LibraryExtension> {
+                applyAndroidCommonConfig()
+
                 applyDefaultConfig()
                 applyCompileOptions()
             }
@@ -18,18 +23,16 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
 }
 
 private fun LibraryExtension.applyDefaultConfig() {
-    compileSdk = 37
-
     defaultConfig {
-        minSdk = 24
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        minSdk = MIN_SDK
+        testInstrumentationRunner = TEST_INSTRUMENTATION_RUNNER
         consumerProguardFiles("consumer-rules.pro")
     }
 }
 
 private fun LibraryExtension.applyCompileOptions() {
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JAVA_VERSION
+        targetCompatibility = JAVA_VERSION
     }
 }

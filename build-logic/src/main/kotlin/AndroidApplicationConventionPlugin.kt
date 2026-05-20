@@ -1,5 +1,9 @@
 import com.android.build.api.dsl.ApplicationExtension
-import org.gradle.api.JavaVersion
+import com.eahm.drinkwaterapp.buildlogic.extension.JAVA_VERSION
+import com.eahm.drinkwaterapp.buildlogic.extension.MIN_SDK
+import com.eahm.drinkwaterapp.buildlogic.extension.TARGET_SDK
+import com.eahm.drinkwaterapp.buildlogic.extension.TEST_INSTRUMENTATION_RUNNER
+import com.eahm.drinkwaterapp.buildlogic.extension.applyAndroidCommonConfig
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -10,6 +14,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             extensions.configure<ApplicationExtension> {
+                applyAndroidCommonConfig()
                 applyDefaultConfig()
                 applyCompileOptions()
             }
@@ -18,18 +23,16 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
 }
 
 private fun ApplicationExtension.applyDefaultConfig() {
-    compileSdk = 37
-
     defaultConfig {
-        minSdk = 24
-        targetSdk = 37
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        minSdk = MIN_SDK
+        targetSdk = TARGET_SDK
+        testInstrumentationRunner = TEST_INSTRUMENTATION_RUNNER
     }
 }
 
 private fun ApplicationExtension.applyCompileOptions() {
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JAVA_VERSION
+        targetCompatibility = JAVA_VERSION
     }
 }
