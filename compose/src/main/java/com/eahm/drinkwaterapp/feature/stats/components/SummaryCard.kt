@@ -39,7 +39,7 @@ private val TrendDownColor = Color(0xFFFFCDD2)
 
 @Composable
 fun SummaryCard(
-    avgMl: Int,
+    avgMl: Float,
     trendPercent: Int,
     isTrendPositive: Boolean,
     periodLabel: String,
@@ -67,7 +67,7 @@ fun SummaryCard(
         Spacer(modifier = Modifier.height(4.dp))
 
         Text(
-            text = avgMl.toFloat().formatVolume(unitPreference),
+            text = avgMl.formatVolume(unitPreference),
             fontFamily = Nunito,
             fontWeight = FontWeight.ExtraBold,
             fontSize = 36.sp,
@@ -106,7 +106,7 @@ fun SummaryCard(
 private fun SummaryCardPreview() {
     DrinkWaterAppTheme {
         SummaryCard(
-            avgMl = 2150,
+            avgMl = 2150f,
             trendPercent = 12,
             isTrendPositive = true,
             periodLabel = "This week's",
@@ -121,7 +121,7 @@ private fun SummaryCardPreview() {
 private fun SummaryCardConsistentPreview() {
     DrinkWaterAppTheme {
         SummaryCard(
-            avgMl = 2000,
+            avgMl = 2000f,
             trendPercent = 0,
             isTrendPositive = true,
             periodLabel = "This week's",
@@ -136,7 +136,7 @@ private fun SummaryCardConsistentPreview() {
 private fun SummaryCardFirstPeriodPreview() {
     DrinkWaterAppTheme {
         SummaryCard(
-            avgMl = 1340,
+            avgMl = 1340f,
             trendPercent = 0,
             isTrendPositive = true,
             periodLabel = "This week's",

@@ -277,7 +277,7 @@ private val previewState = StatsState(
             )
         ),
     ),
-    avgMl = 1850,
+    avgMl = 1850f,
     avgTrendPercent = 12,
     isTrendPositive = true,
     showTrend = true,

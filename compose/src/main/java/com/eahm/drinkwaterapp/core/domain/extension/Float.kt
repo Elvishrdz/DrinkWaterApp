@@ -16,5 +16,5 @@ fun Float.formatVolume(pref: UnitPreference): String = when (pref) {
         if (this >= 1000f) "${"%.1f".format(this / 1000f)} L"
         else "${sanitizeZeroDecimals()} mL"
 
-    UnitPreference.FL_OZ -> "${"%.1f".format(this / 29.574f)} fl oz"
+    UnitPreference.FL_OZ -> "${(this / 29.574f).sanitizeZeroDecimals()} fl oz"
 }

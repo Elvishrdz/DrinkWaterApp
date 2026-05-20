@@ -103,7 +103,7 @@ internal class StatsViewModel(
     // ── Summary ──────────────────────────────────────────────────────────────
 
     private data class Summary(
-        val avgMl: Int,
+        val avgMl: Float,
         val trendPercent: Int,
         val isTrendPositive: Boolean,
         val showTrend: Boolean,
@@ -146,15 +146,17 @@ internal class StatsViewModel(
      */
     private fun computeSummary(pages: List<PeriodPage>, pageIndex: Int): Summary {
         if (pages.isEmpty() || pageIndex !in pages.indices) {
-            return Summary(avgMl = 0, trendPercent = 0, isTrendPositive = true, showTrend = false)
+            return Summary(avgMl = 0f, trendPercent = 0, isTrendPositive = true, showTrend = false)
         }
 
-        // avgMl: average across all days in the full period (7 days for week, etc.)
-        // Divides by the total period size, not just elapsed days, so the weekly average
-        // is consistent regardless of which day of the week it is.
-        val allEntries = pages[pageIndex].entries
-        val avg = if (allEntries.isEmpty()) 0
-        else allEntries.sumOf { it.amountMl } / allEntries.size
+        // avgMl: daily average across all calendar days in the period.
+        // Uses periodDays (7 for week, daysInMonth for month, 365/366 for year) so
+        // the divisor always matches the full period length — not just entries.size,
+        // which would be wrong for year pages where each entry represents a whole month.
+        val page = pages[pageIndex]
+        val allEntries = page.entries
+        val avg = if (allEntries.isEmpty() || page.periodDays == 0) 0f
+        else allEntries.sumOf { it.amountMl }.toFloat() / page.periodDays
 
         // showTrend: only show when at least one prior page has recorded data
         val showTrend = pageIndex > 0 && (0 until pageIndex).any { i ->
@@ -162,7 +164,7 @@ internal class StatsViewModel(
         }
 
         // trendPercent: total consumption this period vs total consumption last period
-        val currentTotal = pages[pageIndex].entries.sumOf { it.amountMl }
+        val currentTotal = page.entries.sumOf { it.amountMl }
         val prevTotal = pages.getOrNull(pageIndex - 1)?.entries?.sumOf { it.amountMl } ?: 0
 
         val trendPercent =
@@ -189,7 +191,10 @@ internal class StatsViewModel(
         val daysFromMonday = today.dayOfWeek.ordinal  // MONDAY=0 … SUNDAY=6
         val thisMonday = today.minus(daysFromMonday, DateTimeUnit.DAY)
 
-        return combine(goalDao.getAllGoals(), historyDao.getEarliestRecord()) { allGoals, earliest ->
+        return combine(
+            goalDao.getAllGoals(),
+            historyDao.getEarliestRecord()
+        ) { allGoals, earliest ->
             Pair(allGoals, earliest)
         }.flatMapLatest { (allGoals, earliestRecord) ->
             val firstGoalDate = allGoals.minByOrNull { it.effectiveDate }?.effectiveDate
@@ -214,6 +219,7 @@ internal class StatsViewModel(
                         val sunday = mon.plus(6, DateTimeUnit.DAY)
                         PeriodPage(
                             rangeLabel = buildWeekRangeLabel(mon, sunday),
+                            periodDays = 7,
                             entries = (0..6).map { dayOffset ->
                                 val date = mon.plus(dayOffset, DateTimeUnit.DAY)
                                 DayEntry(
@@ -231,7 +237,10 @@ internal class StatsViewModel(
 
     /** Pages from the first goal's month to today, oldest first. Each page = all days of a month. */
     private fun loadMonthPages(): Flow<List<PeriodPage>> {
-        return combine(goalDao.getAllGoals(), historyDao.getEarliestRecord()) { allGoals, earliest ->
+        return combine(
+            goalDao.getAllGoals(),
+            historyDao.getEarliestRecord()
+        ) { allGoals, earliest ->
             Pair(allGoals, earliest)
         }.flatMapLatest { (allGoals, earliestRecord) ->
             val firstGoalDate = allGoals.minByOrNull { it.effectiveDate }?.effectiveDate
@@ -248,7 +257,9 @@ internal class StatsViewModel(
             while (y < today.year || (y == today.year && m <= today.monthNumber)) {
                 monthStarts.add(LocalDate(y, m, 1))
                 m++
-                if (m > 12) { m = 1; y++ }
+                if (m > 12) {
+                    m = 1; y++
+                }
             }
 
             historyDao.findByTimestamp(firstMonthStart.atStartOfDay(), today.atEndOfDay())
@@ -260,6 +271,7 @@ internal class StatsViewModel(
                         val daysCount = daysInMonth(year, monthStart.monthNumber)
                         PeriodPage(
                             rangeLabel = buildMonthLabel(month, year),
+                            periodDays = daysCount,
                             entries = (1..daysCount).map { day ->
                                 val date = LocalDate(year, month, day)
                                 DayEntry(
@@ -277,7 +289,10 @@ internal class StatsViewModel(
 
     /** Pages from the first goal's year to today, oldest first. Each page = 12 months. */
     private fun loadYearPages(): Flow<List<PeriodPage>> {
-        return combine(goalDao.getAllGoals(), historyDao.getEarliestRecord()) { allGoals, earliest ->
+        return combine(
+            goalDao.getAllGoals(),
+            historyDao.getEarliestRecord()
+        ) { allGoals, earliest ->
             Pair(allGoals, earliest)
         }.flatMapLatest { (allGoals, earliestRecord) ->
             val firstGoalDate = allGoals.minByOrNull { it.effectiveDate }?.effectiveDate
@@ -291,11 +306,14 @@ internal class StatsViewModel(
                     val monthlyTotals = records
                         .filter { it.amount > 0f }
                         .groupBy { Pair(it.timestamp.year, it.timestamp.monthNumber) }
-                        .mapValues { (_, entries) -> entries.sumOf { it.amount.toDouble() }.toFloat() }
+                        .mapValues { (_, entries) ->
+                            entries.sumOf { it.amount.toDouble() }.toFloat()
+                        }
 
                     (firstYear..today.year).map { year ->
                         PeriodPage(
                             rangeLabel = year.toString(),
+                            periodDays = if (isLeapYear(year)) 366 else 365,
                             entries = (1..12).map { monthNum ->
                                 val daysCount = daysInMonth(year, monthNum)
                                 val lastDay = LocalDate(year, monthNum, daysCount)

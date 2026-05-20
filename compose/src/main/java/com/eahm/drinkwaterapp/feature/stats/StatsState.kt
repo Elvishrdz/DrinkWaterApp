@@ -6,7 +6,7 @@ data class StatsState(
     val selectedPeriod: StatsPeriod = StatsPeriod.WEEK,
     val chartPage: Int = 0,
     val pages: List<PeriodPage> = emptyList(),
-    val avgMl: Int = 0,
+    val avgMl: Float = 0f,
     val avgTrendPercent: Int = 0,
     val isTrendPositive: Boolean = true,
     val showTrend: Boolean = false,
@@ -34,6 +34,11 @@ data class DayEntry(
 data class PeriodPage(
     val rangeLabel: String,
     val entries: List<DayEntry>,
+    /**
+     * Number of calendar days this page spans (7 for a week, 28–31 for a month,
+     * 365/366 for a year). Used to compute the correct daily average in the summary.
+     */
+    val periodDays: Int = 0,
     /**
      * True when this page is entirely before the user's first daily-goal record.
      * The chart shows a "no data" placeholder instead of bars for these pages.
