@@ -80,37 +80,41 @@ internal fun WaterRisingAnimation(
         var startMs = -1L
         val totalMs = config.riseMs + config.holdMs + config.fadeMs
 
-        while (isActive) {
-            val frameMs = withFrameMillis { it }
-            if (startMs < 0L) startMs = frameMs
-            val elapsed = frameMs - startMs
+        try {
+            while (isActive) {
+                val frameMs = withFrameMillis { it }
+                if (startMs < 0L) startMs = frameMs
+                val elapsed = frameMs - startMs
 
-            timeMs = elapsed.toFloat()
+                timeMs = elapsed.toFloat()
 
-            when {
-                elapsed <= config.riseMs -> {
-                    fillFraction = elapsed.toFloat() / config.riseMs.toFloat()
-                    animAlpha = 1f
-                }
+                when {
+                    elapsed <= config.riseMs -> {
+                        fillFraction = elapsed.toFloat() / config.riseMs.toFloat()
+                        animAlpha = 1f
+                    }
 
-                elapsed <= config.riseMs + config.holdMs -> {
-                    fillFraction = 1f
-                    animAlpha = 1f
-                }
+                    elapsed <= config.riseMs + config.holdMs -> {
+                        fillFraction = 1f
+                        animAlpha = 1f
+                    }
 
-                elapsed <= totalMs -> {
-                    fillFraction = 1f
-                    val fadeElapsed = elapsed - config.riseMs - config.holdMs
-                    animAlpha = 1f - fadeElapsed.toFloat() / config.fadeMs.toFloat()
-                }
+                    elapsed <= totalMs -> {
+                        fillFraction = 1f
+                        val fadeElapsed = elapsed - config.riseMs - config.holdMs
+                        animAlpha = 1f - fadeElapsed.toFloat() / config.fadeMs.toFloat()
+                    }
 
-                else -> {
-                    animAlpha = 0f
-                    fillFraction = 0f
-                    onAnimationDone()
-                    break
+                    else -> break
                 }
             }
+        } finally {
+            // Runs whether the animation completed normally OR the coroutine was cancelled
+            // (e.g. user navigated away mid-play). Resetting the ViewModel flag here ensures
+            // the screen never replays the animation on re-entry.
+            animAlpha = 0f
+            fillFraction = 0f
+            onAnimationDone()
         }
     }
 
