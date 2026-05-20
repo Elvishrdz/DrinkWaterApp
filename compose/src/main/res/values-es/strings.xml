@@ -352,7 +352,7 @@
     <string name="drink_log_see_all">VER TODO</string>
     <string name="drink_log_empty_state">Registra una bebida para mostrarla aquí.</string>
     <string name="first_drink_dialog_title">¡Primera bebida registrada!</string>
-    <string name="first_drink_dialog_body">Tu bebida fue agregada al registro de hoy.\n\n¿Te equivocaste? Desliza la entrada hacia la izquierda en el registro para eliminarla.</string>
+    <string name="first_drink_dialog_body">Tu bebida ha sido agregada al registro de hoy.\n\n¿Fue un error? Puedes ir a la pantalla de Historial y eliminar la entrada desde ahí.</string>
     <string name="first_drink_dialog_cta">Entendido</string>
     <string name="drink_log_entry_amount">%1$s mL</string>
 
