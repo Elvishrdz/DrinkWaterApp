@@ -202,7 +202,10 @@ val Project.localProperties: Properties
 
 ## Step 5 — `AndroidComposeConventionPlugin`
 
-Applies the Kotlin Compose compiler plugin, sets `buildFeatures.compose = true`, and adds all Compose dependencies (BOM + libraries). Works for both app and library modules.
+Applies the Kotlin Compose compiler plugin, sets `buildFeatures.compose = true`, and adds all Compose dependencies. Each module type (app vs library) has its own explicit dependency block so it is always clear what a module receives when applying this plugin.
+
+**App module** gets: BOM + all UI libs + `activity-compose` (needed for `setContent`, `ComponentActivity`).
+**Library module** gets: BOM + all UI libs + `activity-compose` (feature modules need it for `rememberLauncherForActivityResult`, `LocalActivity`, etc.). The set is intentionally the same as app — if a future library module genuinely does not need a subset, that dep can be moved to the module's own `build.gradle.kts` instead of removing it from the plugin.
 
 ```kotlin
 // build-logic/src/main/kotlin/AndroidComposeConventionPlugin.kt
@@ -227,36 +230,75 @@ class AndroidComposeConventionPlugin : Plugin<Project> {
             val isLibrary = pluginManager.hasPlugin("com.android.library")
 
             when {
-                isApp -> extensions.configure<ApplicationExtension> {
-                    buildFeatures.compose = true
+                isApp -> {
+                    extensions.configure<ApplicationExtension> {
+                        buildFeatures.compose = true
+                    }
+                    dependencies {
+                        val bom = platform(libs.findLibrary("compose.bom").get())
+                        add("implementation", bom)
+                        add("androidTestImplementation", bom)
+
+                        // Activity host — required for setContent / ComponentActivity
+                        add("implementation", libs.findLibrary("androidx.activity.compose").get())
+
+                        // Core UI
+                        add("implementation", libs.findLibrary("compose.ui").get())
+                        add("implementation", libs.findLibrary("compose.ui.graphics").get())
+                        add("implementation", libs.findLibrary("compose.ui.tooling.preview").get())
+                        add("implementation", libs.findLibrary("compose.ui.text.google.fonts").get())
+
+                        // Material3
+                        add("implementation", libs.findLibrary("compose.material3").get())
+                        add("implementation", libs.findLibrary("compose.material3.adaptive.nav.suite").get())
+                        add("implementation", libs.findLibrary("compose.material3.adaptive").get())
+                        add("implementation", libs.findLibrary("compose.material3.adaptive.layout").get())
+                        add("implementation", libs.findLibrary("compose.material3.adaptive.navigation").get())
+
+                        // Tooling / testing
+                        add("implementation", libs.findLibrary("compose.ui.tooling").get())
+                        add("implementation", libs.findLibrary("compose.ui.test.manifest").get())
+                        add("androidTestImplementation", libs.findLibrary("compose.ui.test.junit4").get())
+                    }
                 }
-                isLibrary -> extensions.configure<LibraryExtension> {
-                    buildFeatures.compose = true
+
+                isLibrary -> {
+                    extensions.configure<LibraryExtension> {
+                        buildFeatures.compose = true
+                    }
+                    dependencies {
+                        val bom = platform(libs.findLibrary("compose.bom").get())
+                        add("implementation", bom)
+                        add("androidTestImplementation", bom)
+
+                        // Activity host — feature library modules need this for
+                        // rememberLauncherForActivityResult, LocalActivity, etc.
+                        add("implementation", libs.findLibrary("androidx.activity.compose").get())
+
+                        // Core UI
+                        add("implementation", libs.findLibrary("compose.ui").get())
+                        add("implementation", libs.findLibrary("compose.ui.graphics").get())
+                        add("implementation", libs.findLibrary("compose.ui.tooling.preview").get())
+                        add("implementation", libs.findLibrary("compose.ui.text.google.fonts").get())
+
+                        // Material3
+                        add("implementation", libs.findLibrary("compose.material3").get())
+                        add("implementation", libs.findLibrary("compose.material3.adaptive.nav.suite").get())
+                        add("implementation", libs.findLibrary("compose.material3.adaptive").get())
+                        add("implementation", libs.findLibrary("compose.material3.adaptive.layout").get())
+                        add("implementation", libs.findLibrary("compose.material3.adaptive.navigation").get())
+
+                        // Tooling / testing
+                        add("implementation", libs.findLibrary("compose.ui.tooling").get())
+                        add("implementation", libs.findLibrary("compose.ui.test.manifest").get())
+                        add("androidTestImplementation", libs.findLibrary("compose.ui.test.junit4").get())
+                    }
                 }
+
                 else -> error(
                     "AndroidComposeConventionPlugin requires either " +
                     "'com.android.application' or 'com.android.library' to be applied first."
                 )
-            }
-
-            dependencies {
-                val bom = platform(libs.findLibrary("compose.bom").get())
-                add("implementation", bom)
-                add("androidTestImplementation", bom)
-
-                add("implementation", libs.findLibrary("androidx.activity.compose").get())
-                add("implementation", libs.findLibrary("compose.ui").get())
-                add("implementation", libs.findLibrary("compose.ui.graphics").get())
-                add("implementation", libs.findLibrary("compose.ui.tooling.preview").get())
-                add("implementation", libs.findLibrary("compose.ui.text.google.fonts").get())
-                add("implementation", libs.findLibrary("compose.material3").get())
-                add("implementation", libs.findLibrary("compose.material3.adaptive.nav.suite").get())
-                add("implementation", libs.findLibrary("compose.material3.adaptive").get())
-                add("implementation", libs.findLibrary("compose.material3.adaptive.layout").get())
-                add("implementation", libs.findLibrary("compose.material3.adaptive.navigation").get())
-                add("implementation", libs.findLibrary("compose.ui.tooling").get())
-                add("implementation", libs.findLibrary("compose.ui.test.manifest").get())
-                add("androidTestImplementation", libs.findLibrary("compose.ui.test.junit4").get())
             }
         }
     }
