@@ -2,6 +2,7 @@ import java.util.Properties
 
 plugins {
     id("com.android.library")
+    id("drinkwater.android.library")
 }
 
 val localProps = Properties().apply {
@@ -15,20 +16,7 @@ val mixpanelTokenProd: String = System.getenv("MIXPANEL_TOKEN")
 
 android {
     namespace = "com.eahm.drinkwaterapp.analytics"
-    compileSdk {
-        version = release(37)
-    }
 
-    defaultConfig {
-        minSdk = 24
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
     buildTypes {
         release {
             buildConfigField("String", "MIXPANEL_TOKEN", "\"$mixpanelTokenProd\"")

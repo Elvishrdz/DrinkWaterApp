@@ -33,5 +33,9 @@ gradlePlugin {
             id = "drinkwater.android.room"
             implementationClass = "AndroidRoomConventionPlugin"
         }
+        register("androidLibrary") {
+            id = "drinkwater.android.library"
+            implementationClass = "AndroidLibraryConventionPlugin"
+        }
     }
 }
