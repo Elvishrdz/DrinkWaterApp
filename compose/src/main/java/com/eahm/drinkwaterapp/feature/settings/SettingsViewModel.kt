@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Build
 import android.provider.Settings
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.edit
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -239,6 +240,9 @@ internal class SettingsViewModel(
         val locales = if (tag.isEmpty()) LocaleListCompat.getEmptyLocaleList()
         else LocaleListCompat.forLanguageTags(tag)
         AppCompatDelegate.setApplicationLocales(locales)
+        application
+            .getSharedPreferences("locale_prefs", android.content.Context.MODE_PRIVATE)
+            .edit { putString("locale_tag", tag) }
     }
 
     fun onDrawOverlayPermissionResult() {

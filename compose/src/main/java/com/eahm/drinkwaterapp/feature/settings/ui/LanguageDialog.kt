@@ -34,7 +34,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 import java.util.Locale
 
-private val SUPPORTED_LOCALES = listOf("en-US", "es-Es")
+private val SUPPORTED_LOCALES = listOf("en-US", "es-ES")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
