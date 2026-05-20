@@ -4,6 +4,7 @@ import android.app.AlarmManager
 import android.os.Build
 import android.provider.Settings
 import android.text.format.DateFormat
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -107,6 +108,10 @@ internal fun OnboardingScreen(
         animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing),
         label = "onboarding_progress",
     )
+
+    BackHandler(enabled = state.step > 1) {
+        viewModel.prevStep()
+    }
 
     CompositionLocalProvider(LocalOnboardingProgress provides animatedProgress) {
         when (OnboardingSteps.byStep(state.step)) {
