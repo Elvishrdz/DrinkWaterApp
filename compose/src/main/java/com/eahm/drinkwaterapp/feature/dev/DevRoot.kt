@@ -59,6 +59,7 @@ import com.eahm.drinkwaterapp.feature.dev.billing.BillingDevRoot
 import com.eahm.drinkwaterapp.feature.dev.celebrations.CelebrationsRoot
 import com.eahm.drinkwaterapp.feature.dev.consent.ConsentDevRoot
 import com.eahm.drinkwaterapp.feature.dev.dailygoal.DailyGoalDevRoot
+import com.eahm.drinkwaterapp.feature.dev.historyinject.HistoryInjectDevRoot
 import com.eahm.drinkwaterapp.feature.dev.menu.DevMenuRoot
 import com.eahm.drinkwaterapp.feature.dev.notifications.NotificationsRoot
 import com.eahm.drinkwaterapp.feature.dev.onboarding.OnboardingDevRoot
@@ -102,6 +103,7 @@ enum class DevDestination(
     ALARMS("Alarms", DwIcons.Bell),
     ALARMS_V2("Alarms V2", DwIcons.Bell),
     WATER_ANIMATION("Water Anim", DwIcons.Wave),
+    HISTORY_INJECT("History", DwIcons.History),
 }
 
 
@@ -219,6 +221,10 @@ internal fun DevRoot(onBackClicked: () -> Unit) {
             )
 
             DevDestination.WATER_ANIMATION -> WaterAnimationDevRoot(
+                onBackClicked = onBackClicked,
+            )
+
+            DevDestination.HISTORY_INJECT -> HistoryInjectDevRoot(
                 onBackClicked = onBackClicked,
             )
         }

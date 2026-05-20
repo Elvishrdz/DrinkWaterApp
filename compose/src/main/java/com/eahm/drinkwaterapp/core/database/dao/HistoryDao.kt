@@ -80,4 +80,7 @@ interface HistoryDao {
 
     @Query("DELETE FROM HistoryEntity")
     suspend fun deleteAll()
+
+    @Query("DELETE FROM HistoryEntity WHERE timestamp BETWEEN :start AND :end")
+    suspend fun deleteAllBetween(start: LocalDateTime, end: LocalDateTime)
 }

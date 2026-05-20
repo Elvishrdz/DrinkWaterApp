@@ -126,6 +126,7 @@ internal fun OnboardingScreen(
                 onGoalChanged = viewModel::onGoalChanged,
                 onNext = { viewModel.nextStep() },
                 onBack = { viewModel.prevStep() },
+                unitPreference = state.unitPreference,
             )
 
             Units -> StepUnits(
@@ -176,6 +177,7 @@ internal fun OnboardingScreen(
                 onNext = { viewModel.nextStep() },
                 onSkip = { viewModel.nextStep() },
                 onBack = { viewModel.prevStep() },
+                unitPreference = state.unitPreference,
             )
 
             RemindersSteps.ExactAlarm -> StepExactAlarm(

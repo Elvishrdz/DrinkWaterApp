@@ -57,6 +57,7 @@ import com.eahm.drinkwaterapp.core.domain.extension.formatVolume
 import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.ui.bottomsheet.AppBottomSheet
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 internal const val AMOUNT_STEP = 50
 internal const val AMOUNT_MIN = 50
@@ -123,18 +124,37 @@ private fun NotificationAmountSheetContent(
     var errorMessage by remember { mutableStateOf("") }
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
+    val displayUnit = effectiveDisplayUnit(unitPreference, value.toFloat())
+
+    val (minDisplay, maxDisplay) = when (displayUnit) {
+        DisplayUnit.ML    -> Pair(AMOUNT_MIN.toFloat(), AMOUNT_MAX.toFloat())
+        DisplayUnit.FL_OZ -> Pair(AMOUNT_MIN / 29.574f, AMOUNT_MAX / 29.574f)
+        DisplayUnit.L     -> Pair(AMOUNT_MIN / 1000f, AMOUNT_MAX / 1000f)
+    }
+
+    fun formatBound(v: Float) = if (displayUnit == DisplayUnit.ML) v.toInt().toString() else "%.1f".format(v)
 
     fun trySave() {
-        val parsed = textInput.trim().toIntOrNull()
+        val parsed = textInput.trim().toFloatOrNull()
         when {
             parsed == null ->
                 errorMessage = context.getString(R.string.validation_error_invalid_number)
-            parsed < AMOUNT_MIN ->
-                errorMessage = context.getString(R.string.validation_error_min_value, AMOUNT_MIN.toString())
-            parsed > AMOUNT_MAX ->
-                errorMessage = context.getString(R.string.validation_error_max_value, AMOUNT_MAX.toString())
+            parsed < minDisplay ->
+                errorMessage = context.getString(R.string.validation_error_min_value, formatBound(minDisplay))
+            parsed > maxDisplay ->
+                errorMessage = context.getString(R.string.validation_error_max_value, formatBound(maxDisplay))
             else -> {
-                onValueSet(parsed)
+                val normalisedDisplay = when (displayUnit) {
+                    DisplayUnit.ML    -> parsed.roundToInt().toFloat()
+                    DisplayUnit.FL_OZ -> (parsed * 10).roundToInt() / 10f
+                    DisplayUnit.L     -> (parsed * 10).roundToInt() / 10f
+                }
+                val amountMl = when (displayUnit) {
+                    DisplayUnit.ML    -> normalisedDisplay
+                    DisplayUnit.FL_OZ -> normalisedDisplay * 29.574f
+                    DisplayUnit.L     -> normalisedDisplay * 1000f
+                }
+                onValueSet(amountMl.roundToInt())
                 isEditing = false
                 textInput = ""
                 errorMessage = ""
@@ -218,14 +238,14 @@ private fun NotificationAmountSheetContent(
                     OutlinedTextField(
                         value = textInput,
                         onValueChange = { textInput = it; errorMessage = "" },
-                        label = { Text(stringResource(R.string.settings_stepper_custom_hint)) },
+                        label = { Text("${stringResource(R.string.settings_stepper_custom_hint)} (${displayUnit.label})") },
                         singleLine = true,
                         isError = errorMessage.isNotEmpty(),
                         supportingText = if (errorMessage.isNotEmpty()) {
                             { Text(errorMessage) }
                         } else null,
                         keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
+                            keyboardType = KeyboardType.Decimal,
                             imeAction = ImeAction.Done,
                         ),
                         keyboardActions = KeyboardActions(onDone = { trySave() }),

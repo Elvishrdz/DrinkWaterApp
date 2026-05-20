@@ -5,9 +5,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.LocalIndication
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -23,21 +21,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterLight
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
 /**
- * Scales the composable down on tap and springs back with a bounce on release.
+ * Scales the composable down on press and springs back with a bounce on release.
  *
- * @param onClick       Click callback.
- * @param shape         Shape used to clip the touch area (and the ripple if enabled).
- * @param enabled       Set to false to disable the scale animation (click still fires).
- * @param rippleEnabled Set to true to show the platform ripple on tap.
+ * Holding the finger down keeps the composable compressed until the finger lifts,
+ * which makes the animation feel more tactile and intentional.
+ *
+ * @param onClick   Callback fired when the finger is released (not on initial press).
+ * @param shape     Shape used to clip the touch area.
+ * @param enabled   Set to false to disable the scale animation (click still fires on release).
  */
 fun Modifier.bounceTap(
     onClick: () -> Unit,
@@ -45,49 +44,42 @@ fun Modifier.bounceTap(
     enabled: Boolean = true,
     rippleEnabled: Boolean = false,
 ): Modifier = composed {
-    val bounceEvent = remember { RingAnimationEvent() }
     val scale = remember { Animatable(1f) }
-    val interactionSource = remember { MutableInteractionSource() }
     val currentEnabled = rememberUpdatedState(enabled)
-
-    LaunchedEffect(bounceEvent) {
-        bounceEvent.interactions.collect {
-            if (!currentEnabled.value) return@collect
-            // Fast compress, then bouncy release
-            scale.animateTo(0.93f, spring(stiffness = Spring.StiffnessHigh))
-            scale.animateTo(
-                targetValue = 1f,
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessMedium,
-                ),
-            )
-        }
-    }
+    val currentOnClick = rememberUpdatedState(onClick)
 
     this
         .scale(scale.value)
         .clip(shape)
-        .clickable(
-            interactionSource = interactionSource,
-            indication = if (rippleEnabled) LocalIndication.current else null,
-            onClick = {
-                bounceEvent.emitBounce()
-                onClick()
-            },
-        )
-}
-
-class RingAnimationEvent {
-
-    val interactions = MutableSharedFlow<Unit>(
-        extraBufferCapacity = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST,
-    )
-
-    fun emitBounce() {
-        interactions.tryEmit(Unit)
-    }
+        .pointerInput(Unit) {
+            detectTapGestures(
+                onPress = { _ ->
+                    if (!currentEnabled.value) {
+                        val released = tryAwaitRelease()
+                        if (released) currentOnClick.value()
+                        return@detectTapGestures
+                    }
+                    // Compress immediately on press
+                    scale.animateTo(0.93f, spring(stiffness = Spring.StiffnessHigh))
+                    // Suspend here while finger is held down
+                    val released = tryAwaitRelease()
+                    if (released) {
+                        // Bouncy spring-back, then fire callback
+                        scale.animateTo(
+                            targetValue = 1f,
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessMedium,
+                            ),
+                        )
+                        currentOnClick.value()
+                    } else {
+                        // Gesture cancelled — snap back without firing callback
+                        scale.animateTo(1f, spring(stiffness = Spring.StiffnessHigh))
+                    }
+                },
+            )
+        }
 }
 
 /**

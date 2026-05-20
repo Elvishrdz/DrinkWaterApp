@@ -74,9 +74,14 @@ import com.eahm.drinkwaterapp.feature.onboarding.totalSteps
 import com.eahm.drinkwaterapp.feature.onboarding.ui.components.DwPrimaryButtonAnimated
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbArtCircle
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbShell
+import com.eahm.drinkwaterapp.core.domain.extension.formatVolume
+import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.feature.settings.ui.AMOUNT_MAX
 import com.eahm.drinkwaterapp.feature.settings.ui.AMOUNT_MIN
 import com.eahm.drinkwaterapp.feature.settings.ui.AMOUNT_STEP
+import com.eahm.drinkwaterapp.feature.settings.ui.DisplayUnit
+import com.eahm.drinkwaterapp.feature.settings.ui.effectiveDisplayUnit
+import kotlin.math.roundToInt
 
 /**
  * Unified notification onboarding step — two designs in one composable.
@@ -96,6 +101,7 @@ internal fun StepNotifs(
     onNext: () -> Unit,
     onSkip: () -> Unit,
     onBack: () -> Unit,
+    unitPreference: UnitPreference = UnitPreference.ML,
 ) {
     val context = LocalContext.current
 
@@ -151,6 +157,7 @@ internal fun StepNotifs(
                 onAmountChange(localAmount.toFloat())
                 onNext()
             },
+            unitPreference = unitPreference,
         )
     } else {
         NotifsPermissionContent(
@@ -274,6 +281,7 @@ private fun NotifsConfigContent(
     onValueSet: (Int) -> Unit,
     onBack: () -> Unit,
     onContinue: () -> Unit,
+    unitPreference: UnitPreference = UnitPreference.ML,
 ) {
     OnbShell(
         step = step,
@@ -303,6 +311,7 @@ private fun NotifsConfigContent(
                 onDecrement = onDecrement,
                 onIncrement = onIncrement,
                 onValueSet = onValueSet,
+                unitPreference = unitPreference,
             )
             Spacer(Modifier.height(16.dp))
             Text(
@@ -323,24 +332,44 @@ private fun AmountStepper(
     onDecrement: () -> Unit,
     onIncrement: () -> Unit,
     onValueSet: (Int) -> Unit,
+    unitPreference: UnitPreference = UnitPreference.ML,
 ) {
     var isEditing by remember { mutableStateOf(false) }
     var textInput by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
+    val displayUnit = effectiveDisplayUnit(unitPreference, value.toFloat())
+
+    val (minDisplay, maxDisplay) = when (displayUnit) {
+        DisplayUnit.ML    -> Pair(AMOUNT_MIN.toFloat(), AMOUNT_MAX.toFloat())
+        DisplayUnit.FL_OZ -> Pair(AMOUNT_MIN / 29.574f, AMOUNT_MAX / 29.574f)
+        DisplayUnit.L     -> Pair(AMOUNT_MIN / 1000f, AMOUNT_MAX / 1000f)
+    }
+
+    fun formatBound(v: Float) = if (displayUnit == DisplayUnit.ML) v.toInt().toString() else "%.1f".format(v)
 
     fun trySave() {
-        val parsed = textInput.trim().toIntOrNull()
+        val parsed = textInput.trim().toFloatOrNull()
         when {
             parsed == null ->
                 errorMessage = context.getString(R.string.validation_error_invalid_number)
-            parsed < AMOUNT_MIN ->
-                errorMessage = context.getString(R.string.validation_error_min_value, AMOUNT_MIN.toString())
-            parsed > AMOUNT_MAX ->
-                errorMessage = context.getString(R.string.validation_error_max_value, AMOUNT_MAX.toString())
+            parsed < minDisplay ->
+                errorMessage = context.getString(R.string.validation_error_min_value, formatBound(minDisplay))
+            parsed > maxDisplay ->
+                errorMessage = context.getString(R.string.validation_error_max_value, formatBound(maxDisplay))
             else -> {
-                onValueSet(parsed)
+                val normalisedDisplay = when (displayUnit) {
+                    DisplayUnit.ML    -> parsed.roundToInt().toFloat()
+                    DisplayUnit.FL_OZ -> (parsed * 10).roundToInt() / 10f
+                    DisplayUnit.L     -> (parsed * 10).roundToInt() / 10f
+                }
+                val amountMl = when (displayUnit) {
+                    DisplayUnit.ML    -> normalisedDisplay
+                    DisplayUnit.FL_OZ -> normalisedDisplay * 29.574f
+                    DisplayUnit.L     -> normalisedDisplay * 1000f
+                }
+                onValueSet(amountMl.roundToInt())
                 isEditing = false
                 textInput = ""
                 errorMessage = ""
@@ -372,19 +401,12 @@ private fun AmountStepper(
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "$value",
+                        text = value.toFloat().formatVolume(unitPreference),
                         fontFamily = Nunito,
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 56.sp,
                         color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.clickable { isEditing = true },
-                    )
-                    Text(
-                        text = "ml",
-                        fontFamily = PlusJakartaSans,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 16.sp,
-                        color = DwInk400,
                     )
                 }
 
@@ -407,14 +429,14 @@ private fun AmountStepper(
                 OutlinedTextField(
                     value = textInput,
                     onValueChange = { textInput = it; errorMessage = "" },
-                    label = { Text(stringResource(R.string.settings_stepper_custom_hint)) },
+                    label = { Text("${stringResource(R.string.settings_stepper_custom_hint)} (${displayUnit.label})") },
                     singleLine = true,
                     isError = errorMessage.isNotEmpty(),
                     supportingText = if (errorMessage.isNotEmpty()) {
                         { Text(errorMessage) }
                     } else null,
                     keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number,
+                        keyboardType = KeyboardType.Decimal,
                         imeAction = ImeAction.Done,
                     ),
                     keyboardActions = KeyboardActions(onDone = { trySave() }),

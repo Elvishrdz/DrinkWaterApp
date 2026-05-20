@@ -18,6 +18,7 @@ import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
+import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps
 import com.eahm.drinkwaterapp.feature.onboarding.totalSteps
 import com.eahm.drinkwaterapp.feature.onboarding.ui.components.DwPrimaryButtonAnimated
@@ -35,6 +36,7 @@ internal fun StepSetGoal(
     onGoalChanged: (Float) -> Unit,
     onNext: () -> Unit,
     onBack: () -> Unit,
+    unitPreference: UnitPreference = UnitPreference.ML,
 ) {
     var currentGoal by remember { mutableFloatStateOf(goalMl.coerceIn(GOAL_MIN, GOAL_MAX)) }
 
@@ -77,6 +79,7 @@ internal fun StepSetGoal(
                     currentGoal = next
                     onGoalChanged(next)
                 },
+                unitPreference = unitPreference,
             )
         }
     }

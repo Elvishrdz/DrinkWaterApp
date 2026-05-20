@@ -47,7 +47,7 @@ internal class StatsViewModel(
         .date
 
     private val _selectedPeriod = MutableStateFlow(StatsPeriod.WEEK)
-    private val _chartPage = MutableStateFlow(0)
+    private val _chartPage = MutableStateFlow(Int.MAX_VALUE) // clamps to newest page on first load
 
     private val pages: StateFlow<List<PeriodPage>> = _selectedPeriod
         .flatMapLatest { period -> loadPagesFlow(period) }
@@ -189,11 +189,15 @@ internal class StatsViewModel(
         val daysFromMonday = today.dayOfWeek.ordinal  // MONDAY=0 … SUNDAY=6
         val thisMonday = today.minus(daysFromMonday, DateTimeUnit.DAY)
 
-        return goalDao.getAllGoals().flatMapLatest { allGoals ->
-            // Start from the Monday of the week that contains the first daily-goal entry.
+        return combine(goalDao.getAllGoals(), historyDao.getEarliestRecord()) { allGoals, earliest ->
+            Pair(allGoals, earliest)
+        }.flatMapLatest { (allGoals, earliestRecord) ->
             val firstGoalDate = allGoals.minByOrNull { it.effectiveDate }?.effectiveDate
-            val firstMonday = if (firstGoalDate != null) {
-                firstGoalDate.minus(firstGoalDate.dayOfWeek.ordinal, DateTimeUnit.DAY)
+            val firstDrinkDate = earliestRecord?.timestamp?.date
+            // Use the earliest of firstGoalDate and firstDrinkDate as the range start.
+            val earliestDate = listOfNotNull(firstGoalDate, firstDrinkDate).minOrNull()
+            val firstMonday = if (earliestDate != null) {
+                earliestDate.minus(earliestDate.dayOfWeek.ordinal, DateTimeUnit.DAY)
             } else thisMonday
 
             historyDao.findByTimestamp(firstMonday.atStartOfDay(), today.atEndOfDay())
@@ -227,10 +231,14 @@ internal class StatsViewModel(
 
     /** Pages from the first goal's month to today, oldest first. Each page = all days of a month. */
     private fun loadMonthPages(): Flow<List<PeriodPage>> {
-        return goalDao.getAllGoals().flatMapLatest { allGoals ->
+        return combine(goalDao.getAllGoals(), historyDao.getEarliestRecord()) { allGoals, earliest ->
+            Pair(allGoals, earliest)
+        }.flatMapLatest { (allGoals, earliestRecord) ->
             val firstGoalDate = allGoals.minByOrNull { it.effectiveDate }?.effectiveDate
-            val firstMonthStart = if (firstGoalDate != null) {
-                LocalDate(firstGoalDate.year, firstGoalDate.monthNumber, 1)
+            val firstDrinkDate = earliestRecord?.timestamp?.date
+            val earliestDate = listOfNotNull(firstGoalDate, firstDrinkDate).minOrNull()
+            val firstMonthStart = if (earliestDate != null) {
+                LocalDate(earliestDate.year, earliestDate.monthNumber, 1)
             } else LocalDate(today.year, today.monthNumber, 1)
 
             // Build list of month starts from firstMonthStart to current month.
@@ -269,9 +277,13 @@ internal class StatsViewModel(
 
     /** Pages from the first goal's year to today, oldest first. Each page = 12 months. */
     private fun loadYearPages(): Flow<List<PeriodPage>> {
-        return goalDao.getAllGoals().flatMapLatest { allGoals ->
+        return combine(goalDao.getAllGoals(), historyDao.getEarliestRecord()) { allGoals, earliest ->
+            Pair(allGoals, earliest)
+        }.flatMapLatest { (allGoals, earliestRecord) ->
             val firstGoalDate = allGoals.minByOrNull { it.effectiveDate }?.effectiveDate
-            val firstYear = firstGoalDate?.year ?: today.year
+            val firstDrinkDate = earliestRecord?.timestamp?.date
+            val earliestDate = listOfNotNull(firstGoalDate, firstDrinkDate).minOrNull()
+            val firstYear = earliestDate?.year ?: today.year
             val rangeStart = LocalDate(firstYear, 1, 1)
 
             historyDao.findByTimestamp(rangeStart.atStartOfDay(), today.atEndOfDay())

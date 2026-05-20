@@ -54,10 +54,19 @@ import com.eahm.drinkwaterapp.core.domain.extension.formatVolume
 import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.ui.bottomsheet.AppBottomSheet
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 internal const val GOAL_STEP = 100f
 internal const val GOAL_MIN = 100f
 internal const val GOAL_MAX = 100_000f
+
+internal enum class DisplayUnit(val label: String) { ML("mL"), L("L"), FL_OZ("fl oz") }
+
+internal fun effectiveDisplayUnit(pref: UnitPreference, valueMl: Float): DisplayUnit = when (pref) {
+    UnitPreference.FL_OZ -> DisplayUnit.FL_OZ
+    UnitPreference.AUTO_LITERS -> if (valueMl >= 1000f) DisplayUnit.L else DisplayUnit.ML
+    UnitPreference.ML -> DisplayUnit.ML
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -133,18 +142,37 @@ internal fun GoalStepperRow(
     var errorMessage by remember { mutableStateOf("") }
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
+    val displayUnit = effectiveDisplayUnit(unitPreference, value)
+
+    val (minDisplay, maxDisplay) = when (displayUnit) {
+        DisplayUnit.ML    -> Pair(GOAL_MIN, GOAL_MAX)
+        DisplayUnit.FL_OZ -> Pair(GOAL_MIN / 29.574f, GOAL_MAX / 29.574f)
+        DisplayUnit.L     -> Pair(GOAL_MIN / 1000f, GOAL_MAX / 1000f)
+    }
+
+    fun formatBound(v: Float) = if (displayUnit == DisplayUnit.ML) v.toInt().toString() else "%.1f".format(v)
 
     fun trySave() {
         val parsed = textInput.trim().toFloatOrNull()
         when {
             parsed == null ->
                 errorMessage = context.getString(R.string.validation_error_invalid_number)
-            parsed < GOAL_MIN ->
-                errorMessage = context.getString(R.string.validation_error_min_value, GOAL_MIN.toInt().toString())
-            parsed > GOAL_MAX ->
-                errorMessage = context.getString(R.string.validation_error_max_value, GOAL_MAX.toInt().toString())
+            parsed < minDisplay ->
+                errorMessage = context.getString(R.string.validation_error_min_value, formatBound(minDisplay))
+            parsed > maxDisplay ->
+                errorMessage = context.getString(R.string.validation_error_max_value, formatBound(maxDisplay))
             else -> {
-                onValueSet(parsed)
+                val normalisedDisplay = when (displayUnit) {
+                    DisplayUnit.ML    -> parsed.roundToInt().toFloat()
+                    DisplayUnit.FL_OZ -> (parsed * 10).roundToInt() / 10f
+                    DisplayUnit.L     -> (parsed * 10).roundToInt() / 10f
+                }
+                val amountMl = when (displayUnit) {
+                    DisplayUnit.ML    -> normalisedDisplay
+                    DisplayUnit.FL_OZ -> normalisedDisplay * 29.574f
+                    DisplayUnit.L     -> normalisedDisplay * 1000f
+                }
+                onValueSet(amountMl)
                 isEditing = false
                 textInput = ""
                 errorMessage = ""
@@ -209,14 +237,14 @@ internal fun GoalStepperRow(
                     OutlinedTextField(
                         value = textInput,
                         onValueChange = { textInput = it; errorMessage = "" },
-                        label = { Text(stringResource(R.string.settings_stepper_custom_hint)) },
+                        label = { Text("${stringResource(R.string.settings_stepper_custom_hint)} (${displayUnit.label})") },
                         singleLine = true,
                         isError = errorMessage.isNotEmpty(),
                         supportingText = if (errorMessage.isNotEmpty()) {
                             { Text(errorMessage) }
                         } else null,
                         keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
+                            keyboardType = KeyboardType.Decimal,
                             imeAction = ImeAction.Done,
                         ),
                         keyboardActions = KeyboardActions(onDone = { trySave() }),
