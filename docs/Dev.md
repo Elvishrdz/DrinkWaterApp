@@ -97,6 +97,7 @@ Priorities Tier 2
 - [] agregar descripcion corta a los presets.
  
 Plan para restaurar compras:
+- [] existe un plan todavia no ejecutado en docs/plans 
 
 - vamos a dejar la opcion de solo poder restaurar en el mismo dispositivo si se guardan los datos
   segun la documentacion de revenuecat.
