@@ -12,6 +12,7 @@ import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManagerV2
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStatsObserver
+import com.eahm.drinkwaterapp.core.data.notificationpermission.NotificationPermissionObserver
 import com.eahm.drinkwaterapp.core.data.streak.StreakRepository
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
@@ -56,6 +57,7 @@ internal class DrinkViewModel(
     val streakRepository: StreakRepository,
     val trackingService: TrackingService,
     val activeHoursObserver: ActiveHoursObserver,
+    notificationPermissionObserver: NotificationPermissionObserver,
 ) : ViewModel() {
 
     private val dao = database.getHistoryDao()
@@ -209,6 +211,9 @@ internal class DrinkViewModel(
             alarmCountdownMs = alarmCountdownMs,
             alarmIsExact = alarmIsExact,
         )
+        else drinkState
+    }.combine(notificationPermissionObserver.hasPermission) { drinkState, hasPermission ->
+        if (drinkState is DrinkState.Data && !hasPermission) drinkState.copy(alarmCountdownMs = null)
         else drinkState
     }.combine(activeHoursObserver.inActiveHours) { drinkState, inActiveHours ->
         if (drinkState is DrinkState.Data) drinkState.copy(isOutsideActiveHours = !inActiveHours)

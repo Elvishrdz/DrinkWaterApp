@@ -48,7 +48,7 @@ Priorities Tier 1
 - [] Agregar aleman a idiomas
 - [] Probar restaurar compra. Que pasa si un usuario compra desinstala e instala otra vez? Se
   restaura con la cuenta de Google o con el id único generado? Probar y agregar comentario.
-
+- [x] ocultar countdown cuando notificaciones estan desactivadas
 
 - [] use Instant instead of LocalDateTime (good for timezone conversion) for dates, then parse to
   localdate time if needed.
