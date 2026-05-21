@@ -33,10 +33,10 @@ Priorities Tier 1
 - [] app: agregar icono monochrome
 - [] fix insets
 - [] fix splash screen (losing aspect ratio) app: corregir splash screen
-- [] add more banners in app screens (adaptive banners)
-- [] Usar otro banner is para banners en history y stats
-- [] Expandir width de banners
-- [] Editar un registro de días solo al ver un interstitial. Pero los últimos 2 registros no
+- [x] add more banners in app screens (adaptive banners)
+- [x] Usar otro banner id para banners en history y stats
+- [x] Expandir width de banners
+- [x] Editar un registro de días solo al ver un interstitial. Pero los últimos 2 registros no
   muestran video y se pueden editar normal siempre
 - [] Mostrar animación beber agua al usar presenta también input y preset
 - [] Actualizar componente reminders en drink screen. Fuera de horas activas solo mostrar el tiempo
