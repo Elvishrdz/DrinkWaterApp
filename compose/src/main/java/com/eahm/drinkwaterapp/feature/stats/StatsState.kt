@@ -1,6 +1,7 @@
 package com.eahm.drinkwaterapp.feature.stats
 
 import com.eahm.drinkwaterapp.core.presentation.UnitPreference
+import kotlinx.datetime.LocalDate
 
 data class StatsState(
     val selectedPeriod: StatsPeriod = StatsPeriod.WEEK,
@@ -15,6 +16,7 @@ data class StatsState(
     val goalStreakDays: Int = 0,
     val bestGoalStreakDays: Int? = null,
     val personalBestMl: Float? = null,
+    val personalBestDate: LocalDate? = null,
     val unitPreference: UnitPreference = UnitPreference.ML,
 )
 

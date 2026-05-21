@@ -436,6 +436,16 @@
     <string name="stats_mini_goal_streak">Racha de metas</string>
     <string name="stats_mini_best_goal_streak">Mejor racha de metas</string>
     <string name="stats_mini_personal_best">Récord personal</string>
+    <string name="stats_best_date_today">Alcanzado: Hoy</string>
+    <string name="stats_best_date_achieved">Alcanzado: %s</string>
+    <plurals name="stats_best_date_days_ago">
+        <item quantity="one">Alcanzado: hace %d día</item>
+        <item quantity="many">Alcanzado: hace %d días</item>
+    </plurals>
+    <plurals name="stats_best_date_months_ago">
+        <item quantity="one">Alcanzado: hace %d mes</item>
+        <item quantity="many">Alcanzado: hace %d meses</item>
+    </plurals>
 
     <!-- Historial — Pantalla -->
     <string name="history_title">Historial</string>

@@ -205,6 +205,7 @@ internal fun StatsContent(
                 goalStreakDays = state.goalStreakDays,
                 bestGoalStreakDays = state.bestGoalStreakDays,
                 personalBestMl = state.personalBestMl,
+                personalBestDate = state.personalBestDate,
                 unitPreference = state.unitPreference,
                 modifier = Modifier.padding(horizontal = 18.dp)
             )

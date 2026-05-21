@@ -439,6 +439,16 @@
     <string name="stats_mini_goal_streak">Goal streak</string>
     <string name="stats_mini_best_goal_streak">Best goal streak</string>
     <string name="stats_mini_personal_best">Personal best</string>
+    <string name="stats_best_date_today">Achieved: Today</string>
+    <string name="stats_best_date_achieved">Achieved: %s</string>
+    <plurals name="stats_best_date_days_ago">
+        <item quantity="one">Achieved: %d day ago</item>
+        <item quantity="many">Achieved: %d days ago</item>
+    </plurals>
+    <plurals name="stats_best_date_months_ago">
+        <item quantity="one">Achieved: %d month ago</item>
+        <item quantity="many">Achieved: %d months ago</item>
+    </plurals>
 
     <!-- History — Screen -->
     <string name="history_title">History</string>

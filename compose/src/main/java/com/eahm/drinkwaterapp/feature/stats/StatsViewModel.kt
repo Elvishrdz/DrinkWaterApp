@@ -82,6 +82,7 @@ internal class StatsViewModel(
             goalStreakDays = streak.goalStreakDays,
             bestGoalStreakDays = streak.bestGoalStreakDays,
             personalBestMl = streak.personalBestMl,
+            personalBestDate = streak.personalBestDate,
         )
     }.combine(prefsStorage.getUnitPreference()) { state, unitPref ->
         state.copy(unitPreference = unitPref)
