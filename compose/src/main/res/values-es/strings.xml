@@ -176,7 +176,7 @@
     <string name="onb_overlay_feature_reminder_description">Toca tu cantidad de agua en una notificación y, si alcanzas tu meta, la tarjeta flotará sobre la app que estés usando.</string>
     <!-- Onboarding — Overlay: Vista previa de la tarjeta -->
     <string name="onb_overlay_card_preview_title">¡Meta diaria alcanzada!</string>
-    <string name="onb_overlay_card_preview_body">Tomaste tus 2.0 L — ¡sigue así!</string>
+    <string name="onb_overlay_card_preview_body">Tomaste tus 2.0 L, ¡sigue así!</string>
     <string name="onb_overlay_card_preview_stat_goal">meta</string>
     <string name="onb_overlay_card_preview_stat_drinks">bebidas</string>
     <string name="onb_overlay_card_preview_stat_streak">días seguidos</string>
@@ -607,7 +607,7 @@
     <string name="goal_overlay_ocean_v1_sub">Cada vaso sumó, y con él la concentración, la energía, la calma.</string>
     <string name="goal_overlay_ocean_v1_cta">¡Salud por eso!</string>
     <string name="goal_overlay_ocean_v2_headline">¡Hidratación completa!\nBuen trabajo hoy.</string>
-    <string name="goal_overlay_ocean_v2_sub">Te cuidaste — un vaso a la vez. Así se forman los hábitos.</string>
+    <string name="goal_overlay_ocean_v2_sub">Te cuidaste, un vaso a la vez. Así se forman los hábitos.</string>
     <string name="goal_overlay_ocean_v2_cta">¡Sigue así!</string>
     <string name="goal_overlay_ocean_v3_headline">¡Meta alcanzada!\nTu cuerpo te lo agradece.</string>
     <string name="goal_overlay_ocean_v3_sub">La hidratación es la base de cada gran día. Tú la construiste.</string>

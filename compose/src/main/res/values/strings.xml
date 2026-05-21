@@ -179,7 +179,7 @@
     <string name="onb_overlay_feature_reminder_description">Tap your drink amount in a notification and if you reach your goal, the card floats over whatever app you\'re using.</string>
     <!-- Onboarding — Overlay: Card preview mockup -->
     <string name="onb_overlay_card_preview_title">Daily goal reached!</string>
-    <string name="onb_overlay_card_preview_body">You drank your 2.0 L — keep it up</string>
+    <string name="onb_overlay_card_preview_body">You drank your 2.0 L, keep it up</string>
     <string name="onb_overlay_card_preview_stat_goal">goal</string>
     <string name="onb_overlay_card_preview_stat_drinks">drinks</string>
     <string name="onb_overlay_card_preview_stat_streak">day streak</string>
@@ -309,7 +309,7 @@
 
     <!-- Settings — Remove Ads bottom sheet -->
     <string name="settings_remove_ads_title">Remove Ads</string>
-    <string name="settings_remove_ads_body">Enjoy DrinkWater completely ad-free with a one-time purchase. Tied to your app store account — restore anytime on any device.</string>
+    <string name="settings_remove_ads_body">Enjoy DrinkWater completely ad-free with a one-time purchase. Tied to your app store account, restore it anytime on any device.</string>
     <string name="settings_remove_ads_cta">Remove Ads</string>
     <string name="settings_remove_ads_cta_with_price">Remove Ads · %1$s</string>
     <string name="settings_remove_ads_restore_cta">Restore Purchase</string>
@@ -558,37 +558,37 @@
     <string name="notif_title_h0_b">Up late? Don\'t forget your water.</string>
     <string name="notif_title_h4_b">Early bird! Time for some water.</string>
     <string name="notif_title_h6_b">Morning! Water before anything else?</string>
-    <string name="notif_title_h8_b">Morning\'s rolling — how\'s your water?</string>
-    <string name="notif_title_h9_b">Mid-morning — sipping enough water?</string>
-    <string name="notif_title_h10_b">Almost noon — time for a water break.</string>
+    <string name="notif_title_h8_b">Morning\'s rolling, how\'s your water?</string>
+    <string name="notif_title_h9_b">Mid-morning, sipping enough water?</string>
+    <string name="notif_title_h10_b">Almost noon, time for a water break.</string>
     <string name="notif_title_h12_b">Noon! Grabbing some water with lunch?</string>
     <string name="notif_title_h13_b">Busy afternoon? Water helps.</string>
-    <string name="notif_title_h15_b">Mid-afternoon — water check!</string>
-    <string name="notif_title_h16_b">Almost done — one more glass!</string>
-    <string name="notif_title_h18_b">Quiet evening — how about some water?</string>
-    <string name="notif_title_h20_b">Winding down — water time!</string>
-    <string name="notif_title_h22_b">Almost bedtime — last glass?</string>
+    <string name="notif_title_h15_b">Mid-afternoon water check!</string>
+    <string name="notif_title_h16_b">Almost done, one more glass!</string>
+    <string name="notif_title_h18_b">Quiet evening, how about some water?</string>
+    <string name="notif_title_h20_b">Winding down, water time!</string>
+    <string name="notif_title_h22_b">Almost bedtime, last glass?</string>
 
     <!-- Notifications — Big text messages -->
     <!-- Start / End of day -->
     <string name="notif_big_start_a">After a full night of sleep, your body is naturally low on fluids. Starting your morning with water rehydrates your cells, boosts your metabolism, and sets a healthy tone for the rest of the day. You\'ve got this!</string>
     <string name="notif_big_start_b">Waking up? Your body just went hours without water while you slept. A glass now is the easiest win of your day.</string>
     <string name="notif_big_end_a">You made it through the day! Open the app to see a summary of your hydration. Celebrate the wins and find chances to do even better tomorrow.</string>
-    <string name="notif_big_end_b">You made it to the end of your day! Open the app to see how you did — every glass counts.</string>
+    <string name="notif_big_end_b">You made it to the end of your day! Open the app to see how you did, every glass counts.</string>
     <!-- Variant A — educational / informative -->
     <string name="notif_big_h0_a">You\'re still up and your body is still working hard. A glass of water right now helps keep your focus sharp, supports your organs, and replaces fluids even through the night.</string>
     <string name="notif_big_h4_a">Early mornings are powerful. After hours of sleep, your body is ready to be refreshed. Starting with a glass of water rehydrates your cells and sets a healthy, energizing tone for your whole day.</string>
     <string name="notif_big_h6_a">Good morning! After 7–8 hours of sleep, your body wakes up naturally dehydrated. Drinking water first thing boosts your metabolism, activates your organs, and helps you feel alert and ready to go.</string>
     <string name="notif_big_h8_a">Your morning is in full swing! Staying hydrated sharpens focus, keeps your energy steady, and helps your brain perform at its best. Grab a glass and power through your morning.</string>
-    <string name="notif_big_h9_a">Did you know? Even mild dehydration — as little as 1–2% — can noticeably reduce concentration and mood. Keep sipping water throughout the morning to stay on top of your game.</string>
+    <string name="notif_big_h9_a">Did you know? Even mild dehydration, as little as 1–2%, can noticeably reduce concentration and mood. Keep sipping water throughout the morning to stay on top of your game.</string>
     <string name="notif_big_h10_a">The late morning is the perfect time to build healthy habits. Regular hydration helps flush out toxins, supports your immune system, and keeps your skin looking great. Time for another glass!</string>
     <string name="notif_big_h12_a">Lunchtime! Water aids digestion and helps your body absorb the nutrients from your meal more effectively. Drink a glass before or during lunch for the best results.</string>
-    <string name="notif_big_h13_a">The early afternoon can feel slow — energy dips after lunch are very common. Staying well hydrated helps regulate your body temperature and keeps your mind alert. Drink up and power through!</string>
+    <string name="notif_big_h13_a">The early afternoon can feel slow, energy dips after lunch are very common. Staying well hydrated helps regulate your body temperature and keeps your mind alert. Drink up and power through!</string>
     <string name="notif_big_h15_a">Feeling a bit sluggish this afternoon? It might just be dehydration. A glass of water is often all you need to refresh your mind and body and push through the rest of the day with energy.</string>
-    <string name="notif_big_h16_a">You\'re in the home stretch! Consistent hydration throughout the day helps prevent headaches, maintain energy levels, and keep your kidneys healthy. Don\'t forget your water — you\'re almost done!</string>
+    <string name="notif_big_h16_a">You\'re in the home stretch! Consistent hydration throughout the day helps prevent headaches, maintain energy levels, and keep your kidneys healthy. Don\'t forget your water, you\'re almost done!</string>
     <string name="notif_big_h18_a">The evening is a great time to reflect and recharge. Drinking water after dinner supports digestion, helps your body recover from the day, and prepares you for restful, restorative sleep.</string>
-    <string name="notif_big_h20_a">As you wind down for the night, gentle hydration helps your body recover from everything you\'ve done today. A glass now is just right — your body will thank you in the morning.</string>
-    <string name="notif_big_h22_a">Before you drift off, a small glass of water helps your body stay hydrated through the night. You did a great job today — rest well and wake up refreshed!</string>
+    <string name="notif_big_h20_a">As you wind down for the night, gentle hydration helps your body recover from everything you\'ve done today. A glass now is just right, your body will thank you in the morning.</string>
+    <string name="notif_big_h22_a">Before you drift off, a small glass of water helps your body stay hydrated through the night. You did a great job today, rest well and wake up refreshed!</string>
     <!-- Variant B — casual / short -->
     <string name="notif_big_h0_b">Still awake? Your body works even when you rest. A quick sip keeps everything running smoothly.</string>
     <string name="notif_big_h4_b">Up before sunrise? Start with some water and you\'ll feel the difference all morning.</string>
@@ -598,7 +598,7 @@
     <string name="notif_big_h10_b">Almost lunchtime! A glass of water now helps you arrive at noon feeling good.</string>
     <string name="notif_big_h12_b">Lunch is better with water. It helps you digest faster and keeps the afternoon slump away.</string>
     <string name="notif_big_h13_b">Post-lunch dip? It might be dehydration. A glass of water does the trick most of the time.</string>
-    <string name="notif_big_h15_b">Afternoon slump? Drink some water before reaching for a snack — you might just need hydration.</string>
+    <string name="notif_big_h15_b">Afternoon slump? Drink some water before reaching for a snack, you might just need hydration.</string>
     <string name="notif_big_h16_b">Heading into the final stretch? Water keeps your energy and focus up to the finish line.</string>
     <string name="notif_big_h18_b">Day\'s winding down. A glass of water now helps your body recover and sets you up for a good night.</string>
     <string name="notif_big_h20_b">Take it easy tonight. A gentle glass of water is all your body needs to wind down.</string>
@@ -610,7 +610,7 @@
     <string name="goal_overlay_ocean_v1_sub">Every glass added up, and so did the focus, the energy, the calm.</string>
     <string name="goal_overlay_ocean_v1_cta">Cheers to that</string>
     <string name="goal_overlay_ocean_v2_headline">Hydration complete!\nWell done today.</string>
-    <string name="goal_overlay_ocean_v2_sub">You took care of yourself — one glass at a time. That\'s what habits are made of.</string>
+    <string name="goal_overlay_ocean_v2_sub">You took care of yourself, one glass at a time. That\'s what habits are made of.</string>
     <string name="goal_overlay_ocean_v2_cta">Keep it up</string>
     <string name="goal_overlay_ocean_v3_headline">Goal reached!\nYour body thanks you.</string>
     <string name="goal_overlay_ocean_v3_sub">Hydration is the foundation of every great day. You built yours.</string>

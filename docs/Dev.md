@@ -43,7 +43,7 @@ Priorities Tier 1
   de la proxima alarma y el estado. no se necesita el grafico ni intervalo, ni vasos.
 - [] Muestra fecha del BEST record personal que diga hoy si es hoy o la fecha del día q fue. Hace 3
   días hace 1 mes. Más de un mes no se muestra
-- [] Revisar traduccion en ingles que no existan guiones de IA mire unos en notificaciones en
+- [x] Revisar traduccion en ingles que no existan guiones de IA mire unos en notificaciones en
   ingles.
 - [] Agregar aleman a idiomas
 - [] Probar restaurar compra. Que pasa si un usuario compra desinstala e instala otra vez? Se
