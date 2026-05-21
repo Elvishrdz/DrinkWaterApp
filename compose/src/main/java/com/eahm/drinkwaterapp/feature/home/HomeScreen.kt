@@ -1,5 +1,6 @@
 package com.eahm.drinkwaterapp.feature.home
 
+import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -67,6 +68,10 @@ internal fun HomeScreen() {
     var currentDestination by rememberSaveable { mutableStateOf(HomeDestination.TODAY) }
 
     val bannerAdState = rememberBelowMainScreenBannerAdState(enabled = !isAdFree)
+
+    BackHandler(enabled = currentDestination != HomeDestination.TODAY) {
+        currentDestination = HomeDestination.TODAY
+    }
 
     // Show the DEV tab only in environments where dev tooling is intentional.
     // staging hides it (testers see the same UI as end users);

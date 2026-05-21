@@ -28,7 +28,7 @@ App Release
 
 Priorities Tier 1
 
-- [] app nav: si presionamos atras desde otra screen, regresar a drink screen y luego salir de la
+- [x] app nav: si presionamos atras desde otra screen, regresar a drink screen y luego salir de la
   app.
 - [] app: agregar icono monochrome
 - [] fix insets
@@ -95,3 +95,13 @@ Priorities Tier 2
   usuario a beber agua solo para alcanzar la meta, puede que solo beber agua sea suficiente (en caso
   que no estemos ni a la mitad del progreso.)
 - [] agregar descripcion corta a los presets.
+ 
+Plan para restaurar compras:
+
+- vamos a dejar la opcion de solo poder restaurar en el mismo dispositivo si se guardan los datos
+  segun la documentacion de revenuecat.
+- para nuevos dispositivos se require una nueva compra
+
+1. autobackup-> app es desinstalada y reinstalada en el mismo dispositivo. restauracion ocurre
+   porque se guardo el id de revenuecat en el backup y puede usarse para restaurar la compra
+   automaticamente
