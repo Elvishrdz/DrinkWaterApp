@@ -38,7 +38,7 @@ Priorities Tier 1
 - [x] Expandir width de banners
 - [x] Editar un registro de días solo al ver un interstitial. Pero los últimos 2 registros no
   muestran video y se pueden editar normal siempre
-- [] Mostrar animación beber agua al usar presenta también input y preset
+- [x] Mostrar animación beber agua al usar presenta también input y preset
 - [] Actualizar componente reminders en drink screen. Fuera de horas activas solo mostrar el tiempo
   de la proxima alarma y el estado. no se necesita el grafico ni intervalo, ni vasos.
 - [] Muestra fecha del BEST record personal que diga hoy si es hoy o la fecha del día q fue. Hace 3

@@ -248,10 +248,7 @@ internal class DrinkViewModel(
             }
 
             val animEnabled = prefsStorage.getWaterAnimationEnabled().first()
-            if (animEnabled &&
-                !_animationPending.value &&
-                (source == DrinkSource.QUICK_SUGGESTION || source == DrinkSource.BOTTOM_SHEET_SUGGESTION)
-            ) {
+            if (animEnabled && !_animationPending.value) {
                 _animationPending.value = true
             }
 
