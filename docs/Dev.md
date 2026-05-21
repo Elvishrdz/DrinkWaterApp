@@ -103,6 +103,9 @@ Priorities Tier 2
   usuario a beber agua solo para alcanzar la meta, puede que solo beber agua sea suficiente (en caso
   que no estemos ni a la mitad del progreso.)
 - [] agregar descripcion corta a los presets.
+- [] Obtener los skips para sugerir reducir notificaciones ai son demasiado. Si el usuario borra
+  mucho la notificacion se puede tratar de reducir el intervalo para evitar molestias. Se sugiere en
+  la pantalla de configuracion de notificaciones/reminders
 
 Plan para restaurar compras:
 
