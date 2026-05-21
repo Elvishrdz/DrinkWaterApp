@@ -64,3 +64,29 @@ Ideas y tareas
   mostrarlo. si es menor talvez no para no confundir mucho
   visualmente. o solo mostrarlo al ultimo trago con el penuntino y no a todos los registros. (esta
   opcion suena mejor para la primera implementation.)
+- [] Editar un registro de días solo al ver un interstitial. Pero los últimos 2 registros no
+  muestran video y se pueden editar normal siempre
+- [] Probar restaurar compra. Que pasa si un usuario compra desinstala e instala otra vez? Se
+  restaura con la cuenta de Google o con el id único generado? Probar y agregar comentario.
+- [] Generar cantidad recomendada para notificación basado en los registros de bebida. El valor que
+  más se repita se muestra como sugerencia.
+- [] Revisar traduccion en ingles que no existan guiones de IA mire unos en notificaciones en
+  ingles.
+- [] Agregar aleman a idiomas
+- [] Expandir width de banners
+- [] Usar otro banner is para banners en history y stats
+- [] Mostrar animación beber agua al usar presenta también input y preset
+- [] Muestra fecha del BEST record personal que diga hoy si es hoy o la fecha del día q fue. Hace 3
+  días hace 1 mes. Más de un mes no se muestra
+- [] Mostrar solo cuando inicia la próxima alarma en componente en drink screen ai estamos en horas
+  no activas
+- [] Considerar la cantidad de agua para textos de los mensajes en las notificaciones:
+  Si no tiene registros: mañana puede ser el dia. Todavia puedes registrar algo hoy. Con las manos
+  vacias. Supongo que se acabo. Me voy en blanco.
+  Si bebio poco: con pequeños pasos se inicia. De a poco se empieza.
+  Supero el gol: lograste tu meta bien hecho. Aun puedes superar mas tu meta. Estas por encima de tu
+  meta. Llegaste encima de la meta. Hoy estas que ardes con tus registros. Hoy impresionaste con tu
+  persistencia. Buen habito.
+  Racha de dias: dos dias seguidos sigue asi. La racha continua un dia mas.
+  Racha alta: ya lo tienes controlado. Estas en las grandes ligas. Nuevo dia sumado a tu racha. Etc
+  etc.
