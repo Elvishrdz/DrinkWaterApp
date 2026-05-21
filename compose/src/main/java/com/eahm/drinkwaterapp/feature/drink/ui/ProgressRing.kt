@@ -65,12 +65,12 @@ fun ProgressRing(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .size(size)
-            .idleShimmer(enabled = idleShimmerEnabled)
             .bounceTap(
                 onClick = { onClick?.invoke() },
                 enabled = bounceEnabled,
                 rippleEnabled = rippleEnabled,
-            ),
+            )
+            .idleShimmer(enabled = idleShimmerEnabled),
     ) {
         val strokeWidth = 14.dp
         val trackColor = DwWater.copy(alpha = 0.15f)

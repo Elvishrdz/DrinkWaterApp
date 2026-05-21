@@ -49,7 +49,8 @@ Priorities Tier 1
 - [] Probar restaurar compra. Que pasa si un usuario compra desinstala e instala otra vez? Se
   restaura con la cuenta de Google o con el id único generado? Probar y agregar comentario.
 - [x] ocultar countdown cuando notificaciones estan desactivadas
-- [] fix shimmer animation in ring progress. if ring pressed the animation is not inside the circle.
+- [x] fix shimmer animation in ring progress. if ring pressed the animation is not inside the
+  circle.
   instead keeps the previous path outside the shape.
 - [] use Instant instead of LocalDateTime (good for timezone conversion) for dates, then parse to
   localdate time if needed.
