@@ -453,7 +453,7 @@
 
     <!-- Historial — Estado vacío -->
     <string name="history_empty_title">Sin bebidas registradas</string>
-    <string name="history_empty_body">Elige otro día, o ve a Hoy para agregar uno.</string>
+    <string name="history_empty_body">Elige otro día, o ve a "Hoy" para agregar uno.</string>
 
     <!-- Historial — Parte del día -->
     <string name="history_part_morning">Mañana</string>

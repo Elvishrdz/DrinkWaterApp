@@ -456,7 +456,7 @@
 
     <!-- History — Empty state -->
     <string name="history_empty_title">No drinks logged</string>
-    <string name="history_empty_body">Pick another day, or head to Today to add one.</string>
+    <string name="history_empty_body">Pick another day, or head to "Today" to add one.</string>
 
     <!-- History — Part of day labels -->
     <string name="history_part_morning">Morning</string>
