@@ -49,7 +49,8 @@ Priorities Tier 1
 - [] Probar restaurar compra. Que pasa si un usuario compra desinstala e instala otra vez? Se
   restaura con la cuenta de Google o con el id único generado? Probar y agregar comentario.
 - [x] ocultar countdown cuando notificaciones estan desactivadas
-
+- [] fix shimmer animation in ring progress. if ring pressed the animation is not inside the circle.
+  instead keeps the previous path outside the shape.
 - [] use Instant instead of LocalDateTime (good for timezone conversion) for dates, then parse to
   localdate time if needed.
 
@@ -95,9 +96,10 @@ Priorities Tier 2
   usuario a beber agua solo para alcanzar la meta, puede que solo beber agua sea suficiente (en caso
   que no estemos ni a la mitad del progreso.)
 - [] agregar descripcion corta a los presets.
- 
+
 Plan para restaurar compras:
-- [] existe un plan todavia no ejecutado en docs/plans 
+
+- [] existe un plan todavia no ejecutado en docs/plans
 
 - vamos a dejar la opcion de solo poder restaurar en el mismo dispositivo si se guardan los datos
   segun la documentacion de revenuecat.
