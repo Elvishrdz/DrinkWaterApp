@@ -50,14 +50,17 @@ class InlineBannerAdState internal constructor(
  *   Pass `!isAdFree` here so that ad-free users do not trigger any network requests.
  */
 @Composable
-fun rememberInlineBannerAdState(enabled: Boolean = true): InlineBannerAdState {
+internal fun rememberInlineBannerAdState(
+    adUnitId: String,
+    enabled: Boolean = true
+): InlineBannerAdState {
     val context = LocalContext.current
     val isInPreview = LocalInspectionMode.current
 
-    val state = remember {
+    val state = remember(enabled) {
         InlineBannerAdState(
             adView = AdView(context).apply {
-                adUnitId = BuildConfig.ADS_BANNER_UNIT_ID
+                this.adUnitId = adUnitId
                 setAdSize(AdSize.getLargeAnchoredAdaptiveBannerAdSize(context, 360))
             }
         )
@@ -123,7 +126,9 @@ fun InlineBannerAd(
 @Composable
 private fun InlineBannerAdPreview() {
     Surface(color = MaterialTheme.colorScheme.background) {
-        val state = rememberInlineBannerAdState()
+        val state = rememberInlineBannerAdState(
+            adUnitId = BuildConfig.BANNER_BELOW_MAIN_SCREEN,
+        )
         InlineBannerAd(state = state)
     }
 }

@@ -7,6 +7,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -16,6 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.eahm.drinkwaterapp.ads.BuildConfig
 import com.google.ads.mediation.admob.AdMobAdapter
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
@@ -108,8 +112,24 @@ fun AdMobCollapsableBanner(
     )
 }
 
-fun Activity.loadFullScreenAd(
-    @StringRes unitIdRes: Int,
+
+fun Activity.loadHistoryScreenEditLogFullScreenAd(
+    adRequest: AdRequest = AdRequest.Builder().build(),
+    onAdLoaded: (InterstitialAd) -> Unit,
+    onAdFailedToLoad: (LoadAdError) -> Unit,
+    onAdDismissed: () -> Unit
+) {
+    loadFullScreenAd(
+        unitIdRes = BuildConfig.INTERSTITIAL_HISTORY_SCREEN_EDIT,
+        adRequest = adRequest,
+        onAdLoaded = onAdLoaded,
+        onAdFailedToLoad = onAdFailedToLoad,
+        onAdDismissed = onAdDismissed,
+    )
+}
+
+private fun Activity.loadFullScreenAd(
+    unitIdRes: String,
     adRequest: AdRequest = AdRequest.Builder().build(),
     onAdLoaded: (InterstitialAd) -> Unit,
     onAdFailedToLoad: (LoadAdError) -> Unit,
@@ -117,7 +137,7 @@ fun Activity.loadFullScreenAd(
 ) {
     InterstitialAd.load(
         this,
-        getString(unitIdRes),
+        unitIdRes,
         adRequest,
         object : InterstitialAdLoadCallback() {
             override fun onAdLoaded(interstitialAd: InterstitialAd) {
@@ -136,4 +156,56 @@ fun Activity.loadFullScreenAd(
             }
         }
     )
+}
+
+class InlineInterstitialAdState internal constructor(
+    val unitIdRes: String,
+) {
+    private val interstitial: MutableState<InterstitialAd?> = mutableStateOf(null)
+    var isLoading: Boolean = false
+
+    fun load(
+        activity: Activity,
+        onLoaded: () -> Unit,
+        onFailedToLoad: () -> Unit,
+        onDismissed: () -> Unit
+    ) {
+        if (isLoading) return
+        isLoading = true
+        activity.loadFullScreenAd(
+            unitIdRes = unitIdRes,
+            onAdLoaded = { ad ->
+                interstitial.value = ad
+                onLoaded()
+                isLoading = false
+            },
+            onAdFailedToLoad = {
+                onFailedToLoad()
+                isLoading = false
+            },
+            onAdDismissed = {
+                interstitial.value = null
+                onDismissed()
+                isLoading = false
+            },
+        )
+    }
+
+
+    fun show(
+        activity: Activity,
+    ) {
+        interstitial.value?.show(activity)
+    }
+}
+
+@Composable
+fun rememberInterstitialState(enabled: Boolean = true): InlineInterstitialAdState? {
+    return remember(enabled) {
+        if (enabled) {
+            InlineInterstitialAdState(
+                unitIdRes = BuildConfig.INTERSTITIAL_HISTORY_SCREEN_EDIT,
+            )
+        } else null
+    }
 }

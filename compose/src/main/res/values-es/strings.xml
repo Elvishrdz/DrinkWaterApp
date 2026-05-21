@@ -458,6 +458,10 @@
     <!-- Historial — Acciones de registro -->
     <string name="history_action_edit">Editar</string>
     <string name="history_action_delete">Eliminar</string>
+    <string name="history_action_edit_amount">Editar cantidad</string>
+    <string name="history_action_edit_time">Editar hora</string>
+    <string name="history_edit_amount_title">Editar cantidad</string>
+    <string name="history_edit_time_message">Selecciona una nueva hora para este registro</string>
 
     <!-- Historial — Navegación de días -->
     <string name="history_nav_prev_day_desc">Día anterior</string>

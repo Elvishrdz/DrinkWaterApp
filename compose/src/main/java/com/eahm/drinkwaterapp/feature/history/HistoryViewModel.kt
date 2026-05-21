@@ -137,6 +137,14 @@ internal class HistoryViewModel(
         }
     }
 
+    fun onUpdateRecord(entity: HistoryEntity) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                historyDao.update(entity)
+            }
+        }
+    }
+
     fun onDateChanged(date: LocalDateTime) {
         historyDate.update { date }
     }

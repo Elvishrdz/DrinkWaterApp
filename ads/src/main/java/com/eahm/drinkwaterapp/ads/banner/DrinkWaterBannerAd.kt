@@ -31,7 +31,7 @@ fun DrinkWaterBannerAd(modifier: Modifier = Modifier) {
     val adView = remember { AdView(context) }
 
     // Set the unique ID for this specific ad unit.
-    adView.adUnitId = BuildConfig.ADS_BANNER_UNIT_ID
+    adView.adUnitId = BuildConfig.BANNER_BELOW_MAIN_SCREEN
 
     // [START set_ad_size]
     // Set a large anchored adaptive banner ad size with a given width.

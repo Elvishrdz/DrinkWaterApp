@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.LibraryBuildType
+
 plugins {
     id("com.android.library")
     id("drinkwater.android.library")
@@ -9,24 +11,52 @@ android {
 
     buildTypes {
         release {
-            val bannerId = "ca-app-pub-9403893294190125/8776486293"
-            buildConfigField("String", "ADS_BANNER_UNIT_ID", "\"$bannerId\"")
+            applyAdConfigurations()
         }
+
         create("staging") {
-            val bannerId = "ca-app-pub-3940256099942544/9214589741"
-            buildConfigField("String", "ADS_BANNER_UNIT_ID", "\"$bannerId\"")
+            applyAdTestConfiguration()
         }
+
         create("qa") {
-            val bannerId = "ca-app-pub-3940256099942544/9214589741"
-            buildConfigField("String", "ADS_BANNER_UNIT_ID", "\"$bannerId\"")
+            applyAdTestConfiguration()
         }
+
         debug {
-            val bannerId = "ca-app-pub-3940256099942544/9214589741"
-            buildConfigField("String", "ADS_BANNER_UNIT_ID", "\"$bannerId\"")
+            applyAdTestConfiguration()
         }
     }
 
     buildFeatures.buildConfig = true
+}
+
+private fun LibraryBuildType.applyAdConfigurations() {
+    manifestPlaceholders["app_id"] = "ca-app-pub-9403893294190125~4239664850"
+
+    val bannerBelowMainScreen = "ca-app-pub-9403893294190125/8776486293"
+    val bannerHistoryScreenLog = "ca-app-pub-9403893294190125/8614957381"
+    val bannerStatsScreenComponent = "ca-app-pub-9403893294190125/6751211378"
+    val interstitialHistoryScreenEditLog = "ca-app-pub-9403893294190125/2975617897"
+
+    buildConfigField("String", "BANNER_BELOW_MAIN_SCREEN", "\"$bannerBelowMainScreen\"")
+    buildConfigField("String", "BANNER_HISTORY_SCREEN_LOGS", "\"$bannerHistoryScreenLog\"")
+    buildConfigField("String", "BANNER_STATS_SCREEN_COMPONENT", "\"$bannerStatsScreenComponent\"")
+    buildConfigField(
+        "String",
+        "INTERSTITIAL_HISTORY_SCREEN_EDIT",
+        "\"$interstitialHistoryScreenEditLog\""
+    )
+}
+
+private fun LibraryBuildType.applyAdTestConfiguration() {
+    manifestPlaceholders["app_id"] = "ca-app-pub-3940256099942544~3347511713"
+
+    val bannerTestId = "ca-app-pub-3940256099942544/9214589741"
+    val interstitialTestId = "ca-app-pub-3940256099942544/1033173712"
+    buildConfigField("String", "BANNER_BELOW_MAIN_SCREEN", "\"$bannerTestId\"")
+    buildConfigField("String", "BANNER_HISTORY_SCREEN_LOGS", "\"$bannerTestId\"")
+    buildConfigField("String", "BANNER_STATS_SCREEN_COMPONENT", "\"$bannerTestId\"")
+    buildConfigField("String", "INTERSTITIAL_HISTORY_SCREEN_EDIT", "\"$interstitialTestId\"")
 }
 
 dependencies {

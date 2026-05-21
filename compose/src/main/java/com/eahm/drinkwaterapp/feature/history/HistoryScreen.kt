@@ -1,6 +1,7 @@
 package com.eahm.drinkwaterapp.feature.history
 
 import android.text.format.DateFormat
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +17,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -29,7 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.ads.banner.InlineBannerAd
-import com.eahm.drinkwaterapp.ads.banner.rememberInlineBannerAdState
+import com.eahm.drinkwaterapp.ads.banner.rememberHistoryScreenLogsBannerAdState
+import com.eahm.drinkwaterapp.ads.banner.rememberInterstitialState
 import com.eahm.drinkwaterapp.core.bindings.toEntity
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -44,18 +51,26 @@ import com.eahm.drinkwaterapp.core.domain.mock.hourGroupMock
 import com.eahm.drinkwaterapp.core.domain.mock.localDateTimeMock
 import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.eahm.drinkwaterapp.core.presentation.UnitPreference
+import com.eahm.drinkwaterapp.feature.history.ui.RecordAmountBottomSheet
 import com.eahm.drinkwaterapp.ui.historylist.DateTimePickerButton
 import com.eahm.drinkwaterapp.ui.historylist.HistoryTimeline
+import com.eahm.drinkwaterapp.ui.historylist.HistoryUI
 import com.eahm.drinkwaterapp.ui.historylist.HourGroup
+import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorDialog
+import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.datetime.LocalDateTime
+import kotlin.random.Random
+
+private const val INTERSTITIAL_PROBABILITY = 0.5f
 
 @Composable
 internal fun HistoryScreen(
     state: HistoryState.Data,
     isAdFree: Boolean,
     onDelete: (HistoryEntity) -> Unit,
+    onUpdate: (HistoryEntity) -> Unit,
     onDateChanged: (LocalDateTime) -> Unit,
     onGoToToday: () -> Unit,
 ) {
@@ -83,6 +98,7 @@ internal fun HistoryScreen(
             isAdFree = isAdFree,
             unitPreference = state.unitPreference,
             onDelete = onDelete,
+            onUpdate = onUpdate,
             onDateChanged = onDateChanged,
             onGoToToday = onGoToToday,
         )
@@ -101,13 +117,61 @@ private fun Content(
     modifier: Modifier = Modifier,
     unitPreference: UnitPreference = UnitPreference.ML,
     onDelete: (HistoryEntity) -> Unit,
+    onUpdate: (HistoryEntity) -> Unit,
     onDateChanged: (LocalDateTime) -> Unit,
     onGoToToday: () -> Unit,
 ) {
     // Hoisted here — survives date changes, item deletions, and group structural shifts.
     // The AdView is created and loadAd fired once per screen visit regardless of how many
     // times the list below recomposes or the banner moves between inside-group / between-group.
-    val bannerAdState = rememberInlineBannerAdState(enabled = !isAdFree)
+    val bannerAdState = rememberHistoryScreenLogsBannerAdState(enabled = !isAdFree)
+
+    // Inline-edit state
+    var editAmountTarget by remember { mutableStateOf<HistoryUI?>(null) }
+    var editTimeTarget by remember { mutableStateOf<HistoryUI?>(null) }
+
+    var pendingAction by remember { mutableStateOf<(() -> Unit)?>(null) }
+    // The two most-recent records of the current day are exempt from the ad gate.
+    val exemptIds = remember(historyRecords, isToday) {
+        if (isToday) historyRecords.flatMap { it.items }.take(2).mapTo(mutableSetOf()) { it.id }
+        else emptySet()
+    }
+
+    val activity = LocalActivity.current
+    val interstitialState = rememberInterstitialState(enabled = !isAdFree)
+    var interstitialReady by remember { mutableStateOf(false) }
+
+    if (!isAdFree && interstitialState != null) {
+        LaunchedEffect(Unit, exemptIds) {
+            activity?.let {
+                interstitialState.load(
+                    activity = it,
+                    onLoaded = { interstitialReady = true },
+                    onFailedToLoad = { interstitialReady = false },
+                    onDismissed = {
+                        interstitialReady = false
+                        pendingAction?.invoke()
+                        pendingAction = null
+                    },
+                )
+            }
+        }
+    }
+
+    fun onRequestEdit(item: HistoryUI, action: () -> Unit) {
+        // check if ad can be displayed
+        val isExempt = item.id in exemptIds
+        val adReady = !isAdFree && !isExempt && interstitialReady
+        val showAd = adReady && Random.nextFloat() < INTERSTITIAL_PROBABILITY
+
+        // or perform action
+        if (showAd && interstitialState != null && activity != null) {
+            pendingAction = action
+            interstitialState.show(activity)
+        } else {
+            action()
+        }
+    }
 
     Column(modifier = modifier) {
         Column(
@@ -178,6 +242,8 @@ private fun Content(
                 is24Hour = is24Hour,
                 unitPreference = unitPreference,
                 onDelete = { onDelete(it.toEntity()) },
+                onEditAmount = { item -> onRequestEdit(item) { editAmountTarget = item } },
+                onEditTime = { item -> onRequestEdit(item) { editTimeTarget = item } },
                 secondItemContent = if (!isAdFree) {
                     { InlineBannerAd(state = bannerAdState) }
                 } else null,
@@ -204,10 +270,48 @@ private fun Content(
             if (!isAdFree) {
                 InlineBannerAd(
                     state = bannerAdState,
-                    modifier = Modifier.padding(horizontal = 18.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 18.dp),
                 )
             }
         }
+    }
+
+    // Edit amount bottom sheet
+    editAmountTarget?.let { target ->
+        RecordAmountBottomSheet(
+            currentAmountMl = target.amount.toFloat(),
+            unitPreference = unitPreference,
+            onAmountChanged = { newMl ->
+                onUpdate(target.toEntity().copy(amount = newMl))
+                editAmountTarget = null
+            },
+            onDismiss = { editAmountTarget = null },
+        )
+    }
+
+    // Edit time dialog
+    editTimeTarget?.let { target ->
+        AppTimeSelectorDialog(
+            time = TimeSelected(target.timestamp.hour, target.timestamp.minute),
+            is24HourFormat = is24Hour,
+            canChangeTimeFormat = false,
+            message = stringResource(R.string.history_edit_time_message),
+            onTimeSelected = { ts ->
+                val newTs = LocalDateTime(
+                    target.timestamp.year,
+                    target.timestamp.monthNumber,
+                    target.timestamp.dayOfMonth,
+                    ts.hour,
+                    ts.minute,
+                    0,
+                )
+                onUpdate(target.toEntity().copy(timestamp = newTs))
+                editTimeTarget = null
+            },
+            onDismiss = { editTimeTarget = null },
+        )
     }
 }
 
@@ -293,6 +397,7 @@ private fun HistoryScreenPreview() {
             is24Hour = false,
             isAdFree = false,
             onDelete = {},
+            onUpdate = {},
             onDateChanged = {},
             onGoToToday = {},
         )

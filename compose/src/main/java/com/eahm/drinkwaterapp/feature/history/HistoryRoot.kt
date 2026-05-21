@@ -25,6 +25,7 @@ internal fun HistoryRoot() {
                 state = data,
                 isAdFree = isAdFree,
                 onDelete = viewModel::onDelete,
+                onUpdate = viewModel::onUpdateRecord,
                 onDateChanged = viewModel::onDateChanged,
                 onGoToToday = viewModel::goToToday,
             )

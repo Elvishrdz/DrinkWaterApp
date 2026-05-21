@@ -461,6 +461,10 @@
     <!-- History — Record actions -->
     <string name="history_action_edit">Edit</string>
     <string name="history_action_delete">Delete</string>
+    <string name="history_action_edit_amount">Edit amount</string>
+    <string name="history_action_edit_time">Edit time</string>
+    <string name="history_edit_amount_title">Edit amount</string>
+    <string name="history_edit_time_message">Select a new time for this record</string>
 
     <!-- History — Day navigation -->
     <string name="history_nav_prev_day_desc">Previous day</string>

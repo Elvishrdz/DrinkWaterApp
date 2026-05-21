@@ -1,9 +1,13 @@
 package com.eahm.drinkwaterapp.ui.historylist
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,9 +25,14 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -170,7 +180,11 @@ fun HistoryTimeline(
     unitPreference: UnitPreference = UnitPreference.ML,
     // Rendered right after the first group (second list position). Null = no injection.
     secondItemContent: (@Composable () -> Unit)? = null,
+    onEditAmount: ((HistoryUI) -> Unit)? = null,
+    onEditTime: ((HistoryUI) -> Unit)? = null,
 ) {
+    var expandedItemId by remember { mutableStateOf<String?>(null) }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -188,6 +202,10 @@ fun HistoryTimeline(
                 is24Hour = is24Hour,
                 unitPreference = unitPreference,
                 onDelete = onDelete,
+                expandedItemId = expandedItemId,
+                onToggleExpand = { id -> expandedItemId = if (expandedItemId == id) null else id },
+                onEditAmount = onEditAmount,
+                onEditTime = onEditTime,
                 // Only inject the slot into the first group. TimelineHourGroup will render it
                 // internally between item[0] and item[1] when the group has >1 items.
                 afterFirstItemContent = if (index == 0) secondItemContent else null,
@@ -209,6 +227,10 @@ private fun TimelineHourGroup(
     onDelete: (HistoryUI) -> Unit,
     modifier: Modifier = Modifier,
     unitPreference: UnitPreference = UnitPreference.ML,
+    expandedItemId: String? = null,
+    onToggleExpand: (String) -> Unit = {},
+    onEditAmount: ((HistoryUI) -> Unit)? = null,
+    onEditTime: ((HistoryUI) -> Unit)? = null,
     // When provided and the group has >1 items, rendered between item[0] and item[1],
     // splitting the card into two. Ignored when the group has only 1 item.
     afterFirstItemContent: (@Composable () -> Unit)? = null,
@@ -267,6 +289,10 @@ private fun TimelineHourGroup(
                     is24Hour = is24Hour,
                     unitPreference = unitPreference,
                     onDelete = onDelete,
+                    isExpanded = expandedItemId == hourGroup.items[0].id,
+                    onToggleExpand = { onToggleExpand(hourGroup.items[0].id) },
+                    onEditAmount = onEditAmount,
+                    onEditTime = onEditTime,
                 )
             }
 
@@ -284,6 +310,10 @@ private fun TimelineHourGroup(
                         is24Hour = is24Hour,
                         unitPreference = unitPreference,
                         onDelete = onDelete,
+                        isExpanded = expandedItemId == item.id,
+                        onToggleExpand = { onToggleExpand(item.id) },
+                        onEditAmount = onEditAmount,
+                        onEditTime = onEditTime,
                     )
                     if (index < rest.lastIndex) {
                         HorizontalDivider(color = DwInk100)
@@ -302,7 +332,11 @@ private fun TimelineHourGroup(
                         item = item,
                         is24Hour = is24Hour,
                         unitPreference = unitPreference,
-                        onDelete = onDelete
+                        onDelete = onDelete,
+                        isExpanded = expandedItemId == item.id,
+                        onToggleExpand = { onToggleExpand(item.id) },
+                        onEditAmount = onEditAmount,
+                        onEditTime = onEditTime,
                     )
                     if (index < hourGroup.items.lastIndex) {
                         HorizontalDivider(color = DwInk100)
@@ -320,56 +354,119 @@ private fun TimelineItemCard(
     onDelete: (HistoryUI) -> Unit,
     modifier: Modifier = Modifier,
     unitPreference: UnitPreference = UnitPreference.ML,
+    isExpanded: Boolean = false,
+    onToggleExpand: () -> Unit = {},
+    onEditAmount: ((HistoryUI) -> Unit)? = null,
+    onEditTime: ((HistoryUI) -> Unit)? = null,
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 14.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        Box(
-            contentAlignment = Alignment.Center,
+    Column(modifier = modifier) {
+        Row(
             modifier = Modifier
-                .size(32.dp)
-                .clip(iconBoxShape)
-                .background(DwTintWater),
+                .fillMaxWidth()
+                .clickable(onClick = onToggleExpand)
+                .padding(horizontal = 14.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Icon(
-                painter = painterResource(getIconResId(item.timestamp)),
-                contentDescription = null,
-                tint = DwWater,
-                modifier = Modifier.size(18.dp),
-            )
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(iconBoxShape)
+                    .background(DwTintWater),
+            ) {
+                Icon(
+                    painter = painterResource(getIconResId(item.timestamp)),
+                    contentDescription = null,
+                    tint = DwWater,
+                    modifier = Modifier.size(18.dp),
+                )
+            }
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = item.amount.toFloat().formatVolume(unitPreference),
+                    fontFamily = PlusJakartaSans,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Text(
+                    text = formatTime(item.timestamp, is24Hour),
+                    fontFamily = JetBrainsMono,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 11.sp,
+                    color = DwInk400,
+                )
+            }
+
+            IconButton(
+                onClick = { onDelete(item) },
+                modifier = Modifier.size(32.dp),
+            ) {
+                Icon(
+                    imageVector = DwIcons.Trash,
+                    contentDescription = stringResource(R.string.history_action_delete),
+                    tint = DwInk300,
+                    modifier = Modifier.size(16.dp),
+                )
+            }
         }
 
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = item.amount.toFloat().formatVolume(unitPreference),
-                fontFamily = PlusJakartaSans,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-            Text(
-                text = formatTime(item.timestamp, is24Hour),
-                fontFamily = JetBrainsMono,
-                fontWeight = FontWeight.Normal,
-                fontSize = 11.sp,
-                color = DwInk400,
-            )
-        }
-
-        IconButton(
-            onClick = { onDelete(item) },
-            modifier = Modifier.size(32.dp),
-        ) {
-            Icon(
-                imageVector = DwIcons.Trash,
-                contentDescription = stringResource(R.string.history_action_delete),
-                tint = DwInk300,
-                modifier = Modifier.size(16.dp),
-            )
+        AnimatedVisibility(visible = isExpanded) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 14.dp, end = 14.dp, bottom = 10.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                if (onEditAmount != null) {
+                    OutlinedButton(
+                        onClick = { onEditAmount(item) },
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(12.dp),
+                        border = BorderStroke(1.dp, DwWater),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = DwWater),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+                    ) {
+                        Icon(
+                            imageVector = DwIcons.Edit,
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp),
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = stringResource(R.string.history_action_edit_amount),
+                            fontFamily = PlusJakartaSans,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 13.sp,
+                        )
+                    }
+                }
+                if (onEditTime != null) {
+                    OutlinedButton(
+                        onClick = { onEditTime(item) },
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(12.dp),
+                        border = BorderStroke(1.dp, DwWater),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = DwWater),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+                    ) {
+                        Icon(
+                            imageVector = DwIcons.Clock,
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp),
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = stringResource(R.string.history_action_edit_time),
+                            fontFamily = PlusJakartaSans,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 13.sp,
+                        )
+                    }
+                }
+            }
         }
     }
 }

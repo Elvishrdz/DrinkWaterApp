@@ -28,7 +28,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.eahm.drinkwaterapp.R
-import com.eahm.drinkwaterapp.ads.banner.DrinkWaterBannerAd
+import com.eahm.drinkwaterapp.ads.banner.InlineBannerAd
+import com.eahm.drinkwaterapp.ads.banner.rememberBelowMainScreenBannerAdState
 import com.eahm.drinkwaterapp.core.billing.PurchaseManager
 import com.eahm.drinkwaterapp.core.config.BuildEnvironment
 import com.eahm.drinkwaterapp.core.data.confetti.ConfettiController
@@ -64,6 +65,8 @@ internal fun HomeScreen() {
     val state by confettiController.state.collectAsStateWithLifecycle()
     val isAdFree by purchaseManager.isAdFree.collectAsStateWithLifecycle()
     var currentDestination by rememberSaveable { mutableStateOf(HomeDestination.TODAY) }
+
+    val bannerAdState = rememberBelowMainScreenBannerAdState(enabled = !isAdFree)
 
     // Show the DEV tab only in environments where dev tooling is intentional.
     // staging hides it (testers see the same UI as end users);
@@ -150,8 +153,9 @@ internal fun HomeScreen() {
             }
 
             if (!isAdFree) {
-                DrinkWaterBannerAd(
-                    modifier = Modifier.fillMaxWidth()
+                InlineBannerAd(
+                    state = bannerAdState,
+                    modifier = Modifier.fillMaxWidth(),
                 )
             }
         }

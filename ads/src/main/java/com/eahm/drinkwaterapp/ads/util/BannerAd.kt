@@ -15,8 +15,9 @@ package com.eahm.drinkwaterapp.ads.util
  * limitations under the License.
  */
 
+import android.view.ViewGroup
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -40,7 +41,18 @@ fun BannerAd(adView: AdView, modifier: Modifier = Modifier) {
         return
     }
 
-    AndroidView(modifier = modifier.wrapContentSize(), factory = { adView })
+    AndroidView(
+        modifier = modifier.fillMaxWidth(),
+        factory = {
+            // Detach the AdView from any previous AndroidViewHolder parent before handing it to
+            // the new one.
+            // Without this, in history screen, changing the date (which can move the banner between
+            // "inside-group" and "between-groups" positions in the composition) causes:
+            // IllegalStateException: The specified child already has a parent.
+            (adView.parent as? ViewGroup)?.removeView(adView)
+            adView
+        },
+    )
 
     // Pause and resume the AdView when the lifecycle is paused and resumed.
     LifecycleResumeEffect(adView) {

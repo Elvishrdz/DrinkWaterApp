@@ -1141,6 +1141,47 @@ object DwIcons {
      * Bold bar chart — same three ascending bars with a heavier stroke.
      * Used as the selected-state icon for the Stats nav item.
      */
+    /**
+     * Pencil / edit icon — tilted pencil body polygon + diagonal eraser line along the spine.
+     * Used for inline record editing in the History screen.
+     */
+    val Edit: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "DwEdit",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).apply {
+            // Pencil body — four-sided polygon (tip at bottom-left, eraser at top-right)
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(3f, 17f)
+                lineTo(3f, 21f)
+                lineTo(7f, 21f)
+                lineTo(18f, 10f)
+                lineTo(14f, 6f)
+                close()
+            }
+            // Diagonal spine line (eraser separator near the top-right)
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round
+            ) {
+                moveTo(14f, 6f)
+                lineTo(18f, 10f)
+                moveTo(16f, 4f)
+                lineTo(20f, 8f)
+            }
+        }.build()
+    }
+
     val BarChartFilled: ImageVector by lazy {
         ImageVector.Builder(
             name = "DwBarChartFilled",

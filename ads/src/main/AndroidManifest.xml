@@ -6,7 +6,7 @@
     <application>
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="@string/ads_app_id" />
+            android:value="${app_id}" />
     </application>
 
 </manifest>
