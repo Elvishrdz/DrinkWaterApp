@@ -54,6 +54,12 @@ Priorities Tier 1
   instead keeps the previous path outside the shape.
 - [] use Instant instead of LocalDateTime (good for timezone conversion) for dates, then parse to
   localdate time if needed.
+- [] notification messages. do not use goodmorning if the start time is not in the morning. start
+  time can be at 6pm evening.
+- [] start and end time of active hours require at least the interval minimum to be set. otherwise
+  we have issues if the interval is just one minute for example.
+- after triggering last alarm remdinder component take another minute before updating its ui state.
+  also last alarm in the component should say: last for the next time of the alarm.
 
 Priorities Tier 2
 
