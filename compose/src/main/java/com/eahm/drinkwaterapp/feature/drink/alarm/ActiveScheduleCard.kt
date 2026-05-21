@@ -1,6 +1,11 @@
 package com.eahm.drinkwaterapp.feature.drink.alarm
 
 import android.text.format.DateFormat
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -68,15 +73,21 @@ internal fun ActiveScheduleCard(
             ActiveStatusBadge(isActive = state.isInActiveHours)
         }
 
-        if (state.schedule != null) {
-            HomeScheduleTimeline(
-                schedule = state.schedule,
-                startTime = state.startTime,
-                endTime = state.endTime,
-                now = state.now,
-                isInActiveHours = state.isInActiveHours,
-                is24Hour = is24Hour,
-            )
+        AnimatedVisibility(
+            visible = state.isInActiveHours && state.schedule != null,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically(),
+        ) {
+            if (state.schedule != null) {
+                HomeScheduleTimeline(
+                    schedule = state.schedule,
+                    startTime = state.startTime,
+                    endTime = state.endTime,
+                    now = state.now,
+                    isInActiveHours = state.isInActiveHours,
+                    is24Hour = is24Hour,
+                )
+            }
         }
 
         SummaryRow(

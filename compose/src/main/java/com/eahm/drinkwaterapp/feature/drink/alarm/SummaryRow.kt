@@ -1,5 +1,10 @@
 package com.eahm.drinkwaterapp.feature.drink.alarm
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
@@ -22,26 +27,34 @@ internal fun SummaryRow(
     is24Hour: Boolean = true,
 ) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        if (schedule != null) {
-            SummaryChip(
-                label = stringResource(R.string.drink_alarm_summary_drinks),
-                value = "${schedule.count}"
-            )
+        AnimatedVisibility(
+            visible = isInActiveHours && schedule != null,
+            enter = fadeIn() + expandHorizontally(),
+            exit = fadeOut() + shrinkHorizontally(),
+        ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (schedule != null) {
+                    SummaryChip(
+                        label = stringResource(R.string.drink_alarm_summary_drinks),
+                        value = "${schedule.count}"
+                    )
 
-            val totalMin = interval.hour * 60 + interval.minute
-            val h = totalMin / 60
-            val m = totalMin % 60
-            val intervalLabel = buildString {
-                if (h > 0) append("${h}h ")
-                if (m > 0 || h == 0) append("${m}m")
-            }.trim()
-            SummaryChip(
-                label = stringResource(
-                    if (isInexact) R.string.drink_alarm_summary_every_approx
-                    else R.string.drink_alarm_summary_every
-                ),
-                value = intervalLabel
-            )
+                    val totalMin = interval.hour * 60 + interval.minute
+                    val h = totalMin / 60
+                    val m = totalMin % 60
+                    val intervalLabel = buildString {
+                        if (h > 0) append("${h}h ")
+                        if (m > 0 || h == 0) append("${m}m")
+                    }.trim()
+                    SummaryChip(
+                        label = stringResource(
+                            if (isInexact) R.string.drink_alarm_summary_every_approx
+                            else R.string.drink_alarm_summary_every
+                        ),
+                        value = intervalLabel
+                    )
+                }
+            }
         }
 
         nextAlarmSlot?.let { next ->
