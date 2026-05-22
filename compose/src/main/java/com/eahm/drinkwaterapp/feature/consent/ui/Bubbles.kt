@@ -33,7 +33,7 @@ internal fun Bubbles(
             Modifier
                 .size(90.dp)
                 .align(Alignment.TopStart)
-                .offset(x = 8.dp, y = 60.dp)
+                .offset(x = 8.dp, y = 70.dp)
                 .background(Color.White.copy(alpha = 0.09f), CircleShape),
         )
         Box(

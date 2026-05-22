@@ -25,7 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.feature.consent.legal.ui.AcceptLegalCheckbox
 import com.eahm.drinkwaterapp.feature.consent.legal.ui.LegalHeaderContent
@@ -65,14 +64,11 @@ internal fun LegalLandscape(
                     .windowInsetsPadding(
                         insets = windowInsets.only(WindowInsetsSides.Start + WindowInsetsSides.Vertical),
                     )
-                    .padding(all = 22.dp),
+                    .padding(all = contentPaddingDp),
                 showStepCounter = showStepCounter,
                 centered = true,
             )
         }
-
-        val horizontalPadding = 22.dp
-        val spaceBetweenDp = 14.dp
 
         Column(
             modifier = Modifier
@@ -86,9 +82,9 @@ internal fun LegalLandscape(
                         insets = windowInsets.only(WindowInsetsSides.End),
                     )
                     .padding(
-                        start = horizontalPadding,
-                        end = horizontalPadding,
-                        bottom = horizontalPadding,
+                        start = contentPaddingDp,
+                        end = contentPaddingDp,
+                        bottom = contentPaddingDp,
                     ),
             ) {
                 LegalScrollableContent(
@@ -100,18 +96,18 @@ internal fun LegalLandscape(
                         .asPaddingValues()
                 )
 
-                Spacer(modifier = Modifier.height(spaceBetweenDp))
+                Spacer(modifier = Modifier.height(verticalSpacingDp))
 
                 Column(
                     modifier = Modifier
                         .windowInsetsPadding(
                             insets = windowInsets.only(WindowInsetsSides.Bottom),
                         ),
-                    verticalArrangement = Arrangement.spacedBy(spaceBetweenDp)
+                    verticalArrangement = Arrangement.spacedBy(verticalSpacingDp)
                 ) {
                     LegalWebLinkButton(
                         modifier = Modifier
-                            .padding(horizontal = horizontalPadding)
+                            .padding(horizontal = contentPaddingDp)
                             .align(Alignment.CenterHorizontally),
                     )
 

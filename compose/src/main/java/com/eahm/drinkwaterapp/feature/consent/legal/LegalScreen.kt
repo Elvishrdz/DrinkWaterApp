@@ -1,9 +1,11 @@
 package com.eahm.drinkwaterapp.feature.consent.legal
 
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterDeep
@@ -20,6 +22,17 @@ internal val legalHeaderGradient = Brush.verticalGradient(
     )
 )
 
+internal val overlapHeightDp = 22.dp
+
+internal val topRoundedShape = RoundedCornerShape(
+    topStart = overlapHeightDp,
+    topEnd = overlapHeightDp
+)
+
+internal val shadowElevationDp = 8.dp
+internal val contentPaddingDp = 22.dp
+internal val verticalSpacingDp = 14.dp
+
 @Composable
 internal fun LegalScreen(
     privacyToggleChecked: Boolean,
@@ -29,7 +42,8 @@ internal fun LegalScreen(
     onAccept: () -> Unit,
 ) {
     when (layoutType) {
-        LayoutType.PORTRAIT -> LegalPortrait(
+        LayoutType.PORTRAIT,
+            -> LegalPortrait(
             privacyToggleChecked = privacyToggleChecked,
             showStepCounter = showStepCounter,
             onToggleChanged = onToggleChanged,
@@ -37,14 +51,16 @@ internal fun LegalScreen(
         )
 
         LayoutType.LANDSCAPE,
-        LayoutType.FOLDABLE_EXPANDED -> LegalLandscape(
+            -> LegalLandscape(
             privacyToggleChecked = privacyToggleChecked,
             showStepCounter = showStepCounter,
             onToggleChanged = onToggleChanged,
             onAccept = onAccept,
         )
 
-        LayoutType.TABLE_TOP -> LegalTableTop(
+        LayoutType.FOLDABLE_EXPANDED,
+        LayoutType.TABLE_TOP,
+            -> LegalTableTop(
             privacyToggleChecked = privacyToggleChecked,
             showStepCounter = showStepCounter,
             onToggleChanged = onToggleChanged,

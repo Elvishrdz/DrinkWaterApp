@@ -3,6 +3,7 @@ package com.eahm.drinkwaterapp.feature.consent.legal
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -16,16 +17,15 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.feature.consent.legal.ui.AcceptLegalCheckbox
 import com.eahm.drinkwaterapp.feature.consent.legal.ui.LegalHeaderContent
@@ -33,8 +33,6 @@ import com.eahm.drinkwaterapp.feature.consent.legal.ui.LegalMainButton
 import com.eahm.drinkwaterapp.feature.consent.legal.ui.LegalScrollableContent
 import com.eahm.drinkwaterapp.feature.consent.legal.ui.LegalWebLinkButton
 import com.eahm.drinkwaterapp.feature.consent.ui.Bubbles
-
-private val overlapHeightDp = 22.dp
 
 @Composable
 internal fun LegalPortrait(
@@ -58,89 +56,93 @@ internal fun LegalPortrait(
                     .matchParentSize()
                     .background(legalHeaderGradient),
             )
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth(),
-            ) {
-                LegalHeaderContent(
-                    modifier = Modifier
-                        .windowInsetsPadding(
-                            insets = windowInsets.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
-                        )
-                        .padding(all = 22.dp),
-                    showStepCounter = showStepCounter,
-                    centered = false
-                )
 
-                Box(
-                    modifier = Modifier
-                        .zIndex(1f)
-                        .height(overlapHeightDp),
-                ) {
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(overlapHeightDp),
-                        shape = RoundedCornerShape(
-                            topStart = overlapHeightDp,
-                            topEnd = overlapHeightDp
-                        ),
-                        shadowElevation = 0.dp,
-                        color = MaterialTheme.colorScheme.surface,
-                    ) {}
-                }
-            }
+            LegalHeaderContent(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .windowInsetsPadding(
+                        insets = windowInsets.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
+                    )
+                    .padding(all = contentPaddingDp)
+                    .padding(bottom = overlapHeightDp),
+                showStepCounter = showStepCounter,
+                centered = false
+            )
         }
 
-        Column(
+        Surface(
             modifier = Modifier
-                .background(color = MaterialTheme.colorScheme.surface)
-                .fillMaxSize(),
+                .weight(1f)
+                .fillMaxWidth()
+                .layout { measurable, constraints ->
+                    val overlapPx = overlapHeightDp.roundToPx()
+
+                    val placeable = measurable.measure(
+                        constraints.copy(
+                            minHeight = constraints.minHeight + overlapPx,
+                            maxHeight = constraints.maxHeight + overlapPx,
+                        )
+                    )
+
+                    layout(placeable.width, constraints.maxHeight) {
+                        placeable.placeRelative(0, -overlapPx)
+                    }
+
+                },
+            shape = topRoundedShape,
+            shadowElevation = shadowElevationDp,
+            color = MaterialTheme.colorScheme.surface,
         ) {
-            val horizontalPadding = 22.dp
-            val spaceBetweenDp = 14.dp
-
-            LegalScrollableContent(
+            Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = horizontalPadding)
-                    .verticalScroll(rememberScrollState()),
-            )
+                    .background(color = MaterialTheme.colorScheme.surface)
+                    .fillMaxSize(),
+            ) {
+                LegalScrollableContent(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = contentPaddingDp)
+                        .verticalScroll(rememberScrollState()),
+                    contentPadding = PaddingValues(
+                        top = overlapHeightDp,
+                    )
+                )
 
-            Spacer(modifier = Modifier.height(spaceBetweenDp))
+                Spacer(modifier = Modifier.height(verticalSpacingDp))
 
-            LegalWebLinkButton(
-                modifier = Modifier
-                    .padding(horizontal = horizontalPadding)
-                    .align(Alignment.CenterHorizontally),
-            )
+                LegalWebLinkButton(
+                    modifier = Modifier
+                        .padding(horizontal = contentPaddingDp)
+                        .align(Alignment.CenterHorizontally),
+                )
 
-            Spacer(modifier = Modifier.height(spaceBetweenDp))
+                Spacer(modifier = Modifier.height(verticalSpacingDp))
 
-            AcceptLegalCheckbox(
-                privacyToggleChecked = privacyToggleChecked,
-                onToggleChanged = onToggleChanged,
-                modifier = Modifier
-                    .padding(horizontal = horizontalPadding),
-            )
+                AcceptLegalCheckbox(
+                    privacyToggleChecked = privacyToggleChecked,
+                    onToggleChanged = onToggleChanged,
+                    modifier = Modifier
+                        .padding(horizontal = contentPaddingDp),
+                )
 
-            Spacer(modifier = Modifier.height(spaceBetweenDp))
+                Spacer(modifier = Modifier.height(verticalSpacingDp))
 
-            LegalMainButton(
-                onClick = onAccept,
-                enabled = privacyToggleChecked,
-                modifier = Modifier
-                    .padding(horizontal = horizontalPadding),
-            )
+                LegalMainButton(
+                    onClick = onAccept,
+                    enabled = privacyToggleChecked,
+                    modifier = Modifier
+                        .padding(horizontal = contentPaddingDp),
+                )
 
-            Spacer(modifier = Modifier.height(overlapHeightDp))
+                Spacer(modifier = Modifier.height(overlapHeightDp))
 
-            Spacer(
-                modifier = Modifier
-                    .windowInsetsPadding(
-                        insets = windowInsets.only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal),
-                    ),
-            )
+                Spacer(
+                    modifier = Modifier
+                        .windowInsetsPadding(
+                            insets = windowInsets.only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal),
+                        ),
+                )
+            }
         }
     }
 }

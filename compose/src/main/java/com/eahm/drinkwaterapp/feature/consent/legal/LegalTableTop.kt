@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -34,7 +33,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.feature.consent.legal.ui.AcceptLegalCheckbox
 import com.eahm.drinkwaterapp.feature.consent.legal.ui.LegalHeaderContent
@@ -51,9 +49,6 @@ internal fun LegalTableTop(
     onAccept: () -> Unit,
 ) {
     val windowInsets = WindowInsets.safeDrawing.union(WindowInsets.displayCutout)
-
-    val allSidesPadding = 22.dp
-    val overlapDp = 22.dp
 
     Column(
         modifier = Modifier
@@ -76,12 +71,12 @@ internal fun LegalTableTop(
                     .windowInsetsPadding(
                         insets = windowInsets.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
                     )
-                    .padding(horizontal = allSidesPadding)
+                    .padding(horizontal = contentPaddingDp)
                     .verticalScroll(rememberScrollState()),
                 contentPadding = PaddingValues(
                     top = windowInsets.only(WindowInsetsSides.Top).asPaddingValues()
-                        .calculateTopPadding() + allSidesPadding,
-                    bottom = allSidesPadding + overlapDp,
+                        .calculateTopPadding() + contentPaddingDp,
+                    bottom = contentPaddingDp + overlapHeightDp,
                 ),
                 showStepCounter = showStepCounter,
                 centered = true,
@@ -93,7 +88,7 @@ internal fun LegalTableTop(
                 .weight(1f)
                 .fillMaxWidth()
                 .layout { measurable, constraints ->
-                    val overlapPx = overlapDp.roundToPx()
+                    val overlapPx = overlapHeightDp.roundToPx()
                     val placeable = measurable.measure(
                         constraints.copy(
                             minHeight = constraints.minHeight + overlapPx,
@@ -104,31 +99,30 @@ internal fun LegalTableTop(
                         placeable.placeRelative(0, -overlapPx)
                     }
                 },
-            shape = RoundedCornerShape(topStart = overlapDp, topEnd = overlapDp),
-            shadowElevation = 8.dp,
+            shape = topRoundedShape,
+            shadowElevation = shadowElevationDp,
             color = MaterialTheme.colorScheme.surface,
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxSize(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 Column(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight()
                         .verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.spacedBy(14.dp),
+                    verticalArrangement = Arrangement.spacedBy(verticalSpacingDp),
                 ) {
                     LegalScrollableContent(
                         contentPadding = PaddingValues(
-                            start = allSidesPadding + windowInsets
+                            start = contentPaddingDp + windowInsets
                                 .only(WindowInsetsSides.Start)
                                 .asPaddingValues()
                                 .calculateStartPadding(LayoutDirection.Ltr),
-                            end = allSidesPadding,
-                            top = allSidesPadding + overlapDp,
-                            bottom = allSidesPadding + windowInsets
+                            end = contentPaddingDp,
+                            top = contentPaddingDp + overlapHeightDp,
+                            bottom = contentPaddingDp + windowInsets
                                 .only(WindowInsetsSides.Bottom)
                                 .asPaddingValues()
                                 .calculateBottomPadding(),
@@ -147,15 +141,15 @@ internal fun LegalTableTop(
                         .fillMaxHeight()
                         .verticalScroll(acceptAreaScrollState)
                         .padding(
-                            start = allSidesPadding,
-                            end = allSidesPadding + windowInsets
+                            start = contentPaddingDp,
+                            end = contentPaddingDp + windowInsets
                                 .only(WindowInsetsSides.End)
                                 .asPaddingValues()
                                 .calculateEndPadding(LayoutDirection.Ltr),
                         ),
-                    verticalArrangement = Arrangement.spacedBy(14.dp, Alignment.Bottom),
+                    verticalArrangement = Arrangement.spacedBy(verticalSpacingDp, Alignment.Bottom),
                 ) {
-                    Spacer(Modifier.height(allSidesPadding))
+                    Spacer(Modifier.height(contentPaddingDp))
 
                     LegalWebLinkButton(
                         modifier = Modifier
@@ -174,7 +168,7 @@ internal fun LegalTableTop(
 
                     Spacer(
                         Modifier.height(
-                            allSidesPadding + windowInsets
+                            contentPaddingDp + windowInsets
                                 .only(WindowInsetsSides.Bottom)
                                 .asPaddingValues()
                                 .calculateBottomPadding(),
