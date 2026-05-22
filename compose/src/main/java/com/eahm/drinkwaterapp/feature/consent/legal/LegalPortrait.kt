@@ -23,14 +23,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterDeep
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterLight
 import com.eahm.drinkwaterapp.feature.consent.legal.ui.AcceptLegalCheckbox
 import com.eahm.drinkwaterapp.feature.consent.legal.ui.LegalHeaderContent
 import com.eahm.drinkwaterapp.feature.consent.legal.ui.LegalMainButton
@@ -39,14 +35,6 @@ import com.eahm.drinkwaterapp.feature.consent.legal.ui.LegalWebLinkButton
 import com.eahm.drinkwaterapp.feature.consent.ui.Bubbles
 
 private val overlapHeightDp = 22.dp
-
-internal val legalHeaderGradient = Brush.verticalGradient(
-    colorStops = arrayOf(
-        0.0f to DwWaterLight,
-        0.5f to DwWater,
-        1.0f to DwWaterDeep,
-    )
-)
 
 @Composable
 internal fun LegalPortrait(

@@ -39,8 +39,13 @@ internal fun LegalHeaderContent(
     modifier: Modifier = Modifier,
 ) {
     val textAlign = if (centered) TextAlign.Center else TextAlign.Start
+    val horizontalAlignment = if (centered) Alignment.CenterHorizontally else Alignment.Start
 
-    Column(modifier = modifier) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = horizontalAlignment,
+        verticalArrangement = Arrangement.Center,
+    ) {
         Box(
             modifier = Modifier
                 .size(64.dp)
