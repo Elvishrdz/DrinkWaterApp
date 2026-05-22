@@ -60,6 +60,10 @@ Priorities Tier 1
   we have issues if the interval is just one minute for example.
 - after triggering last alarm remdinder component take another minute before updating its ui state.
   also last alarm in the component should say: last for the next time of the alarm.
+- [x] Agregar codigo para los correo de drinkwater app y poder filtralos en gmail.
+  codigo problemas: PR100:
+  codigo features: FR200:
+- [] test feature and problem emails are arriving to the correct tags in the support email inbox.
 
 Priorities Tier 2
 
