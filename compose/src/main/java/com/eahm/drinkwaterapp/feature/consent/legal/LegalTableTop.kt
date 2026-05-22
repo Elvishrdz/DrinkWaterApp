@@ -130,16 +130,16 @@ internal fun LegalTableTop(
                     )
                 }
 
-                val acceptAreaScrollState = rememberScrollState()
+                val ctaScrollState = rememberScrollState()
 
                 // set end position as initial state
-                LaunchedEffect(Unit) { acceptAreaScrollState.scrollTo(acceptAreaScrollState.maxValue) }
+                LaunchedEffect(Unit) { ctaScrollState.scrollTo(ctaScrollState.maxValue) }
 
                 Column(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight()
-                        .verticalScroll(acceptAreaScrollState)
+                        .verticalScroll(ctaScrollState)
                         .padding(
                             start = contentPaddingDp,
                             end = contentPaddingDp + windowInsets

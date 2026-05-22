@@ -5,98 +5,165 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.displayCutout
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.LayoutDirection
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagentaDark
 import com.eahm.drinkwaterapp.feature.consent.trackingrequest.ui.TrackButtons
 import com.eahm.drinkwaterapp.feature.consent.trackingrequest.ui.TrackHeaderContent
 import com.eahm.drinkwaterapp.feature.consent.trackingrequest.ui.TrackMainContent
 import com.eahm.drinkwaterapp.feature.consent.ui.Bubbles
 
-/**
- * Table-top: gradient branding panel on the top half,
- * white content surface on the bottom half.
- */
 @Composable
 internal fun TrackingRequestTableTop(
-    innerPadding: PaddingValues,
     isTrackingEnabled: Boolean,
     showStepCounter: Boolean,
     onAllow: () -> Unit,
     onDecline: () -> Unit,
 ) {
-    val magentaGradient = Brush.verticalGradient(listOf(Color(0xFFB83A95), DwMagentaDark))
+    val windowInsets = WindowInsets.safeDrawing.union(WindowInsets.displayCutout)
 
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(innerPadding),
+            .fillMaxSize(),
     ) {
-        // Top: gradient branding panel
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
-                .clip(RoundedCornerShape(bottomStart = 36.dp, bottomEnd = 36.dp))
-                .background(magentaGradient),
+                .weight(1f),
         ) {
-            Bubbles()
-            Column(
+            Bubbles(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(trackMagentaGradient),
+            )
+
+            TrackHeaderContent(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 22.dp, vertical = 24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-            ) {
-                TrackHeaderContent(showStepCounter = showStepCounter, centered = true)
-            }
+                    .windowInsetsPadding(
+                        insets = windowInsets.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
+                    )
+                    .padding(horizontal = trackContentPaddingDp)
+                    .verticalScroll(rememberScrollState()),
+                contentPadding = PaddingValues(
+                    top = windowInsets.only(WindowInsetsSides.Top).asPaddingValues()
+                        .calculateTopPadding() + trackContentPaddingDp,
+                    bottom = trackContentPaddingDp + trackOverlapHeightDp,
+                ),
+                showStepCounter = showStepCounter,
+                centered = true,
+            )
         }
 
-        // Bottom: white surface — scrollable content area + buttons pinned at bottom
         Surface(
             modifier = Modifier
+                .weight(1f)
                 .fillMaxWidth()
-                .weight(1f),
-            shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-            shadowElevation = 8.dp,
+                .layout { measurable, constraints ->
+                    val overlapPx = trackOverlapHeightDp.roundToPx()
+                    val placeable = measurable.measure(
+                        constraints.copy(
+                            minHeight = constraints.minHeight + overlapPx,
+                            maxHeight = constraints.maxHeight + overlapPx,
+                        )
+                    )
+                    layout(placeable.width, constraints.maxHeight) {
+                        placeable.placeRelative(0, -overlapPx)
+                    }
+                },
+            shape = trackTopRoundedShape,
+            shadowElevation = trackShadowElevationDp,
             color = MaterialTheme.colorScheme.surface,
         ) {
-            Column(
+            Row(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(22.dp),
+                    .fillMaxSize(),
             ) {
                 Column(
                     modifier = Modifier
                         .weight(1f)
+                        .fillMaxHeight()
                         .verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.spacedBy(14.dp),
+                    verticalArrangement = Arrangement.spacedBy(trackVerticalSpacingDp),
                 ) {
-                    TrackMainContent()
+                    TrackMainContent(
+                        contentPadding = PaddingValues(
+                            start = trackContentPaddingDp + windowInsets
+                                .only(WindowInsetsSides.Start)
+                                .asPaddingValues()
+                                .calculateStartPadding(LayoutDirection.Ltr),
+                            end = trackContentPaddingDp,
+                            top = trackContentPaddingDp + trackOverlapHeightDp,
+                            bottom = trackContentPaddingDp + windowInsets
+                                .only(WindowInsetsSides.Bottom)
+                                .asPaddingValues()
+                                .calculateBottomPadding(),
+                        )
+                    )
                 }
-                Spacer(Modifier.height(14.dp))
-                TrackButtons(
-                    isTrackingEnabled = isTrackingEnabled,
-                    onAllow = onAllow,
-                    onDecline = onDecline,
-                )
+
+                val ctaScrollState = rememberScrollState()
+
+                // set end position as initial state
+                LaunchedEffect(Unit) { ctaScrollState.scrollTo(ctaScrollState.maxValue) }
+
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .verticalScroll(ctaScrollState)
+                        .padding(
+                            start = trackContentPaddingDp,
+                            end = trackContentPaddingDp + windowInsets
+                                .only(WindowInsetsSides.End)
+                                .asPaddingValues()
+                                .calculateEndPadding(LayoutDirection.Ltr),
+                        ),
+                    verticalArrangement = Arrangement.spacedBy(trackVerticalSpacingDp, Alignment.Bottom),
+                ) {
+                    Spacer(Modifier.height(trackContentPaddingDp))
+
+                    TrackButtons(
+                        isTrackingEnabled = isTrackingEnabled,
+                        onAllow = onAllow,
+                        onDecline = onDecline,
+                    )
+
+                    Spacer(
+                        Modifier.height(
+                            trackContentPaddingDp + windowInsets
+                                .only(WindowInsetsSides.Bottom)
+                                .asPaddingValues()
+                                .calculateBottomPadding(),
+                        ),
+                    )
+                }
             }
         }
     }
@@ -106,8 +173,20 @@ internal fun TrackingRequestTableTop(
 @Composable
 private fun TrackingRequestTableTopPreview() {
     DrinkWaterAppTheme {
-        TrackingRequestTableTop(
-            innerPadding = PaddingValues(0.dp),
+        TrackingRequestScreen(
+            isTrackingEnabled = false,
+            showStepCounter = true,
+            onAllow = {},
+            onDecline = {},
+        )
+    }
+}
+
+@Preview(name = "TableTop", widthDp = 700, heightDp = 700, fontScale = 1.5f)
+@Composable
+private fun BigFontPreview() {
+    DrinkWaterAppTheme {
+        TrackingRequestScreen(
             isTrackingEnabled = false,
             showStepCounter = true,
             onAllow = {},

@@ -55,7 +55,7 @@ internal fun LegalHeaderContent(
         modifier = modifier
             .padding(horizontalPadding),
         horizontalAlignment = horizontalAlignment,
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Top,
     ) {
         Spacer(Modifier.height(contentPadding.calculateTopPadding()))
 

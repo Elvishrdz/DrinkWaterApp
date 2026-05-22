@@ -50,7 +50,7 @@ internal fun LegalScrollableContent(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        // Scrollable policy card — expands to fill available vertical space
+
         Surface(
             modifier = Modifier
                 .padding(bottom = contentPadding.calculateBottomPadding()),
