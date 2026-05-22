@@ -17,26 +17,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.R
-import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 
-/**
- * Controls: agree row + CTA button.
- */
 @Composable
-internal fun LegalControls(
+internal fun AcceptLegalCheckbox(
     privacyToggleChecked: Boolean,
     onToggleChanged: (Boolean) -> Unit,
-    onAccept: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    // Agree row
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)
             .background(MaterialTheme.colorScheme.primaryContainer)
@@ -59,16 +55,10 @@ internal fun LegalControls(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onPrimaryContainer,
             fontWeight = FontWeight.Medium,
+            textAlign = TextAlign.Center,
             modifier = Modifier.weight(1f),
         )
     }
-
-    DwPrimaryButton(
-        text = stringResource(R.string.consent_legal_cta),
-        onClick = onAccept,
-        enabled = privacyToggleChecked,
-        modifier = Modifier.fillMaxWidth(),
-    )
 }
 
 private class CheckedPreviewProvider : PreviewParameterProvider<Boolean> {
@@ -77,15 +67,14 @@ private class CheckedPreviewProvider : PreviewParameterProvider<Boolean> {
 
 @Preview(showBackground = true, widthDp = 360)
 @Composable
-private fun LegalControlsPreview(
+private fun AcceptLegalCheckboxPreview(
     @PreviewParameter(CheckedPreviewProvider::class) checked: Boolean,
 ) {
     DrinkWaterAppTheme {
         Column(Modifier.padding(16.dp)) {
-            LegalControls(
+            AcceptLegalCheckbox(
                 privacyToggleChecked = checked,
                 onToggleChanged = {},
-                onAccept = {},
             )
         }
     }

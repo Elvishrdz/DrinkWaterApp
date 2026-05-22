@@ -24,10 +24,11 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterDeep
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterLight
-import com.eahm.drinkwaterapp.feature.consent.legal.ui.Bubbles
-import com.eahm.drinkwaterapp.feature.consent.legal.ui.LegalControls
+import com.eahm.drinkwaterapp.feature.consent.legal.ui.AcceptLegalCheckbox
 import com.eahm.drinkwaterapp.feature.consent.legal.ui.LegalHeaderContent
+import com.eahm.drinkwaterapp.feature.consent.legal.ui.LegalMainButton
 import com.eahm.drinkwaterapp.feature.consent.legal.ui.LegalScrollableContent
+import com.eahm.drinkwaterapp.feature.consent.ui.Bubbles
 
 /**
  * Table-top: gradient branding panel on the top half,
@@ -101,10 +102,14 @@ internal fun LegalTableTop(
                         .fillMaxHeight(),
                     verticalArrangement = Arrangement.spacedBy(14.dp, Alignment.CenterVertically),
                 ) {
-                    LegalControls(
+                    AcceptLegalCheckbox(
                         privacyToggleChecked = privacyToggleChecked,
                         onToggleChanged = onToggleChanged,
-                        onAccept = onAccept,
+                    )
+
+                    LegalMainButton(
+                        onClick = onAccept,
+                        enabled = privacyToggleChecked,
                     )
                 }
             }

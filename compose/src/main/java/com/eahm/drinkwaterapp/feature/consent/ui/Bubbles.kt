@@ -1,4 +1,4 @@
-package com.eahm.drinkwaterapp.feature.consent.trackingrequest.ui
+package com.eahm.drinkwaterapp.feature.consent.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -14,10 +14,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagentaDark
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterLight
 
 @Composable
-internal fun Bubbles() {
-    Box(modifier = Modifier.fillMaxSize()) {
+internal fun Bubbles(
+    modifier: Modifier = Modifier,
+) {
+    Box(modifier = modifier) {
         Box(
             Modifier
                 .size(140.dp)
@@ -45,11 +49,9 @@ internal fun Bubbles() {
 @Preview(widthDp = 300, heightDp = 300)
 @Composable
 private fun BubblesPreview() {
-    Box(
+    Bubbles(
         modifier = Modifier
             .fillMaxSize()
-            .background(Brush.verticalGradient(listOf(Color(0xFFB83A95), DwMagentaDark))),
-    ) {
-        Bubbles()
-    }
+            .background(Brush.verticalGradient(listOf(DwWaterLight, DwWater, DwMagentaDark))),
+    )
 }

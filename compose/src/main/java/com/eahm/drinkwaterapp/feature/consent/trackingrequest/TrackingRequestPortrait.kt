@@ -26,10 +26,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagentaDark
-import com.eahm.drinkwaterapp.feature.consent.trackingrequest.ui.Bubbles
 import com.eahm.drinkwaterapp.feature.consent.trackingrequest.ui.TrackButtons
 import com.eahm.drinkwaterapp.feature.consent.trackingrequest.ui.TrackHeaderContent
 import com.eahm.drinkwaterapp.feature.consent.trackingrequest.ui.TrackMainContent
+import com.eahm.drinkwaterapp.feature.consent.ui.Bubbles
 
 private val TrackWaveHeight = 220.dp
 private val TrackOverlapHeight = 25.dp

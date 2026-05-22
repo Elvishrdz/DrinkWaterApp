@@ -28,7 +28,7 @@
     <string name="consent_legal_title">Política de privacidad y términos de uso</string>
     <string name="consent_legal_updated">Última actualización · 12 de mayo de 2026</string>
     <string name="consent_legal_lede">Tómate un momento para leer nuestros términos de uso y política de privacidad para usar la app DrinkWater.</string>
-    <string name="consent_legal_web_link">Lee la versión más reciente en drinkwater.app</string>
+    <string name="consent_legal_web_link">Lee la versión más reciente</string>
     <string name="consent_legal_agree">He leído y acepto la Política de privacidad y los Términos de uso.</string>
     <string name="consent_legal_cta">Aceptar y continuar</string>
 

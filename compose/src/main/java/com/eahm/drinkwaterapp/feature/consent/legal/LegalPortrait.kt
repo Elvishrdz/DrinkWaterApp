@@ -1,19 +1,23 @@
 package com.eahm.drinkwaterapp.feature.consent.legal
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -27,12 +31,22 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterDeep
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterLight
-import com.eahm.drinkwaterapp.feature.consent.legal.ui.Bubbles
-import com.eahm.drinkwaterapp.feature.consent.legal.ui.LegalBodyContent
+import com.eahm.drinkwaterapp.feature.consent.legal.ui.AcceptLegalCheckbox
 import com.eahm.drinkwaterapp.feature.consent.legal.ui.LegalHeaderContent
+import com.eahm.drinkwaterapp.feature.consent.legal.ui.LegalMainButton
+import com.eahm.drinkwaterapp.feature.consent.legal.ui.LegalScrollableContent
+import com.eahm.drinkwaterapp.feature.consent.legal.ui.LegalWebLinkButton
+import com.eahm.drinkwaterapp.feature.consent.ui.Bubbles
 
-private val LegalWaveHeight = 248.dp
-private val LegalOverlapHeight = 25.dp
+private val overlapHeightDp = 22.dp
+
+internal val legalHeaderGradient = Brush.verticalGradient(
+    colorStops = arrayOf(
+        0.0f to DwWaterLight,
+        0.5f to DwWater,
+        1.0f to DwWaterDeep,
+    )
+)
 
 @Composable
 internal fun LegalPortrait(
@@ -41,56 +55,104 @@ internal fun LegalPortrait(
     onToggleChanged: (Boolean) -> Unit,
     onAccept: () -> Unit,
 ) {
-    val waterGradient = Brush.verticalGradient(listOf(DwWaterLight, DwWater, DwWaterDeep))
-
     val windowInsets = WindowInsets.safeDrawing.union(WindowInsets.displayCutout)
 
-    BoxWithConstraints(
+    Column(
         modifier = Modifier
             .fillMaxSize(),
     ) {
-        val sheetHeight = maxHeight - (LegalWaveHeight - LegalOverlapHeight)
-
-        // Wave header
         Box(
             modifier = Modifier
-                .align(Alignment.TopCenter)
-                .fillMaxWidth()
-                .height(LegalWaveHeight)
-                .zIndex(0f)
-                .background(waterGradient),
+                .fillMaxWidth(),
         ) {
-            Bubbles()
+            Bubbles(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(legalHeaderGradient),
+            )
             Column(
-                Modifier.padding(start = 22.dp, end = 22.dp, top = 24.dp, bottom = 40.dp),
+                modifier = Modifier
+                    .fillMaxWidth(),
             ) {
-                LegalHeaderContent(showStepCounter = showStepCounter, centered = false)
+                LegalHeaderContent(
+                    modifier = Modifier
+                        .windowInsetsPadding(
+                            insets = windowInsets.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
+                        )
+                        .padding(all = 22.dp),
+                    showStepCounter = showStepCounter,
+                    centered = false
+                )
+
+                Box(
+                    modifier = Modifier
+                        .zIndex(1f)
+                        .height(overlapHeightDp),
+                ) {
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(overlapHeightDp),
+                        shape = RoundedCornerShape(
+                            topStart = overlapHeightDp,
+                            topEnd = overlapHeightDp
+                        ),
+                        shadowElevation = 0.dp,
+                        color = MaterialTheme.colorScheme.surface,
+                    ) {}
+                }
             }
         }
 
-        // Overlapping white sheet
-        Surface(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(sheetHeight)
-                .align(Alignment.BottomStart)
-                .zIndex(1f),
-            shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-            shadowElevation = 8.dp,
-            color = MaterialTheme.colorScheme.surface,
+                .background(color = MaterialTheme.colorScheme.surface)
+                .fillMaxSize(),
         ) {
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .padding(22.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp),
-            ) {
-                LegalBodyContent(
-                    privacyToggleChecked = privacyToggleChecked,
-                    onToggleChanged = onToggleChanged,
-                    onAccept = onAccept,
-                )
-            }
+            val horizontalPadding = 22.dp
+            val spaceBetweenDp = 14.dp
+
+            LegalScrollableContent(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = horizontalPadding)
+                    .verticalScroll(rememberScrollState()),
+            )
+
+            Spacer(modifier = Modifier.height(spaceBetweenDp))
+
+            LegalWebLinkButton(
+                modifier = Modifier
+                    .padding(horizontal = horizontalPadding)
+                    .align(Alignment.CenterHorizontally),
+            )
+
+            Spacer(modifier = Modifier.height(spaceBetweenDp))
+
+            AcceptLegalCheckbox(
+                privacyToggleChecked = privacyToggleChecked,
+                onToggleChanged = onToggleChanged,
+                modifier = Modifier
+                    .padding(horizontal = horizontalPadding),
+            )
+
+            Spacer(modifier = Modifier.height(spaceBetweenDp))
+
+            LegalMainButton(
+                onClick = onAccept,
+                enabled = privacyToggleChecked,
+                modifier = Modifier
+                    .padding(horizontal = horizontalPadding),
+            )
+
+            Spacer(modifier = Modifier.height(overlapHeightDp))
+
+            Spacer(
+                modifier = Modifier
+                    .windowInsetsPadding(
+                        insets = windowInsets.only(WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal),
+                    ),
+            )
         }
     }
 }
@@ -98,6 +160,19 @@ internal fun LegalPortrait(
 @Preview(name = "Portrait")
 @Composable
 private fun LegalPortraitPreview() {
+    DrinkWaterAppTheme {
+        LegalScreen(
+            privacyToggleChecked = false,
+            showStepCounter = true,
+            onToggleChanged = {},
+            onAccept = {},
+        )
+    }
+}
+
+@Preview(fontScale = 1.5f)
+@Composable
+private fun BigFontPreview() {
     DrinkWaterAppTheme {
         LegalScreen(
             privacyToggleChecked = false,

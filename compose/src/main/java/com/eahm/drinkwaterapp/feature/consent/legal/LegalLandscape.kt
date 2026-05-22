@@ -20,9 +20,11 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterDeep
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterLight
-import com.eahm.drinkwaterapp.feature.consent.legal.ui.Bubbles
-import com.eahm.drinkwaterapp.feature.consent.legal.ui.LegalBodyContent
+import com.eahm.drinkwaterapp.feature.consent.legal.ui.AcceptLegalCheckbox
 import com.eahm.drinkwaterapp.feature.consent.legal.ui.LegalHeaderContent
+import com.eahm.drinkwaterapp.feature.consent.legal.ui.LegalMainButton
+import com.eahm.drinkwaterapp.feature.consent.legal.ui.LegalScrollableContent
+import com.eahm.drinkwaterapp.feature.consent.ui.Bubbles
 
 /**
  * Landscape / foldable-expanded: gradient branding panel on the left,
@@ -64,16 +66,23 @@ internal fun LegalLandscape(
 
         Column(
             modifier = Modifier
-                .weight(1f)
                 .fillMaxSize()
                 .padding(22.dp)
                 .background(color = MaterialTheme.colorScheme.surface),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            LegalBodyContent(
+            LegalScrollableContent(
+                modifier = Modifier.weight(1f),
+            )
+
+            AcceptLegalCheckbox(
                 privacyToggleChecked = privacyToggleChecked,
                 onToggleChanged = onToggleChanged,
-                onAccept = onAccept,
+            )
+
+            LegalMainButton(
+                onClick = onAccept,
+                enabled = privacyToggleChecked,
             )
         }
     }
