@@ -1,14 +1,13 @@
-package com.eahm.drinkwaterapp.feature.consent.ui
+package com.eahm.drinkwaterapp.feature.consent.trackingrequest
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,8 +23,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -36,11 +34,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -48,50 +44,48 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.zIndex
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
+import com.eahm.drinkwaterapp.core.designsystem.component.button.DwTertiaryButton
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterDeep
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterLight
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagentaDark
 import com.eahm.drinkwaterapp.core.presentation.LayoutType
 import com.eahm.drinkwaterapp.core.presentation.getLayoutType
-import com.eahm.drinkwaterapp.feature.consent.extension.sanitizeHtml
 
-private val LegalWaveHeight = 248.dp
-private val LegalOverlapHeight = 25.dp
+private val TrackWaveHeight = 220.dp
+private val TrackOverlapHeight = 25.dp
 
 @Composable
-internal fun LegalScreen(
-    privacyToggleChecked: Boolean,
+internal fun TrackingRequestScreen(
+    isTrackingEnabled: Boolean,
     showStepCounter: Boolean,
-    onToggleChanged: (Boolean) -> Unit,
-    onAccept: () -> Unit,
+    onAllow: () -> Unit,
+    onDecline: () -> Unit,
 ) {
     val innerPadding = PaddingValues()
     when (getLayoutType()) {
-        LayoutType.PORTRAIT -> LegalPortraitLayout(
+        LayoutType.PORTRAIT -> TrackingRequestPortrait(
             innerPadding = innerPadding,
-            privacyToggleChecked = privacyToggleChecked,
+            isTrackingEnabled = isTrackingEnabled,
             showStepCounter = showStepCounter,
-            onToggleChanged = onToggleChanged,
-            onAccept = onAccept,
+            onAllow = onAllow,
+            onDecline = onDecline,
         )
 
         LayoutType.LANDSCAPE,
-        LayoutType.FOLDABLE_EXPANDED -> LegalLandscapeLayout(
+        LayoutType.FOLDABLE_EXPANDED -> TrackingRequestLandscape(
             innerPadding = innerPadding,
-            privacyToggleChecked = privacyToggleChecked,
+            isTrackingEnabled = isTrackingEnabled,
             showStepCounter = showStepCounter,
-            onToggleChanged = onToggleChanged,
-            onAccept = onAccept,
+            onAllow = onAllow,
+            onDecline = onDecline,
         )
 
-        LayoutType.TABLE_TOP -> LegalTableTopLayout(
+        LayoutType.TABLE_TOP -> TrackingRequestTableTop(
             innerPadding = innerPadding,
-            privacyToggleChecked = privacyToggleChecked,
+            isTrackingEnabled = isTrackingEnabled,
             showStepCounter = showStepCounter,
-            onToggleChanged = onToggleChanged,
-            onAccept = onAccept,
+            onAllow = onAllow,
+            onDecline = onDecline,
         )
     }
 }
@@ -103,37 +97,36 @@ internal fun LegalScreen(
  * Identical to the original single-column design.
  */
 @Composable
-private fun LegalPortraitLayout(
+private fun TrackingRequestPortrait(
     innerPadding: PaddingValues,
-    privacyToggleChecked: Boolean,
+    isTrackingEnabled: Boolean,
     showStepCounter: Boolean,
-    onToggleChanged: (Boolean) -> Unit,
-    onAccept: () -> Unit,
+    onAllow: () -> Unit,
+    onDecline: () -> Unit,
 ) {
-    val waterGradient = Brush.verticalGradient(listOf(DwWaterLight, DwWater, DwWaterDeep))
+    val magentaGradient = Brush.verticalGradient(listOf(Color(0xFFB83A95), DwMagentaDark))
 
     BoxWithConstraints(
         Modifier
             .fillMaxSize()
             .padding(innerPadding),
     ) {
-        // TODO: show background over the status bar
-        val sheetHeight = maxHeight - (LegalWaveHeight - LegalOverlapHeight)
+        val sheetHeight = maxHeight - (TrackWaveHeight - TrackOverlapHeight)
 
         // Wave header
         Box(
             Modifier
                 .align(Alignment.TopCenter)
                 .fillMaxWidth()
-                .height(LegalWaveHeight)
+                .height(TrackWaveHeight)
                 .zIndex(0f)
-                .background(waterGradient),
+                .background(magentaGradient),
         ) {
-            LegalBubbles()
+            TrackBubbles()
             Column(
                 Modifier.padding(start = 22.dp, end = 22.dp, top = 24.dp, bottom = 40.dp),
             ) {
-                LegalHeaderContent(showStepCounter = showStepCounter, centered = false)
+                TrackHeaderContent(showStepCounter = showStepCounter, centered = false)
             }
         }
 
@@ -151,13 +144,16 @@ private fun LegalPortraitLayout(
             Column(
                 Modifier
                     .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
                     .padding(22.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-                LegalBodyContent(
-                    privacyToggleChecked = privacyToggleChecked,
-                    onToggleChanged = onToggleChanged,
-                    onAccept = onAccept,
+                TrackMainContent()
+                Spacer(Modifier.weight(1f))
+                TrackButtons(
+                    isTrackingEnabled = isTrackingEnabled,
+                    onAllow = onAllow,
+                    onDecline = onDecline
                 )
             }
         }
@@ -169,14 +165,14 @@ private fun LegalPortraitLayout(
  * white content surface on the right.
  */
 @Composable
-private fun LegalLandscapeLayout(
+private fun TrackingRequestLandscape(
     innerPadding: PaddingValues,
-    privacyToggleChecked: Boolean,
+    isTrackingEnabled: Boolean,
     showStepCounter: Boolean,
-    onToggleChanged: (Boolean) -> Unit,
-    onAccept: () -> Unit,
+    onAllow: () -> Unit,
+    onDecline: () -> Unit,
 ) {
-    val waterGradient = Brush.verticalGradient(listOf(DwWaterLight, DwWater, DwWaterDeep))
+    val magentaGradient = Brush.verticalGradient(listOf(Color(0xFFB83A95), DwMagentaDark))
 
     Row(
         modifier = Modifier
@@ -188,9 +184,9 @@ private fun LegalLandscapeLayout(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxHeight()
-                .background(waterGradient),
+                .background(magentaGradient),
         ) {
-            LegalBubbles()
+            TrackBubbles()
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -198,23 +194,39 @@ private fun LegalLandscapeLayout(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
-                LegalHeaderContent(showStepCounter = showStepCounter, centered = true)
+                TrackHeaderContent(showStepCounter = showStepCounter, centered = true)
             }
         }
 
-        Column(
+        // Right: white surface — scrollable content area + buttons pinned at bottom
+        Surface(
             modifier = Modifier
                 .weight(1f)
-                .fillMaxSize()
-                .padding(22.dp)
-                .background(color = MaterialTheme.colorScheme.surface),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+                .fillMaxHeight(),
+            shape = RoundedCornerShape(topStart = 28.dp, bottomStart = 28.dp),
+            shadowElevation = 8.dp,
+            color = MaterialTheme.colorScheme.surface,
         ) {
-            LegalBodyContent(
-                privacyToggleChecked = privacyToggleChecked,
-                onToggleChanged = onToggleChanged,
-                onAccept = onAccept,
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(22.dp),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(14.dp),
+                ) {
+                    TrackMainContent()
+                }
+                Spacer(Modifier.height(14.dp))
+                TrackButtons(
+                    isTrackingEnabled = isTrackingEnabled,
+                    onAllow = onAllow,
+                    onDecline = onDecline
+                )
+            }
         }
     }
 }
@@ -224,14 +236,14 @@ private fun LegalLandscapeLayout(
  * white content surface on the bottom half.
  */
 @Composable
-private fun LegalTableTopLayout(
+private fun TrackingRequestTableTop(
     innerPadding: PaddingValues,
-    privacyToggleChecked: Boolean,
+    isTrackingEnabled: Boolean,
     showStepCounter: Boolean,
-    onToggleChanged: (Boolean) -> Unit,
-    onAccept: () -> Unit,
+    onAllow: () -> Unit,
+    onDecline: () -> Unit,
 ) {
-    val waterGradient = Brush.verticalGradient(listOf(DwWaterLight, DwWater, DwWaterDeep))
+    val magentaGradient = Brush.verticalGradient(listOf(Color(0xFFB83A95), DwMagentaDark))
 
     Column(
         modifier = Modifier
@@ -243,9 +255,10 @@ private fun LegalTableTopLayout(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .background(waterGradient),
+                .clip(RoundedCornerShape(bottomStart = 36.dp, bottomEnd = 36.dp))
+                .background(magentaGradient),
         ) {
-            LegalBubbles()
+            TrackBubbles()
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -253,50 +266,38 @@ private fun LegalTableTopLayout(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
-                LegalHeaderContent(showStepCounter = showStepCounter, centered = true)
+                TrackHeaderContent(showStepCounter = showStepCounter, centered = true)
             }
         }
 
-        // Bottom: white surface — left scrollable content, right controls
+        // Bottom: white surface — scrollable content area + buttons pinned at bottom
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
-                .offset(0.dp, (-25).dp),
+                .weight(1f),
             shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
             shadowElevation = 8.dp,
             color = MaterialTheme.colorScheme.surface,
         ) {
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(22.dp)
-                    .padding(top = 25.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    .padding(22.dp),
             ) {
-                // Left: scrollable policy content
                 Column(
                     modifier = Modifier
                         .weight(1f)
-                        .fillMaxHeight(),
+                        .verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(14.dp),
                 ) {
-                    LegalScrollableContent()
+                    TrackMainContent()
                 }
-
-                // Right: agree row + CTA, centered vertically
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight(),
-                    verticalArrangement = Arrangement.spacedBy(14.dp, Alignment.CenterVertically),
-                ) {
-                    LegalControls(
-                        privacyToggleChecked = privacyToggleChecked,
-                        onToggleChanged = onToggleChanged,
-                        onAccept = onAccept,
-                    )
-                }
+                Spacer(Modifier.height(14.dp))
+                TrackButtons(
+                    isTrackingEnabled = isTrackingEnabled,
+                    onAllow = onAllow,
+                    onDecline = onDecline
+                )
             }
         }
     }
@@ -307,7 +308,7 @@ private fun LegalTableTopLayout(
 // region Shared composables
 
 @Composable
-private fun LegalBubbles() {
+private fun TrackBubbles() {
     Box(modifier = Modifier.fillMaxSize()) {
         Box(
             Modifier
@@ -334,7 +335,7 @@ private fun LegalBubbles() {
 }
 
 @Composable
-private fun LegalHeaderContent(
+private fun TrackHeaderContent(
     showStepCounter: Boolean,
     centered: Boolean,
 ) {
@@ -353,7 +354,7 @@ private fun LegalHeaderContent(
         contentAlignment = Alignment.Center,
     ) {
         Icon(
-            imageVector = DwIcons.ShieldCheck,
+            imageVector = DwIcons.PulseHeart,
             contentDescription = null,
             tint = Color.White,
             modifier = Modifier.size(30.dp),
@@ -363,10 +364,18 @@ private fun LegalHeaderContent(
     Spacer(Modifier.height(16.dp))
 
     if (showStepCounter) {
+        // Step 1 = done, step 2 = active
         Row(
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            Box(
+                Modifier
+                    .width(22.dp)
+                    .height(5.dp)
+                    .clip(RoundedCornerShape(3.dp))
+                    .background(Color.White.copy(alpha = 0.65f)),
+            )
             Box(
                 Modifier
                     .width(30.dp)
@@ -374,17 +383,10 @@ private fun LegalHeaderContent(
                     .clip(RoundedCornerShape(3.dp))
                     .background(Color.White),
             )
-            Box(
-                Modifier
-                    .width(22.dp)
-                    .height(5.dp)
-                    .clip(RoundedCornerShape(3.dp))
-                    .background(Color.White.copy(alpha = 0.30f)),
-            )
         }
         Spacer(Modifier.height(10.dp))
         Text(
-            text = stringResource(R.string.consent_legal_step),
+            text = stringResource(R.string.consent_track_step),
             color = Color.White.copy(alpha = 0.85f),
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Bold,
@@ -398,152 +400,149 @@ private fun LegalHeaderContent(
     }
 
     Text(
-        text = stringResource(R.string.consent_legal_title),
+        text = stringResource(R.string.consent_track_title),
         color = Color.White,
         style = MaterialTheme.typography.headlineMedium,
         fontWeight = FontWeight.Bold,
         textAlign = textAlign,
         modifier = Modifier.fillMaxWidth(),
     )
-    Spacer(Modifier.height(8.dp))
-    Text(
-        text = stringResource(R.string.consent_legal_updated),
-        color = Color.White.copy(alpha = 0.80f),
-        style = MaterialTheme.typography.labelSmall,
-        letterSpacing = 0.04.em,
-        textAlign = textAlign,
-        modifier = Modifier.fillMaxWidth(),
-    )
 }
 
-/**
- * Scrollable part of the body: lede text + policy card + web link.
- * [ColumnScope] receiver enables [ColumnScope.weight] on the policy card.
- */
+/** Lede text + feature card. Shared across all layout variants. */
 @Composable
-private fun ColumnScope.LegalScrollableContent() {
-    val uriHandler = LocalUriHandler.current
-
-    // Lede
+private fun TrackMainContent() {
     Text(
-        text = stringResource(R.string.consent_legal_lede),
+        text = stringResource(R.string.consent_track_lede),
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
 
-    // Scrollable policy card — expands to fill available vertical space
     Surface(
-        modifier = Modifier
-            .weight(1f)
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.surfaceContainerLow,
         shape = MaterialTheme.shapes.medium,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
     ) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
+        Column {
+            FeatureCardRow(
+                imageVector = DwIcons.Lightbulb,
+                iconContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                iconTint = MaterialTheme.colorScheme.onPrimaryContainer,
+                title = stringResource(R.string.consent_track_feature_usage_title),
+                description = stringResource(R.string.consent_track_feature_usage_desc),
+            )
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 12.dp),
+                color = MaterialTheme.colorScheme.outlineVariant,
+            )
+            FeatureCardRow(
+                imageVector = DwIcons.Star,
+                iconContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                iconTint = MaterialTheme.colorScheme.onSecondaryContainer,
+                title = stringResource(R.string.consent_track_feature_private_title),
+                description = stringResource(R.string.consent_track_feature_private_desc),
+            )
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 12.dp),
+                color = MaterialTheme.colorScheme.outlineVariant,
+            )
+            FeatureCardRow(
+                imageVector = DwIcons.Settings,
+                iconContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                iconTint = MaterialTheme.colorScheme.onPrimaryContainer,
+                title = stringResource(R.string.consent_track_feature_control_title),
+                description = stringResource(R.string.consent_track_feature_control_desc),
+            )
+        }
+    }
+}
+
+/** Accept / decline buttons. Shared across all layout variants. */
+@Composable
+private fun TrackButtons(
+    isTrackingEnabled: Boolean,
+    onAllow: () -> Unit,
+    onDecline: () -> Unit,
+) {
+    AnimatedContent(targetState = isTrackingEnabled) { tracking ->
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            if (tracking) {
+                Text(
+                    text = stringResource(R.string.consent_track_active),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(Modifier.height(8.dp))
+                DwPrimaryButton(
+                    text = stringResource(R.string.onb_cta_continue),
+                    onClick = onAllow,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            } else {
+                DwTertiaryButton(
+                    text = stringResource(R.string.action_not_now),
+                    onClick = onDecline,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                DwPrimaryButton(
+                    text = stringResource(R.string.consent_track_cta_allow),
+                    onClick = onAllow,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        }
+    }
+}
+
+// endregion
+
+// region Internal composables
+
+@Composable
+private fun FeatureCardRow(
+    imageVector: ImageVector,
+    iconContainerColor: Color,
+    iconTint: Color,
+    title: String,
+    description: String,
+) {
+    Row(
+        modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            modifier = Modifier
+                .size(36.dp)
+                .clip(CircleShape)
+                .background(iconContainerColor),
+            contentAlignment = Alignment.Center,
         ) {
-            val localContent = stringResource(R.string.privacy_policy_local_content)
-            val styledText = AnnotatedString.fromHtml(localContent.sanitizeHtml())
+            Icon(
+                imageVector = imageVector,
+                contentDescription = null,
+                tint = iconTint,
+                modifier = Modifier.size(18.dp),
+            )
+        }
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+        ) {
             Text(
-                text = styledText,
+                text = title,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Bold,
+            )
+            Text(
+                text = description,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }
-
-    // Web link
-    Row(
-        modifier = Modifier
-            .align(Alignment.CenterHorizontally)
-            .clickable { uriHandler.openUri("https://www.freeprivacypolicy.com/privacy/view/04c015dc119a00b1ec8a21df46a9bfb1") }
-            .padding(horizontal = 4.dp, vertical = 4.dp),
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(
-            imageVector = DwIcons.Share,
-            contentDescription = null,
-            modifier = Modifier.size(14.dp),
-            tint = MaterialTheme.colorScheme.primary,
-        )
-        Text(
-            text = stringResource(R.string.consent_legal_web_link),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.primary,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 0.04.em,
-        )
-    }
-}
-
-/**
- * Controls: agree row + CTA button.
- */
-@Composable
-private fun LegalControls(
-    privacyToggleChecked: Boolean,
-    onToggleChanged: (Boolean) -> Unit,
-    onAccept: () -> Unit,
-) {
-    // Agree row
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(MaterialTheme.shapes.medium)
-            .background(MaterialTheme.colorScheme.primaryContainer)
-            .clickable { onToggleChanged(!privacyToggleChecked) }
-            .padding(horizontal = 12.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        Checkbox(
-            checked = privacyToggleChecked,
-            onCheckedChange = onToggleChanged,
-            colors = CheckboxDefaults.colors(
-                checkedColor = MaterialTheme.colorScheme.primary,
-                uncheckedColor = MaterialTheme.colorScheme.primary,
-                checkmarkColor = MaterialTheme.colorScheme.onPrimary,
-            ),
-        )
-        Text(
-            text = stringResource(R.string.consent_legal_agree),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.weight(1f),
-        )
-    }
-
-    DwPrimaryButton(
-        text = stringResource(R.string.consent_legal_cta),
-        onClick = onAccept,
-        enabled = privacyToggleChecked,
-        modifier = Modifier.fillMaxWidth(),
-    )
-}
-
-/**
- * Body content for portrait and landscape layouts — places scrollable content
- * and controls in a single column. The [ColumnScope] receiver enables
- * [ColumnScope.weight] on the policy card via [LegalScrollableContent].
- */
-@Composable
-private fun ColumnScope.LegalBodyContent(
-    privacyToggleChecked: Boolean,
-    onToggleChanged: (Boolean) -> Unit,
-    onAccept: () -> Unit,
-) {
-    LegalScrollableContent()
-    LegalControls(
-        privacyToggleChecked = privacyToggleChecked,
-        onToggleChanged = onToggleChanged,
-        onAccept = onAccept,
-    )
 }
 
 // endregion
@@ -552,41 +551,41 @@ private fun ColumnScope.LegalBodyContent(
 
 @Preview(name = "Portrait")
 @Composable
-private fun LegalScreenPortraitPreview() {
+private fun TrackingRequestScreenPortraitPreview() {
     DrinkWaterAppTheme {
-        LegalScreen(
-            privacyToggleChecked = false,
+        TrackingRequestScreen(
+            isTrackingEnabled = false,
             showStepCounter = true,
-            onToggleChanged = {},
-            onAccept = {},
+            onAllow = {},
+            onDecline = {},
         )
     }
 }
 
 @Preview(name = "Landscape", widthDp = 900, heightDp = 420)
 @Composable
-private fun LegalScreenLandscapePreview() {
+private fun TrackingRequestLandscapePreview() {
     DrinkWaterAppTheme {
-        LegalLandscapeLayout(
+        TrackingRequestLandscape(
             innerPadding = PaddingValues(0.dp),
-            privacyToggleChecked = false,
+            isTrackingEnabled = false,
             showStepCounter = true,
-            onToggleChanged = {},
-            onAccept = {},
+            onAllow = {},
+            onDecline = {},
         )
     }
 }
 
 @Preview(name = "TableTop", widthDp = 700, heightDp = 700)
 @Composable
-private fun LegalScreenTableTopPreview() {
+private fun TrackingRequestTableTopPreview() {
     DrinkWaterAppTheme {
-        LegalTableTopLayout(
+        TrackingRequestTableTop(
             innerPadding = PaddingValues(0.dp),
-            privacyToggleChecked = false,
+            isTrackingEnabled = false,
             showStepCounter = true,
-            onToggleChanged = {},
-            onAccept = {},
+            onAllow = {},
+            onDecline = {},
         )
     }
 }

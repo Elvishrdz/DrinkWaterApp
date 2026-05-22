@@ -14,3 +14,8 @@ internal sealed interface ConsentState {
         val isTrackingEnabled: Boolean,
     ) : ConsentState
 }
+
+internal enum class ConsentStep {
+    LEGAL,
+    TRACKING_REQUEST,
+}

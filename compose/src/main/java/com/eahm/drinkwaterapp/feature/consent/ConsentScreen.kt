@@ -1,10 +1,8 @@
 package com.eahm.drinkwaterapp.feature.consent
 
 import androidx.compose.runtime.Composable
-import com.eahm.drinkwaterapp.feature.consent.ui.LegalScreen
-import com.eahm.drinkwaterapp.feature.consent.ui.TrackRequestScreen
-
-internal enum class ConsentStep { PRIVACY_POLICY, TRACKING }
+import com.eahm.drinkwaterapp.feature.consent.legal.LegalScreen
+import com.eahm.drinkwaterapp.feature.consent.trackingrequest.TrackingRequestScreen
 
 @Composable
 internal fun ConsentScreen(
@@ -18,14 +16,14 @@ internal fun ConsentScreen(
 
         is ConsentState.Data -> {
             when (state.step) {
-                ConsentStep.PRIVACY_POLICY -> LegalScreen(
+                ConsentStep.LEGAL -> LegalScreen(
                     privacyToggleChecked = state.privacyToggleChecked,
                     showStepCounter = state.showStepCounter,
                     onToggleChanged = { onAction(ConsentAction.SetPrivacyToggle(it)) },
                     onAccept = { onAction(ConsentAction.AcceptPrivacyPolicy) },
                 )
 
-                ConsentStep.TRACKING -> TrackRequestScreen(
+                ConsentStep.TRACKING_REQUEST -> TrackingRequestScreen(
                     isTrackingEnabled = state.isTrackingEnabled,
                     showStepCounter = state.showStepCounter,
                     onAllow = { onAction(ConsentAction.AllowTracking) },

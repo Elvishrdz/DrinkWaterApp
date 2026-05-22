@@ -42,7 +42,7 @@ internal class ConsentViewModel(
     ) { showStepCounter, privacyPolicy, isTrackingEnabled, toggle ->
         if (privacyPolicy != null) {
             ConsentState.Data(
-                step = ConsentStep.TRACKING,
+                step = ConsentStep.TRACKING_REQUEST,
                 showStepCounter = showStepCounter == true,
                 privacyToggleChecked = toggle,
                 isTrackingEnabled = isTrackingEnabled,
@@ -50,7 +50,7 @@ internal class ConsentViewModel(
 
         } else {
             ConsentState.Data(
-                step = ConsentStep.PRIVACY_POLICY,
+                step = ConsentStep.LEGAL,
                 showStepCounter = showStepCounter == true,
                 privacyToggleChecked = toggle,
                 isTrackingEnabled = isTrackingEnabled,
