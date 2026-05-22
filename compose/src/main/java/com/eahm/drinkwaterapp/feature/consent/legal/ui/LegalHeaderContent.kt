@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
-import com.eahm.drinkwaterapp.feature.consent.legal.legalHeaderGradient
+import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults
 
 @Composable
 internal fun LegalHeaderContent(
@@ -149,7 +149,7 @@ private fun LegalHeaderContentPreview(
 ) {
     LegalHeaderContent(
         modifier = Modifier
-            .background(legalHeaderGradient),
+            .background(ConsentDefaults.legalGradient),
         showStepCounter = true,
         centered = centered
     )

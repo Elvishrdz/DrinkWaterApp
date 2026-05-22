@@ -25,7 +25,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.feature.consent.legal.ui.AcceptLegalCheckbox
 import com.eahm.drinkwaterapp.feature.consent.legal.ui.LegalHeaderContent
@@ -33,6 +32,12 @@ import com.eahm.drinkwaterapp.feature.consent.legal.ui.LegalMainButton
 import com.eahm.drinkwaterapp.feature.consent.legal.ui.LegalScrollableContent
 import com.eahm.drinkwaterapp.feature.consent.legal.ui.LegalWebLinkButton
 import com.eahm.drinkwaterapp.feature.consent.ui.Bubbles
+import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults.contentPaddingDp
+import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults.legalGradient
+import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults.overlapHeightDp
+import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults.shadowElevationDp
+import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults.topRoundedShape
+import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults.verticalSpacingDp
 
 @Composable
 internal fun LegalPortrait(
@@ -54,7 +59,7 @@ internal fun LegalPortrait(
             Bubbles(
                 modifier = Modifier
                     .matchParentSize()
-                    .background(legalHeaderGradient),
+                    .background(legalGradient),
             )
 
             LegalHeaderContent(

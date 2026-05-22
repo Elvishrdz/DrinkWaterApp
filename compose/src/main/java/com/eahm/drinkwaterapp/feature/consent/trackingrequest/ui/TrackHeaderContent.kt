@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
-import com.eahm.drinkwaterapp.feature.consent.trackingrequest.trackMagentaGradient
+import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults
 
 @Composable
 internal fun TrackHeaderContent(
@@ -140,7 +140,7 @@ private fun TrackHeaderContentPreview(
 ) {
     TrackHeaderContent(
         modifier = Modifier
-            .background(trackMagentaGradient),
+            .background(ConsentDefaults.trackingGradient),
         showStepCounter = true,
         centered = centered
     )

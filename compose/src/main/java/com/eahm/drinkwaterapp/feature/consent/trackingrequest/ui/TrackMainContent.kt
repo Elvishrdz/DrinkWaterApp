@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
-import com.eahm.drinkwaterapp.feature.consent.trackingrequest.trackVerticalSpacingDp
+import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults.verticalSpacingDp
 
 @Composable
 internal fun TrackMainContent(
@@ -35,7 +35,7 @@ internal fun TrackMainContent(
     Column(
         modifier = modifier
             .padding(horizontal),
-        verticalArrangement = Arrangement.spacedBy(trackVerticalSpacingDp),
+        verticalArrangement = Arrangement.spacedBy(verticalSpacingDp),
     ) {
         Text(
             modifier = Modifier

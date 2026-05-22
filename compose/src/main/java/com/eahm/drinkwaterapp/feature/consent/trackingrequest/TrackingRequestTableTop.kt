@@ -38,6 +38,12 @@ import com.eahm.drinkwaterapp.feature.consent.trackingrequest.ui.TrackButtons
 import com.eahm.drinkwaterapp.feature.consent.trackingrequest.ui.TrackHeaderContent
 import com.eahm.drinkwaterapp.feature.consent.trackingrequest.ui.TrackMainContent
 import com.eahm.drinkwaterapp.feature.consent.ui.Bubbles
+import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults.contentPaddingDp
+import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults.overlapHeightDp
+import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults.shadowElevationDp
+import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults.topRoundedShape
+import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults.trackingGradient
+import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults.verticalSpacingDp
 
 @Composable
 internal fun TrackingRequestTableTop(
@@ -60,7 +66,7 @@ internal fun TrackingRequestTableTop(
             Bubbles(
                 modifier = Modifier
                     .matchParentSize()
-                    .background(trackMagentaGradient),
+                    .background(trackingGradient),
             )
 
             TrackHeaderContent(
@@ -69,12 +75,12 @@ internal fun TrackingRequestTableTop(
                     .windowInsetsPadding(
                         insets = windowInsets.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
                     )
-                    .padding(horizontal = trackContentPaddingDp)
+                    .padding(horizontal = contentPaddingDp)
                     .verticalScroll(rememberScrollState()),
                 contentPadding = PaddingValues(
                     top = windowInsets.only(WindowInsetsSides.Top).asPaddingValues()
-                        .calculateTopPadding() + trackContentPaddingDp,
-                    bottom = trackContentPaddingDp + trackOverlapHeightDp,
+                        .calculateTopPadding() + contentPaddingDp,
+                    bottom = contentPaddingDp + overlapHeightDp,
                 ),
                 showStepCounter = showStepCounter,
                 centered = true,
@@ -86,7 +92,7 @@ internal fun TrackingRequestTableTop(
                 .weight(1f)
                 .fillMaxWidth()
                 .layout { measurable, constraints ->
-                    val overlapPx = trackOverlapHeightDp.roundToPx()
+                    val overlapPx = overlapHeightDp.roundToPx()
                     val placeable = measurable.measure(
                         constraints.copy(
                             minHeight = constraints.minHeight + overlapPx,
@@ -97,8 +103,8 @@ internal fun TrackingRequestTableTop(
                         placeable.placeRelative(0, -overlapPx)
                     }
                 },
-            shape = trackTopRoundedShape,
-            shadowElevation = trackShadowElevationDp,
+            shape = topRoundedShape,
+            shadowElevation = shadowElevationDp,
             color = MaterialTheme.colorScheme.surface,
         ) {
             Row(
@@ -110,17 +116,17 @@ internal fun TrackingRequestTableTop(
                         .weight(1f)
                         .fillMaxHeight()
                         .verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.spacedBy(trackVerticalSpacingDp),
+                    verticalArrangement = Arrangement.spacedBy(verticalSpacingDp),
                 ) {
                     TrackMainContent(
                         contentPadding = PaddingValues(
-                            start = trackContentPaddingDp + windowInsets
+                            start = contentPaddingDp + windowInsets
                                 .only(WindowInsetsSides.Start)
                                 .asPaddingValues()
                                 .calculateStartPadding(LayoutDirection.Ltr),
-                            end = trackContentPaddingDp,
-                            top = trackContentPaddingDp + trackOverlapHeightDp,
-                            bottom = trackContentPaddingDp + windowInsets
+                            end = contentPaddingDp,
+                            top = contentPaddingDp + overlapHeightDp,
+                            bottom = contentPaddingDp + windowInsets
                                 .only(WindowInsetsSides.Bottom)
                                 .asPaddingValues()
                                 .calculateBottomPadding(),
@@ -139,15 +145,15 @@ internal fun TrackingRequestTableTop(
                         .fillMaxHeight()
                         .verticalScroll(ctaScrollState)
                         .padding(
-                            start = trackContentPaddingDp,
-                            end = trackContentPaddingDp + windowInsets
+                            start = contentPaddingDp,
+                            end = contentPaddingDp + windowInsets
                                 .only(WindowInsetsSides.End)
                                 .asPaddingValues()
                                 .calculateEndPadding(LayoutDirection.Ltr),
                         ),
-                    verticalArrangement = Arrangement.spacedBy(trackVerticalSpacingDp, Alignment.Bottom),
+                    verticalArrangement = Arrangement.spacedBy(verticalSpacingDp, Alignment.Bottom),
                 ) {
-                    Spacer(Modifier.height(trackContentPaddingDp))
+                    Spacer(Modifier.height(contentPaddingDp))
 
                     TrackButtons(
                         isTrackingEnabled = isTrackingEnabled,
@@ -157,7 +163,7 @@ internal fun TrackingRequestTableTop(
 
                     Spacer(
                         Modifier.height(
-                            trackContentPaddingDp + windowInsets
+                            contentPaddingDp + windowInsets
                                 .only(WindowInsetsSides.Bottom)
                                 .asPaddingValues()
                                 .calculateBottomPadding(),

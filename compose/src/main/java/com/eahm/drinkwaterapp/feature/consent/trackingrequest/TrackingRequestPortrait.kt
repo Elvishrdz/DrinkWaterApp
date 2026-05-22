@@ -25,12 +25,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.tooling.preview.Preview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
-import com.eahm.drinkwaterapp.feature.consent.legal.contentPaddingDp
-import com.eahm.drinkwaterapp.feature.consent.legal.overlapHeightDp
 import com.eahm.drinkwaterapp.feature.consent.trackingrequest.ui.TrackButtons
 import com.eahm.drinkwaterapp.feature.consent.trackingrequest.ui.TrackHeaderContent
 import com.eahm.drinkwaterapp.feature.consent.trackingrequest.ui.TrackMainContent
 import com.eahm.drinkwaterapp.feature.consent.ui.Bubbles
+import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults.contentPaddingDp
+import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults.overlapHeightDp
+import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults.shadowElevationDp
+import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults.topRoundedShape
+import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults.trackingGradient
+import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults.verticalSpacingDp
 
 @Composable
 internal fun TrackingRequestPortrait(
@@ -52,7 +56,7 @@ internal fun TrackingRequestPortrait(
             Bubbles(
                 modifier = Modifier
                     .matchParentSize()
-                    .background(trackMagentaGradient),
+                    .background(trackingGradient),
             )
 
             TrackHeaderContent(
@@ -61,8 +65,8 @@ internal fun TrackingRequestPortrait(
                     .windowInsetsPadding(
                         insets = windowInsets.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
                     )
-                    .padding(all = trackContentPaddingDp)
-                    .padding(bottom = trackOverlapHeightDp),
+                    .padding(all = contentPaddingDp)
+                    .padding(bottom = overlapHeightDp),
                 showStepCounter = showStepCounter,
                 centered = false
             )
@@ -73,7 +77,7 @@ internal fun TrackingRequestPortrait(
                 .weight(1f)
                 .fillMaxWidth()
                 .layout { measurable, constraints ->
-                    val overlapPx = trackOverlapHeightDp.roundToPx()
+                    val overlapPx = overlapHeightDp.roundToPx()
 
                     val placeable = measurable.measure(
                         constraints.copy(
@@ -86,8 +90,8 @@ internal fun TrackingRequestPortrait(
                         placeable.placeRelative(0, -overlapPx)
                     }
                 },
-            shape = trackTopRoundedShape,
-            shadowElevation = trackShadowElevationDp,
+            shape = topRoundedShape,
+            shadowElevation = shadowElevationDp,
             color = MaterialTheme.colorScheme.surface,
         ) {
             Column(
@@ -105,9 +109,9 @@ internal fun TrackingRequestPortrait(
                     )
                 )
 
-                Spacer(modifier = Modifier.height(trackVerticalSpacingDp))
+                Spacer(modifier = Modifier.height(verticalSpacingDp))
 
-                Box(modifier = Modifier.padding(horizontal = trackContentPaddingDp)) {
+                Box(modifier = Modifier.padding(horizontal = contentPaddingDp)) {
                     TrackButtons(
                         isTrackingEnabled = isTrackingEnabled,
                         onAllow = onAllow,
@@ -115,7 +119,7 @@ internal fun TrackingRequestPortrait(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(trackOverlapHeightDp))
+                Spacer(modifier = Modifier.height(overlapHeightDp))
 
                 Spacer(
                     modifier = Modifier.windowInsetsPadding(

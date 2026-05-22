@@ -32,6 +32,9 @@ import com.eahm.drinkwaterapp.feature.consent.legal.ui.LegalMainButton
 import com.eahm.drinkwaterapp.feature.consent.legal.ui.LegalScrollableContent
 import com.eahm.drinkwaterapp.feature.consent.legal.ui.LegalWebLinkButton
 import com.eahm.drinkwaterapp.feature.consent.ui.Bubbles
+import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults.contentPaddingDp
+import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults.legalGradient
+import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults.verticalSpacingDp
 
 @Composable
 internal fun LegalLandscape(
@@ -50,12 +53,12 @@ internal fun LegalLandscape(
             modifier = Modifier
                 .weight(0.7f)
                 .fillMaxHeight()
-                .background(legalHeaderGradient),
+                .background(legalGradient),
         ) {
             Bubbles(
                 modifier = Modifier
                     .matchParentSize()
-                    .background(legalHeaderGradient),
+                    .background(legalGradient),
             )
 
             LegalHeaderContent(

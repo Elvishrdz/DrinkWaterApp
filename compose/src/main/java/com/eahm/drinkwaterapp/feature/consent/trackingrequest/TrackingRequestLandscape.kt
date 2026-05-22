@@ -28,6 +28,9 @@ import com.eahm.drinkwaterapp.feature.consent.trackingrequest.ui.TrackButtons
 import com.eahm.drinkwaterapp.feature.consent.trackingrequest.ui.TrackHeaderContent
 import com.eahm.drinkwaterapp.feature.consent.trackingrequest.ui.TrackMainContent
 import com.eahm.drinkwaterapp.feature.consent.ui.Bubbles
+import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults.contentPaddingDp
+import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults.trackingGradient
+import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults.verticalSpacingDp
 
 @Composable
 internal fun TrackingRequestLandscape(
@@ -46,12 +49,12 @@ internal fun TrackingRequestLandscape(
             modifier = Modifier
                 .weight(0.7f)
                 .fillMaxHeight()
-                .background(trackMagentaGradient),
+                .background(trackingGradient),
         ) {
             Bubbles(
                 modifier = Modifier
                     .matchParentSize()
-                    .background(trackMagentaGradient),
+                    .background(trackingGradient),
             )
 
             TrackHeaderContent(
@@ -60,7 +63,7 @@ internal fun TrackingRequestLandscape(
                     .windowInsetsPadding(
                         insets = windowInsets.only(WindowInsetsSides.Start + WindowInsetsSides.Vertical),
                     )
-                    .padding(all = trackContentPaddingDp),
+                    .padding(all = contentPaddingDp),
                 showStepCounter = showStepCounter,
                 centered = true,
             )
@@ -79,9 +82,9 @@ internal fun TrackingRequestLandscape(
                         insets = windowInsets.only(WindowInsetsSides.End),
                     )
                     .padding(
-                        start = trackContentPaddingDp,
-                        end = trackContentPaddingDp,
-                        bottom = trackContentPaddingDp,
+                        start = contentPaddingDp,
+                        end = contentPaddingDp,
+                        bottom = contentPaddingDp,
                     ),
             ) {
                 TrackMainContent(
@@ -93,7 +96,7 @@ internal fun TrackingRequestLandscape(
                         .asPaddingValues(),
                 )
 
-                Spacer(modifier = Modifier.height(trackVerticalSpacingDp))
+                Spacer(modifier = Modifier.height(verticalSpacingDp))
 
                 Column(
                     modifier = Modifier.windowInsetsPadding(
