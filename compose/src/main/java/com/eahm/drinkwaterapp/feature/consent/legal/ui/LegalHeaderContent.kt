@@ -5,10 +5,14 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.eahm.drinkwaterapp.R
@@ -37,15 +42,23 @@ internal fun LegalHeaderContent(
     showStepCounter: Boolean,
     centered: Boolean,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
 ) {
     val textAlign = if (centered) TextAlign.Center else TextAlign.Start
     val horizontalAlignment = if (centered) Alignment.CenterHorizontally else Alignment.Start
+    val horizontalPadding = PaddingValues(
+        start = contentPadding.calculateStartPadding(LayoutDirection.Ltr),
+        end = contentPadding.calculateEndPadding(LayoutDirection.Ltr),
+    )
 
     Column(
-        modifier = modifier,
+        modifier = modifier
+            .padding(horizontalPadding),
         horizontalAlignment = horizontalAlignment,
         verticalArrangement = Arrangement.Center,
     ) {
+        Spacer(Modifier.height(contentPadding.calculateTopPadding()))
+
         Box(
             modifier = Modifier
                 .size(64.dp)
@@ -120,6 +133,8 @@ internal fun LegalHeaderContent(
             textAlign = textAlign,
             modifier = Modifier.fillMaxWidth(),
         )
+
+        Spacer(Modifier.height(contentPadding.calculateBottomPadding()))
     }
 }
 

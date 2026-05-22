@@ -1,6 +1,5 @@
 package com.eahm.drinkwaterapp.feature.consent.legal
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,7 +28,6 @@ internal fun LegalScreen(
     onToggleChanged: (Boolean) -> Unit,
     onAccept: () -> Unit,
 ) {
-    val innerPadding = PaddingValues()
     when (layoutType) {
         LayoutType.PORTRAIT -> LegalPortrait(
             privacyToggleChecked = privacyToggleChecked,
@@ -47,7 +45,6 @@ internal fun LegalScreen(
         )
 
         LayoutType.TABLE_TOP -> LegalTableTop(
-            innerPadding = innerPadding,
             privacyToggleChecked = privacyToggleChecked,
             showStepCounter = showStepCounter,
             onToggleChanged = onToggleChanged,
