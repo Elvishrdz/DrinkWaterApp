@@ -24,6 +24,8 @@ internal class MixpanelTrackingService(
 
     // App-level consent flag — persisted across sessions. Defaults to true so tracking
     // is active from the very first launch and we can observe whether users opt out.
+    // This will be explained in the privacy policy. It is required to identify when users dont want
+    // to enable tracking as part of the app feature.
     private val prefs = application.getSharedPreferences("analytics_prefs", Context.MODE_PRIVATE)
     private var consentGranted: Boolean
         get() = prefs.getBoolean("tracking_consent", true)
