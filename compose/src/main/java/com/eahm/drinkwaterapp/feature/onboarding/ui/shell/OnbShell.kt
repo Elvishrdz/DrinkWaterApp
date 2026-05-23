@@ -14,16 +14,12 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -48,6 +44,7 @@ import com.eahm.drinkwaterapp.core.presentation.getLayoutType
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps
 import com.eahm.drinkwaterapp.feature.onboarding.totalSteps
 import com.eahm.drinkwaterapp.feature.onboarding.ui.icons.OnbIcons
+import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.ui.OnbTopAppBar
 
 /**
  * Provides the animated progress fraction (0f–1f) to [OnbTopAppBar].
@@ -56,8 +53,8 @@ import com.eahm.drinkwaterapp.feature.onboarding.ui.icons.OnbIcons
  */
 internal val LocalOnboardingProgress = compositionLocalOf<Float?> { null }
 
-private val ArtCircleSize = 72.dp
-private val BodyCornerRadius = 32.dp
+internal val ArtCircleSize = 72.dp
+internal val BodyCornerRadius = 30.dp
 
 /**
  * Shared onboarding shell used by all 11 steps.
@@ -75,7 +72,7 @@ internal fun OnbShell(
     subtitle: String? = null,
     art: (@Composable () -> Unit)? = null,
     onBack: (() -> Unit)? = null,
-    useAdaptiveLayout: Boolean = false,
+    useAdaptiveLayout: Boolean = true,
     footer: @Composable ColumnScope.() -> Unit = {},
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -93,102 +90,19 @@ internal fun OnbShell(
 
             LayoutType.PORTRAIT -> OnbShellPortrait(
                 step = step, total = total, title = title, subtitle = subtitle,
-                art = art, onBack = onBack, modifier = modifier, footer = footer, content = content,
+                art = art, onBack = onBack, modifier = modifier, footer = footer,
+                scrollableContent = content,
             )
         }
     } else {
         OnbShellPortrait(
             step = step, total = total, title = title, subtitle = subtitle,
-            art = art, onBack = onBack, modifier = modifier, footer = footer, content = content,
+            art = art, onBack = onBack, modifier = modifier, footer = footer,
+            scrollableContent = content,
         )
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun OnbShellPortrait(
-    step: Int,
-    total: Int,
-    title: String,
-    subtitle: String?,
-    art: (@Composable () -> Unit)?,
-    onBack: (() -> Unit)?,
-    modifier: Modifier = Modifier,
-    footer: @Composable ColumnScope.() -> Unit,
-    content: @Composable ColumnScope.() -> Unit,
-) {
-    Box(modifier = modifier.fillMaxSize()) {
-        GradientBackground()
-        OnbBubbles()
-
-        Column {
-            OnbTopAppBar(
-                onBack = onBack,
-                step = step,
-                total = total,
-                modifier = Modifier
-                    .statusBarsPadding()
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp, vertical = 8.dp),
-            )
-
-            Spacer(Modifier.height(24.dp))
-
-            Surface(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .widthIn(max = BottomSheetDefaults.SheetMaxWidth),
-                shape = RoundedCornerShape(topStart = BodyCornerRadius, topEnd = BodyCornerRadius),
-                color = MaterialTheme.colorScheme.surface,
-                shadowElevation = 0.dp,
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 24.dp, vertical = 32.dp),
-                ) {
-                    // header
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        art?.let { artContent ->
-                            Box(
-                                modifier = Modifier.padding(bottom = 12.dp),
-                                contentAlignment = Alignment.Center,
-                                content = { artContent() },
-                            )
-                        }
-                        Text(
-                            text = title,
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                        if (subtitle != null) {
-                            Spacer(Modifier.height(8.dp))
-                            Text(
-                                text = subtitle,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-
-                    Spacer(Modifier.height(12.dp))
-                    Column(
-                        modifier = Modifier
-                            .verticalScroll(rememberScrollState())
-                            .weight(1f),
-                    ) {
-                        content()
-                    }
-                    Spacer(Modifier.height(12.dp))
-                    footer()
-                }
-            }
-        }
-    }
-}
 
 /**
  * Landscape / foldable-expanded layout.
@@ -399,62 +313,7 @@ private fun OnbShellTableTop(
 }
 
 @Composable
-private fun OnbTopAppBar(
-    step: Int,
-    total: Int,
-    onBack: (() -> Unit)?,
-    modifier: Modifier = Modifier,
-) {
-    // Use the animated value provided by OnboardingScreen (persists across step changes).
-    // Fall back to a static fraction in previews where no provider exists.
-    val progress = LocalOnboardingProgress.current ?: (step.toFloat() / total.toFloat())
-
-    Column(
-        modifier = modifier,
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            if (onBack != null) {
-                IconButton(
-                    modifier = Modifier.size(48.dp),
-                    onClick = onBack
-                ) {
-                    Icon(
-                        imageVector = OnbIcons.ArrowBack,
-                        contentDescription = "Back",
-                        tint = Color.White,
-                        modifier = Modifier.size(24.dp),
-                    )
-                }
-            } else {
-                Spacer(Modifier.size(48.dp))
-            }
-            Spacer(Modifier.weight(1f))
-            Text(
-                text = "$step of $total",
-                style = MaterialTheme.typography.labelSmall,
-                color = Color.White.copy(alpha = 0.85f),
-                modifier = Modifier.padding(end = 8.dp),
-            )
-        }
-        Spacer(Modifier.height(7.dp))
-        LinearProgressIndicator(
-            progress = { progress },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(3.dp)
-                .padding(horizontal = 8.dp)
-                .clip(CircleShape),
-            color = Color.White,
-            trackColor = Color.White.copy(alpha = 0.30f),
-        )
-    }
-}
-
-@Composable
-private fun GradientBackground() {
+internal fun GradientBackground() {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -471,7 +330,7 @@ private fun GradientBackground() {
 }
 
 @Composable
-private fun OnbBubbles() {
+internal fun OnbBubbles() {
     Box(Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
@@ -517,53 +376,6 @@ internal fun OnbArtCircle(
             tint = Color.White,
             modifier = Modifier.size(36.dp),
         )
-    }
-}
-
-
-/** First step — no back button. */
-@DwPreview
-@Composable
-private fun OnbShellPortraitFirstStepPreview() {
-    DrinkWaterAppTheme {
-        OnbShellPortrait(
-            step = 1,
-            total = OnboardingSteps.totalSteps,
-            title = "Let's build a great habit",
-            subtitle = "In the next steps we'll quickly set up your hydration goal and reminders.",
-            art = null,
-            onBack = null,
-            footer = {
-                DwPrimaryButton(
-                    text = "Get started",
-                    onClick = {},
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            },
-        ) { /* content placeholder */ }
-    }
-}
-
-/** Mid-step with back button and art circle. */
-@DwPreview
-@Composable
-private fun OnbShellPortraitMidStepPreview() {
-    DrinkWaterAppTheme {
-        OnbShellPortrait(
-            step = 7,
-            total = OnboardingSteps.totalSteps,
-            title = "Alarms that arrive on time",
-            subtitle = "Allow the app to schedule precise alarms so your reminders fire exactly when you expect them.",
-            art = { OnbArtCircle(icon = OnbIcons.Check) },
-            onBack = {},
-            footer = {
-                DwPrimaryButton(
-                    text = "Allow exact alarms",
-                    onClick = {},
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            },
-        ) { /* content placeholder */ }
     }
 }
 

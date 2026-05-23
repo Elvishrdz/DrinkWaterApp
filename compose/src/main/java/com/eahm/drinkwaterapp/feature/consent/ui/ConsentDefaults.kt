@@ -26,7 +26,7 @@ internal object ConsentDefaults {
         )
     )
 
-    val overlapHeightDp = 22.dp
+    val overlapHeightDp = 30.dp
 
     val topRoundedShape = RoundedCornerShape(
         topStart = overlapHeightDp,

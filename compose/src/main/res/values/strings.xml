@@ -70,6 +70,7 @@
     <string name="overlay_allow_over_other_apps">Allow display over other apps</string>
 
     <!-- Onboarding — shared -->
+    <string name="onb_step_counter">%1$d of %2$d</string>
     <string name="onb_cta_continue">Continue</string>
 
     <!-- Onboarding — Intro -->
