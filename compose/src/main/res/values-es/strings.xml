@@ -208,10 +208,10 @@
     <!-- Onboarding — Unidades -->
     <string name="onb_units_title">Elige tus unidades</string>
     <string name="onb_units_subtitle">Elige cómo quieres ver tu consumo de agua en toda la app.</string>
-    <string name="onb_units_ml_title">Mililitros (mL)</string>
-    <string name="onb_units_ml_subtitle">Usado en todo el mundo</string>
-    <string name="onb_units_fl_oz_title">Onzas fluidas (fl oz)</string>
-    <string name="onb_units_fl_oz_subtitle">Usado para medir líquidos y bebidas</string>
+    <string name="onb_units_ml_title">Solo mililitros (mL)</string>
+    <string name="onb_units_auto_liters_title">Litros automático (mL y L)</string>
+    <string name="onb_units_auto_liters_subtitle">Muestra litros cuando el valor llega a 1000 mL o más</string>
+    <string name="onb_units_fl_oz_title">Solo onzas fluidas (fl oz)</string>
 
     <string name="onb_done_title">¡Todo listo!</string>
     <string name="onb_done_title_with_name">¡Todo listo, %1$s!</string>

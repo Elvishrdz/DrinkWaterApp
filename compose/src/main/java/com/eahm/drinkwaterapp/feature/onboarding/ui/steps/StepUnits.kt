@@ -1,10 +1,13 @@
 package com.eahm.drinkwaterapp.feature.onboarding.ui.steps
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
@@ -38,14 +41,21 @@ internal fun stepUnits(
         Column {
             ChoiceCard(
                 title = stringResource(R.string.onb_units_ml_title),
-                subtitle = stringResource(R.string.onb_units_ml_subtitle),
-                selected = selectedUnit == UnitPreference.ML || selectedUnit == UnitPreference.AUTO_LITERS,
+                selected = selectedUnit == UnitPreference.ML,
                 onClick = { onSelect(UnitPreference.ML) },
                 leadingIcon = DwIcons.Drop,
             )
+            Spacer(modifier = Modifier.height(7.dp))
+            ChoiceCard(
+                title = stringResource(R.string.onb_units_auto_liters_title),
+                subtitle = stringResource(R.string.onb_units_auto_liters_subtitle),
+                selected = selectedUnit == UnitPreference.AUTO_LITERS,
+                onClick = { onSelect(UnitPreference.AUTO_LITERS) },
+                leadingIcon = DwIcons.Drop,
+            )
+            Spacer(modifier = Modifier.height(7.dp))
             ChoiceCard(
                 title = stringResource(R.string.onb_units_fl_oz_title),
-                subtitle = stringResource(R.string.onb_units_fl_oz_subtitle),
                 selected = selectedUnit == UnitPreference.FL_OZ,
                 onClick = { onSelect(UnitPreference.FL_OZ) },
                 leadingIcon = DwIcons.Ruler,
@@ -74,6 +84,16 @@ private fun StepUnitsMlPreview() {
     DrinkWaterAppTheme {
         StepUnitsBasePreview(
             selectedUnit = UnitPreference.ML,
+        )
+    }
+}
+
+@DwPreview
+@Composable
+private fun StepUnitsAutoLitersPreview() {
+    DrinkWaterAppTheme {
+        StepUnitsBasePreview(
+            selectedUnit = UnitPreference.AUTO_LITERS,
         )
     }
 }

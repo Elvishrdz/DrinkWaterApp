@@ -210,10 +210,10 @@
     <!-- Onboarding — Units -->
     <string name="onb_units_title">Choose your units</string>
     <string name="onb_units_subtitle">Pick how you want to see your water intake displayed throughout the app.</string>
-    <string name="onb_units_ml_title">Milliliters (mL)</string>
-    <string name="onb_units_ml_subtitle">Used worldwide</string>
-    <string name="onb_units_fl_oz_title">Fluid Ounces (fl oz)</string>
-    <string name="onb_units_fl_oz_subtitle">Used to measure liquids and beverages</string>
+    <string name="onb_units_ml_title">Only Milliliters (mL)</string>
+    <string name="onb_units_auto_liters_title">Auto Liters (mL and L)</string>
+    <string name="onb_units_auto_liters_subtitle">Shows liters when value reaches 1000 mL or more</string>
+    <string name="onb_units_fl_oz_title">Only Fluid Ounces (fl oz)</string>
 
     <!-- Onboarding — Done -->
     <string name="onb_done_title">You\'re all set!</string>
