@@ -2,25 +2,13 @@ package com.eahm.drinkwaterapp.feature.onboarding.ui.shell
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Alignment
@@ -29,19 +17,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
-import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
-import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterDeep
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterLight
 import com.eahm.drinkwaterapp.core.presentation.LayoutType
 import com.eahm.drinkwaterapp.core.presentation.getLayoutType
-import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps
-import com.eahm.drinkwaterapp.feature.onboarding.totalSteps
-import com.eahm.drinkwaterapp.feature.onboarding.ui.icons.OnbIcons
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.ui.OnbTopAppBar
 
 /**
@@ -76,7 +57,14 @@ internal fun OnbShell(
 ) {
     if (useAdaptiveLayout) {
         when (getLayoutType()) {
-            LayoutType.LANDSCAPE, LayoutType.FOLDABLE_EXPANDED -> OnbShellLandscape(
+            LayoutType.LANDSCAPE-> OnbShellLandscape(
+                weight = 0.7f,
+                step = step, total = total, title = title, subtitle = subtitle,
+                art = art, onBack = onBack, modifier = modifier, footer = footer, content = content,
+            )
+
+            LayoutType.FOLDABLE_EXPANDED -> OnbShellLandscape(
+                weight = 1f,
                 step = step, total = total, title = title, subtitle = subtitle,
                 art = art, onBack = onBack, modifier = modifier, footer = footer, content = content,
             )
@@ -101,113 +89,12 @@ internal fun OnbShell(
     }
 }
 
-
-/**
- * Table-top layout.
- * Gradient panel on the top half (top bar + header art/text), white surface panel on the bottom half (content + footer).
- */
 @Composable
-private fun OnbShellTableTop(
-    step: Int,
-    total: Int,
-    title: String,
-    subtitle: String?,
-    art: (@Composable () -> Unit)?,
-    onBack: (() -> Unit)?,
+internal fun GradientBackground(
     modifier: Modifier = Modifier,
-    footer: @Composable ColumnScope.() -> Unit,
-    content: @Composable ColumnScope.() -> Unit,
 ) {
-    Column(modifier = modifier.fillMaxSize()) {
-        // Top: gradient branding panel
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-        ) {
-            GradientBackground()
-            OnbBubbles()
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .statusBarsPadding()
-                    .padding(horizontal = 8.dp, vertical = 8.dp),
-            ) {
-                OnbTopAppBar(
-                    step = step,
-                    total = total,
-                    onBack = onBack,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp),
-                    ) {
-                        art?.let { artContent ->
-                            Box(
-                                modifier = Modifier.padding(bottom = 12.dp),
-                                contentAlignment = Alignment.Center,
-                                content = { artContent() },
-                            )
-                        }
-                        Text(
-                            text = title,
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = Color.White,
-                            textAlign = TextAlign.Center,
-                        )
-                        if (subtitle != null) {
-                            Spacer(Modifier.height(8.dp))
-                            Text(
-                                text = subtitle,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color.White.copy(alpha = 0.80f),
-                                textAlign = TextAlign.Center,
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        // Bottom: white surface content panel
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-            shape = RoundedCornerShape(topStart = BodyCornerRadius, topEnd = BodyCornerRadius),
-            color = MaterialTheme.colorScheme.surface,
-            shadowElevation = 0.dp,
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 24.dp, vertical = 24.dp),
-            ) {
-                Column(
-                    modifier = Modifier
-                        .verticalScroll(rememberScrollState())
-                        .weight(1f),
-                ) {
-                    content()
-                }
-                Spacer(Modifier.height(12.dp))
-                footer()
-            }
-        }
-    }
-}
-
-@Composable
-internal fun GradientBackground() {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(
                 brush = Brush.verticalGradient(
@@ -268,27 +155,5 @@ internal fun OnbArtCircle(
             tint = Color.White,
             modifier = Modifier.size(36.dp),
         )
-    }
-}
-
-@DwPreview
-@Composable
-private fun OnbShellTableTopPreview() {
-    DrinkWaterAppTheme {
-        OnbShellTableTop(
-            step = 7,
-            total = OnboardingSteps.totalSteps,
-            title = "Alarms that arrive on time",
-            subtitle = "Allow the app to schedule precise alarms so your reminders fire exactly when you expect them.",
-            art = { OnbArtCircle(icon = OnbIcons.Check) },
-            onBack = {},
-            footer = {
-                DwPrimaryButton(
-                    text = "Allow exact alarms",
-                    onClick = {},
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            },
-        ) { /* content placeholder */ }
     }
 }

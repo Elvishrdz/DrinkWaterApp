@@ -35,6 +35,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps
 import com.eahm.drinkwaterapp.feature.onboarding.totalSteps
 import com.eahm.drinkwaterapp.feature.onboarding.ui.icons.OnbIcons
+import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.ui.OnbShellDefaults
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.ui.OnbShellDefaults.externalPaddingDp
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.ui.OnbShellDefaults.topRoundedShape
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.ui.OnbTopAppBar
@@ -83,7 +84,7 @@ internal fun OnbShellPortrait(
                     .padding(horizontal = externalPaddingDp),
                 shape = topRoundedShape,
                 color = MaterialTheme.colorScheme.surface,
-                shadowElevation = 0.dp,
+                shadowElevation = OnbShellDefaults.shadowElevationDp,
             ) {
                 Column(
                     modifier = Modifier
