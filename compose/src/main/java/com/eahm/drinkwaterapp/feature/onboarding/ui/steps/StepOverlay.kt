@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,7 +25,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.R
@@ -37,52 +37,48 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
-import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps
-import com.eahm.drinkwaterapp.feature.onboarding.totalSteps
+import com.eahm.drinkwaterapp.feature.onboarding.OnboardingStepBasePreview
 import com.eahm.drinkwaterapp.feature.onboarding.ui.components.DwPrimaryButtonAnimated
 import com.eahm.drinkwaterapp.feature.onboarding.ui.icons.OnbIcons
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbArtCircle
-import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbShell
 
-// Ocean-variant hero gradient, matching GoalCelebrationCard "Ocean" theme
 private val HeroTop = Color(0xFF4FB3DD)
 private val HeroBottom = Color(0xFF0E5A82)
 
-/** Step 7 — Overlay / "display over other apps" permission. */
 @Composable
-internal fun StepOverlay(
-    step: Int,
+internal fun stepOverlay(
     overlayGranted: Boolean,
     onAllow: () -> Unit,
     onContinue: () -> Unit,
     onBack: () -> Unit,
-) {
-    if (overlayGranted) {
-        GrantedLayout(step = step, onContinue = onContinue, onBack = onBack)
-    } else {
-        RequestLayout(step = step, onAllow = onAllow, onSkip = onContinue, onBack = onBack)
-    }
-}
-
-// ── Not granted ───────────────────────────────────────────────────────────────
-
-@Composable
-private fun RequestLayout(
-    step: Int,
-    onAllow: () -> Unit,
-    onSkip: () -> Unit,
-    onBack: () -> Unit,
-) {
-    OnbShell(
-        step = step,
-        total = OnboardingSteps.totalSteps,
+): OnboardingStep = if (overlayGranted) {
+    OnboardingStep(
+        art = { OnbArtCircle(icon = OnbIcons.Check) },
+        title = stringResource(R.string.onb_overlay_granted_title),
+        subtitle = stringResource(R.string.onb_overlay_granted_subtitle),
+        onBack = onBack,
+        footer = {
+            DwPrimaryButtonAnimated(
+                text = stringResource(R.string.onb_cta_continue),
+                onClick = onContinue,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        },
+        content = {
+            CelebrationCardPreview()
+            Spacer(Modifier.height(16.dp))
+            GrantedFeatureList()
+        },
+    )
+} else {
+    OnboardingStep(
+        art = { OnbArtCircle(icon = DwIcons.Star) },
         title = stringResource(R.string.onb_overlay_request_title),
         subtitle = stringResource(R.string.onb_overlay_request_subtitle),
-        art = { OnbArtCircle(icon = DwIcons.Star) },
         onBack = onBack,
         footer = {
             TextButton(
-                onClick = onSkip,
+                onClick = onContinue,
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(
@@ -98,49 +94,14 @@ private fun RequestLayout(
                 modifier = Modifier.fillMaxWidth(),
             )
         },
-    ) {
-        CelebrationCardPreview()
-        Spacer(Modifier.height(16.dp))
-        OverlayStepsList()
-    }
-}
-
-// ── Already granted ───────────────────────────────────────────────────────────
-
-@Composable
-private fun GrantedLayout(
-    step: Int,
-    onContinue: () -> Unit,
-    onBack: () -> Unit,
-) {
-    OnbShell(
-        step = step,
-        total = OnboardingSteps.totalSteps,
-        title = stringResource(R.string.onb_overlay_granted_title),
-        subtitle = stringResource(R.string.onb_overlay_granted_subtitle),
-        art = { OnbArtCircle(icon = OnbIcons.Check) },
-        onBack = onBack,
-
-        footer = {
-            DwPrimaryButtonAnimated(
-                text = stringResource(R.string.onb_cta_continue),
-                onClick = onContinue,
-                modifier = Modifier.fillMaxWidth(),
-            )
+        content = {
+            CelebrationCardPreview()
+            Spacer(Modifier.height(16.dp))
+            OverlayStepsList()
         },
-    ) {
-        CelebrationCardPreview()
-        Spacer(Modifier.height(16.dp))
-        GrantedFeatureList()
-    }
+    )
 }
 
-// ── Shared: celebration card preview ─────────────────────────────────────────
-
-/**
- * A static mockup of the GoalCelebrationCard so the user can see what they'll get.
- * Uses the Ocean variant gradient (DwWater family) to match the real widget.
- */
 @Composable
 private fun CelebrationCardPreview() {
     Column(
@@ -152,7 +113,6 @@ private fun CelebrationCardPreview() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        // Medallion
         Box(
             modifier = Modifier
                 .size(48.dp)
@@ -180,7 +140,6 @@ private fun CelebrationCardPreview() {
             color = Color.White.copy(alpha = 0.80f),
         )
 
-        // Stats strip
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -197,7 +156,6 @@ private fun CelebrationCardPreview() {
                 value = "8",
                 label = stringResource(R.string.onb_overlay_card_preview_stat_drinks)
             )
-
             if (FeatureFlags.streakFeatureEnabled) {
                 StatCell(
                     value = "3",
@@ -211,21 +169,14 @@ private fun CelebrationCardPreview() {
 @Composable
 private fun StatCell(value: String, label: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            text = value,
-            fontWeight = FontWeight.ExtraBold,
-            fontSize = 15.sp,
-            color = DwMagenta,
-        )
+        Text(text = value, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, color = DwMagenta)
         Text(
             text = label,
             style = MaterialTheme.typography.labelSmall,
-            color = Color.White.copy(alpha = 0.70f),
+            color = Color.White.copy(alpha = 0.70f)
         )
     }
 }
-
-// ── Request: how-to steps ─────────────────────────────────────────────────────
 
 @Composable
 private fun OverlayStepsList() {
@@ -285,8 +236,6 @@ private fun StepRow(number: Int, text: String, isLast: Boolean) {
     }
 }
 
-// ── Granted: feature explanation rows ────────────────────────────────────────
-
 @Composable
 private fun GrantedFeatureList() {
     Column(
@@ -305,9 +254,7 @@ private fun GrantedFeatureList() {
             description = stringResource(R.string.onb_overlay_feature_app_description),
         )
         Spacer(Modifier.height(12.dp))
-        androidx.compose.material3.HorizontalDivider(
-            color = MaterialTheme.colorScheme.outlineVariant,
-        )
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
         Spacer(Modifier.height(12.dp))
         FeatureRow(
             icon = DwIcons.Bell,
@@ -361,19 +308,23 @@ private fun FeatureRow(
     }
 }
 
-// ── Previews ──────────────────────────────────────────────────────────────────
-
-@DwPreview
 @Composable
-private fun StepOverlayRequestPreview() {
-    DrinkWaterAppTheme {
-        StepOverlay(
-            step = 7,
-            overlayGranted = false,
+private fun StepOverlayBasePreview(overlayGranted: Boolean) {
+    OnboardingStepBasePreview(
+        config = stepOverlay(
+            overlayGranted = overlayGranted,
             onAllow = {},
             onContinue = {},
             onBack = {},
-        )
+        ),
+    )
+}
+
+@DwPreview
+@Composable
+private fun StepOverlayPreview() {
+    DrinkWaterAppTheme {
+        StepOverlayBasePreview(overlayGranted = true)
     }
 }
 
@@ -381,28 +332,6 @@ private fun StepOverlayRequestPreview() {
 @Composable
 private fun StepOverlayGrantedPreview() {
     DrinkWaterAppTheme {
-        StepOverlay(
-            step = 7,
-            overlayGranted = true,
-            onAllow = {},
-            onContinue = {},
-            onBack = {},
-        )
-    }
-}
-
-@Preview(name = "Landscape", widthDp = 900, heightDp = 420)
-@Composable
-private fun StepOverlayLandscapePreview() {
-    DrinkWaterAppTheme {
-        StepOverlay(step = 8, overlayGranted = false, onAllow = {}, onContinue = {}, onBack = {})
-    }
-}
-
-@Preview(name = "Tablet", widthDp = 1200, heightDp = 800)
-@Composable
-private fun StepOverlayTabletPreview() {
-    DrinkWaterAppTheme {
-        StepOverlay(step = 8, overlayGranted = false, onAllow = {}, onContinue = {}, onBack = {})
+        StepOverlayBasePreview(overlayGranted = false)
     }
 }

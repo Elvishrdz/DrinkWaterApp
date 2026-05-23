@@ -1,6 +1,5 @@
 package com.eahm.drinkwaterapp.feature.onboarding.ui.steps
 
-import android.text.format.DateFormat
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -31,10 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
@@ -44,11 +41,10 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
-import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.eahm.drinkwaterapp.feature.onboarding.OnbTimeSelection
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingFormState
+import com.eahm.drinkwaterapp.feature.onboarding.OnboardingStepBasePreview
 import com.eahm.drinkwaterapp.feature.onboarding.ui.components.DwPrimaryButtonAnimated
-import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbShell
 import kotlinx.coroutines.delay
 
 private const val ROW_STAGGER_MS = 150L
@@ -56,27 +52,18 @@ private const val ROW_START_DELAY_MS = 150L
 private const val BUTTON_DELAY_MS = 900L
 
 @Composable
-internal fun StepDone(
-    step: Int,
+internal fun stepDone(
     state: OnboardingFormState,
+    is24Hour: Boolean,
     onStart: () -> Unit,
     onBack: () -> Unit,
-) {
+): OnboardingStep {
     val title = if (state.name.isBlank()) {
         stringResource(R.string.onb_done_title)
     } else {
         stringResource(R.string.onb_done_title_with_name, state.name)
     }
-    val context = LocalContext.current
-    val is24Hour = when (state.timeFormatPreference) {
-        TimeFormatPreference.SYSTEM -> DateFormat.is24HourFormat(context)
-        TimeFormatPreference.HOUR_12 -> false
-        TimeFormatPreference.HOUR_24 -> true
-    }
-
-    OnbShell(
-        step = step,
-        total = step,
+    return OnboardingStep(
         title = title,
         subtitle = stringResource(R.string.onb_done_subtitle),
         onBack = onBack,
@@ -88,9 +75,10 @@ internal fun StepDone(
                 delayMs = BUTTON_DELAY_MS,
             )
         },
-    ) {
-        SummaryCard(state = state, is24Hour = is24Hour)
-    }
+        content = {
+            SummaryCard(state = state, is24Hour = is24Hour)
+        },
+    )
 }
 
 @Composable
@@ -240,20 +228,31 @@ private fun OnbTimeSelection.formatTime(is24Hour: Boolean): String {
     }
 }
 
+private val previewState = OnboardingFormState(
+    name = "Luigi",
+    intervalMinutes = 45,
+    goalMl = 2200f,
+    wakeTime = OnbTimeSelection(hour = 7, minute = 0, isPm = false),
+    sleepTime = OnbTimeSelection(hour = 10, minute = 30, isPm = true),
+)
+
+@Composable
+private fun StepDoneBasePreview(state: OnboardingFormState) {
+    OnboardingStepBasePreview(
+        config = stepDone(
+            state = state,
+            is24Hour = false,
+            onStart = {},
+            onBack = {},
+        ),
+    )
+}
+
 @DwPreview
 @Composable
 private fun StepDonePreview() {
     DrinkWaterAppTheme {
-        StepDone(
-            step = 1,
-            state = OnboardingFormState(
-                name = "Alex",
-                intervalMinutes = 45,
-                goalMl = 2200f,
-            ),
-            onStart = {},
-            onBack = {},
-        )
+        StepDoneBasePreview(state = previewState)
     }
 }
 
@@ -261,41 +260,6 @@ private fun StepDonePreview() {
 @Composable
 private fun StepDoneNoNamePreview() {
     DrinkWaterAppTheme {
-        StepDone(
-            step = 1,
-            state = OnboardingFormState(
-                name = "",
-                intervalMinutes = 45,
-                goalMl = 2200f,
-            ),
-            onStart = {},
-            onBack = {},
-        )
-    }
-}
-
-@Preview(name = "Landscape", widthDp = 900, heightDp = 420)
-@Composable
-private fun StepDoneLandscapePreview() {
-    DrinkWaterAppTheme {
-        StepDone(
-            step = 9,
-            state = OnboardingFormState(name = "Alex", intervalMinutes = 45, goalMl = 2200f),
-            onStart = {},
-            onBack = {},
-        )
-    }
-}
-
-@Preview(name = "Tablet", widthDp = 1200, heightDp = 800)
-@Composable
-private fun StepDoneTabletPreview() {
-    DrinkWaterAppTheme {
-        StepDone(
-            step = 9,
-            state = OnboardingFormState(name = "Alex", intervalMinutes = 45, goalMl = 2200f),
-            onStart = {},
-            onBack = {},
-        )
+        StepDoneBasePreview(state = previewState.copy(name = ""))
     }
 }

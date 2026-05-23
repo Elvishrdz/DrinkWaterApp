@@ -6,7 +6,7 @@ import androidx.compose.runtime.Immutable
 
 @Immutable
 data class OnboardingStep(
-    val art: @Composable () -> Unit,
+    val art: (@Composable () -> Unit)? = null,
     val title: String,
     val subtitle: String,
     val onBack: (() -> Unit)? = null,

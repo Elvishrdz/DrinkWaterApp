@@ -106,7 +106,7 @@ internal fun OnbBubbles() {
         Box(
             modifier = Modifier
                 .size(130.dp)
-                .align(Alignment.TopEnd)
+                .align(Alignment.CenterStart)
                 .offset(x = 45.dp, y = 20.dp)
                 .clip(CircleShape)
                 .background(Color.White.copy(alpha = 0.09f)),

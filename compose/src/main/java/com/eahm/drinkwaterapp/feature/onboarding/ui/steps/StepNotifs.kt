@@ -1,10 +1,8 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.eahm.drinkwaterapp.feature.onboarding.ui.steps
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -26,12 +24,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -56,26 +54,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwSecondaryButton
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
-import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
-import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps
-import com.eahm.drinkwaterapp.feature.onboarding.totalSteps
-import com.eahm.drinkwaterapp.feature.onboarding.ui.components.DwPrimaryButtonAnimated
-import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbArtCircle
-import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbShell
+import com.eahm.drinkwaterapp.core.domain.extension.canShowNotifications
 import com.eahm.drinkwaterapp.core.domain.extension.formatVolume
 import com.eahm.drinkwaterapp.core.presentation.UnitPreference
+import com.eahm.drinkwaterapp.feature.onboarding.OnboardingStepBasePreview
+import com.eahm.drinkwaterapp.feature.onboarding.ui.components.DwPrimaryButtonAnimated
+import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbArtCircle
 import com.eahm.drinkwaterapp.feature.settings.ui.AMOUNT_MAX
 import com.eahm.drinkwaterapp.feature.settings.ui.AMOUNT_MIN
 import com.eahm.drinkwaterapp.feature.settings.ui.AMOUNT_STEP
@@ -83,18 +78,10 @@ import com.eahm.drinkwaterapp.feature.settings.ui.DisplayUnit
 import com.eahm.drinkwaterapp.feature.settings.ui.effectiveDisplayUnit
 import kotlin.math.roundToInt
 
-/**
- * Unified notification onboarding step — two designs in one composable.
- *
- * Internal flow:
- *  - Already has permission  → Config UI directly
- *  - No permission           → Permission UI
- *      → Allow granted       → Config UI
- *      → Skip / deny         → [onSkip] (bypasses Config)
- */
+@Suppress("AssignedValueIsNeverRead")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun StepNotifs(
-    step: Int,
+internal fun stepNotifs(
     intervalMinutes: Int,
     notifAmountMl: Float,
     onAmountChange: (Float) -> Unit,
@@ -102,138 +89,178 @@ internal fun StepNotifs(
     onSkip: () -> Unit,
     onBack: () -> Unit,
     unitPreference: UnitPreference = UnitPreference.ML,
-) {
+): OnboardingStep {
     val context = LocalContext.current
+    val hasNotificationPermission = context.canShowNotifications
 
-    // Computed once: did the user already have permission when landing on this step?
-    val startedWithPermission = remember {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ContextCompat.checkSelfPermission(
-                context, Manifest.permission.POST_NOTIFICATIONS
-            ) == PackageManager.PERMISSION_GRANTED
-        } else {
-            true
+
+    var showQuickDrinkStep by rememberSaveable(hasNotificationPermission) {
+        mutableStateOf(hasNotificationPermission)
+    }
+
+    return if (showQuickDrinkStep) {
+        var localAmount by rememberSaveable(notifAmountMl) {
+            mutableIntStateOf(
+                notifAmountMl.toInt()
+                    .coerceIn(AMOUNT_MIN, AMOUNT_MAX)
+                    .let { it - (it % AMOUNT_STEP) }
+                    .coerceAtLeast(AMOUNT_MIN)
+            )
         }
-    }
 
-    var showConfig by rememberSaveable { mutableStateOf(startedWithPermission) }
-    var showDeniedDialog by rememberSaveable { mutableStateOf(false) }
-
-    // Local stepper state — initialized from ViewModel, flushed to VM on Continue
-    var localAmount by rememberSaveable {
-        mutableIntStateOf(
-            notifAmountMl.toInt()
-                .coerceIn(AMOUNT_MIN, AMOUNT_MAX)
-                .let { it - (it % AMOUNT_STEP) }
-                .coerceAtLeast(AMOUNT_MIN)
-        )
-    }
-
-    val notifLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-    ) { isGranted ->
-        if (isGranted) showConfig = true else showDeniedDialog = true
-    }
-
-    fun requestPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            notifLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-        } else {
-            showConfig = true
-        }
-    }
-
-    // ── UI selection ──────────────────────────────────────────────────────────
-    if (showConfig) {
-        NotifsConfigContent(
-            step = step,
+        stepQuickDrink(
+            unitPreference = unitPreference,
             localAmount = localAmount,
-            onDecrement = { localAmount = (localAmount - AMOUNT_STEP).coerceAtLeast(AMOUNT_MIN) },
-            onIncrement = { localAmount = (localAmount + AMOUNT_STEP).coerceAtMost(AMOUNT_MAX) },
-            onValueSet = { localAmount = it },
-            // Back from config: go to permission UI if we came from there, else prev step
-            onBack = if (startedWithPermission) onBack else ({ showConfig = false }),
+            onBack = onBack,
             onContinue = {
                 onAmountChange(localAmount.toFloat())
                 onNext()
             },
-            unitPreference = unitPreference,
+            onDecrement = {
+                localAmount = (localAmount - AMOUNT_STEP).coerceAtLeast(AMOUNT_MIN)
+            },
+            onIncrement = {
+                localAmount = (localAmount + AMOUNT_STEP).coerceAtMost(AMOUNT_MAX)
+            },
+            onValueSet = { localAmount = it }
         )
+
     } else {
-        NotifsPermissionContent(
-            step = step,
-            intervalMinutes = intervalMinutes,
-            onAllow = { requestPermission() },
-            onSkip = onSkip,
-            onBack = onBack,
-        )
-    }
+        var showPermissionDeniedDialog by rememberSaveable { mutableStateOf(false) }
 
-    // ── Permission denied dialog ──────────────────────────────────────────────
-    if (showDeniedDialog) {
-        NotifsDeniedDialog(
-            onGoToSettings = {
-                showDeniedDialog = false
-                val intent = Intent().apply {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
-                        putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
-                    } else {
-                        action = "android.settings.APP_NOTIFICATION_SETTINGS"
-                        putExtra("app_package", context.packageName)
-                        putExtra("app_uid", context.applicationInfo.uid)
-                    }
-                }
-                context.startActivity(intent)
-            },
-            onDismiss = {
-                showDeniedDialog = false
-            },
-        )
-    }
-}
+        val permissionLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+        ) { isGranted ->
+            if (isGranted) showQuickDrinkStep = true
+            else showPermissionDeniedDialog = true
+        }
 
-// ── Design 1: Permission ──────────────────────────────────────────────────────
+        fun requestPermission() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            } else {
+                showQuickDrinkStep = true
+            }
+        }
 
-@Composable
-private fun NotifsPermissionContent(
-    step: Int,
-    intervalMinutes: Int,
-    onAllow: () -> Unit,
-    onSkip: () -> Unit,
-    onBack: () -> Unit,
-) {
-    val intervalLabel = formatIntervalLabel(intervalMinutes)
+        if (showPermissionDeniedDialog) {
+            val onDismiss = { showPermissionDeniedDialog = false }
 
-    OnbShell(
-        step = step,
-        total = OnboardingSteps.totalSteps,
-        title = stringResource(R.string.onb_notifs_permission_title),
-        subtitle = stringResource(R.string.onb_notifs_permission_subtitle, intervalLabel),
-        art = { OnbArtCircle(icon = DwIcons.Bell) },
-        onBack = onBack,
-        footer = {
-            TextButton(
-                onClick = onSkip,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(
-                    text = stringResource(R.string.onb_notifs_permission_cta_skip),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+            BasicAlertDialog(onDismissRequest = onDismiss) {
+                PermissionDeniedContent(
+                    onGoToSettings = {
+                        showPermissionDeniedDialog = false
+                        val intent = Intent().apply {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
+                                putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                            } else {
+                                @Suppress("DEPRECATION")
+                                action = "android.settings.APP_NOTIFICATION_SETTINGS"
+                                putExtra("app_package", context.packageName)
+                                putExtra("app_uid", context.applicationInfo.uid)
+                            }
+                        }
+                        context.startActivity(intent)
+                    },
+                    onDismiss = onDismiss,
                 )
             }
-            Spacer(Modifier.height(8.dp))
-            DwPrimaryButton(
-                text = stringResource(R.string.onb_notifs_permission_cta_allow),
-                onClick = onAllow,
-                modifier = Modifier.fillMaxWidth(),
-            )
-        },
-    ) {
-        PermissionCard()
+        }
+
+        stepRequestNotificationPermission(
+            intervalMinutes = intervalMinutes,
+            onBack = onBack,
+            onSkip = onSkip,
+            onRequestNotificationPermission = ::requestPermission,
+        )
     }
 }
+
+
+@Composable
+private fun stepQuickDrink(
+    unitPreference: UnitPreference,
+    localAmount: Int,
+    onBack: () -> Unit,
+    onContinue: () -> Unit,
+    onDecrement: () -> Unit,
+    onIncrement: () -> Unit,
+    onValueSet: (Int) -> Unit,
+) = OnboardingStep(
+    art = { OnbArtCircle(icon = DwIcons.Glass) },
+    title = stringResource(R.string.onb_notifs_config_title),
+    subtitle = stringResource(R.string.onb_notifs_config_subtitle),
+    onBack = onBack,
+    footer = {
+        DwPrimaryButtonAnimated(
+            text = stringResource(R.string.onb_cta_continue),
+            onClick = onContinue,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    },
+    content = {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            AmountStepper(
+                value = localAmount,
+                isAtMin = localAmount <= AMOUNT_MIN,
+                isAtMax = localAmount >= AMOUNT_MAX,
+                onDecrement = onDecrement,
+                onIncrement = onIncrement,
+                onValueSet = onValueSet,
+                unitPreference = unitPreference,
+            )
+            Spacer(Modifier.height(16.dp))
+            Text(
+                text = stringResource(R.string.onb_notifs_config_hint),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            )
+        }
+    },
+)
+
+@Composable
+private fun stepRequestNotificationPermission(
+    intervalMinutes: Int,
+    onBack: () -> Unit,
+    onSkip: () -> Unit,
+    onRequestNotificationPermission: () -> Unit,
+) = OnboardingStep(
+    art = { OnbArtCircle(icon = DwIcons.Bell) },
+    title = stringResource(R.string.onb_notifs_permission_title),
+    subtitle = stringResource(
+        R.string.onb_notifs_permission_subtitle,
+        formatIntervalLabel(intervalMinutes)
+    ),
+    onBack = onBack,
+    footer = {
+        TextButton(
+            onClick = onSkip,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(
+                text = stringResource(R.string.onb_notifs_permission_cta_skip),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Spacer(Modifier.height(8.dp))
+        DwPrimaryButton(
+            text = stringResource(R.string.onb_notifs_permission_cta_allow),
+            onClick = onRequestNotificationPermission,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    },
+    content = {
+        PermissionCard()
+    },
+)
 
 @Composable
 private fun PermissionCard() {
@@ -271,67 +298,16 @@ private fun PermissionCard() {
     }
 }
 
-@Composable
-private fun NotifsConfigContent(
-    step: Int,
-    localAmount: Int,
-    onDecrement: () -> Unit,
-    onIncrement: () -> Unit,
-    onValueSet: (Int) -> Unit,
-    onBack: () -> Unit,
-    onContinue: () -> Unit,
-    unitPreference: UnitPreference = UnitPreference.ML,
-) {
-    OnbShell(
-        step = step,
-        total = OnboardingSteps.totalSteps,
-        title = stringResource(R.string.onb_notifs_config_title),
-        subtitle = stringResource(R.string.onb_notifs_config_subtitle),
-        art = { OnbArtCircle(icon = DwIcons.Glass) },
-        onBack = onBack,
-
-        footer = {
-            DwPrimaryButtonAnimated(
-                text = stringResource(R.string.onb_cta_continue),
-                onClick = onContinue,
-                modifier = Modifier.fillMaxWidth(),
-            )
-        },
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            AmountStepper(
-                value = localAmount,
-                isAtMin = localAmount <= AMOUNT_MIN,
-                isAtMax = localAmount >= AMOUNT_MAX,
-                onDecrement = onDecrement,
-                onIncrement = onIncrement,
-                onValueSet = onValueSet,
-                unitPreference = unitPreference,
-            )
-            Spacer(Modifier.height(16.dp))
-            Text(
-                text = stringResource(R.string.onb_notifs_config_hint),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-            )
-        }
-    }
-}
-
+@Suppress("AssignedValueIsNeverRead")
 @Composable
 private fun AmountStepper(
+    unitPreference: UnitPreference,
     value: Int,
     isAtMin: Boolean,
     isAtMax: Boolean,
     onDecrement: () -> Unit,
     onIncrement: () -> Unit,
     onValueSet: (Int) -> Unit,
-    unitPreference: UnitPreference = UnitPreference.ML,
 ) {
     var isEditing by remember { mutableStateOf(false) }
     var textInput by remember { mutableStateOf("") }
@@ -341,32 +317,39 @@ private fun AmountStepper(
     val displayUnit = effectiveDisplayUnit(unitPreference, value.toFloat())
 
     val (minDisplay, maxDisplay) = when (displayUnit) {
-        DisplayUnit.ML    -> Pair(AMOUNT_MIN.toFloat(), AMOUNT_MAX.toFloat())
+        DisplayUnit.ML -> Pair(AMOUNT_MIN.toFloat(), AMOUNT_MAX.toFloat())
         DisplayUnit.FL_OZ -> Pair(AMOUNT_MIN / 29.574f, AMOUNT_MAX / 29.574f)
-        DisplayUnit.L     -> Pair(AMOUNT_MIN / 1000f, AMOUNT_MAX / 1000f)
+        DisplayUnit.L -> Pair(AMOUNT_MIN / 1000f, AMOUNT_MAX / 1000f)
     }
 
-    fun formatBound(v: Float) = if (displayUnit == DisplayUnit.ML) v.toInt().toString() else "%.1f".format(v)
+    fun formatBound(v: Float) =
+        if (displayUnit == DisplayUnit.ML) v.toInt().toString() else "%.1f".format(v)
 
+    @SuppressLint("LocalContextGetResourceValueCall")
     fun trySave() {
         val parsed = textInput.trim().toFloatOrNull()
         when {
             parsed == null ->
                 errorMessage = context.getString(R.string.validation_error_invalid_number)
+
             parsed < minDisplay ->
-                errorMessage = context.getString(R.string.validation_error_min_value, formatBound(minDisplay))
+                errorMessage =
+                    context.getString(R.string.validation_error_min_value, formatBound(minDisplay))
+
             parsed > maxDisplay ->
-                errorMessage = context.getString(R.string.validation_error_max_value, formatBound(maxDisplay))
+                errorMessage =
+                    context.getString(R.string.validation_error_max_value, formatBound(maxDisplay))
+
             else -> {
                 val normalisedDisplay = when (displayUnit) {
-                    DisplayUnit.ML    -> parsed.roundToInt().toFloat()
+                    DisplayUnit.ML -> parsed.roundToInt().toFloat()
                     DisplayUnit.FL_OZ -> (parsed * 10).roundToInt() / 10f
-                    DisplayUnit.L     -> (parsed * 10).roundToInt() / 10f
+                    DisplayUnit.L -> (parsed * 10).roundToInt() / 10f
                 }
                 val amountMl = when (displayUnit) {
-                    DisplayUnit.ML    -> normalisedDisplay
+                    DisplayUnit.ML -> normalisedDisplay
                     DisplayUnit.FL_OZ -> normalisedDisplay * 29.574f
-                    DisplayUnit.L     -> normalisedDisplay * 1000f
+                    DisplayUnit.L -> normalisedDisplay * 1000f
                 }
                 onValueSet(amountMl.roundToInt())
                 isEditing = false
@@ -384,10 +367,13 @@ private fun AmountStepper(
         if (!editing) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
+                horizontalArrangement = Arrangement.spacedBy(15.dp, Alignment.CenterHorizontally),
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                AmountStepperButton(enabled = !isAtMin, onClick = onDecrement) {
+                AmountStepperButton(
+                    enabled = !isAtMin,
+                    onClick = onDecrement,
+                ) {
                     Box(
                         modifier = Modifier
                             .size(width = 16.dp, height = 2.5.dp)
@@ -396,22 +382,26 @@ private fun AmountStepper(
                     )
                 }
 
-                Spacer(Modifier.width(32.dp))
-
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    modifier = Modifier
+                        .clickable { isEditing = true },
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Text(
                         text = value.toFloat().formatVolume(unitPreference),
                         fontFamily = Nunito,
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 56.sp,
+                        lineHeight = 56.sp,
+                        textAlign = TextAlign.Center,
                         color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.clickable { isEditing = true },
                     )
                 }
 
-                Spacer(Modifier.width(32.dp))
-
-                AmountStepperButton(enabled = !isAtMax, onClick = onIncrement) {
+                AmountStepperButton(
+                    enabled = !isAtMax,
+                    onClick = onIncrement,
+                ) {
                     Icon(
                         imageVector = DwIcons.Plus,
                         contentDescription = "Increase",
@@ -465,12 +455,13 @@ private fun AmountStepper(
 @Composable
 private fun AmountStepperButton(
     enabled: Boolean,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
     content: @Composable () -> Unit,
 ) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier
+        modifier = modifier
             .size(56.dp)
             .clip(CircleShape)
             .background(if (enabled) DwTintWater else DwTintWater.copy(alpha = 0.5f))
@@ -480,52 +471,49 @@ private fun AmountStepperButton(
     }
 }
 
-// ── Denial dialog ─────────────────────────────────────────────────────────────
-
 @Composable
-private fun NotifsDeniedDialog(
+private fun PermissionDeniedContent(
     onGoToSettings: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    BasicAlertDialog(onDismissRequest = onDismiss) {
-        Column(
-            modifier = Modifier
-                .clip(RoundedCornerShape(20.dp))
-                .background(MaterialTheme.colorScheme.background)
-                .padding(24.dp),
-        ) {
-            Text(
-                text = stringResource(R.string.notif_disabled_title),
-                fontFamily = PlusJakartaSans,
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp,
-                color = MaterialTheme.colorScheme.onBackground,
-            )
-            Spacer(Modifier.height(10.dp))
-            Text(
-                text = stringResource(R.string.notif_disabled_body, stringResource(R.string.app_name)),
-                fontFamily = PlusJakartaSans,
-                fontWeight = FontWeight.Normal,
-                fontSize = 14.sp,
-                color = DwInk500,
-            )
-            Spacer(Modifier.height(24.dp))
-            DwPrimaryButton(
-                text = stringResource(R.string.action_open_settings),
-                onClick = onGoToSettings,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            Spacer(Modifier.height(8.dp))
-            DwSecondaryButton(
-                text = stringResource(R.string.action_cancel),
-                onClick = onDismiss,
-                modifier = Modifier.fillMaxWidth(),
-            )
-        }
+    Column(
+        modifier = Modifier
+            .clip(RoundedCornerShape(20.dp))
+            .background(MaterialTheme.colorScheme.background)
+            .padding(24.dp),
+    ) {
+        Text(
+            text = stringResource(R.string.notif_disabled_title),
+            fontFamily = PlusJakartaSans,
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp,
+            color = MaterialTheme.colorScheme.onBackground,
+        )
+        Spacer(Modifier.height(10.dp))
+        Text(
+            text = stringResource(
+                R.string.notif_disabled_body,
+                stringResource(R.string.app_name)
+            ),
+            fontFamily = PlusJakartaSans,
+            fontWeight = FontWeight.Normal,
+            fontSize = 14.sp,
+            color = DwInk500,
+        )
+        Spacer(Modifier.height(24.dp))
+        DwPrimaryButton(
+            text = stringResource(R.string.action_open_settings),
+            onClick = onGoToSettings,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Spacer(Modifier.height(8.dp))
+        DwSecondaryButton(
+            text = stringResource(R.string.action_cancel),
+            onClick = onDismiss,
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
 
 /** "45m", "1h", "1h 30m" */
 internal fun formatIntervalLabel(minutes: Int): String {
@@ -537,92 +525,148 @@ internal fun formatIntervalLabel(minutes: Int): String {
     }.trim()
 }
 
-// ── Previews ──────────────────────────────────────────────────────────────────
+@Composable
+private fun StepNotifsPermissionBasePreview() {
+    OnboardingStepBasePreview(
+        config = stepNotifs(
+            intervalMinutes = 45,
+            notifAmountMl = 150f,
+            onAmountChange = {},
+            onNext = {},
+            onSkip = {},
+            onBack = {},
+        ),
+    )
+}
+
+@Composable
+private fun StepRequestNotificationPermissionBasePreview() {
+    OnboardingStepBasePreview(
+        config = stepRequestNotificationPermission(
+            intervalMinutes = 60,
+            onBack = {},
+            onSkip = {},
+            onRequestNotificationPermission = {},
+        ),
+    )
+}
+
+@Preview
+@Composable
+private fun StepRequestNotificationPermissionPreview() {
+    DrinkWaterAppTheme {
+        StepRequestNotificationPermissionBasePreview()
+    }
+}
+
+
+@Composable
+private fun StepQuickDrinkBasePreview() {
+    OnboardingStepBasePreview(
+        config = stepQuickDrink(
+            unitPreference = UnitPreference.ML,
+            localAmount = 100,
+            onBack = {},
+            onContinue = {},
+            onDecrement = {},
+            onIncrement = {},
+            onValueSet = {},
+        ),
+    )
+}
+
+@Preview
+@Composable
+private fun StepQuickDrinkPreview() {
+    DrinkWaterAppTheme {
+        StepQuickDrinkBasePreview()
+    }
+}
+
+@Composable
+private fun StepNotifsAmountBasePreview() {
+    OnboardingStepBasePreview(
+        config = OnboardingStep(
+            art = { OnbArtCircle(icon = DwIcons.Glass) },
+            title = stringResource(R.string.onb_notifs_config_title),
+            subtitle = stringResource(R.string.onb_notifs_config_subtitle),
+            onBack = {},
+            footer = {
+                DwPrimaryButtonAnimated(
+                    text = stringResource(R.string.onb_cta_continue),
+                    onClick = {},
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            },
+            content = {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    AmountStepper(
+                        unitPreference = UnitPreference.ML,
+                        value = 150,
+                        isAtMin = false,
+                        isAtMax = false,
+                        onDecrement = {},
+                        onIncrement = {},
+                        onValueSet = {},
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    Text(
+                        text = stringResource(R.string.onb_notifs_config_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            },
+        ),
+    )
+}
 
 @DwPreview
 @Composable
 private fun StepNotifsPermissionPreview() {
     DrinkWaterAppTheme {
-        NotifsPermissionContent(
-            step = 6,
-            intervalMinutes = 45,
-            onAllow = {},
-            onSkip = {},
-            onBack = {},
-        )
+        StepNotifsPermissionBasePreview()
     }
 }
 
 @DwPreview
 @Composable
-private fun StepNotifsPermissionCustomIntervalPreview() {
+private fun StepNotifsAmountPreview() {
     DrinkWaterAppTheme {
-        NotifsPermissionContent(
-            step = 6,
-            intervalMinutes = 90,
-            onAllow = {},
-            onSkip = {},
-            onBack = {},
-        )
+        StepNotifsAmountBasePreview()
     }
 }
 
-@DwPreview
+@Preview
 @Composable
-private fun StepNotifsConfigPreview() {
-    DrinkWaterAppTheme {
-        NotifsConfigContent(
-            step = 6,
-            localAmount = 150,
-            onDecrement = {},
-            onIncrement = {},
-            onValueSet = {},
-            onBack = {},
-            onContinue = {},
-        )
-    }
+private fun PermissionCardPreview() {
+    PermissionCard()
 }
 
-@DwPreview
+@Preview
 @Composable
-private fun StepNotifsConfigAtMinPreview() {
-    DrinkWaterAppTheme {
-        NotifsConfigContent(
-            step = 6,
-            localAmount = AMOUNT_MIN,
-            onDecrement = {},
-            onIncrement = {},
-            onValueSet = {},
-            onBack = {},
-            onContinue = {},
-        )
-    }
+private fun AmountStepperPreview() {
+    AmountStepper(
+        unitPreference = UnitPreference.ML,
+        value = 100,
+        isAtMin = false,
+        isAtMax = false,
+        onDecrement = {},
+        onIncrement = {},
+        onValueSet = {},
+    )
 }
 
-@Preview(name = "Landscape", widthDp = 900, heightDp = 420)
+@Preview
 @Composable
-private fun StepNotifsLandscapePreview() {
-    DrinkWaterAppTheme {
-        NotifsPermissionContent(
-            step = 6,
-            intervalMinutes = 45,
-            onAllow = {},
-            onSkip = {},
-            onBack = {},
-        )
-    }
-}
-
-@Preview(name = "Tablet", widthDp = 1200, heightDp = 800)
-@Composable
-private fun StepNotifsTabletPreview() {
-    DrinkWaterAppTheme {
-        NotifsPermissionContent(
-            step = 6,
-            intervalMinutes = 45,
-            onAllow = {},
-            onSkip = {},
-            onBack = {},
-        )
-    }
+private fun PermissionDeniedContentPreview() {
+    PermissionDeniedContent(
+        onGoToSettings = {},
+        onDismiss = {},
+    )
 }

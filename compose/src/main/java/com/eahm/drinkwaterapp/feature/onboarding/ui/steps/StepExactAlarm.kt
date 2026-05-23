@@ -24,7 +24,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
@@ -35,45 +34,40 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
-import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps
-import com.eahm.drinkwaterapp.feature.onboarding.totalSteps
+import com.eahm.drinkwaterapp.feature.onboarding.OnboardingStepBasePreview
 import com.eahm.drinkwaterapp.feature.onboarding.ui.components.DwPrimaryButtonAnimated
 import com.eahm.drinkwaterapp.feature.onboarding.ui.icons.OnbIcons
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbArtCircle
-import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbShell
 
-/** Step 7 — Schedule exact alarm permission. */
 @Composable
-internal fun StepExactAlarm(
-    step: Int,
+internal fun stepExactAlarm(
     exactAlarmGranted: Boolean,
     onAllow: () -> Unit,
     onContinue: () -> Unit,
     onSkip: () -> Unit,
     onBack: () -> Unit,
-) {
-    if (exactAlarmGranted) {
-        GrantedLayout(step = step, onContinue = onContinue, onBack = onBack)
-    } else {
-        RequestLayout(step = step, onAllow = onAllow, onSkip = onSkip, onBack = onBack)
-    }
-}
-
-// ── Not granted ───────────────────────────────────────────────────────────────
-
-@Composable
-private fun RequestLayout(
-    step: Int,
-    onAllow: () -> Unit,
-    onSkip: () -> Unit,
-    onBack: () -> Unit,
-) {
-    OnbShell(
-        step = step,
-        total = OnboardingSteps.totalSteps,
+): OnboardingStep = if (exactAlarmGranted) {
+    OnboardingStep(
+        art = { OnbArtCircle(icon = OnbIcons.Check) },
+        title = stringResource(R.string.onb_exact_alarm_granted_title),
+        subtitle = stringResource(R.string.onb_exact_alarm_granted_subtitle),
+        onBack = onBack,
+        footer = {
+            DwPrimaryButtonAnimated(
+                text = stringResource(R.string.onb_cta_continue),
+                onClick = onContinue,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        },
+        content = {
+            BenefitList()
+        },
+    )
+} else {
+    OnboardingStep(
+        art = { OnbArtCircle(icon = DwIcons.Clock) },
         title = stringResource(R.string.onb_exact_alarm_title),
         subtitle = stringResource(R.string.onb_exact_alarm_subtitle),
-        art = { OnbArtCircle(icon = DwIcons.Clock) },
         onBack = onBack,
         footer = {
             TextButton(
@@ -93,42 +87,13 @@ private fun RequestLayout(
                 modifier = Modifier.fillMaxWidth(),
             )
         },
-    ) {
-        BenefitList()
-        Spacer(Modifier.height(16.dp))
-        HowToStepsList()
-    }
-}
-
-// ── Already granted ───────────────────────────────────────────────────────────
-
-@Composable
-private fun GrantedLayout(
-    step: Int,
-    onContinue: () -> Unit,
-    onBack: () -> Unit,
-) {
-    OnbShell(
-        step = step,
-        total = OnboardingSteps.totalSteps,
-        title = stringResource(R.string.onb_exact_alarm_granted_title),
-        subtitle = stringResource(R.string.onb_exact_alarm_granted_subtitle),
-        art = { OnbArtCircle(icon = OnbIcons.Check) },
-        onBack = onBack,
-
-        footer = {
-            DwPrimaryButtonAnimated(
-                text = stringResource(R.string.onb_cta_continue),
-                onClick = onContinue,
-                modifier = Modifier.fillMaxWidth(),
-            )
+        content = {
+            BenefitList()
+            Spacer(Modifier.height(16.dp))
+            HowToStepsList()
         },
-    ) {
-        BenefitList()
-    }
+    )
 }
-
-// ── Shared: benefit list ──────────────────────────────────────────────────────
 
 @Composable
 private fun BenefitList() {
@@ -212,8 +177,6 @@ private fun BenefitRow(
     }
 }
 
-// ── Request: how-to steps ─────────────────────────────────────────────────────
-
 @Composable
 private fun HowToStepsList() {
     val steps = listOf(
@@ -272,20 +235,26 @@ private fun HowToStepRow(number: Int, text: String, isLast: Boolean) {
     }
 }
 
-// ── Previews ──────────────────────────────────────────────────────────────────
-
-@DwPreview
 @Composable
-private fun StepExactAlarmRequestPreview() {
-    DrinkWaterAppTheme {
-        StepExactAlarm(
-            step = 7,
-            exactAlarmGranted = false,
+private fun StepExactAlarmBasePreview(
+    exactAlarmGranted: Boolean,
+) {
+    OnboardingStepBasePreview(
+        config = stepExactAlarm(
+            exactAlarmGranted = exactAlarmGranted,
             onAllow = {},
             onContinue = {},
             onSkip = {},
             onBack = {},
-        )
+        ),
+    )
+}
+
+@DwPreview
+@Composable
+private fun StepExactAlarmPreview() {
+    DrinkWaterAppTheme {
+        StepExactAlarmBasePreview(exactAlarmGranted = true)
     }
 }
 
@@ -293,43 +262,6 @@ private fun StepExactAlarmRequestPreview() {
 @Composable
 private fun StepExactAlarmGrantedPreview() {
     DrinkWaterAppTheme {
-        StepExactAlarm(
-            step = 7,
-            exactAlarmGranted = true,
-            onAllow = {},
-            onContinue = {},
-            onSkip = {},
-            onBack = {},
-        )
-    }
-}
-
-@Preview(name = "Landscape", widthDp = 900, heightDp = 420)
-@Composable
-private fun StepExactAlarmLandscapePreview() {
-    DrinkWaterAppTheme {
-        StepExactAlarm(
-            step = 7,
-            exactAlarmGranted = false,
-            onAllow = {},
-            onContinue = {},
-            onSkip = {},
-            onBack = {},
-        )
-    }
-}
-
-@Preview(name = "Tablet", widthDp = 1200, heightDp = 800)
-@Composable
-private fun StepExactAlarmTabletPreview() {
-    DrinkWaterAppTheme {
-        StepExactAlarm(
-            step = 7,
-            exactAlarmGranted = false,
-            onAllow = {},
-            onContinue = {},
-            onSkip = {},
-            onBack = {},
-        )
+        StepExactAlarmBasePreview(exactAlarmGranted = false)
     }
 }

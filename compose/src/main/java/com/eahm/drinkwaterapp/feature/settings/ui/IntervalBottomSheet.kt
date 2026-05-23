@@ -31,6 +31,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -72,7 +73,7 @@ internal fun IntervalBottomSheet(
     val maxMinutes = (windowMinutes - INTERVAL_STEP).coerceAtLeast(INTERVAL_MIN)
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
-    var value by remember {
+    var value by rememberSaveable {
         mutableIntStateOf(currentMinutes.coerceIn(INTERVAL_MIN, maxMinutes))
     }
     var isEditing by remember { mutableStateOf(false) }
@@ -89,10 +90,15 @@ internal fun IntervalBottomSheet(
         when {
             parsed == null ->
                 errorMessage = context.getString(R.string.validation_error_invalid_number)
+
             parsed < INTERVAL_MIN ->
-                errorMessage = context.getString(R.string.validation_error_min_value, INTERVAL_MIN.toString())
+                errorMessage =
+                    context.getString(R.string.validation_error_min_value, INTERVAL_MIN.toString())
+
             parsed > maxMinutes ->
-                errorMessage = context.getString(R.string.validation_error_max_value, maxMinutes.toString())
+                errorMessage =
+                    context.getString(R.string.validation_error_max_value, maxMinutes.toString())
+
             else -> {
                 value = parsed
                 isEditing = false
@@ -141,7 +147,9 @@ internal fun IntervalBottomSheet(
                     ) {
                         IntervalStepperButton(
                             enabled = !isAtMin,
-                            onClick = { value = (value - INTERVAL_STEP).coerceAtLeast(INTERVAL_MIN) },
+                            onClick = {
+                                value = (value - INTERVAL_STEP).coerceAtLeast(INTERVAL_MIN)
+                            },
                         ) {
                             Box(
                                 modifier = Modifier
