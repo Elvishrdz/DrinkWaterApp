@@ -57,7 +57,7 @@ internal fun OnbShell(
 ) {
     if (useAdaptiveLayout) {
         when (getLayoutType()) {
-            LayoutType.LANDSCAPE-> OnbShellLandscape(
+            LayoutType.LANDSCAPE -> OnbShellLandscape(
                 weight = 0.7f,
                 step = step, total = total, title = title, subtitle = subtitle,
                 art = art, onBack = onBack, modifier = modifier, footer = footer, content = content,
@@ -76,15 +76,13 @@ internal fun OnbShell(
 
             LayoutType.PORTRAIT -> OnbShellPortrait(
                 step = step, total = total, title = title, subtitle = subtitle,
-                art = art, onBack = onBack, modifier = modifier, footer = footer,
-                scrollableContent = content,
+                art = art, onBack = onBack, modifier = modifier, footer = footer, content = content,
             )
         }
     } else {
         OnbShellPortrait(
             step = step, total = total, title = title, subtitle = subtitle,
-            art = art, onBack = onBack, modifier = modifier, footer = footer,
-            scrollableContent = content,
+            art = art, onBack = onBack, modifier = modifier, footer = footer, content = content,
         )
     }
 }

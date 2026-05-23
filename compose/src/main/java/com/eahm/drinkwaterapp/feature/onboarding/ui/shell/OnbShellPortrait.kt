@@ -51,7 +51,7 @@ internal fun OnbShellPortrait(
     onBack: (() -> Unit)?,
     modifier: Modifier = Modifier,
     footer: @Composable ColumnScope.() -> Unit,
-    scrollableContent: @Composable ColumnScope.() -> Unit,
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     val windowInsets = WindowInsets.safeDrawing.union(WindowInsets.displayCutout)
 
@@ -92,7 +92,10 @@ internal fun OnbShellPortrait(
                         .padding(horizontal = 24.dp),
                 ) {
                     Column(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .verticalScroll(rememberScrollState())
+                            .weight(1f),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         if (art != null) {
@@ -121,16 +124,9 @@ internal fun OnbShellPortrait(
                                 textAlign = TextAlign.Center,
                             )
                         }
-                    }
 
-                    Spacer(Modifier.height(12.dp))
-
-                    Column(
-                        modifier = Modifier
-                            .verticalScroll(rememberScrollState())
-                            .weight(1f),
-                    ) {
-                        scrollableContent()
+                        Spacer(Modifier.height(12.dp))
+                        content()
                     }
 
                     Spacer(Modifier.height(12.dp))
