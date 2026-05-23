@@ -19,42 +19,36 @@ import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.presentation.UnitPreference
-import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps
-import com.eahm.drinkwaterapp.feature.onboarding.totalSteps
+import com.eahm.drinkwaterapp.feature.onboarding.OnboardingStepBasePreview
 import com.eahm.drinkwaterapp.feature.onboarding.ui.components.DwPrimaryButtonAnimated
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbArtCircle
-import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbShell
 import com.eahm.drinkwaterapp.feature.settings.ui.GOAL_MAX
 import com.eahm.drinkwaterapp.feature.settings.ui.GOAL_MIN
 import com.eahm.drinkwaterapp.feature.settings.ui.GOAL_STEP
 import com.eahm.drinkwaterapp.feature.settings.ui.GoalStepperRow
 
 @Composable
-internal fun StepSetGoal(
-    step: Int,
+internal fun stepSetGoal(
     goalMl: Float,
     onGoalChanged: (Float) -> Unit,
     onNext: () -> Unit,
     onBack: () -> Unit,
     unitPreference: UnitPreference = UnitPreference.ML,
-) {
-    var currentGoal by remember { mutableFloatStateOf(goalMl.coerceIn(GOAL_MIN, GOAL_MAX)) }
+) = OnboardingStep(
+    art = { OnbArtCircle(icon = DwIcons.Drop) },
+    title = stringResource(R.string.onb_goal_title),
+    subtitle = stringResource(R.string.onb_set_goal_subtitle),
+    onBack = onBack,
+    footer = {
+        DwPrimaryButtonAnimated(
+            text = stringResource(R.string.onb_set_goal_cta),
+            onClick = onNext,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    },
+    content = {
+        var currentGoal by remember { mutableFloatStateOf(goalMl.coerceIn(GOAL_MIN, GOAL_MAX)) }
 
-    OnbShell(
-        step = step,
-        total = OnboardingSteps.totalSteps,
-        title = stringResource(R.string.onb_goal_title),
-        subtitle = stringResource(R.string.onb_set_goal_subtitle),
-        art = { OnbArtCircle(icon = DwIcons.Drop) },
-        onBack = onBack,
-        footer = {
-            DwPrimaryButtonAnimated(
-                text = stringResource(R.string.onb_set_goal_cta),
-                onClick = onNext,
-                modifier = Modifier.fillMaxWidth(),
-            )
-        },
-    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -81,20 +75,26 @@ internal fun StepSetGoal(
                 unitPreference = unitPreference,
             )
         }
-    }
+    },
+)
+
+@Composable
+private fun StepSetGoalBasePreview() {
+    OnboardingStepBasePreview(
+        config = stepSetGoal(
+            goalMl = 2200f,
+            onGoalChanged = {},
+            onNext = {},
+            onBack = {},
+        ),
+    )
 }
 
 @DwPreview
 @Composable
 private fun StepSetGoalPreview() {
     DrinkWaterAppTheme {
-        StepSetGoal(
-            step = 1,
-            goalMl = 2200f,
-            onGoalChanged = {},
-            onNext = {},
-            onBack = {},
-        )
+        StepSetGoalBasePreview()
     }
 }
 
@@ -102,7 +102,7 @@ private fun StepSetGoalPreview() {
 @Composable
 private fun StepSetGoalLandscapePreview() {
     DrinkWaterAppTheme {
-        StepSetGoal(step = 2, goalMl = 2200f, onGoalChanged = {}, onNext = {}, onBack = {})
+        StepSetGoalBasePreview()
     }
 }
 
@@ -110,6 +110,6 @@ private fun StepSetGoalLandscapePreview() {
 @Composable
 private fun StepSetGoalTabletPreview() {
     DrinkWaterAppTheme {
-        StepSetGoal(step = 2, goalMl = 2200f, onGoalChanged = {}, onNext = {}, onBack = {})
+        StepSetGoalBasePreview()
     }
 }

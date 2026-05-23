@@ -10,36 +10,31 @@ import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.presentation.UnitPreference
-import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps
-import com.eahm.drinkwaterapp.feature.onboarding.totalSteps
+import com.eahm.drinkwaterapp.feature.onboarding.OnboardingStepBasePreview
 import com.eahm.drinkwaterapp.feature.onboarding.ui.components.ChoiceCard
 import com.eahm.drinkwaterapp.feature.onboarding.ui.components.DwPrimaryButtonAnimated
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbArtCircle
-import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbShell
+
 
 @Composable
-internal fun StepUnits(
-    step: Int,
+internal fun stepUnits(
     selectedUnit: UnitPreference,
     onSelect: (UnitPreference) -> Unit,
     onNext: () -> Unit,
     onBack: () -> Unit,
-) {
-    OnbShell(
-        step = step,
-        total = OnboardingSteps.totalSteps,
-        title = stringResource(R.string.onb_units_title),
-        subtitle = stringResource(R.string.onb_units_subtitle),
-        art = { OnbArtCircle(icon = DwIcons.Drop) },
-        onBack = onBack,
-        footer = {
-            DwPrimaryButtonAnimated(
-                text = stringResource(R.string.onb_cta_continue),
-                onClick = onNext,
-                modifier = Modifier.fillMaxWidth(),
-            )
-        },
-    ) {
+) = OnboardingStep(
+    art = { OnbArtCircle(icon = DwIcons.Drop) },
+    title = stringResource(R.string.onb_units_title),
+    subtitle = stringResource(R.string.onb_units_subtitle),
+    onBack = onBack,
+    footer = {
+        DwPrimaryButtonAnimated(
+            text = stringResource(R.string.onb_cta_continue),
+            onClick = onNext,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    },
+    content = {
         Column {
             ChoiceCard(
                 title = stringResource(R.string.onb_units_ml_title),
@@ -56,19 +51,29 @@ internal fun StepUnits(
                 leadingIcon = DwIcons.Ruler,
             )
         }
-    }
+    },
+)
+
+@Composable
+private fun StepUnitsBasePreview(
+    selectedUnit: UnitPreference,
+) {
+    OnboardingStepBasePreview(
+        config = stepUnits(
+            selectedUnit = selectedUnit,
+            onSelect = {},
+            onNext = {},
+            onBack = {},
+        ),
+    )
 }
 
 @DwPreview
 @Composable
 private fun StepUnitsMlPreview() {
     DrinkWaterAppTheme {
-        StepUnits(
-            step = 3,
+        StepUnitsBasePreview(
             selectedUnit = UnitPreference.ML,
-            onSelect = {},
-            onNext = {},
-            onBack = {},
         )
     }
 }
@@ -77,12 +82,8 @@ private fun StepUnitsMlPreview() {
 @Composable
 private fun StepUnitsFlOzPreview() {
     DrinkWaterAppTheme {
-        StepUnits(
-            step = 3,
+        StepUnitsBasePreview(
             selectedUnit = UnitPreference.FL_OZ,
-            onSelect = {},
-            onNext = {},
-            onBack = {},
         )
     }
 }

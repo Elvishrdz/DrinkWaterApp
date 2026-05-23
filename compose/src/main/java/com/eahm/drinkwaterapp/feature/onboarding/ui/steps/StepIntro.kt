@@ -34,31 +34,25 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterDeep
-import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps
-import com.eahm.drinkwaterapp.feature.onboarding.totalSteps
+import com.eahm.drinkwaterapp.feature.onboarding.OnboardingStepBasePreview
 import com.eahm.drinkwaterapp.feature.onboarding.ui.components.DwPrimaryButtonAnimated
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbArtCircle
-import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbShell
 
 @Composable
-internal fun StepIntro(
-    step: Int,
+internal fun stepIntro(
     onNext: () -> Unit,
-) {
-    OnbShell(
-        step = step,
-        total = OnboardingSteps.totalSteps,
-        title = stringResource(R.string.onb_intro_title),
-        subtitle = stringResource(R.string.onb_intro_subtitle),
-        art = { OnbArtCircle(icon = DwIcons.Drop) },
-        footer = {
-            DwPrimaryButtonAnimated(
-                text = stringResource(R.string.onb_intro_cta_text),
-                onClick = onNext,
-                modifier = Modifier.fillMaxWidth(),
-            )
-        },
-    ) {
+) = OnboardingStep(
+    art = { OnbArtCircle(icon = DwIcons.Drop) },
+    title = stringResource(R.string.onb_intro_title),
+    subtitle = stringResource(R.string.onb_intro_subtitle),
+    footer = {
+        DwPrimaryButtonAnimated(
+            text = stringResource(R.string.onb_intro_cta_text),
+            onClick = onNext,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    },
+    content = {
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
@@ -66,8 +60,8 @@ internal fun StepIntro(
         ) {
             IntroFeatureCards()
         }
-    }
-}
+    },
+)
 
 @Composable
 private fun IntroFeatureCards() {
@@ -143,14 +137,20 @@ private fun IntroFeatureCard(
     }
 }
 
+@Composable
+private fun StepIntroBasePreview() {
+    OnboardingStepBasePreview(
+        config = stepIntro(
+            onNext = {},
+        ),
+    )
+}
+
 @DwPreview
 @Composable
 private fun StepIntroPreview() {
     DrinkWaterAppTheme {
-        StepIntro(
-            step = 1,
-            onNext = {},
-        )
+        StepIntroBasePreview()
     }
 }
 
@@ -158,10 +158,7 @@ private fun StepIntroPreview() {
 @Composable
 private fun StepIntroLandscapePreview() {
     DrinkWaterAppTheme {
-        StepIntro(
-            step = 1,
-            onNext = {},
-        )
+        StepIntroBasePreview()
     }
 }
 
@@ -169,9 +166,6 @@ private fun StepIntroLandscapePreview() {
 @Composable
 private fun StepIntroTabletPreview() {
     DrinkWaterAppTheme {
-        StepIntro(
-            step = 1,
-            onNext = {},
-        )
+        StepIntroBasePreview()
     }
 }

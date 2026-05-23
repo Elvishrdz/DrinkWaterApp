@@ -17,52 +17,46 @@ import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.feature.onboarding.OnbTimeSelection
-import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps
-import com.eahm.drinkwaterapp.feature.onboarding.totalSteps
+import com.eahm.drinkwaterapp.feature.onboarding.OnboardingStepBasePreview
 import com.eahm.drinkwaterapp.feature.onboarding.ui.components.DwPrimaryButtonAnimated
 import com.eahm.drinkwaterapp.feature.onboarding.ui.components.OnbTimeWheel
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbArtCircle
-import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbShell
 
 @Composable
-internal fun StepWake(
-    step: Int,
+internal fun stepWake(
     wakeTime: OnbTimeSelection,
     sleepTime: OnbTimeSelection,
     is24Hour: Boolean,
     onWakeTimeChange: (OnbTimeSelection) -> Unit,
     onNext: () -> Unit,
     onBack: () -> Unit,
-) {
-    val isSameTime = wakeTime.toActiveTime() == sleepTime.toActiveTime()
+) = OnboardingStep(
+    art = { OnbArtCircle(icon = DwIcons.Sun) },
+    title = stringResource(R.string.onb_wake_title),
+    subtitle = stringResource(R.string.onb_wake_subtitle),
+    onBack = onBack,
+    footer = {
+        val isSameTime = wakeTime.toActiveTime() == sleepTime.toActiveTime()
 
-    OnbShell(
-        step = step,
-        total = OnboardingSteps.totalSteps,
-        title = stringResource(R.string.onb_wake_title),
-        subtitle = stringResource(R.string.onb_wake_subtitle),
-        art = { OnbArtCircle(icon = DwIcons.Sun) },
-        onBack = onBack,
-        footer = {
-            if (isSameTime) {
-                Text(
-                    text = stringResource(R.string.onb_wake_same_time_error),
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp),
-                )
-            }
-            DwPrimaryButtonAnimated(
-                text = stringResource(R.string.onb_cta_continue),
-                onClick = onNext,
-                enabled = !isSameTime,
-                modifier = Modifier.fillMaxWidth(),
+        if (isSameTime) {
+            Text(
+                text = stringResource(R.string.onb_wake_same_time_error),
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
             )
-        },
-    ) {
+        }
+        DwPrimaryButtonAnimated(
+            text = stringResource(R.string.onb_cta_continue),
+            onClick = onNext,
+            enabled = !isSameTime,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    },
+    content = {
         OnbTimeWheel(
             time = wakeTime,
             onTimeChange = onWakeTimeChange,
@@ -71,22 +65,28 @@ internal fun StepWake(
                 .fillMaxWidth()
                 .wrapContentWidth(Alignment.CenterHorizontally),
         )
-    }
-}
+    },
+)
 
-@DwPreview
 @Composable
-private fun StepWakePreview() {
-    DrinkWaterAppTheme {
-        StepWake(
-            step = 1,
+private fun StepWakeBasePreview() {
+    OnboardingStepBasePreview(
+        config = stepWake(
             wakeTime = OnbTimeSelection(hour = 7, minute = 0, isPm = false),
             sleepTime = OnbTimeSelection(hour = 10, minute = 0, isPm = true),
             is24Hour = false,
             onWakeTimeChange = {},
             onNext = {},
             onBack = {},
-        )
+        ),
+    )
+}
+
+@DwPreview
+@Composable
+private fun StepWakePreview() {
+    DrinkWaterAppTheme {
+        StepWakeBasePreview()
     }
 }
 
@@ -94,15 +94,7 @@ private fun StepWakePreview() {
 @Composable
 private fun StepWakeLandscapePreview() {
     DrinkWaterAppTheme {
-        StepWake(
-            step = 3,
-            wakeTime = OnbTimeSelection(hour = 7, minute = 0, isPm = false),
-            sleepTime = OnbTimeSelection(hour = 10, minute = 0, isPm = true),
-            is24Hour = false,
-            onWakeTimeChange = {},
-            onNext = {},
-            onBack = {},
-        )
+        StepWakeBasePreview()
     }
 }
 
@@ -110,14 +102,6 @@ private fun StepWakeLandscapePreview() {
 @Composable
 private fun StepWakeTabletPreview() {
     DrinkWaterAppTheme {
-        StepWake(
-            step = 3,
-            wakeTime = OnbTimeSelection(hour = 7, minute = 0, isPm = false),
-            sleepTime = OnbTimeSelection(hour = 10, minute = 0, isPm = true),
-            is24Hour = false,
-            onWakeTimeChange = {},
-            onNext = {},
-            onBack = {},
-        )
+        StepWakeBasePreview()
     }
 }
