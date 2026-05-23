@@ -122,3 +122,10 @@ Plan para restaurar compras:
 1. autobackup-> app es desinstalada y reinstalada en el mismo dispositivo. restauracion ocurre
    porque se guardo el id de revenuecat en el backup y puede usarse para restaurar la compra
    automaticamente
+
+MORE STEPS
+
+- [] agregar accesibilidad: content description / talkback
+- [] agregar accesibilidad: ui navigation
+- [] agregar accesibilidad: font size / screen size checks (revisar mas, la app ya esta adaptada
+  para distintas pantallas y configuraciones)
