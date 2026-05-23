@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,9 +35,9 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps
 import com.eahm.drinkwaterapp.feature.onboarding.totalSteps
 import com.eahm.drinkwaterapp.feature.onboarding.ui.icons.OnbIcons
+import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.ui.OnbShellDefaults.externalPaddingDp
+import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.ui.OnbShellDefaults.topRoundedShape
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.ui.OnbTopAppBar
-
-internal val externalPaddingDp = 7.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,7 +81,7 @@ internal fun OnbShellPortrait(
                     .fillMaxSize()
                     .widthIn(max = BottomSheetDefaults.SheetMaxWidth)
                     .padding(horizontal = externalPaddingDp),
-                shape = RoundedCornerShape(topStart = BodyCornerRadius, topEnd = BodyCornerRadius),
+                shape = topRoundedShape,
                 color = MaterialTheme.colorScheme.surface,
                 shadowElevation = 0.dp,
             ) {

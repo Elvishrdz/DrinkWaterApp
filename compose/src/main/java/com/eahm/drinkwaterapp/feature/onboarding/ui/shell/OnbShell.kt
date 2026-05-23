@@ -4,9 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -103,112 +101,6 @@ internal fun OnbShell(
     }
 }
 
-
-/**
- * Landscape / foldable-expanded layout.
- * Gradient panel on the left (top bar + header art/text), white surface panel on the right (content + footer).
- */
-@Composable
-private fun OnbShellLandscape(
-    step: Int,
-    total: Int,
-    title: String,
-    subtitle: String?,
-    art: (@Composable () -> Unit)?,
-    onBack: (() -> Unit)?,
-    modifier: Modifier = Modifier,
-    footer: @Composable ColumnScope.() -> Unit,
-    content: @Composable ColumnScope.() -> Unit,
-) {
-    Row(
-        modifier = modifier
-            .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.surface)
-    ) {
-        // Left: gradient branding panel
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(),
-        ) {
-            GradientBackground()
-            OnbBubbles()
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .statusBarsPadding()
-                    .padding(horizontal = 8.dp, vertical = 8.dp),
-            ) {
-                OnbTopAppBar(
-                    step = step,
-                    total = total,
-                    onBack = onBack,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp),
-                    ) {
-                        art?.let { artContent ->
-                            Box(
-                                modifier = Modifier.padding(bottom = 12.dp),
-                                contentAlignment = Alignment.Center,
-                                content = { artContent() },
-                            )
-                        }
-                        Text(
-                            text = title,
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = Color.White,
-                            textAlign = TextAlign.Center,
-                        )
-                        if (subtitle != null) {
-                            Spacer(Modifier.height(8.dp))
-                            Text(
-                                text = subtitle,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color.White.copy(alpha = 0.80f),
-                                textAlign = TextAlign.Center,
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        // Right: white surface content panel
-        Surface(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(),
-            shape = RoundedCornerShape(topStart = BodyCornerRadius, bottomStart = BodyCornerRadius),
-            color = MaterialTheme.colorScheme.surface,
-            shadowElevation = 0.dp,
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 24.dp, vertical = 32.dp),
-            ) {
-                Column(
-                    modifier = Modifier
-                        .verticalScroll(rememberScrollState())
-                        .weight(1f),
-                ) {
-                    content()
-                }
-                Spacer(Modifier.height(12.dp))
-                footer()
-            }
-        }
-    }
-}
 
 /**
  * Table-top layout.
@@ -376,28 +268,6 @@ internal fun OnbArtCircle(
             tint = Color.White,
             modifier = Modifier.size(36.dp),
         )
-    }
-}
-
-@DwPreview
-@Composable
-private fun OnbShellLandscapePreview() {
-    DrinkWaterAppTheme {
-        OnbShellLandscape(
-            step = 7,
-            total = OnboardingSteps.totalSteps,
-            title = "Alarms that arrive on time",
-            subtitle = "Allow the app to schedule precise alarms so your reminders fire exactly when you expect them.",
-            art = { OnbArtCircle(icon = OnbIcons.Check) },
-            onBack = {},
-            footer = {
-                DwPrimaryButton(
-                    text = "Allow exact alarms",
-                    onClick = {},
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            },
-        ) { /* content placeholder */ }
     }
 }
 
