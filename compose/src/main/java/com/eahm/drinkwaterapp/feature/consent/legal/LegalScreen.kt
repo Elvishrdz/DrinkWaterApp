@@ -27,6 +27,7 @@ internal fun LegalScreen(
 
         LayoutType.LANDSCAPE,
             -> LegalLandscape(
+            weight = 0.7f,
             privacyToggleChecked = privacyToggleChecked,
             showStepCounter = showStepCounter,
             onToggleChanged = onToggleChanged,
@@ -34,6 +35,15 @@ internal fun LegalScreen(
         )
 
         LayoutType.FOLDABLE_EXPANDED,
+            -> LegalLandscape(
+            weight = 1f,
+            privacyToggleChecked = privacyToggleChecked,
+            showStepCounter = showStepCounter,
+            onToggleChanged = onToggleChanged,
+            onAccept = onAccept,
+        )
+
+
         LayoutType.TABLE_TOP,
             -> LegalTableTop(
             privacyToggleChecked = privacyToggleChecked,

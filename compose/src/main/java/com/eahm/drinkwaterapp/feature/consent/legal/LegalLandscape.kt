@@ -38,6 +38,7 @@ import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults.verticalSpacing
 
 @Composable
 internal fun LegalLandscape(
+    weight: Float,
     privacyToggleChecked: Boolean,
     showStepCounter: Boolean,
     onToggleChanged: (Boolean) -> Unit,
@@ -51,7 +52,7 @@ internal fun LegalLandscape(
     ) {
         Box(
             modifier = Modifier
-                .weight(0.7f)
+                .weight(weight)
                 .fillMaxHeight()
                 .background(legalGradient),
         ) {
@@ -134,6 +135,7 @@ internal fun LegalLandscape(
 private fun LegalLandscapePreview() {
     DrinkWaterAppTheme {
         LegalLandscape(
+            weight = 1f,
             privacyToggleChecked = false,
             showStepCounter = true,
             onToggleChanged = {},
@@ -147,6 +149,7 @@ private fun LegalLandscapePreview() {
 private fun BigFontPreview() {
     DrinkWaterAppTheme {
         LegalLandscape(
+            weight = 1f,
             privacyToggleChecked = false,
             showStepCounter = true,
             onToggleChanged = {},
