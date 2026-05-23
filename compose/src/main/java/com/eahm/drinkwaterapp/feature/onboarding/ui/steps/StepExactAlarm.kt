@@ -75,7 +75,6 @@ private fun RequestLayout(
         subtitle = stringResource(R.string.onb_exact_alarm_subtitle),
         art = { OnbArtCircle(icon = DwIcons.Clock) },
         onBack = onBack,
-        useAdaptiveLayout = true,
         footer = {
             TextButton(
                 onClick = onSkip,
@@ -116,7 +115,7 @@ private fun GrantedLayout(
         subtitle = stringResource(R.string.onb_exact_alarm_granted_subtitle),
         art = { OnbArtCircle(icon = OnbIcons.Check) },
         onBack = onBack,
-        useAdaptiveLayout = true,
+
         footer = {
             DwPrimaryButtonAnimated(
                 text = stringResource(R.string.onb_cta_continue),

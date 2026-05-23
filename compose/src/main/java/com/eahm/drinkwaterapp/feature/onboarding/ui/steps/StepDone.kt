@@ -80,7 +80,6 @@ internal fun StepDone(
         title = title,
         subtitle = stringResource(R.string.onb_done_subtitle),
         onBack = onBack,
-        useAdaptiveLayout = true,
         footer = {
             DwPrimaryButtonAnimated(
                 text = stringResource(R.string.onb_done_cta),

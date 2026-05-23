@@ -47,7 +47,6 @@ internal fun StepSetGoal(
         subtitle = stringResource(R.string.onb_set_goal_subtitle),
         art = { OnbArtCircle(icon = DwIcons.Drop) },
         onBack = onBack,
-        useAdaptiveLayout = true,
         footer = {
             DwPrimaryButtonAnimated(
                 text = stringResource(R.string.onb_set_goal_cta),

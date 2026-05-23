@@ -51,7 +51,6 @@ internal fun StepIntro(
         title = stringResource(R.string.onb_intro_title),
         subtitle = stringResource(R.string.onb_intro_subtitle),
         art = { OnbArtCircle(icon = DwIcons.Drop) },
-        useAdaptiveLayout = true,
         footer = {
             DwPrimaryButtonAnimated(
                 text = stringResource(R.string.onb_intro_cta_text),

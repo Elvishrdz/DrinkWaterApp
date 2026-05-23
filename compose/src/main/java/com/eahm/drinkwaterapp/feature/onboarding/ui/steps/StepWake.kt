@@ -43,7 +43,6 @@ internal fun StepWake(
         subtitle = stringResource(R.string.onb_wake_subtitle),
         art = { OnbArtCircle(icon = DwIcons.Sun) },
         onBack = onBack,
-        useAdaptiveLayout = true,
         footer = {
             if (isSameTime) {
                 Text(

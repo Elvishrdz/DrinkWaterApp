@@ -32,7 +32,6 @@ internal fun StepUnits(
         subtitle = stringResource(R.string.onb_units_subtitle),
         art = { OnbArtCircle(icon = DwIcons.Drop) },
         onBack = onBack,
-        useAdaptiveLayout = true,
         footer = {
             DwPrimaryButtonAnimated(
                 text = stringResource(R.string.onb_cta_continue),

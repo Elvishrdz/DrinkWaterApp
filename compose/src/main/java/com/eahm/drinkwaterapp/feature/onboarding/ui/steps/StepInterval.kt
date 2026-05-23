@@ -79,7 +79,6 @@ internal fun StepInterval(
         subtitle = stringResource(R.string.onb_interval_subtitle),
         art = { OnbArtCircle(icon = DwIcons.Clock) },
         onBack = onBack,
-        useAdaptiveLayout = true,
         footer = {
             DwPrimaryButtonAnimated(
                 text = stringResource(R.string.onb_cta_continue),

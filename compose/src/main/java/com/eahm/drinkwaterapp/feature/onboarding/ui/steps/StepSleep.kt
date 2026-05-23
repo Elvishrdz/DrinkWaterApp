@@ -44,7 +44,6 @@ internal fun StepSleep(
         subtitle = stringResource(R.string.onb_sleep_subtitle),
         art = { OnbArtCircle(icon = DwIcons.Moon) },
         onBack = onBack,
-        useAdaptiveLayout = true,
         footer = {
             if (isSameTime) {
                 Text(

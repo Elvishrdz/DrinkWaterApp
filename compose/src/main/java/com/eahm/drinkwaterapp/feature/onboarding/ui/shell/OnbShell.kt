@@ -35,12 +35,6 @@ internal val LocalOnboardingProgress = compositionLocalOf<Float?> { null }
 internal val ArtCircleSize = 72.dp
 internal val BodyCornerRadius = 30.dp
 
-/**
- * Shared onboarding shell used by all 11 steps.
- *
- * When [useAdaptiveLayout] is `true`, the shell switches between portrait,
- * landscape, and table-top arrangements based on the current [LayoutType].
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun OnbShell(
@@ -49,38 +43,31 @@ internal fun OnbShell(
     title: String,
     modifier: Modifier = Modifier,
     subtitle: String? = null,
+    layoutType: LayoutType = getLayoutType(),
     art: (@Composable () -> Unit)? = null,
     onBack: (() -> Unit)? = null,
-    useAdaptiveLayout: Boolean = true,
     footer: @Composable ColumnScope.() -> Unit = {},
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    if (useAdaptiveLayout) {
-        when (getLayoutType()) {
-            LayoutType.LANDSCAPE -> OnbShellLandscape(
-                weight = 0.7f,
-                step = step, total = total, title = title, subtitle = subtitle,
-                art = art, onBack = onBack, modifier = modifier, footer = footer, content = content,
-            )
+    when (layoutType) {
+        LayoutType.LANDSCAPE -> OnbShellLandscape(
+            weight = 0.7f,
+            step = step, total = total, title = title, subtitle = subtitle,
+            art = art, onBack = onBack, modifier = modifier, footer = footer, content = content,
+        )
 
-            LayoutType.FOLDABLE_EXPANDED -> OnbShellLandscape(
-                weight = 1f,
-                step = step, total = total, title = title, subtitle = subtitle,
-                art = art, onBack = onBack, modifier = modifier, footer = footer, content = content,
-            )
+        LayoutType.FOLDABLE_EXPANDED -> OnbShellLandscape(
+            weight = 1f,
+            step = step, total = total, title = title, subtitle = subtitle,
+            art = art, onBack = onBack, modifier = modifier, footer = footer, content = content,
+        )
 
-            LayoutType.TABLE_TOP -> OnbShellTableTop(
-                step = step, total = total, title = title, subtitle = subtitle,
-                art = art, onBack = onBack, modifier = modifier, footer = footer, content = content,
-            )
+        LayoutType.TABLE_TOP -> OnbShellTableTop(
+            step = step, total = total, title = title, subtitle = subtitle,
+            art = art, onBack = onBack, modifier = modifier, footer = footer, content = content,
+        )
 
-            LayoutType.PORTRAIT -> OnbShellPortrait(
-                step = step, total = total, title = title, subtitle = subtitle,
-                art = art, onBack = onBack, modifier = modifier, footer = footer, content = content,
-            )
-        }
-    } else {
-        OnbShellPortrait(
+        LayoutType.PORTRAIT -> OnbShellPortrait(
             step = step, total = total, title = title, subtitle = subtitle,
             art = art, onBack = onBack, modifier = modifier, footer = footer, content = content,
         )

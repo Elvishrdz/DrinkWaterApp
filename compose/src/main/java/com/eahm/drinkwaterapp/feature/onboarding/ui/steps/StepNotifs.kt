@@ -212,7 +212,6 @@ private fun NotifsPermissionContent(
         subtitle = stringResource(R.string.onb_notifs_permission_subtitle, intervalLabel),
         art = { OnbArtCircle(icon = DwIcons.Bell) },
         onBack = onBack,
-        useAdaptiveLayout = true,
         footer = {
             TextButton(
                 onClick = onSkip,
@@ -290,7 +289,7 @@ private fun NotifsConfigContent(
         subtitle = stringResource(R.string.onb_notifs_config_subtitle),
         art = { OnbArtCircle(icon = DwIcons.Glass) },
         onBack = onBack,
-        useAdaptiveLayout = true,
+
         footer = {
             DwPrimaryButtonAnimated(
                 text = stringResource(R.string.onb_cta_continue),
