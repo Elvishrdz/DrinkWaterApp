@@ -17,13 +17,20 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterDeep
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWaterLight
 import com.eahm.drinkwaterapp.core.presentation.LayoutType
 import com.eahm.drinkwaterapp.core.presentation.getLayoutType
+import com.eahm.drinkwaterapp.core.presentation.layouttype.LayoutTypesPreviewProvider
+import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps
+import com.eahm.drinkwaterapp.feature.onboarding.totalSteps
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.ui.OnbTopAppBar
+import com.eahm.drinkwaterapp.feature.onboarding.ui.steps.stepOverlay
 
 /**
  * Provides the animated progress fraction (0f–1f) to [OnbTopAppBar].
@@ -139,6 +146,33 @@ internal fun OnbArtCircle(
             contentDescription = null,
             tint = Color.White,
             modifier = Modifier.size(36.dp),
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun LegalScreenPreview(
+    @PreviewParameter(LayoutTypesPreviewProvider::class) layoutType: LayoutType,
+) {
+    DrinkWaterAppTheme {
+        val stepConfig = stepOverlay(
+            overlayGranted = true,
+            onAllow = {},
+            onContinue = {},
+            onBack = {},
+        )
+
+        OnbShell(
+            layoutType = layoutType,
+            step = 1,
+            total = OnboardingSteps.totalSteps,
+            title = stepConfig.title,
+            subtitle = stepConfig.subtitle,
+            art = stepConfig.art,
+            onBack = stepConfig.onBack,
+            footer = stepConfig.footer,
+            content = stepConfig.content,
         )
     }
 }

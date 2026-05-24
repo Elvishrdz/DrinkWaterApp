@@ -1,8 +1,8 @@
 package com.eahm.drinkwaterapp.core.presentation
 
 enum class LayoutType {
-    TABLE_TOP,
+    PORTRAIT,
     LANDSCAPE,
     FOLDABLE_EXPANDED,
-    PORTRAIT,
+    TABLE_TOP,
 }

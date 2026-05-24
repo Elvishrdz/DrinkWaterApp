@@ -1,7 +1,7 @@
 package com.eahm.drinkwaterapp.feature.onboarding.ui.shell
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -28,8 +28,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -38,9 +36,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps
 import com.eahm.drinkwaterapp.feature.onboarding.totalSteps
 import com.eahm.drinkwaterapp.feature.onboarding.ui.icons.OnbIcons
-import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.ui.OnbShellDefaults.contentPaddingDp
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.ui.OnbShellDefaults.externalPaddingDp
-import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.ui.OnbShellDefaults.topRoundedShape
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.ui.OnbTopAppBar
 
 @Composable
@@ -87,83 +83,42 @@ internal fun OnbShellLandscape(
 
                 Spacer(modifier = Modifier.height(3.dp))
 
-                BoxWithConstraints(
+                Box(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth(),
+                    contentAlignment = Alignment.Center,
                 ) {
-                    val containerHeight = constraints.maxHeight
-                    val density = LocalDensity.current
-                    val artGapPx = with(density) { 10.dp.roundToPx() }
-                    val stackTopPaddingPx = with(density) { contentPaddingDp.roundToPx() }
-                    val bottomInsetDp = windowInsets.only(WindowInsetsSides.Bottom)
-                        .asPaddingValues().calculateBottomPadding()
-
                     Column(
                         modifier = Modifier
-                            .fillMaxWidth()
                             .padding(horizontal = externalPaddingDp)
                             .verticalScroll(rememberScrollState()),
                         horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
                     ) {
-                        Layout(
-                            content = {
-                                Box { art?.invoke() }
-                                Text(
-                                    text = title,
-                                    style = MaterialTheme.typography.headlineSmall,
-                                    color = Color.White,
-                                    textAlign = TextAlign.Center,
-                                )
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                        ) { measurables, lc ->
-                            val artPlaceable =
-                                measurables[0].measure(lc.copy(minWidth = 0, minHeight = 0))
-                            val titlePlaceable = measurables[1].measure(lc.copy(minHeight = 0))
-                            val hasArt = art != null && artPlaceable.height > 0
-                            val artH = artPlaceable.height
-
-                            val artY: Int
-                            val titleY: Int
-                            val layoutH: Int
-
-                            if (hasArt) {
-                                val proposedTitleY = (containerHeight - titlePlaceable.height) / 2
-                                val proposedArtY = proposedTitleY - artGapPx - artH
-                                if (proposedArtY >= 0) {
-                                    // Fits: title centered, art directly above
-                                    artY = proposedArtY
-                                    titleY = proposedTitleY
-                                    layoutH = containerHeight
-                                } else {
-                                    // Doesn't fit centered: stack, let scroll take over
-                                    artY = stackTopPaddingPx
-                                    titleY = artY + artH + artGapPx
-                                    layoutH = titleY + titlePlaceable.height
-                                }
-                            } else {
-                                // No art: center title
-                                artY = 0
-                                titleY = (containerHeight - titlePlaceable.height) / 2
-                                layoutH = containerHeight
-                            }
-
-                            layout(lc.maxWidth, layoutH) {
-                                if (hasArt) {
-                                    artPlaceable.placeRelative(
-                                        x = (lc.maxWidth - artPlaceable.width) / 2,
-                                        y = artY,
-                                    )
-                                }
-                                titlePlaceable.placeRelative(
-                                    x = (lc.maxWidth - titlePlaceable.width) / 2,
-                                    y = titleY,
-                                )
-                            }
+                        if (art != null) {
+                            Box(
+                                modifier = Modifier.padding(bottom = 10.dp),
+                                contentAlignment = Alignment.Center,
+                                content = { art() },
+                            )
                         }
 
-                        Spacer(Modifier.height(bottomInsetDp))
+                        Text(
+                            text = title,
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = Color.White,
+                            textAlign = TextAlign.Center,
+                        )
+
+                        Spacer(
+                            Modifier.height(
+                                height = windowInsets
+                                    .only(WindowInsetsSides.Bottom)
+                                    .asPaddingValues()
+                                    .calculateBottomPadding(),
+                            )
+                        )
                     }
                 }
             }
@@ -173,7 +128,6 @@ internal fun OnbShellLandscape(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxHeight(),
-            shape = topRoundedShape,
             color = MaterialTheme.colorScheme.surface,
             shadowElevation = 0.dp,
         ) {
