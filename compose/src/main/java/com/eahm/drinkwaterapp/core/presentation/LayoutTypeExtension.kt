@@ -34,14 +34,14 @@ fun getLayoutType(): LayoutType {
                     // when font and screen is big enough, the window value changes from expanded to medium
                     isMedium
                 -> {
-                // Hinge list is empty when phone is in landscape
-                val isLandscape = windowPosture.hingeList.isEmpty()
+                when {
+                    windowPosture.hingeList.isNotEmpty() -> LayoutType.FOLDABLE_EXPANDED
 
-                if (isLandscape) {
-                    LayoutType.LANDSCAPE
+                    // Landscape when width >= height (phone landscape or tablet landscape)
+                    window.minWidthDp >= window.minHeightDp -> LayoutType.LANDSCAPE
 
-                } else {
-                    LayoutType.FOLDABLE_EXPANDED
+                    // Tablet in portrait
+                    else -> LayoutType.PORTRAIT
                 }
             }
 

@@ -12,6 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.window.core.layout.WindowSizeClass
+import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_EXPANDED_LOWER_BOUND
+import androidx.window.core.layout.WindowSizeClass.Companion.WIDTH_DP_MEDIUM_LOWER_BOUND
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.presentation.getLayoutType
 
@@ -45,6 +47,18 @@ internal fun AdaptiveScreen(
     val matching = breakpoint2.find {
         val result = it.isAtLeastBreakpoint(window.minWidthDp, window.minHeightDp)
         result
+    }
+
+    val isExpanded = when {
+        window.minWidthDp < WIDTH_DP_MEDIUM_LOWER_BOUND -> false
+        window.minWidthDp < WIDTH_DP_EXPANDED_LOWER_BOUND -> false
+        else -> true
+    }
+
+    val isMedium = when {
+        window.minWidthDp < WIDTH_DP_MEDIUM_LOWER_BOUND -> false
+        window.minWidthDp < WIDTH_DP_EXPANDED_LOWER_BOUND -> true
+        else -> false
     }
 
     val layoutType = getLayoutType()
@@ -124,6 +138,17 @@ internal fun AdaptiveScreen(
             Text(
                 text = "Height expanded: $heightExpanded",
                 color = Color.Gray,
+            )
+
+
+            Text(
+                text = "isExpanded: $isExpanded",
+                color = Color.Cyan,
+            )
+
+            Text(
+                text = "isMedium: $isMedium",
+                color = Color.Cyan,
             )
         }
     }
