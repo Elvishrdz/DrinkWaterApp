@@ -163,7 +163,14 @@ internal fun OnbShellLandscape(
                         Spacer(Modifier.height(12.dp))
                     }
 
-                    content()
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                        verticalArrangement = Arrangement.Center,
+                    ) {
+                        content()
+                    }
                 }
                 Spacer(Modifier.height(12.dp))
                 footer()

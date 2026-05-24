@@ -6,6 +6,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -13,6 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalInspectionMode
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import kotlinx.coroutines.delay
@@ -33,21 +35,32 @@ fun DwPrimaryButtonAnimated(
         buttonVisible = true
     }
 
-    AnimatedVisibility(
-        visible = buttonVisible,
-        enter = fadeIn(animationSpec = tween(300)) + slideInVertically(
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioMediumBouncy,
-                stiffness = Spring.StiffnessMedium,
+    Box {
+        if (!buttonVisible) {
+            // display a button in the area to reserve the space
+            DwPrimaryButton(
+                text = text,
+                onClick = onClick,
+                modifier = modifier.alpha(0f),
+                enabled = false,
+            )
+        }
+        AnimatedVisibility(
+            visible = buttonVisible,
+            enter = fadeIn(animationSpec = tween(300)) + slideInVertically(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessMedium,
+                ),
+                initialOffsetY = { it },
             ),
-            initialOffsetY = { it },
-        ),
-    ) {
-        DwPrimaryButton(
-            text = text,
-            onClick = onClick,
-            modifier = modifier,
-            enabled = enabled,
-        )
+        ) {
+            DwPrimaryButton(
+                text = text,
+                onClick = onClick,
+                modifier = modifier,
+                enabled = enabled,
+            )
+        }
     }
 }
