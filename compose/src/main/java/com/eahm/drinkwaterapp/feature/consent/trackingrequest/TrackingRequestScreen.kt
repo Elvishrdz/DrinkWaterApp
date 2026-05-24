@@ -33,6 +33,7 @@ internal fun TrackingRequestScreen(
             onDecline = onDecline,
         )
 
+        LayoutType.FOLDABLE_BOOK,
         LayoutType.FOLDABLE_EXPANDED,
         LayoutType.TABLE_TOP,
             -> TrackingRequestTableTop(

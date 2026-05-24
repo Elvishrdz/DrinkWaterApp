@@ -63,6 +63,7 @@ internal fun OnbShell(
             art = art, onBack = onBack, modifier = modifier, footer = footer, content = content,
         )
 
+        LayoutType.FOLDABLE_BOOK,
         LayoutType.FOLDABLE_EXPANDED -> OnbShellLandscape(
             weight = 1f,
             step = step, total = total, title = title, subtitle = subtitle,

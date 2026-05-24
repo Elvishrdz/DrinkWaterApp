@@ -34,6 +34,7 @@ internal fun LegalScreen(
             onAccept = onAccept,
         )
 
+        LayoutType.FOLDABLE_BOOK,
         LayoutType.FOLDABLE_EXPANDED,
             -> LegalLandscape(
             weight = 1f,

@@ -55,6 +55,7 @@ internal fun DrinkLayout(
         )
 
         LayoutType.LANDSCAPE,
+        LayoutType.FOLDABLE_BOOK,
         LayoutType.FOLDABLE_EXPANDED -> LandscapeLayout(
             innerPadding = innerPadding,
             modifier = modifier,

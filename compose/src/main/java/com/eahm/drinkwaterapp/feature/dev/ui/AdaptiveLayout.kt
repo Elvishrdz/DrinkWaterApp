@@ -46,6 +46,7 @@ internal fun Adaptive(
         }
 
         LayoutType.LANDSCAPE,
+        LayoutType.FOLDABLE_BOOK,
         LayoutType.FOLDABLE_EXPANDED,
             -> {
             Row(

@@ -61,8 +61,7 @@ fun getLayoutType(): LayoutType {
                 when {
                     windowPosture.hingeList.isNotEmpty() -> {
                         if (isBookMode) {
-                            // TODO("Add FOLDABLE_BOOK to LayoutType and return it here")
-                            LayoutType.FOLDABLE_EXPANDED
+                            LayoutType.FOLDABLE_BOOK
                         } else {
                             LayoutType.FOLDABLE_EXPANDED
                         }

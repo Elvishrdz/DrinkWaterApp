@@ -71,7 +71,6 @@ import com.eahm.drinkwaterapp.feature.dev.celebrations.CelebrationsRoot
 import com.eahm.drinkwaterapp.feature.dev.consent.ConsentDevRoot
 import com.eahm.drinkwaterapp.feature.dev.dailygoal.DailyGoalDevRoot
 import com.eahm.drinkwaterapp.feature.dev.historyinject.HistoryInjectDevRoot
-import com.eahm.drinkwaterapp.feature.history.v2.HistoryV2Root
 import com.eahm.drinkwaterapp.feature.dev.menu.DevMenuRoot
 import com.eahm.drinkwaterapp.feature.dev.notifications.NotificationsRoot
 import com.eahm.drinkwaterapp.feature.dev.onboarding.OnboardingDevRoot
@@ -79,6 +78,7 @@ import com.eahm.drinkwaterapp.feature.dev.streak.StreakDevRoot
 import com.eahm.drinkwaterapp.feature.dev.tracking.TrackingDevRoot
 import com.eahm.drinkwaterapp.feature.dev.ui.Adaptive
 import com.eahm.drinkwaterapp.feature.dev.wateranimation.WaterAnimationDevRoot
+import com.eahm.drinkwaterapp.feature.history.v2.HistoryV2Root
 import com.eahm.drinkwaterapp.ui.drinkbutton.DrinkButton
 import com.eahm.drinkwaterapp.ui.drinks.BubbleConfig
 import com.eahm.drinkwaterapp.ui.drinks.DrinkAppearance
@@ -243,6 +243,7 @@ private fun DevNavLayout(
     when (layoutType) {
         LayoutType.TABLE_TOP,
         LayoutType.LANDSCAPE,
+        LayoutType.FOLDABLE_BOOK,
         LayoutType.FOLDABLE_EXPANDED,
             -> {
             Row(modifier = Modifier.fillMaxSize()) {
