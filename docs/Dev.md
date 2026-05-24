@@ -28,7 +28,7 @@ App Release
 
 Priorities Tier 1
 
-- [] Tablet: onboarding muestra rounded corners y white background en darknmode. Ver captura
+- [x] Tablet: onboarding muestra rounded corners y white background en darknmode. Ver captura
 - [] Grafico no cambia letras del dia abreviadas al nuevo idioma al cambiar
 - [] Gráfico de goles y gráfico de ingesta. Uno muestra si alcanzaste el gol y otro es de cantidad
   hay q agregar ambos.
