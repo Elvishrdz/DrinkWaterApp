@@ -28,6 +28,18 @@ App Release
 
 Priorities Tier 1
 
+- [] Tablet: onboarding muestra rounded corners y white background en darknmode. Ver captura
+- [] Grafico no cambia letras del dia abreviadas al nuevo idioma al cambiar
+- [] Gráfico de goles y gráfico de ingesta. Uno muestra si alcanzaste el gol y otro es de cantidad
+  hay q agregar ambos.
+  Con toggle al gráfico.
+- [] Las estadísticas no se actualizan real time. Si la app está abierta nunca se actualiza solo an
+  cerra y abrir otra vez se verán los cambios en el gráfico
+- [] El historia no se actualiza al pasar de un día a otro
+- [] El botón de hoy se queda en el día anterior pero la fecha ya cambió. Revisar y corregir esto.
+- [] Obtener los skips para sugerir reducir notificaciones ai son demasiado. Si el usuario borra
+  mucho la notificacion se puede tratar de reducir el intervalo para evitar molestias. Se sugiere en
+  la pantalla de configuracion de notificaciones/reminders
 - [x] app nav: si presionamos atras desde otra screen, regresar a drink screen y luego salir de la
   app.
 - [] app: agregar icono monochrome
