@@ -13,6 +13,7 @@ internal sealed interface DrinkState {
 
     @Immutable
     data class Data(
+        val isAdFree: Boolean,
         val drinkStreakDays: Int,
         val showStreakBadge: Boolean,
         val drinkStats: DrinkStats?,

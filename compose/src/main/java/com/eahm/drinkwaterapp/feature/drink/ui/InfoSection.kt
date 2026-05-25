@@ -1,11 +1,11 @@
 package com.eahm.drinkwaterapp.feature.drink.ui
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStats
@@ -18,21 +18,22 @@ internal fun InfoSection(
     state: DrinkState.Data,
     onNavigateToHistory: () -> Unit,
     onNavigateToSettings: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    val isPreview = LocalInspectionMode.current
-    if (!isPreview) {
+    Column(modifier = modifier) {
         HomeAlarmCard(
             modifier = Modifier.padding(horizontal = 20.dp),
             onNavigateToSettings = onNavigateToSettings,
         )
         Spacer(modifier = Modifier.height(16.dp))
+
+        TodayLogSection(
+            items = state.todayLogs,
+            onSeeAll = onNavigateToHistory,
+            modifier = Modifier.padding(horizontal = 20.dp),
+            unitPreference = state.unitPreference,
+        )
     }
-    TodayLogSection(
-        items = state.todayLogs,
-        onSeeAll = onNavigateToHistory,
-        modifier = Modifier.padding(horizontal = 20.dp),
-        unitPreference = state.unitPreference,
-    )
 }
 
 @Preview
@@ -41,6 +42,7 @@ private fun InfoSectionPreview() {
     DrinkWaterAppTheme {
         InfoSection(
             state = DrinkState.Data(
+                isAdFree = false,
                 drinkStreakDays = 5,
                 showStreakBadge = true,
                 drinkStats = DrinkStats(
@@ -65,6 +67,7 @@ private fun InfoSectionEmptyPreview() {
     DrinkWaterAppTheme {
         InfoSection(
             state = DrinkState.Data(
+                isAdFree = false,
                 drinkStreakDays = 0,
                 showStreakBadge = false,
                 drinkStats = null,

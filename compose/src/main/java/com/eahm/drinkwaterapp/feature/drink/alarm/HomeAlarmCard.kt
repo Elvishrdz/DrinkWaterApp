@@ -4,12 +4,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkSchedule
-import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkSlot
-import com.eahm.drinkwaterapp.core.data.drinkalarm.data.TimeResult
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import kotlinx.datetime.LocalDateTime
@@ -19,8 +17,18 @@ import org.koin.compose.viewmodel.koinViewModel
 internal fun HomeAlarmCard(
     onNavigateToSettings: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: HomeAlarmViewModel = koinViewModel(),
 ) {
+    val isPreview = LocalInspectionMode.current
+    if (isPreview) {
+        ActiveScheduleCard(
+            state = homeAlarmStateActiveMock,
+            modifier = modifier,
+        )
+        return
+    }
+
+    val viewModel = koinViewModel<HomeAlarmViewModel>()
+
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     when (val s = state) {
@@ -55,19 +63,21 @@ private fun NotConfiguredPreview() {
 private fun ActiveInActiveHoursPreview() {
     DrinkWaterAppTheme {
         ActiveScheduleCard(
-            state = HomeAlarmState.Active(
-                startTime = LocalDateTime(2026, 5, 10, 8, 0),
-                endTime = LocalDateTime(2026, 5, 10, 20, 0),
-                interval = AlarmInterval(0, 90),
-                schedule = drinkScheduleMock,
-                nextAlarmSlot = LocalDateTime(2026, 5, 10, 14, 30),
-                isInActiveHours = true,
-                now = LocalDateTime(2026, 5, 10, 13, 15),
-            ),
+            state = homeAlarmStateActiveMock,
             modifier = Modifier.padding(20.dp),
         )
     }
 }
+
+private val homeAlarmStateActiveMock = HomeAlarmState.Active(
+    startTime = LocalDateTime(2026, 5, 10, 8, 0),
+    endTime = LocalDateTime(2026, 5, 10, 20, 0),
+    interval = AlarmInterval(0, 90),
+    schedule = drinkScheduleMock,
+    nextAlarmSlot = LocalDateTime(2026, 5, 10, 14, 30),
+    isInActiveHours = true,
+    now = LocalDateTime(2026, 5, 10, 13, 15),
+)
 
 @Preview
 @Composable

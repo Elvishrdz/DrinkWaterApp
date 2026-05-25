@@ -43,7 +43,7 @@ fun ProgressRing(
     current: Float,
     goal: Float,
     modifier: Modifier = Modifier,
-    size: Dp = 220.dp,
+    size: Dp = 230.dp,
     displayZeroPercentage: Boolean = true,
     onClick: (() -> Unit)? = null,
     bounceEnabled: Boolean = true,

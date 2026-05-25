@@ -14,8 +14,8 @@ import org.koin.compose.viewmodel.koinViewModel
 internal fun DrinkRoot(
     onNavigateToHistory: () -> Unit,
     onNavigateToSettings: () -> Unit,
-    viewModel: DrinkViewModel = koinViewModel()
 ) {
+    val viewModel = koinViewModel<DrinkViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     when (val data = state) {
@@ -27,12 +27,7 @@ internal fun DrinkRoot(
             Box(Modifier.fillMaxSize()) {
                 DrinkScreen(
                     state = data,
-                    onDrink = { amount, source -> viewModel.onDrink(amount, source) },
-                    onReorderPresets = viewModel::onPresetsReordered,
-                    onCreatePreset = viewModel::onCreatePreset,
-                    onDeletePreset = viewModel::onDeletePreset,
-                    onRestorePreset = viewModel::onRestorePreset,
-                    onBottomSheetOpened = viewModel::onBottomSheetOpened,
+                    onAction = viewModel::onAction,
                     onNavigateToHistory = onNavigateToHistory,
                     onNavigateToSettings = onNavigateToSettings,
                 )

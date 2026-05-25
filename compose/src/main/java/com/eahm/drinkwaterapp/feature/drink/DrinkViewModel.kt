@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingDrink
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
+import com.eahm.drinkwaterapp.core.billing.PurchaseManager
 import com.eahm.drinkwaterapp.core.data.confetti.ConfettiController
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
@@ -58,6 +59,7 @@ internal class DrinkViewModel(
     val trackingService: TrackingService,
     val activeHoursObserver: ActiveHoursObserver,
     notificationPermissionObserver: NotificationPermissionObserver,
+    private val purchaseManager: PurchaseManager,
 ) : ViewModel() {
 
     private val dao = database.getHistoryDao()
@@ -189,11 +191,13 @@ internal class DrinkViewModel(
         extras,
         history,
         drinkStatsObserver.drinkStats,
-    ) { extras, history, drinkStats ->
+        purchaseManager.isAdFree,
+    ) { extras, history, drinkStats, isAdFree ->
         if (history == null || extras == null) {
             DrinkState.Loading
         } else {
             DrinkState.Data(
+                isAdFree = isAdFree,
                 drinkStreakDays = extras.streakData.drinkStreakDays,
                 showStreakBadge = extras.streakData.drinkStreakDays > 0,
                 quickDrinkSuggestions = extras.quickDrinkSuggestions,
@@ -229,6 +233,21 @@ internal class DrinkViewModel(
         started = SharingStarted.Lazily,
         initialValue = DrinkState.Loading,
     )
+
+    fun onAction(action: DrinkAction) {
+        when (action) {
+            is DrinkAction.Drink -> onDrink(amount = action.amount, source = action.source)
+            is DrinkAction.CreatePreset -> onCreatePreset(amount = action.amount)
+            is DrinkAction.DeletePreset -> onDeletePreset(action.preset)
+            is DrinkAction.ReorderPresets -> onPresetsReordered(
+                newOrder = action.newOrder,
+                reorderingQuickPresets = action.reorderingQuickPresets
+            )
+
+            is DrinkAction.RestorePreset -> onRestorePreset(action.preset)
+            is DrinkAction.BottomSheetOpened -> onBottomSheetOpened(presetCount = action.presetCount)
+        }
+    }
 
     fun onDrink(amount: Float, source: DrinkSource) {
         val sourceKey = when (source) {

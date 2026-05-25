@@ -4,11 +4,16 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.displayCutout
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,6 +27,7 @@ import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStats
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.presentation.LayoutType
+import com.eahm.drinkwaterapp.core.presentation.layouttype.NavigationType
 import com.eahm.drinkwaterapp.core.presentation.layouttype.getLayoutAndNavigationType
 import com.eahm.drinkwaterapp.feature.drink.layout.DrinkLandscape
 import com.eahm.drinkwaterapp.feature.drink.layout.DrinkPortrait
@@ -34,20 +40,12 @@ import com.eahm.drinkwaterapp.feature.drink.ui.previewLogEntries
 @Composable
 internal fun DrinkScreen(
     state: DrinkState.Data,
-    onDrink: (Float, DrinkSource) -> Unit,
-    onReorderPresets: (List<DrinkSuggestion>, Boolean) -> Unit,
-    onCreatePreset: (Float) -> Unit,
-    onDeletePreset: (DrinkSuggestion) -> Unit,
-    onRestorePreset: (DrinkSuggestion) -> Unit,
-    onBottomSheetOpened: (Int) -> Unit,
+    onAction: (DrinkAction) -> Unit,
     onNavigateToHistory: () -> Unit,
     onNavigateToSettings: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
-    val windowInsets = WindowInsets.safeDrawing.union(WindowInsets.displayCutout)
-
     val innerPadding = PaddingValues()
-    val (layoutType, navigation) = getLayoutAndNavigationType()
+    val (layoutType, navigationType) = getLayoutAndNavigationType()
 
     val ringSection: @Composable () -> Unit = {
         RingSection(state = state)
@@ -56,12 +54,7 @@ internal fun DrinkScreen(
     val actionsSection: @Composable () -> Unit = {
         ActionsSection(
             state = state,
-            onDrink = onDrink,
-            onReorderPresets = onReorderPresets,
-            onCreatePreset = onCreatePreset,
-            onDeletePreset = onDeletePreset,
-            onRestorePreset = onRestorePreset,
-            onBottomSheetOpened = onBottomSheetOpened,
+            onAction = onAction,
         )
     }
 
@@ -76,20 +69,42 @@ internal fun DrinkScreen(
     when (layoutType) {
         LayoutType.PORTRAIT_EXPANDED,
         LayoutType.PORTRAIT,
-            -> DrinkPortrait(
-            innerPadding = innerPadding,
-            modifier = modifier,
-            ringSection = ringSection,
-            actionsSection = actionsSection,
-            infoSection = infoSection,
-        )
+            -> {
+            val windowInsets = WindowInsets.safeDrawing.union(WindowInsets.displayCutout)
+
+            // only calculate bottom padding when using navigation rail and no banner visible
+            val bottomPadding =
+                if (navigationType == NavigationType.NavigationRail && state.isAdFree) {
+                    windowInsets.asPaddingValues().calculateBottomPadding()
+                } else {
+                    0.dp
+                }
+
+            val contentPadding = PaddingValues(
+                top = windowInsets.asPaddingValues().calculateTopPadding(),
+                bottom = bottomPadding,
+            )
+
+            DrinkPortrait(
+                state = state,
+                modifier = Modifier
+                    .windowInsetsPadding(
+                        insets = windowInsets.only(WindowInsetsSides.Horizontal),
+                    )
+                    .fillMaxSize(),
+                contentPadding = contentPadding,
+                onAction = onAction,
+                onNavigateToHistory = onNavigateToHistory,
+                onNavigateToSettings = onNavigateToSettings,
+            )
+        }
 
         LayoutType.LANDSCAPE,
         LayoutType.FOLDABLE_BOOK,
         LayoutType.FOLDABLE_EXPANDED,
             -> DrinkLandscape(
             innerPadding = innerPadding,
-            modifier = modifier,
+            modifier = Modifier,
             ringSection = ringSection,
             actionsSection = actionsSection,
             infoSection = infoSection,
@@ -98,7 +113,7 @@ internal fun DrinkScreen(
         LayoutType.TABLE_TOP,
             -> DrinkTableTop(
             innerPadding = innerPadding,
-            modifier = modifier,
+            modifier = Modifier,
             ringSection = ringSection,
             actionsSection = actionsSection,
             infoSection = infoSection,
@@ -123,13 +138,8 @@ internal fun DrinkScreen(
 private fun DrinkScreenPreview() {
     DrinkWaterAppTheme {
         DrinkScreen(
-            state = stateMock,
-            onDrink = { _, _ -> },
-            onReorderPresets = { _, _ -> },
-            onCreatePreset = {},
-            onDeletePreset = {},
-            onRestorePreset = {},
-            onBottomSheetOpened = {},
+            state = drinkStateMock,
+            onAction = {},
             onNavigateToHistory = {},
             onNavigateToSettings = {},
         )
@@ -141,13 +151,8 @@ private fun DrinkScreenPreview() {
 private fun DrinkScreenLandscapePreview() {
     DrinkWaterAppTheme {
         DrinkScreen(
-            state = stateMock,
-            onDrink = { _, _ -> },
-            onReorderPresets = { _, _ -> },
-            onCreatePreset = {},
-            onDeletePreset = {},
-            onRestorePreset = {},
-            onBottomSheetOpened = {},
+            state = drinkStateMock,
+            onAction = {},
             onNavigateToHistory = {},
             onNavigateToSettings = {},
         )
@@ -159,13 +164,8 @@ private fun DrinkScreenLandscapePreview() {
 private fun DrinkScreenTabletPreview() {
     DrinkWaterAppTheme {
         DrinkScreen(
-            state = stateMock,
-            onDrink = { _, _ -> },
-            onReorderPresets = { _, _ -> },
-            onCreatePreset = {},
-            onDeletePreset = {},
-            onRestorePreset = {},
-            onBottomSheetOpened = {},
+            state = drinkStateMock,
+            onAction = {},
             onNavigateToHistory = {},
             onNavigateToSettings = {},
         )
@@ -177,7 +177,7 @@ private fun DrinkScreenTabletPreview() {
 private fun DrinkScreenGoalReachedPreview() {
     DrinkWaterAppTheme {
         DrinkScreen(
-            state = stateMock.copy(
+            state = drinkStateMock.copy(
                 drinkStats = DrinkStats(
                     goalAmount = 2400f,
                     drinkAmount = 2400f,
@@ -186,12 +186,7 @@ private fun DrinkScreenGoalReachedPreview() {
                 drinkStreakDays = 7,
                 showStreakBadge = true,
             ),
-            onDrink = { _, _ -> },
-            onReorderPresets = { _, _ -> },
-            onCreatePreset = {},
-            onDeletePreset = {},
-            onRestorePreset = {},
-            onBottomSheetOpened = {},
+            onAction = {},
             onNavigateToHistory = {},
             onNavigateToSettings = {},
         )
@@ -204,7 +199,8 @@ internal val drinkSuggestionsMocks = listOf(
     DrinkSuggestion(3, 300f),
 )
 
-private val stateMock = DrinkState.Data(
+internal val drinkStateMock = DrinkState.Data(
+    isAdFree = false,
     drinkStreakDays = 0,
     showStreakBadge = false,
     drinkStats = DrinkStats(

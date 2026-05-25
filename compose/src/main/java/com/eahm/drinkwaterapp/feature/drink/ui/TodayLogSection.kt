@@ -63,7 +63,6 @@ fun TodayLogSection(
 ) {
     Column(
         modifier = modifier
-            .fillMaxWidth()
             .outlineBorderStyle()
             .background(MaterialTheme.colorScheme.surface)
             .padding(14.dp)

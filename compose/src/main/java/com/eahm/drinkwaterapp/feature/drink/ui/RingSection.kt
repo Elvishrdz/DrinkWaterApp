@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -45,8 +44,9 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.R
-import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
+import com.eahm.drinkwaterapp.core.config.FeatureFlags
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStats
+import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwThemePreview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
@@ -60,21 +60,23 @@ import kotlinx.coroutines.delay
 import kotlin.random.Random
 
 @Composable
-internal fun RingSection(state: DrinkState.Data) {
-    TodayHeader(
-        streak = state.drinkStreakDays,
-        showStreak = state.showStreakBadge,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 20.dp, end = 20.dp, top = 20.dp),
-    )
-
+internal fun RingSection(
+    state: DrinkState.Data,
+    modifier: Modifier = Modifier,
+) {
     Column(
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 4.dp),
     ) {
+        if (FeatureFlags.streakFeatureEnabled) {
+            TodayHeader(
+                streak = state.drinkStreakDays,
+                showStreak = state.showStreakBadge,
+                modifier = Modifier
+                    .padding(start = 20.dp, end = 20.dp, top = 20.dp),
+            )
+        }
+
         ProgressRing(
             current = state.drinkStats?.drinkAmount ?: 0f,
             goal = state.drinkStats?.goalAmount ?: 0f,
@@ -322,6 +324,7 @@ private fun RingSectionPreview() {
         Column {
             RingSection(
                 state = DrinkState.Data(
+                    isAdFree = false,
                     drinkStreakDays = 5,
                     showStreakBadge = true,
                     drinkStats = DrinkStats(
