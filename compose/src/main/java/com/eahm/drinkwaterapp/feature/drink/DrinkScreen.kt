@@ -44,6 +44,8 @@ internal fun DrinkScreen(
     onNavigateToHistory: () -> Unit,
     onNavigateToSettings: () -> Unit,
 ) {
+    val windowInsets = WindowInsets.safeDrawing.union(WindowInsets.displayCutout)
+
     val innerPadding = PaddingValues()
     val (layoutType, navigationType) = getLayoutAndNavigationType()
 
@@ -66,31 +68,52 @@ internal fun DrinkScreen(
         )
     }
 
+    // only calculate bottom padding when using navigation rail and no banner visible
+    val bottomPadding =
+        if (navigationType == NavigationType.NavigationRail && state.isAdFree) {
+            windowInsets.asPaddingValues().calculateBottomPadding()
+        } else {
+            0.dp
+        }
+
+    val contentPadding = PaddingValues(
+        top = windowInsets.asPaddingValues().calculateTopPadding(),
+        bottom = bottomPadding,
+    )
+
+    // TODO: persist drink water presets suggestions bottom sheet and value when changing layouts
     when (layoutType) {
         LayoutType.PORTRAIT_EXPANDED,
         LayoutType.PORTRAIT,
+            -> DrinkPortrait(
+            state = state,
+            modifier = Modifier
+                .windowInsetsPadding(
+                    insets = windowInsets.only(WindowInsetsSides.Horizontal),
+                )
+                .fillMaxSize(),
+            contentPadding = contentPadding,
+            onAction = onAction,
+            onNavigateToHistory = onNavigateToHistory,
+            onNavigateToSettings = onNavigateToSettings,
+        )
+
+        LayoutType.LANDSCAPE,
+        LayoutType.FOLDABLE_BOOK,
+        LayoutType.FOLDABLE_EXPANDED,
             -> {
-            val windowInsets = WindowInsets.safeDrawing.union(WindowInsets.displayCutout)
+            val insets = when (navigationType) {
+                NavigationType.NavigationBar -> windowInsets
+                    .only(WindowInsetsSides.Horizontal)
 
-            // only calculate bottom padding when using navigation rail and no banner visible
-            val bottomPadding =
-                if (navigationType == NavigationType.NavigationRail && state.isAdFree) {
-                    windowInsets.asPaddingValues().calculateBottomPadding()
-                } else {
-                    0.dp
-                }
+                NavigationType.NavigationRail -> windowInsets
+                    .only(WindowInsetsSides.End)
+            }
 
-            val contentPadding = PaddingValues(
-                top = windowInsets.asPaddingValues().calculateTopPadding(),
-                bottom = bottomPadding,
-            )
-
-            DrinkPortrait(
+            DrinkLandscape(
                 state = state,
                 modifier = Modifier
-                    .windowInsetsPadding(
-                        insets = windowInsets.only(WindowInsetsSides.Horizontal),
-                    )
+                    .windowInsetsPadding(insets)
                     .fillMaxSize(),
                 contentPadding = contentPadding,
                 onAction = onAction,
@@ -98,17 +121,6 @@ internal fun DrinkScreen(
                 onNavigateToSettings = onNavigateToSettings,
             )
         }
-
-        LayoutType.LANDSCAPE,
-        LayoutType.FOLDABLE_BOOK,
-        LayoutType.FOLDABLE_EXPANDED,
-            -> DrinkLandscape(
-            innerPadding = innerPadding,
-            modifier = Modifier,
-            ringSection = ringSection,
-            actionsSection = actionsSection,
-            infoSection = infoSection,
-        )
 
         LayoutType.TABLE_TOP,
             -> DrinkTableTop(
