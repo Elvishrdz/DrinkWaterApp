@@ -2,6 +2,7 @@ package com.eahm.drinkwaterapp
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.eahm.drinkwaterapp.core.config.PrivacyPolicyConfig
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManagerV2
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,10 +37,11 @@ class MainViewModel(
 
     private fun updateState() {
         viewModelScope.launch {
+            val trackingDecided = prefsStorage.getTrackingConsentDecided().firstOrNull() ?: false
+            val policyVersionAccepted = prefsStorage.getPrivacyPolicyVersionAccepted().firstOrNull()
             state.update {
                 MainState.Ready(
-                    consentCompleted = prefsStorage.getTrackingConsentDecided().firstOrNull()
-                        ?: false,
+                    consentCompleted = trackingDecided && policyVersionAccepted == PrivacyPolicyConfig.CURRENT_POLICY_DATE,
                     onboardingCompleted = prefsStorage.getOnboardingCompleted().firstOrNull()
                         ?: false,
                 )

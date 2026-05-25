@@ -43,6 +43,7 @@ private class DataStorePrefsStorage(
     )
 
     private val privacyPolicyAcceptedAtKey = longPreferencesKey("PRIVACY_POLICY_ACCEPTED_AT")
+    private val privacyPolicyVersionAcceptedKey = longPreferencesKey("PRIVACY_POLICY_VERSION_ACCEPTED")
     private val trackingConsentDecidedKey = booleanPreferencesKey("TRACKING_CONSENT_DECIDED")
     private val onboardingCompletedKey = booleanPreferencesKey("ONBOARDING_COMPLETED")
     private val usernameKey = stringPreferencesKey("USERNAME")
@@ -77,6 +78,23 @@ private class DataStorePrefsStorage(
 
     override suspend fun clearPrivacyPolicyAccepted() {
         dataStore.edit { it.remove(privacyPolicyAcceptedAtKey) }
+    }
+
+    override fun getPrivacyPolicyVersionAccepted(): Flow<Long?> {
+        return dataStore.data.map { preferences ->
+            preferences[privacyPolicyVersionAcceptedKey]
+        }
+    }
+
+    override suspend fun setPrivacyPolicyVersionAccepted(policyDate: Long) {
+        dataStore.updateData { preferences ->
+            preferences.toMutablePreferences()
+                .also { it[privacyPolicyVersionAcceptedKey] = policyDate }
+        }
+    }
+
+    override suspend fun clearPrivacyPolicyVersionAccepted() {
+        dataStore.edit { it.remove(privacyPolicyVersionAcceptedKey) }
     }
 
     override fun getTrackingConsentDecided(): Flow<Boolean> {
@@ -301,6 +319,7 @@ private class DataStorePrefsStorage(
 
     override suspend fun clear() {
         clearPrivacyPolicyAccepted()
+        clearPrivacyPolicyVersionAccepted()
         clearTrackingConsentDecided()
         dataStore.edit {
             it.remove(onboardingCompletedKey)

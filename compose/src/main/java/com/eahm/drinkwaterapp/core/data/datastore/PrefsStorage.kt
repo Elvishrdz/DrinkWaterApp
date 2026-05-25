@@ -12,6 +12,10 @@ interface PrefsStorage {
     suspend fun setPrivacyPolicyAccepted(acceptedAt: Long)
     suspend fun clearPrivacyPolicyAccepted()
 
+    fun getPrivacyPolicyVersionAccepted(): Flow<Long?>
+    suspend fun setPrivacyPolicyVersionAccepted(policyDate: Long)
+    suspend fun clearPrivacyPolicyVersionAccepted()
+
     fun getTrackingConsentDecided(): Flow<Boolean>
     suspend fun setTrackingConsentDecided()
     suspend fun clearTrackingConsentDecided()

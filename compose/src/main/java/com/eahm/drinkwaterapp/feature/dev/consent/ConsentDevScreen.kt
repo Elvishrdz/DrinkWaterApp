@@ -28,16 +28,26 @@ internal fun ConsentDevScreen(
     privacyPolicyAcceptedAt: Long?,
     trackingConsentDecided: Boolean,
     isTracking: Boolean,
+    privacyPolicyVersionAccepted: Long?,
+    currentPolicyDate: Long,
+    isPolicyUpToDate: Boolean,
     onResetPrivacyPolicy: () -> Unit,
     onResetTrackingConsentDecided: () -> Unit,
     onResetAll: () -> Unit,
     setPrivacyPolicyAcceptedNow: () -> Unit,
+    onAcceptPolicyVersionNow: () -> Unit,
+    onSimulatePolicyUpdate: () -> Unit,
     onLaunchConsent: () -> Unit,
     onBackClicked: () -> Unit,
 ) {
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
     val ppTimestamp = privacyPolicyAcceptedAt
-        ?.let { SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(it)) }
+        ?.let { dateFormat.format(Date(it)) }
         ?: "null"
+    val versionAcceptedFormatted = privacyPolicyVersionAccepted
+        ?.let { dateFormat.format(Date(it)) }
+        ?: "null"
+    val currentPolicyDateFormatted = dateFormat.format(Date(currentPolicyDate))
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         LazyColumn(
@@ -83,6 +93,29 @@ internal fun ConsentDevScreen(
                 )
             }
 
+            item {
+                Text(
+                    text = "Privacy Policy version accepted: $versionAcceptedFormatted",
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 13.sp,
+                )
+            }
+
+            item {
+                Text(
+                    text = "Current policy date: $currentPolicyDateFormatted",
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 13.sp,
+                )
+            }
+
+            item {
+                Text(
+                    text = "Policy up to date: $isPolicyUpToDate",
+                    fontSize = 13.sp,
+                )
+            }
+
             item { Spacer(Modifier.height(7.dp)) }
 
             item {
@@ -97,6 +130,23 @@ internal fun ConsentDevScreen(
                     onClick = setPrivacyPolicyAcceptedNow,
                     modifier = Modifier.fillMaxWidth(),
                 )
+            }
+
+            item {
+                DwTertiaryButton(
+                    text = "Accept policy version now",
+                    onClick = onAcceptPolicyVersionNow,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+
+            item {
+                OutlinedButton(
+                    onClick = onSimulatePolicyUpdate,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text("Simulate policy update (clear version)")
+                }
             }
 
             item {

@@ -6,5 +6,9 @@ internal sealed interface ConsentDevState {
         val privacyPolicyAcceptedAt: Long?,
         val trackingConsentDecided: Boolean,
         val isTracking: Boolean,
-    ) : ConsentDevState
+        val privacyPolicyVersionAccepted: Long?,
+        val currentPolicyDate: Long,
+    ) : ConsentDevState {
+        val isPolicyUpToDate: Boolean get() = privacyPolicyVersionAccepted == currentPolicyDate
+    }
 }
