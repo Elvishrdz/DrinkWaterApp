@@ -34,6 +34,7 @@ import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults.verticalSpacing
 
 @Composable
 internal fun TrackingRequestLandscape(
+    weight: Float,
     isTrackingEnabled: Boolean,
     showStepCounter: Boolean,
     onAllow: () -> Unit,
@@ -47,7 +48,7 @@ internal fun TrackingRequestLandscape(
     ) {
         Box(
             modifier = Modifier
-                .weight(0.7f)
+                .weight(weight)
                 .fillMaxHeight()
                 .background(trackingGradient),
         ) {
@@ -119,6 +120,7 @@ internal fun TrackingRequestLandscape(
 private fun TrackingRequestLandscapePreview() {
     DrinkWaterAppTheme {
         TrackingRequestLandscape(
+            weight = 1f,
             isTrackingEnabled = false,
             showStepCounter = true,
             onAllow = {},
@@ -132,6 +134,7 @@ private fun TrackingRequestLandscapePreview() {
 private fun BigFontPreview() {
     DrinkWaterAppTheme {
         TrackingRequestLandscape(
+            weight = 1f,
             isTrackingEnabled = false,
             showStepCounter = true,
             onAllow = {},

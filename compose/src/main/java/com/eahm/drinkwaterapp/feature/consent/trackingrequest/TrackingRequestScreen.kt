@@ -28,6 +28,7 @@ internal fun TrackingRequestScreen(
 
         LayoutType.LANDSCAPE,
             -> TrackingRequestLandscape(
+            weight = 0.7f,
             isTrackingEnabled = isTrackingEnabled,
             showStepCounter = showStepCounter,
             onAllow = onAllow,
@@ -36,6 +37,15 @@ internal fun TrackingRequestScreen(
 
         LayoutType.FOLDABLE_BOOK,
         LayoutType.FOLDABLE_EXPANDED,
+            -> TrackingRequestLandscape(
+            weight = 1f,
+            isTrackingEnabled = isTrackingEnabled,
+            showStepCounter = showStepCounter,
+            onAllow = onAllow,
+            onDecline = onDecline,
+        )
+
+
         LayoutType.TABLE_TOP,
             -> TrackingRequestTableTop(
             isTrackingEnabled = isTrackingEnabled,
