@@ -1,5 +1,6 @@
 package com.eahm.drinkwaterapp.feature.drink
 
+import androidx.compose.runtime.Immutable
 import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStats
 import com.eahm.drinkwaterapp.core.data.streak.StreakData
@@ -10,6 +11,7 @@ internal sealed interface DrinkState {
 
     data object Loading : DrinkState
 
+    @Immutable
     data class Data(
         val drinkStreakDays: Int,
         val showStreakBadge: Boolean,
@@ -26,6 +28,7 @@ internal sealed interface DrinkState {
     ) : DrinkState
 }
 
+@Immutable
 data class DrinkExtras(
     val streakData: StreakData,
     val quickDrinkSuggestions: List<DrinkSuggestion>,

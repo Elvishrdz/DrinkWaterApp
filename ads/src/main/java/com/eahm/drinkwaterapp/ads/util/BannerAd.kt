@@ -18,11 +18,14 @@ package com.eahm.drinkwaterapp.ads.util
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.google.android.gms.ads.AdView
@@ -37,7 +40,15 @@ import com.google.android.gms.ads.AdView
 fun BannerAd(adView: AdView, modifier: Modifier = Modifier) {
     // Ad load does not work in preview mode because it requires a network connection.
     if (LocalInspectionMode.current) {
-        Box { Text(text = "Google Mobile Ads preview banner.", modifier.align(Alignment.Center)) }
+        Box(modifier = modifier) {
+            Text(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(3.dp),
+                text = "Google Mobile Ads preview banner.",
+                textAlign = TextAlign.Center,
+            )
+        }
         return
     }
 
