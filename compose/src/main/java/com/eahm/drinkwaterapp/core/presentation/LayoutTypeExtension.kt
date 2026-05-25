@@ -132,6 +132,49 @@ fun rememberBookModeInfo(): BookModeInfo? {
     }
 }
 
+data class TableTopInfo(
+    /** Height from physical top edge to the hinge start. */
+    val topPanelHeight: Dp,
+    /** Height from hinge end to physical bottom edge. */
+    val bottomPanelHeight: Dp,
+    val hingeHeight: Dp,
+    val isSeparating: Boolean,
+)
+
+/**
+ * Returns hinge geometry when the device is in tabletop posture
+ * (half-open with a horizontal hinge), or null in any other layout.
+ * Mirrors [rememberBookModeInfo] for the horizontal axis.
+ */
+@SuppressLint("RestrictedApi")
+@Composable
+fun rememberTableTopInfo(): TableTopInfo? {
+    val context = LocalContext.current
+    val density = LocalDensity.current
+    val windowHeightPx = LocalWindowInfo.current.containerSize.height
+
+    val initial = WindowLayoutInfo(emptyList())
+    val windowLayoutInfo by remember(context) {
+        WindowInfoTracker.getOrCreate(context).windowLayoutInfo(context)
+    }.collectAsStateWithLifecycle(initial)
+
+    val feature = windowLayoutInfo.displayFeatures
+        .filterIsInstance<FoldingFeature>()
+        .firstOrNull {
+            it.orientation == FoldingFeature.Orientation.HORIZONTAL &&
+                    it.state == FoldingFeature.State.HALF_OPENED
+        } ?: return null
+
+    return with(density) {
+        TableTopInfo(
+            topPanelHeight = feature.bounds.top.toDp(),
+            bottomPanelHeight = (windowHeightPx - feature.bounds.bottom).toDp(),
+            hingeHeight = (feature.bounds.bottom - feature.bounds.top).toDp(),
+            isSeparating = feature.isSeparating,
+        )
+    }
+}
+
 /**
  * Geometry of the hinge area when a foldable device is in book mode
  * (half-open with a vertical hinge). Use this to keep content within

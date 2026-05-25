@@ -3,7 +3,6 @@ package com.eahm.drinkwaterapp.feature.drink.layout
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,6 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
+import com.eahm.drinkwaterapp.core.presentation.BookModeInfo
+import com.eahm.drinkwaterapp.core.presentation.FoldAwareTwoColumnRow
 import com.eahm.drinkwaterapp.feature.drink.DrinkAction
 import com.eahm.drinkwaterapp.feature.drink.DrinkState
 import com.eahm.drinkwaterapp.feature.drink.alarm.HomeAlarmCard
@@ -33,64 +34,62 @@ internal fun DrinkLandscape(
     onNavigateToSettings: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
-    leftContentWeight: Float = 1f,
+    bookModeInfo: BookModeInfo? = null,
 ) {
-    Row(
-        modifier = modifier
-            .padding(horizontal = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Column(
-            modifier = Modifier
-                .weight(leftContentWeight)
-                .fillMaxHeight()
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            Spacer(Modifier.height(contentPadding.calculateTopPadding()))
-            Spacer(Modifier.height(8.dp))
-            RingSection(
-                state = state,
-                modifier = modifier
-                    .fillMaxWidth(),
-            )
-            Spacer(Modifier.height(8.dp))
-            Spacer(Modifier.height(contentPadding.calculateBottomPadding()))
-        }
+    FoldAwareTwoColumnRow(
+        bookModeInfo = bookModeInfo,
+        modifier = modifier.padding(horizontal = 8.dp),
+        leftContent = {
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                Spacer(Modifier.height(contentPadding.calculateTopPadding()))
+                Spacer(Modifier.height(8.dp))
+                RingSection(
+                    state = state,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(contentPadding.calculateBottomPadding()))
+            }
+        },
+        rightContent = {
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .verticalScroll(rememberScrollState()),
+            ) {
+                Spacer(Modifier.height(contentPadding.calculateTopPadding()))
+                Spacer(Modifier.height(8.dp))
 
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight()
-                .verticalScroll(rememberScrollState()),
-        ) {
-            Spacer(Modifier.height(contentPadding.calculateTopPadding()))
-            Spacer(Modifier.height(8.dp))
+                ActionsSection(
+                    state = state,
+                    onAction = onAction,
+                )
 
-            ActionsSection(
-                state = state,
-                onAction = onAction,
-            )
+                Spacer(Modifier.height(16.dp))
 
-            Spacer(Modifier.height(16.dp))
+                HomeAlarmCard(
+                    onNavigateToSettings = onNavigateToSettings,
+                )
 
-            HomeAlarmCard(
-                onNavigateToSettings = onNavigateToSettings,
-            )
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(16.dp))
+                TodayLogSection(
+                    items = state.todayLogs,
+                    onSeeAll = onNavigateToHistory,
+                    unitPreference = state.unitPreference,
+                )
 
-            TodayLogSection(
-                items = state.todayLogs,
-                onSeeAll = onNavigateToHistory,
-                unitPreference = state.unitPreference,
-            )
-
-            Spacer(Modifier.height(8.dp))
-            Spacer(Modifier.height(contentPadding.calculateBottomPadding()))
-        }
-    }
+                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(contentPadding.calculateBottomPadding()))
+            }
+        },
+    )
 }
 
 @Preview(name = "Landscape", widthDp = 900, heightDp = 420)
