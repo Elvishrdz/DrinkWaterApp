@@ -2,7 +2,7 @@ Development
 
 urgent fixes
 
-- []  despues de aceptar overlay permission al regresar a la app no seguimos al siguiente paso.
+- [x]  despues de aceptar overlay permission al regresar a la app no seguimos al siguiente paso.
 
 Next release priorities
 

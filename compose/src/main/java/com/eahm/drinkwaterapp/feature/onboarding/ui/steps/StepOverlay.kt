@@ -1,5 +1,9 @@
 package com.eahm.drinkwaterapp.feature.onboarding.ui.steps
 
+import android.content.Intent
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,10 +27,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.config.FeatureFlags
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
@@ -47,60 +53,97 @@ private val HeroBottom = Color(0xFF0E5A82)
 
 @Composable
 internal fun stepOverlay(
-    overlayGranted: Boolean,
-    onAllow: () -> Unit,
     onContinue: () -> Unit,
     onBack: () -> Unit,
-): OnboardingStep = if (overlayGranted) {
-    OnboardingStep(
-        art = { OnbArtCircle(icon = OnbIcons.Check) },
-        title = stringResource(R.string.onb_overlay_granted_title),
-        subtitle = stringResource(R.string.onb_overlay_granted_subtitle),
-        onBack = onBack,
-        footer = {
-            DwPrimaryButtonAnimated(
-                text = stringResource(R.string.onb_cta_continue),
-                onClick = onContinue,
-                modifier = Modifier.fillMaxWidth(),
-            )
-        },
-        content = {
-            CelebrationCardPreview()
-            Spacer(Modifier.height(16.dp))
-            GrantedFeatureList()
-        },
-    )
-} else {
-    OnboardingStep(
-        art = { OnbArtCircle(icon = DwIcons.Star) },
-        title = stringResource(R.string.onb_overlay_request_title),
-        subtitle = stringResource(R.string.onb_overlay_request_subtitle),
-        onBack = onBack,
-        footer = {
-            TextButton(
-                onClick = onContinue,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(
-                    text = stringResource(R.string.onb_overlay_request_cta_skip),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+): OnboardingStep {
+    val context = LocalContext.current
+    // Overlay ("display over other apps") permission launcher.
+    // Auto-advances when the user grants permission and returns to the app.
+    val overlayLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+    ) {
+        val permissionGranted = Settings.canDrawOverlays(context)
+        if (permissionGranted) {
+            onContinue()
+        }
+    }
+
+    return if (Settings.canDrawOverlays(context)) {
+        stepOverlayGranted(onBack = onBack, onContinue = onContinue)
+
+    } else {
+        stepRequestOverlay(
+            onBack = onBack,
+            onContinue = onContinue,
+            requestOverlayPermission = {
+                overlayLauncher.launch(
+                    Intent(
+                        Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        "package:${context.packageName}".toUri(),
+                    )
                 )
             }
-            Spacer(Modifier.height(8.dp))
-            DwPrimaryButton(
-                text = stringResource(R.string.overlay_allow_over_other_apps),
-                onClick = onAllow,
-                modifier = Modifier.fillMaxWidth(),
-            )
-        },
-        content = {
-            CelebrationCardPreview()
-            Spacer(Modifier.height(16.dp))
-            OverlayStepsList()
-        },
-    )
+        )
+    }
 }
+
+@Composable
+private fun stepOverlayGranted(
+    onBack: () -> Unit,
+    onContinue: () -> Unit
+) = OnboardingStep(
+    art = { OnbArtCircle(icon = OnbIcons.Check) },
+    title = stringResource(R.string.onb_overlay_granted_title),
+    subtitle = stringResource(R.string.onb_overlay_granted_subtitle),
+    onBack = onBack,
+    footer = {
+        DwPrimaryButtonAnimated(
+            text = stringResource(R.string.onb_cta_continue),
+            onClick = onContinue,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    },
+    content = {
+        CelebrationCardPreview()
+        Spacer(Modifier.height(16.dp))
+        GrantedFeatureList()
+    },
+)
+
+@Composable
+private fun stepRequestOverlay(
+    onBack: () -> Unit,
+    onContinue: () -> Unit,
+    requestOverlayPermission: () -> Unit
+) = OnboardingStep(
+    art = { OnbArtCircle(icon = DwIcons.Star) },
+    title = stringResource(R.string.onb_overlay_request_title),
+    subtitle = stringResource(R.string.onb_overlay_request_subtitle),
+    onBack = onBack,
+    footer = {
+        TextButton(
+            onClick = onContinue,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(
+                text = stringResource(R.string.onb_overlay_request_cta_skip),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Spacer(Modifier.height(8.dp))
+        DwPrimaryButton(
+            text = stringResource(R.string.overlay_allow_over_other_apps),
+            onClick = requestOverlayPermission,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    },
+    content = {
+        CelebrationCardPreview()
+        Spacer(Modifier.height(16.dp))
+        OverlayStepsList()
+    },
+)
 
 @Composable
 private fun CelebrationCardPreview() {
@@ -311,12 +354,18 @@ private fun FeatureRow(
 @Composable
 private fun StepOverlayBasePreview(overlayGranted: Boolean) {
     OnboardingStepBasePreview(
-        config = stepOverlay(
-            overlayGranted = overlayGranted,
-            onAllow = {},
-            onContinue = {},
-            onBack = {},
-        ),
+        config = if (overlayGranted) {
+            stepOverlayGranted(
+                onBack = {},
+                onContinue = {},
+            )
+        } else {
+            stepRequestOverlay(
+                onBack = {},
+                onContinue = {},
+                requestOverlayPermission = {},
+            )
+        }
     )
 }
 

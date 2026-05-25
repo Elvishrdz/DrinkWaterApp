@@ -19,7 +19,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps.Celebrations
@@ -51,25 +50,6 @@ internal fun OnboardingScreen(
     val viewModel = koinViewModel<OnboardingViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
-
-    // Overlay ("display over other apps") permission launcher.
-    // Auto-advances when the user grants permission and returns to the app.
-    val overlayLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult(),
-    ) {
-        if (Settings.canDrawOverlays(context)) {
-            viewModel.nextStep()
-        }
-    }
-
-    fun requestOverlayPermission() {
-        overlayLauncher.launch(
-            Intent(
-                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                "package:${context.packageName}".toUri(),
-            )
-        )
-    }
 
     // Exact alarm permission launcher (Android 12+).
     // Auto-advances when the user grants the permission and returns to the app.
@@ -116,7 +96,6 @@ internal fun OnboardingScreen(
     }
 
     val step = OnboardingSteps.byStep(state.step)
-
 
     var showCustomIntervalBottomSheet by rememberSaveable { mutableStateOf(false) }
     var currentMinutes by rememberSaveable { mutableIntStateOf(0) }
@@ -193,8 +172,6 @@ internal fun OnboardingScreen(
         )
 
         Celebrations -> stepOverlay(
-            overlayGranted = Settings.canDrawOverlays(context),
-            onAllow = ::requestOverlayPermission,
             onContinue = viewModel::nextStep,
             onBack = viewModel::prevStep,
         )

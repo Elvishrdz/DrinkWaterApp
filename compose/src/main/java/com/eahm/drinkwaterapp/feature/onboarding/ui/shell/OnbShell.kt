@@ -163,8 +163,6 @@ private fun LegalScreenPreview(
 ) {
     DrinkWaterAppTheme {
         val stepConfig = stepOverlay(
-            overlayGranted = true,
-            onAllow = {},
             onContinue = {},
             onBack = {},
         )
