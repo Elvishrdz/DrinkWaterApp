@@ -21,7 +21,8 @@ internal fun Adaptive(
     val layoutType = getLayoutType()
 
     when (layoutType) {
-        LayoutType.TABLE_TOP -> {
+        LayoutType.TABLE_TOP,
+            -> {
             Column(
                 modifier = modifier,
                 verticalArrangement = Arrangement.spacedBy(7.dp),
@@ -69,7 +70,9 @@ internal fun Adaptive(
             }
         }
 
-        LayoutType.PORTRAIT -> {
+        LayoutType.PORTRAIT_EXPANDED,
+        LayoutType.PORTRAIT,
+            -> {
             Column(
                 modifier = modifier,
                 horizontalAlignment = Alignment.CenterHorizontally,

@@ -59,29 +59,29 @@ fun getLayoutType(): LayoutType {
                 LayoutType.TABLE_TOP
             }
 
-            isExpanded ||
-                    // when font and screen is big enough, the window value changes from expanded to medium
-                    isMedium
-                -> {
-                when {
-                    windowPosture.hingeList.isNotEmpty() -> {
-                        if (isBookMode) {
-                            LayoutType.FOLDABLE_BOOK
-                        } else {
-                            LayoutType.FOLDABLE_EXPANDED
-                        }
-                    }
-
-                    // Landscape when width >= height (phone landscape or tablet landscape)
-                    window.minWidthDp >= window.minHeightDp -> LayoutType.LANDSCAPE
-
-                    // Tablet in portrait
-                    else -> LayoutType.PORTRAIT
+            // Foldable with hinge: book mode or fully expanded
+            windowPosture.hingeList.isNotEmpty() && (isExpanded || isMedium) -> {
+                if (isBookMode) {
+                    LayoutType.FOLDABLE_BOOK
+                } else {
+                    LayoutType.FOLDABLE_EXPANDED
                 }
             }
 
+            // Landscape: phone landscape or tablet landscape (width >= height)
+            (isExpanded || isMedium) && window.minWidthDp >= window.minHeightDp -> {
+                LayoutType.LANDSCAPE
+            }
+
+            // Portrait: phone portrait (compact width) or tablet portrait (medium/expanded width).
             else -> {
-                LayoutType.PORTRAIT
+                val isTabletPortrait = isExpanded || isMedium
+
+                if (isTabletPortrait) {
+                    LayoutType.PORTRAIT_EXPANDED
+                } else {
+                    LayoutType.PORTRAIT
+                }
             }
         }
     }
@@ -99,6 +99,7 @@ fun getLayoutType(): LayoutType {
  * val maxWidth = bookModeInfo?.leftPanelWidth ?: Dp.Unspecified
  * ```
  */
+// TODO: table top also can be affected. change name from book mode.
 @SuppressLint("RestrictedApi")
 @Composable
 private fun rememberBookModeInfo(): BookModeInfo? {

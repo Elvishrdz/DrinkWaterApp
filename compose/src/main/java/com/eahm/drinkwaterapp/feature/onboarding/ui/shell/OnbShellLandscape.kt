@@ -165,7 +165,6 @@ internal fun OnbShellLandscape(
 
                     Column(
                         modifier = Modifier
-                            .weight(1f)
                             .fillMaxWidth(),
                         verticalArrangement = Arrangement.Center,
                     ) {

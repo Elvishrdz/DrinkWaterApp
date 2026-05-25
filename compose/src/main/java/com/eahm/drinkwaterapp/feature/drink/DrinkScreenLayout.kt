@@ -46,7 +46,9 @@ internal fun DrinkLayout(
     infoSection: @Composable () -> Unit,
 ) {
     when (getLayoutType()) {
-        LayoutType.PORTRAIT -> PortraitLayout(
+        LayoutType.PORTRAIT_EXPANDED,
+        LayoutType.PORTRAIT,
+            -> PortraitLayout(
             innerPadding = innerPadding,
             modifier = modifier,
             ringSection = ringSection,
@@ -56,7 +58,8 @@ internal fun DrinkLayout(
 
         LayoutType.LANDSCAPE,
         LayoutType.FOLDABLE_BOOK,
-        LayoutType.FOLDABLE_EXPANDED -> LandscapeLayout(
+        LayoutType.FOLDABLE_EXPANDED,
+            -> LandscapeLayout(
             innerPadding = innerPadding,
             modifier = modifier,
             ringSection = ringSection,
@@ -64,7 +67,8 @@ internal fun DrinkLayout(
             infoSection = infoSection,
         )
 
-        LayoutType.TABLE_TOP -> TableTopLayout(
+        LayoutType.TABLE_TOP,
+            -> TableTopLayout(
             innerPadding = innerPadding,
             modifier = modifier,
             ringSection = ringSection,

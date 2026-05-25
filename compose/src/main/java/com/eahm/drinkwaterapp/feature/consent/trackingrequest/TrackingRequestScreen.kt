@@ -17,6 +17,7 @@ internal fun TrackingRequestScreen(
     onDecline: () -> Unit,
 ) {
     when (layoutType) {
+        LayoutType.PORTRAIT_EXPANDED,
         LayoutType.PORTRAIT,
             -> TrackingRequestPortrait(
             isTrackingEnabled = isTrackingEnabled,

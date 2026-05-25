@@ -57,25 +57,30 @@ internal fun OnbShell(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     when (layoutType) {
-        LayoutType.LANDSCAPE -> OnbShellLandscape(
+        LayoutType.LANDSCAPE,
+            -> OnbShellLandscape(
             weight = 0.7f,
             step = step, total = total, title = title, subtitle = subtitle,
             art = art, onBack = onBack, modifier = modifier, footer = footer, content = content,
         )
 
         LayoutType.FOLDABLE_BOOK,
-        LayoutType.FOLDABLE_EXPANDED -> OnbShellLandscape(
+        LayoutType.FOLDABLE_EXPANDED,
+            -> OnbShellLandscape(
             weight = 1f,
             step = step, total = total, title = title, subtitle = subtitle,
             art = art, onBack = onBack, modifier = modifier, footer = footer, content = content,
         )
 
-        LayoutType.TABLE_TOP -> OnbShellTableTop(
+        LayoutType.TABLE_TOP,
+            -> OnbShellTableTop(
             step = step, total = total, title = title, subtitle = subtitle,
             art = art, onBack = onBack, modifier = modifier, footer = footer, content = content,
         )
 
-        LayoutType.PORTRAIT -> OnbShellPortrait(
+        LayoutType.PORTRAIT_EXPANDED,
+        LayoutType.PORTRAIT,
+            -> OnbShellPortrait(
             step = step, total = total, title = title, subtitle = subtitle,
             art = art, onBack = onBack, modifier = modifier, footer = footer, content = content,
         )

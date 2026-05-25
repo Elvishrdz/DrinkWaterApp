@@ -266,6 +266,7 @@ private fun DevNavLayout(
             }
         }
 
+        LayoutType.PORTRAIT_EXPANDED,
         LayoutType.PORTRAIT,
             -> {
             Column(modifier = Modifier.fillMaxSize()) {

@@ -17,6 +17,7 @@ internal fun LegalScreen(
     onAccept: () -> Unit,
 ) {
     when (layoutType) {
+        LayoutType.PORTRAIT_EXPANDED,
         LayoutType.PORTRAIT,
             -> LegalPortrait(
             privacyToggleChecked = privacyToggleChecked,
