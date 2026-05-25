@@ -26,12 +26,16 @@ Out of scope
 
 App Release
 
+- [] preparar app sin ads, con registros mock para sacar las capturas de pantalla
 - [] listing: preparar capturas
 - [] listing: preparar recursos de imagenes
 - [] listing: preparar description y title en diferentes idiomas
 
 Priorities Tier 1
 
+- [] al aceptar una nueva politica de privacidad, y si ya esta aprovado el tracking, no mostrar esta
+  pantalla. actualmente aparece rapidamente antes de quitarse cuando se aceptan nuevas politicas de
+  privacidad en la app
 - [x] Tablet: onboarding muestra rounded corners y white background en darknmode. Ver captura
 - [] Grafico no cambia letras del dia abreviadas al nuevo idioma al cambiar
 - [] Gráfico de goles y gráfico de ingesta. Uno muestra si alcanzaste el gol y otro es de cantidad
