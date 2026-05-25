@@ -19,6 +19,7 @@ internal fun ConsentScreen(
                 ConsentStep.LEGAL -> LegalScreen(
                     privacyToggleChecked = state.privacyToggleChecked,
                     showStepCounter = state.showStepCounter,
+                    showNewBadge = state.showNewBadge,
                     onToggleChanged = { onAction(ConsentAction.SetPrivacyToggle(it)) },
                     onAccept = { onAction(ConsentAction.AcceptPrivacyPolicy) },
                 )

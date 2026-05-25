@@ -41,6 +41,7 @@ import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults
 internal fun LegalHeaderContent(
     showStepCounter: Boolean,
     centered: Boolean,
+    showNewBadge: Boolean,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -125,14 +126,37 @@ internal fun LegalHeaderContent(
             modifier = Modifier.fillMaxWidth(),
         )
         Spacer(Modifier.height(8.dp))
-        Text(
-            text = stringResource(R.string.consent_legal_updated),
-            color = Color.White.copy(alpha = 0.80f),
-            style = MaterialTheme.typography.labelSmall,
-            letterSpacing = 0.04.em,
-            textAlign = textAlign,
+        Row(
             modifier = Modifier.fillMaxWidth(),
-        )
+            horizontalArrangement = if (centered) Arrangement.Center else Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = stringResource(R.string.consent_legal_updated),
+                color = Color.White.copy(alpha = 0.80f),
+                style = MaterialTheme.typography.labelSmall,
+                letterSpacing = 0.04.em,
+            )
+            // Badge only for returning users re-accepting a new policy version
+            if (showNewBadge) {
+                Spacer(Modifier.width(6.dp))
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = Color(0xFFFFB300),
+                            shape = RoundedCornerShape(999.dp),
+                        )
+                        .padding(horizontal = 6.dp, vertical = 2.dp),
+                ) {
+                    Text(
+                        text = stringResource(R.string.consent_legal_new_badge),
+                        color = Color.White,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            }
+        }
 
         Spacer(Modifier.height(contentPadding.calculateBottomPadding()))
     }
@@ -151,6 +175,7 @@ private fun LegalHeaderContentPreview(
         modifier = Modifier
             .background(ConsentDefaults.legalGradient),
         showStepCounter = true,
+        showNewBadge = true,
         centered = centered
     )
 }

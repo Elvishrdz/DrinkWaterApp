@@ -41,6 +41,7 @@ internal fun LegalLandscape(
     weight: Float,
     privacyToggleChecked: Boolean,
     showStepCounter: Boolean,
+    showNewBadge: Boolean,
     onToggleChanged: (Boolean) -> Unit,
     onAccept: () -> Unit,
 ) {
@@ -70,6 +71,7 @@ internal fun LegalLandscape(
                     )
                     .padding(all = contentPaddingDp),
                 showStepCounter = showStepCounter,
+                showNewBadge = showNewBadge,
                 centered = true,
             )
         }
@@ -138,6 +140,7 @@ private fun LegalLandscapePreview() {
             weight = 1f,
             privacyToggleChecked = false,
             showStepCounter = true,
+            showNewBadge = false,
             onToggleChanged = {},
             onAccept = {},
         )
@@ -152,6 +155,7 @@ private fun BigFontPreview() {
             weight = 1f,
             privacyToggleChecked = false,
             showStepCounter = true,
+            showNewBadge = false,
             onToggleChanged = {},
             onAccept = {},
         )

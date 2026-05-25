@@ -40,11 +40,16 @@ internal class ConsentViewModel(
         prefsStorage.getPrivacyPolicyVersionAccepted(),
         isTrackingEnabled,
         privacyToggleChecked,
-    ) { showStepCounter, policyVersionAccepted, isTrackingEnabled, toggle ->
+        prefsStorage.getPrivacyPolicyAcceptedAt(),
+    ) { showStepCounter, policyVersionAccepted, isTrackingEnabled, toggle, acceptedAt ->
+        val showNewBadge =
+            acceptedAt != null && policyVersionAccepted != PrivacyPolicyConfig.CURRENT_POLICY_DATE
+
         if (policyVersionAccepted == PrivacyPolicyConfig.CURRENT_POLICY_DATE) {
             ConsentState.Data(
                 step = ConsentStep.TRACKING_REQUEST,
                 showStepCounter = showStepCounter == true,
+                showNewBadge = showNewBadge,
                 privacyToggleChecked = toggle,
                 isTrackingEnabled = isTrackingEnabled,
             )
@@ -52,6 +57,7 @@ internal class ConsentViewModel(
             ConsentState.Data(
                 step = ConsentStep.LEGAL,
                 showStepCounter = showStepCounter == true,
+                showNewBadge = showNewBadge,
                 privacyToggleChecked = toggle,
                 isTrackingEnabled = isTrackingEnabled,
             )
@@ -75,7 +81,8 @@ internal class ConsentViewModel(
                 viewModelScope.launch {
                     prefsStorage.setPrivacyPolicyAccepted(System.currentTimeMillis())
                     prefsStorage.setPrivacyPolicyVersionAccepted(PrivacyPolicyConfig.CURRENT_POLICY_DATE)
-                    val alreadyDecidedTracking = prefsStorage.getTrackingConsentDecided().firstOrNull() == true
+                    val alreadyDecidedTracking =
+                        prefsStorage.getTrackingConsentDecided().firstOrNull() == true
                     if (alreadyDecidedTracking) onCompleteSteps()
                     // else: combine() naturally transitions to TRACKING_REQUEST
                 }

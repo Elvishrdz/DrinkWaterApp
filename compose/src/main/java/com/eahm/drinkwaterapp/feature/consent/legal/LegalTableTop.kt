@@ -51,6 +51,7 @@ import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults.verticalSpacing
 internal fun LegalTableTop(
     privacyToggleChecked: Boolean,
     showStepCounter: Boolean,
+    showNewBadge: Boolean,
     onToggleChanged: (Boolean) -> Unit,
     onAccept: () -> Unit,
 ) {
@@ -85,6 +86,7 @@ internal fun LegalTableTop(
                     bottom = contentPaddingDp + overlapHeightDp,
                 ),
                 showStepCounter = showStepCounter,
+                showNewBadge = showNewBadge,
                 centered = true,
             )
         }
@@ -193,6 +195,7 @@ private fun LegalTableTopPreview() {
         LegalTableTop(
             privacyToggleChecked = false,
             showStepCounter = true,
+            showNewBadge = false,
             onToggleChanged = {},
             onAccept = {},
         )
@@ -206,6 +209,7 @@ private fun BigFontPreview() {
         LegalTableTop(
             privacyToggleChecked = false,
             showStepCounter = true,
+            showNewBadge = false,
             onToggleChanged = {},
             onAccept = {},
         )

@@ -12,6 +12,7 @@ import com.eahm.drinkwaterapp.core.presentation.layouttype.LayoutTypesPreviewPro
 internal fun LegalScreen(
     privacyToggleChecked: Boolean,
     showStepCounter: Boolean,
+    showNewBadge: Boolean,
     layoutType: LayoutType = getLayoutType(),
     onToggleChanged: (Boolean) -> Unit,
     onAccept: () -> Unit,
@@ -22,6 +23,7 @@ internal fun LegalScreen(
             -> LegalPortrait(
             privacyToggleChecked = privacyToggleChecked,
             showStepCounter = showStepCounter,
+            showNewBadge = showNewBadge,
             onToggleChanged = onToggleChanged,
             onAccept = onAccept,
         )
@@ -31,6 +33,7 @@ internal fun LegalScreen(
             weight = 0.7f,
             privacyToggleChecked = privacyToggleChecked,
             showStepCounter = showStepCounter,
+            showNewBadge = showNewBadge,
             onToggleChanged = onToggleChanged,
             onAccept = onAccept,
         )
@@ -41,6 +44,7 @@ internal fun LegalScreen(
             weight = 1f,
             privacyToggleChecked = privacyToggleChecked,
             showStepCounter = showStepCounter,
+            showNewBadge = showNewBadge,
             onToggleChanged = onToggleChanged,
             onAccept = onAccept,
         )
@@ -50,6 +54,7 @@ internal fun LegalScreen(
             -> LegalTableTop(
             privacyToggleChecked = privacyToggleChecked,
             showStepCounter = showStepCounter,
+            showNewBadge = showNewBadge,
             onToggleChanged = onToggleChanged,
             onAccept = onAccept,
         )
@@ -65,6 +70,7 @@ private fun LegalScreenPreview(
         LegalScreen(
             privacyToggleChecked = false,
             showStepCounter = true,
+            showNewBadge = false,
             layoutType = layoutType,
             onToggleChanged = {},
             onAccept = {},

@@ -28,6 +28,7 @@
     <string name="consent_legal_step">Step 1 of 2</string>
     <string name="consent_legal_title">Privacy Policy &amp; Terms of use</string>
     <string name="consent_legal_updated">Last updated · May 12, 2026</string>
+    <string name="consent_legal_new_badge">New</string>
     <string name="consent_legal_lede">Take a moment to read our terms of use and privacy policy to use DrinkWater app.</string>
     <string name="consent_legal_web_link">Read the latest version</string>
     <string name="consent_legal_agree">I\'ve read and agree to the Privacy Policy &amp; Terms of Use.</string>

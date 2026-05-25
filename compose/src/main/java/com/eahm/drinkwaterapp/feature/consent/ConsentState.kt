@@ -10,6 +10,7 @@ internal sealed interface ConsentState {
     data class Data(
         val step: ConsentStep,
         val showStepCounter: Boolean,
+        val showNewBadge: Boolean,
         val privacyToggleChecked: Boolean,
         val isTrackingEnabled: Boolean,
     ) : ConsentState
