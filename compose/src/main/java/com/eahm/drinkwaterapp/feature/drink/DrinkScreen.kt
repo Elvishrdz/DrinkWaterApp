@@ -1,19 +1,14 @@
 package com.eahm.drinkwaterapp.feature.drink
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.union
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,7 +23,9 @@ import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStats
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.presentation.LayoutType
 import com.eahm.drinkwaterapp.core.presentation.layouttype.getLayoutAndNavigationType
-import com.eahm.drinkwaterapp.feature.drink.layout.PortraitLayout
+import com.eahm.drinkwaterapp.feature.drink.layout.DrinkLandscape
+import com.eahm.drinkwaterapp.feature.drink.layout.DrinkPortrait
+import com.eahm.drinkwaterapp.feature.drink.layout.DrinkTableTop
 import com.eahm.drinkwaterapp.feature.drink.ui.ActionsSection
 import com.eahm.drinkwaterapp.feature.drink.ui.InfoSection
 import com.eahm.drinkwaterapp.feature.drink.ui.RingSection
@@ -47,6 +44,8 @@ internal fun DrinkScreen(
     onNavigateToSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val windowInsets = WindowInsets.safeDrawing.union(WindowInsets.displayCutout)
+
     val innerPadding = PaddingValues()
     val (layoutType, navigation) = getLayoutAndNavigationType()
 
@@ -74,16 +73,10 @@ internal fun DrinkScreen(
         )
     }
 
-    /*
-    *  when using navigation rail AND no banner we should calculate bottom padding
-    *  when using navigation rail AND banner we should not calculate bottom padding
-    *
-    * */
-
     when (layoutType) {
         LayoutType.PORTRAIT_EXPANDED,
         LayoutType.PORTRAIT,
-            -> PortraitLayout(
+            -> DrinkPortrait(
             innerPadding = innerPadding,
             modifier = modifier,
             ringSection = ringSection,
@@ -94,7 +87,7 @@ internal fun DrinkScreen(
         LayoutType.LANDSCAPE,
         LayoutType.FOLDABLE_BOOK,
         LayoutType.FOLDABLE_EXPANDED,
-            -> LandscapeLayout(
+            -> DrinkLandscape(
             innerPadding = innerPadding,
             modifier = modifier,
             ringSection = ringSection,
@@ -103,7 +96,7 @@ internal fun DrinkScreen(
         )
 
         LayoutType.TABLE_TOP,
-            -> TableTopLayout(
+            -> DrinkTableTop(
             innerPadding = innerPadding,
             modifier = modifier,
             ringSection = ringSection,
@@ -226,103 +219,6 @@ private val stateMock = DrinkState.Data(
 )
 
 @Composable
-private fun LandscapeLayout(
-    innerPadding: PaddingValues,
-    modifier: Modifier = Modifier,
-    ringSection: @Composable () -> Unit,
-    actionsSection: @Composable () -> Unit,
-    infoSection: @Composable () -> Unit,
-) {
-    Row(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(innerPadding),
-    ) {
-        // Left column: ring centered vertically
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight()
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            ringSection()
-        }
-
-        // Right column: actions then info, scrollable
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight()
-                .verticalScroll(rememberScrollState()),
-        ) {
-            Spacer(Modifier.height(8.dp))
-            actionsSection()
-            Spacer(Modifier.height(16.dp))
-            infoSection()
-            Spacer(Modifier.height(16.dp))
-        }
-    }
-}
-
-@Composable
-private fun TableTopLayout(
-    innerPadding: PaddingValues,
-    modifier: Modifier = Modifier,
-    ringSection: @Composable () -> Unit,
-    actionsSection: @Composable () -> Unit,
-    infoSection: @Composable () -> Unit,
-) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(innerPadding),
-    ) {
-        // Top half: ring centered
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            ringSection()
-        }
-
-        // Bottom half: actions (left) and info (right), side-by-side
-        Row(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-        ) {
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-            ) {
-                actionsSection()
-            }
-
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .verticalScroll(rememberScrollState()),
-            ) {
-                Spacer(Modifier.height(8.dp))
-                infoSection()
-                Spacer(Modifier.height(16.dp))
-            }
-        }
-    }
-}
-
-@Composable
 internal fun SlotPlaceholder(label: String, color: Color, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
@@ -336,32 +232,6 @@ internal fun SlotPlaceholder(label: String, color: Color, modifier: Modifier = M
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold,
             color = color,
-        )
-    }
-}
-
-@Preview(name = "Landscape", widthDp = 900, heightDp = 420)
-@Composable
-private fun LandscapeLayoutPreview() {
-    DrinkWaterAppTheme {
-        LandscapeLayout(
-            innerPadding = PaddingValues(0.dp),
-            ringSection = { SlotPlaceholder("Ring", Color(0xFF2196F3)) },
-            actionsSection = { SlotPlaceholder("Actions", Color(0xFF4CAF50)) },
-            infoSection = { SlotPlaceholder("Info", Color(0xFFFF9800)) },
-        )
-    }
-}
-
-@Preview(name = "TableTop", widthDp = 700, heightDp = 700)
-@Composable
-private fun TableTopLayoutPreview() {
-    DrinkWaterAppTheme {
-        TableTopLayout(
-            innerPadding = PaddingValues(0.dp),
-            ringSection = { SlotPlaceholder("Ring", Color(0xFF2196F3)) },
-            actionsSection = { SlotPlaceholder("Actions", Color(0xFF4CAF50)) },
-            infoSection = { SlotPlaceholder("Info", Color(0xFFFF9800)) },
         )
     }
 }

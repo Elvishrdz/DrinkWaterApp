@@ -16,7 +16,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.feature.drink.SlotPlaceholder
 
 @Composable
-internal fun PortraitLayout(
+internal fun DrinkPortrait(
     innerPadding: PaddingValues,
     modifier: Modifier = Modifier,
     ringSection: @Composable () -> Unit,
@@ -34,15 +34,15 @@ internal fun PortraitLayout(
         actionsSection()
         Spacer(Modifier.height(16.dp))
         infoSection()
-        Spacer(Modifier.height(innerPadding.calculateBottomPadding() + 16.dp))
+        Spacer(Modifier.height(innerPadding.calculateBottomPadding()))
     }
 }
 
 @Preview(name = "Portrait")
 @Composable
-private fun PortraitLayoutPreview() {
+private fun DrinkPortraitPreview() {
     DrinkWaterAppTheme {
-        PortraitLayout(
+        DrinkPortrait(
             innerPadding = PaddingValues(0.dp),
             ringSection = { SlotPlaceholder("Ring", Color(0xFF2196F3)) },
             actionsSection = { SlotPlaceholder("Actions", Color(0xFF4CAF50)) },
