@@ -1,15 +1,28 @@
 #!/usr/bin/env python3
 """Upload Play Store listing (text + images) from the listing/ directory.
 
-Folder structure under listing/<locale>/images/:
-  app-icon/          → icon
-  feature-graphics/  → featureGraphic
-  screenshots-phone/ → phoneScreenshots
-  screenshots-7in/   → sevenInchScreenshots
-  screenshots-10in/  → tenInchScreenshots
-  screenshots-tv/    → tvScreenshots
-  screenshots-wear/  → wearScreenshots
-  banner-tv/         → tvBanner
+Folder structure under listing/<locale>/graphics/  (legacy: images/):
+  app-icon/                   → icon
+  feature-graphics/           → featureGraphic
+  screenshots-phone/          → phoneScreenshots
+  screenshots-tablet-7-inch/  → sevenInchScreenshots
+  screenshots-tablet-10-inch/ → tenInchScreenshots
+  screenshots-tv/             → tvScreenshots
+  screenshots-xr/             → xrScreenshots
+  screenshots-chromebook/     → chromebookScreenshots
+  banner-tv/                  → tvBanner
+
+Text files under listing/<locale>/:
+  app-name.txt           → title  (legacy alias: title.txt)
+  short_description.txt  → shortDescription
+  full_description.txt   → fullDescription
+
+Video URL files under listing/<locale>/video/:
+  video-url.txt                → video
+  spatial-xr-video-url.txt     → spatialVideo  (Android XR)
+  non-spatial-xr-video-url.txt → nonSpatialVideo  (Android XR)
+
+Files that are absent or empty are silently skipped and never uploaded.
 
 Environment variables
 ---------------------
@@ -36,16 +49,23 @@ SCOPES = ["https://www.googleapis.com/auth/androidpublisher"]
 # locale. The Play API rejects secondary locales if the default is missing.
 DEFAULT_LOCALE = "en-US"
 
-# Maps human-readable folder names → Play Developer API imageType identifiers
+# Maps folder names → Play Developer API imageType identifiers.
+# Both the new canonical names and legacy names are supported.
 FOLDER_TO_IMAGE_TYPE = {
-    "app-icon":           "icon",
-    "feature-graphics":   "featureGraphic",
-    "screenshots-phone":  "phoneScreenshots",
-    "screenshots-7in":    "sevenInchScreenshots",
-    "screenshots-10in":   "tenInchScreenshots",
-    "screenshots-tv":     "tvScreenshots",
-    "screenshots-wear":   "wearScreenshots",
-    "banner-tv":          "tvBanner",
+    # Canonical names (match graphics/ folder structure)
+    "app-icon":                   "icon",
+    "feature-graphics":           "featureGraphic",
+    "screenshots-phone":          "phoneScreenshots",
+    "screenshots-tablet-7-inch":  "sevenInchScreenshots",
+    "screenshots-tablet-10-inch": "tenInchScreenshots",
+    "screenshots-tv":             "tvScreenshots",
+    "screenshots-xr":             "xrScreenshots",
+    "screenshots-chromebook":     "chromebookScreenshots",
+    "banner-tv":                  "tvBanner",
+    # Legacy folder names (kept for backward compatibility)
+    "screenshots-7in":            "sevenInchScreenshots",
+    "screenshots-10in":           "tenInchScreenshots",
+    "screenshots-wear":           "wearScreenshots",
 }
 
 # ── Config from env ────────────────────────────────────────────────────────────
@@ -133,22 +153,45 @@ def upload_listing(service, edit_id):
             upload_images(service, edit_id, locale, locale_dir)
 
 
+def _read_if_nonempty(path: Path) -> str | None:
+    """Return stripped file content, or None if the file is absent or blank."""
+    if not path.exists():
+        return None
+    text = path.read_text(encoding="utf-8").strip()
+    return text if text else None
+
+
 def upload_text(service, edit_id, locale, locale_dir):
-    fields = {
-        "title":            locale_dir / "title.txt",
+    # app-name.txt is the canonical name; title.txt is the legacy fallback.
+    title_path = locale_dir / "app-name.txt"
+    if not title_path.exists():
+        title_path = locale_dir / "title.txt"
+
+    text_fields: dict[str, Path] = {
+        "title":            title_path,
         "shortDescription": locale_dir / "short_description.txt",
         "fullDescription":  locale_dir / "full_description.txt",
     }
 
-    body = {}
-    for field, path in fields.items():
-        if path.exists():
-            text = path.read_text(encoding="utf-8").strip()
-            body[field] = text
-            print(f"  {field}: {len(text)} chars")
+    # Video URLs live in an optional video/ subdirectory.
+    video_dir = locale_dir / "video"
+    video_fields: dict[str, Path] = {
+        "video":           video_dir / "video-url.txt",
+        "spatialVideo":    video_dir / "spatial-xr-video-url.txt",
+        "nonSpatialVideo": video_dir / "non-spatial-xr-video-url.txt",
+    }
+
+    body: dict[str, str] = {}
+    for field, path in {**text_fields, **video_fields}.items():
+        value = _read_if_nonempty(path)
+        if value is not None:
+            body[field] = value
+            print(f"  {field}: {len(value)} chars")
+        elif path.exists():
+            print(f"  {field}: (empty — skipped)")
 
     if not body:
-        print("  No text files found, skipping text upload.")
+        print("  No text files found or all are empty, skipping text upload.")
         return
 
     try:
@@ -174,9 +217,12 @@ def _image_sort_key(p: Path):
 
 
 def upload_images(service, edit_id, locale, locale_dir):
-    images_dir = locale_dir / "images"
+    # graphics/ is the canonical folder name; images/ is the legacy fallback.
+    images_dir = locale_dir / "graphics"
     if not images_dir.is_dir():
-        print(f"  No images/ directory — skipping all image types for {locale}.")
+        images_dir = locale_dir / "images"
+    if not images_dir.is_dir():
+        print(f"  No graphics/ or images/ directory — skipping all image types for {locale}.")
         return
 
     for folder_name, image_type in FOLDER_TO_IMAGE_TYPE.items():

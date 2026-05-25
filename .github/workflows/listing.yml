@@ -9,9 +9,9 @@ on:
         default: "all"
         type: choice
         options:
-          - all        # title + descriptions + app-icon + screenshots
-          - text       # title + descriptions only
-          - images     # app-icon + screenshots only
+          - all        # title + descriptions + video URLs + all images
+          - text       # title + descriptions + video URLs only
+          - images     # app-icon + screenshots + banner only
       locale:
         description: "Locale to update, e.g. en-US or es-ES (leave empty to update all locales)"
         required: false
