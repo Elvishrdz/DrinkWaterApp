@@ -6,5 +6,7 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 
 internal val billingModule = module {
-    singleOf(::PurchaseManager) bind AppInitializer::class
+    //singleOf(::TestPurchaseManager) bind PurchaseManager::class
+    singleOf(::RevenueCatPurchaseManager) bind AppInitializer::class
+    singleOf(::RevenueCatPurchaseManager) bind PurchaseManager::class
 }
