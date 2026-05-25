@@ -29,12 +29,10 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.presentation.LayoutType
 import com.eahm.drinkwaterapp.core.presentation.layouttype.NavigationType
 import com.eahm.drinkwaterapp.core.presentation.layouttype.getLayoutAndNavigationType
+import com.eahm.drinkwaterapp.core.presentation.rememberBookModeInfo
 import com.eahm.drinkwaterapp.feature.drink.layout.DrinkLandscape
 import com.eahm.drinkwaterapp.feature.drink.layout.DrinkPortrait
 import com.eahm.drinkwaterapp.feature.drink.layout.DrinkTableTop
-import com.eahm.drinkwaterapp.feature.drink.ui.ActionsSection
-import com.eahm.drinkwaterapp.feature.drink.ui.InfoSection
-import com.eahm.drinkwaterapp.feature.drink.ui.RingSection
 import com.eahm.drinkwaterapp.feature.drink.ui.previewLogEntries
 
 @Composable
@@ -46,27 +44,7 @@ internal fun DrinkScreen(
 ) {
     val windowInsets = WindowInsets.safeDrawing.union(WindowInsets.displayCutout)
 
-    val innerPadding = PaddingValues()
     val (layoutType, navigationType) = getLayoutAndNavigationType()
-
-    val ringSection: @Composable () -> Unit = {
-        RingSection(state = state)
-    }
-
-    val actionsSection: @Composable () -> Unit = {
-        ActionsSection(
-            state = state,
-            onAction = onAction,
-        )
-    }
-
-    val infoSection: @Composable () -> Unit = {
-        InfoSection(
-            state = state,
-            onNavigateToHistory = onNavigateToHistory,
-            onNavigateToSettings = onNavigateToSettings,
-        )
-    }
 
     // only calculate bottom padding when using navigation rail and no banner visible
     val bottomPadding =
@@ -124,11 +102,16 @@ internal fun DrinkScreen(
 
         LayoutType.TABLE_TOP,
             -> DrinkTableTop(
-            innerPadding = innerPadding,
-            modifier = Modifier,
-            ringSection = ringSection,
-            actionsSection = actionsSection,
-            infoSection = infoSection,
+            state = state,
+            modifier = Modifier
+                .windowInsetsPadding(
+                    insets = windowInsets.only(WindowInsetsSides.Horizontal),
+                )
+                .fillMaxSize(),
+            contentPadding = contentPadding,
+            onAction = onAction,
+            onNavigateToHistory = onNavigateToHistory,
+            onNavigateToSettings = onNavigateToSettings,
         )
     }
 }
