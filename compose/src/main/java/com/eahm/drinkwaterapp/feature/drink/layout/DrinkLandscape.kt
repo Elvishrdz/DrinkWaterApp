@@ -33,15 +33,16 @@ internal fun DrinkLandscape(
     onNavigateToSettings: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
+    leftContentWeight: Float = 1f,
 ) {
     Row(
         modifier = modifier
             .padding(horizontal = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(3.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Column(
             modifier = Modifier
-                .weight(0.7f)
+                .weight(leftContentWeight)
                 .fillMaxHeight()
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,

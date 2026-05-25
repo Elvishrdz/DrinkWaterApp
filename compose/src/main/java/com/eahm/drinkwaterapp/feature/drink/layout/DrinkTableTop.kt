@@ -33,6 +33,7 @@ internal fun DrinkTableTop(
     onNavigateToSettings: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
+    bottomContentWeight: Float = 1f,
 ) {
     val borderPadding = 20.dp
 
@@ -79,7 +80,7 @@ internal fun DrinkTableTop(
 
         Row(
             modifier = Modifier
-                .weight(1f)
+                .weight(bottomContentWeight)
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(borderPadding),
         ) {

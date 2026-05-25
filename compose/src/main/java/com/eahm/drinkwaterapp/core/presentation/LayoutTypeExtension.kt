@@ -102,7 +102,7 @@ fun getLayoutType(): LayoutType {
 // TODO: table top also can be affected. change name from book mode.
 @SuppressLint("RestrictedApi")
 @Composable
-private fun rememberBookModeInfo(): BookModeInfo? {
+fun rememberBookModeInfo(): BookModeInfo? {
     val context = LocalContext.current
     val density = LocalDensity.current
     val windowWidthPx = LocalWindowInfo.current.containerSize.width
@@ -143,7 +143,7 @@ private fun rememberBookModeInfo(): BookModeInfo? {
  *   0                  hingeStart         hingeEnd               windowWidth
  *                           |<- hingeCenter ->|
  */
-private data class BookModeInfo(
+data class BookModeInfo(
     /** Usable width of the left panel (from the left edge to the hinge start). */
     val leftPanelWidth: Dp,
     /** Usable width of the right panel (from the hinge end to the right edge). */

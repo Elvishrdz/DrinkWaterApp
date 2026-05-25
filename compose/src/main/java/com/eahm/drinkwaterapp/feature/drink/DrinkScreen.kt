@@ -29,7 +29,6 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.presentation.LayoutType
 import com.eahm.drinkwaterapp.core.presentation.layouttype.NavigationType
 import com.eahm.drinkwaterapp.core.presentation.layouttype.getLayoutAndNavigationType
-import com.eahm.drinkwaterapp.core.presentation.rememberBookModeInfo
 import com.eahm.drinkwaterapp.feature.drink.layout.DrinkLandscape
 import com.eahm.drinkwaterapp.feature.drink.layout.DrinkPortrait
 import com.eahm.drinkwaterapp.feature.drink.layout.DrinkTableTop
@@ -80,6 +79,11 @@ internal fun DrinkScreen(
         LayoutType.FOLDABLE_BOOK,
         LayoutType.FOLDABLE_EXPANDED,
             -> {
+            /*
+             when the navigation is on left side (navigation rail) we have less space for the
+             content on the left side, using weight 1f is not working since now we need to find the
+             width of the nav rail and consider that in our calculations.
+            * */
             val insets = when (navigationType) {
                 NavigationType.NavigationBar -> windowInsets
                     .only(WindowInsetsSides.Horizontal)
@@ -88,12 +92,22 @@ internal fun DrinkScreen(
                     .only(WindowInsetsSides.End)
             }
 
+            // Workaround to align left content properly in foldable book layout
+            val leftContentWeight = if (navigationType == NavigationType.NavigationRail
+                && (layoutType == LayoutType.FOLDABLE_BOOK || layoutType == LayoutType.FOLDABLE_EXPANDED)
+            ) {
+                0.8f
+            } else {
+                1f
+            }
+
             DrinkLandscape(
                 state = state,
                 modifier = Modifier
                     .windowInsetsPadding(insets)
                     .fillMaxSize(),
                 contentPadding = contentPadding,
+                leftContentWeight = leftContentWeight,
                 onAction = onAction,
                 onNavigateToHistory = onNavigateToHistory,
                 onNavigateToSettings = onNavigateToSettings,
@@ -101,18 +115,37 @@ internal fun DrinkScreen(
         }
 
         LayoutType.TABLE_TOP,
-            -> DrinkTableTop(
-            state = state,
-            modifier = Modifier
-                .windowInsetsPadding(
-                    insets = windowInsets.only(WindowInsetsSides.Horizontal),
-                )
-                .fillMaxSize(),
-            contentPadding = contentPadding,
-            onAction = onAction,
-            onNavigateToHistory = onNavigateToHistory,
-            onNavigateToSettings = onNavigateToSettings,
-        )
+            -> {
+            // Workaround to align bottom content properly in tabletop layout
+            val bottomContentWeight = if (navigationType == NavigationType.NavigationBar) {
+                if (state.isAdFree) {
+                    0.7f
+                } else {
+                    0.4f
+                }
+
+            } else {
+                if (state.isAdFree) {
+                    1f
+                } else {
+                    0.7f
+                }
+            }
+
+            DrinkTableTop(
+                state = state,
+                modifier = Modifier
+                    .windowInsetsPadding(
+                        insets = windowInsets.only(WindowInsetsSides.Horizontal),
+                    )
+                    .fillMaxSize(),
+                contentPadding = contentPadding,
+                bottomContentWeight = bottomContentWeight,
+                onAction = onAction,
+                onNavigateToHistory = onNavigateToHistory,
+                onNavigateToSettings = onNavigateToSettings,
+            )
+        }
     }
 }
 
