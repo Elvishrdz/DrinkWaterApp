@@ -7,8 +7,15 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -30,12 +37,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.eahm.drinkwaterapp.ads.banner.InlineBannerAd
+import com.eahm.drinkwaterapp.ads.banner.InlineBannerAdState
 import com.eahm.drinkwaterapp.ads.banner.rememberBelowMainScreenBannerAdState
 import com.eahm.drinkwaterapp.core.billing.PurchaseManager
 import com.eahm.drinkwaterapp.core.config.BuildEnvironment
 import com.eahm.drinkwaterapp.core.data.confetti.ConfettiController
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
+import com.eahm.drinkwaterapp.core.presentation.layouttype.NavigationType
 import com.eahm.drinkwaterapp.core.presentation.layouttype.getNavigationType
 import com.eahm.drinkwaterapp.core.presentation.layouttype.toNavigationSuite
 import com.eahm.drinkwaterapp.feature.dev.DevRoot
@@ -73,15 +82,20 @@ internal fun HomeScreen() {
         MenuWrapper(menu = it)
     }
 
+    val windowInsets = WindowInsets.safeDrawing.union(WindowInsets.displayCutout)
+    val navigationType = getNavigationType()
+
     Content(
         menuWrapper = menu,
+        navigationType = navigationType,
         isConfettiActive = state,
         currentDestination = currentDestination,
         advertisementContent = {
             if (!isAdFree) {
-                InlineBannerAd(
+                Banner(
                     state = bannerAdState,
-                    modifier = Modifier.fillMaxWidth(),
+                    navigationType = navigationType,
+                    windowInsets = windowInsets,
                 )
             }
         },
@@ -102,6 +116,32 @@ internal fun HomeScreen() {
     }
 }
 
+@Composable
+private fun Banner(
+    state: InlineBannerAdState,
+    navigationType: NavigationType,
+    windowInsets: WindowInsets = WindowInsets.safeDrawing,
+) {
+    val modifier = when (navigationType) {
+        NavigationType.NavigationBar -> {
+            Modifier.fillMaxWidth()
+        }
+
+        NavigationType.NavigationRail -> {
+            Modifier
+                .windowInsetsPadding(
+                    insets = windowInsets.only(WindowInsetsSides.Bottom + WindowInsetsSides.End),
+                )
+                .fillMaxWidth()
+        }
+    }
+
+    InlineBannerAd(
+        state = state,
+        modifier = modifier,
+    )
+}
+
 @Immutable
 data class MenuWrapper(
     val menu: List<HomeDestination>,
@@ -110,12 +150,13 @@ data class MenuWrapper(
 @Composable
 private fun Content(
     menuWrapper: MenuWrapper,
+    navigationType: NavigationType = getNavigationType(),
     currentDestination: HomeDestination,
     onMenuItemClicked: (HomeDestination) -> Unit,
     advertisementContent: @Composable ColumnScope.() -> Unit,
     isConfettiActive: Boolean,
     onConfettiFinished: () -> Unit,
-    onDestinationSet: @Composable ColumnScope.() -> Unit,
+    destinationContent: @Composable ColumnScope.() -> Unit,
 ) {
     val itemColors = NavigationSuiteDefaults.itemColors(
         navigationBarItemColors = NavigationBarItemDefaults.colors(
@@ -142,7 +183,7 @@ private fun Content(
     )
 
     NavigationSuiteScaffold(
-        layoutType = getNavigationType().toNavigationSuite,
+        layoutType = navigationType.toNavigationSuite,
         navigationSuiteColors = suiteColors,
         navigationSuiteItems = {
             menuWrapper.menu.forEach { destination ->
@@ -176,11 +217,11 @@ private fun Content(
     ) {
         Column(Modifier.fillMaxSize()) {
             Column(
-                Modifier
+                modifier = Modifier
                     .fillMaxSize()
-                    .weight(1f)
+                    .weight(1f),
             ) {
-                onDestinationSet()
+                destinationContent()
             }
 
             advertisementContent()
@@ -198,16 +239,16 @@ private fun Content(
 @Composable
 private fun ContentPreview() {
     DrinkWaterAppTheme {
+        val navigationType = getNavigationType()
         Content(
             menuWrapper = MenuWrapper(menu = HomeDestination.entries),
+            navigationType = navigationType,
             currentDestination = HomeDestination.TODAY,
             onMenuItemClicked = {},
             advertisementContent = {
-                val state = rememberBelowMainScreenBannerAdState(enabled = true)
-
-                InlineBannerAd(
-                    state = state,
-                    modifier = Modifier.fillMaxWidth(),
+                Banner(
+                    state = rememberBelowMainScreenBannerAdState(enabled = true),
+                    navigationType = navigationType,
                 )
             },
             isConfettiActive = false,
