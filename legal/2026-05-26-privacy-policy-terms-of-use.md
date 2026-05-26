@@ -1,7 +1,6 @@
 # Drink Water App — Privacy Policy & Terms of Use
 
-**Effective date:** May 25, 2026
-**Last updated:** May 25, 2026
+**Effective date:** May 26, 2026
 **Developer contact:** eahm3595@gmail.com
 
 ---
@@ -25,16 +24,16 @@ do not agree, please uninstall the App.
 
 During onboarding and normal use, the App asks you for:
 
-| Data                                   | Purpose                                                                                                                       |
-|----------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| Aprobacion de politica de privacidad   | Aceptar legalmente como la aplicacion usa la informacion que provees                                                          |
-| Aprobacion de terminos de uso          | Aceptar los lineamientos y reglas para el uso de la aplicacion                                                                |
-| Aprobacion envio de eventos de rastreo | Decidir si enviar datos de uso de caracteristicas de la app para analisis con proposito de mejorar la experiencia del usuario |
-| Unit preference (ml / oz / cups)       | Display measurements in your preferred format                                                                                 |
-| Meta                                   | Establecer la cantidad de agua que el usuario desea tomar diariamente                                                         |
-| Wake time / sleep time                 | Schedule drink reminders within active hours                                                                                  |
-| Reminder frequency                     | Control how often notifications are sent                                                                                      |
-| Cantidad a mostrar en notificaciones   | Registrar una cantidad predefinida de agua bebida desde las notificaciones                                                    |
+| Data                             | Purpose                                                                                   |
+|----------------------------------|-------------------------------------------------------------------------------------------|
+| Privacy policy acceptance        | Legally acknowledge how the App uses the information you provide                          |
+| Terms of use acceptance          | Accept the guidelines and rules for using the App                                         |
+| Usage tracking consent           | Choose whether to send app feature usage data for analysis to improve the user experience |
+| Unit preference (ml / oz / cups) | Display measurements in your preferred format                                             |
+| Daily water goal                 | Set the amount of water you want to drink each day                                        |
+| Wake time / sleep time           | Schedule drink reminders within active hours                                              |
+| Reminder frequency               | Control how often notifications are sent                                                  |
+| Notification quick-add amount    | Log a predefined amount of water consumed directly from notifications                     |
 
 **All of the above is stored exclusively on your device** using the device local storage.
 
@@ -60,7 +59,8 @@ features are used and improve the App. Specifically:
 
 **No personal data, water log content, or identifiable information is included in these events.**
 Each device is assigned a random anonymous ID that is not linked to your name, email, or any other
-identity. De hecho, la app no obtiene de ningun lugar informacion de tu nombre, correo o identidad.
+identity. The App does not collect your name, email address, or any other identity information from
+any source.
 
 - Mixpanel data is processed on servers located in the **European Union**.
 - You can opt out at any time from **Settings → Privacy & Legal → Usage Tracking**.
@@ -86,9 +86,9 @@ device advertising identifiers and use them to show relevant ads, consistent wit
 Policy. You can reset or limit your advertising ID in your device's Google settings.
 
 Purchasing the **Remove Ads** in-app product permanently disables all ads and associated tracking.
-Nosotros nos encargamos de no conectar mas con los servicios de anuncios una vez que la app es
-comprada. Si identificas que aun existe alguna conexion con anuncios despues de una compra, por
-favor reporta este comportamiento inusual para tomar acciones immediatamente.
+We ensure no further connections are made to advertising services once the ad-free purchase is
+completed. If you notice any continued ad-related activity after purchasing, please report this
+unusual behavior so we can take immediate action.
 
 #### 2.6 Purchase Information
 
@@ -98,8 +98,8 @@ entitlement to the ad-free version. RevenueCat receives:
 - Google Play purchase tokens (issued by Google, not by us)
 - Your entitlement status (whether ads are removed)
 
-RevenueCat no recibe ninguna otra informacion sensible. si identificas algun uso inusual
-incentivamos a que lo reportes para tomar acciones.
+RevenueCat does not receive any other sensitive information. If you notice any unusual activity,
+we encourage you to report it so we can take appropriate action.
 See RevenueCat's Privacy Policy for details.
 
 ---
@@ -149,14 +149,14 @@ the services described above:
 | RevenueCat                    | Purchase management        | Google Play purchase tokens        | https://www.revenuecat.com/privacy          |
 
 We may also disclose your information if required by law, court order, or to protect the rights,
-safety, or property of users or the public, la aplicacion genera ids por cada instalacion por lo
-cual identificar un usuario especifico no es posible a menos que se pueda acceder a los archivos
-locales, en todo caso se podria remover la informacion que cualquier usuario desee borrar, aunque
-una reinstalacion de la app tambien puede solucionar este problema.
+safety, or property of users or the public. The App generates a unique ID per installation, which
+means it is not possible to identify a specific user unless local device files are accessed. In any
+case, any user may request removal of their data at any time; reinstalling the App also permanently
+deletes all local data.
 
-Informacion de rastreo se usa unicamente para determinar que configuraciones son las mas usadas para
-establecerlas como predeterminadas en futuras actualizaciones. Tambien para agregar o remover
-caracteristicas que son muy o poco usadas. Todo con el fin de mejorar la experiencia del usuario.
+Tracking information is used solely to determine which settings and features are most commonly used,
+in order to set better defaults in future updates and to add or remove features based on usage
+patterns. All of this is aimed at improving the user experience.
 
 ---
 
@@ -174,8 +174,8 @@ caracteristicas que son muy o poco usadas. Todo con el fin de mejorar la experie
 
 ### 7. This App Is Not a Medical Application
 
-Drink Water App is a personal wellness utility designed to help you build a hydration habit. It is *
-*not a medical device** and does not provide medical advice, diagnosis, or treatment. The daily
+Drink Water App is a personal wellness utility designed to help you build a hydration habit. It is
+**not a medical device** and does not provide medical advice, diagnosis, or treatment. The daily
 water goal suggested by the App is an estimate based on commonly used formulas and is not a
 substitute for advice from a qualified healthcare professional. Consult your doctor for any
 health-related decisions.
@@ -184,10 +184,9 @@ health-related decisions.
 
 ### 8. Children's Privacy
 
-La app es muy simple y puede ser usada por usuarios e cualquier edad. Nosotros recomendamos que
-menores de edad sean instruidos por sus padres o tutores antes de cualquier uso de la app. La app
-tampoco esta dirigida a menores directamente. We do not knowingly collect personal
-information de menores de edad. If you are a parent or guardian and believe your child has
+The App is simple to use and may be used by people of any age. We recommend that minors be guided
+by a parent or guardian before using the App. The App is not directed at minors. We do not knowingly
+collect personal information from minors. If you are a parent or guardian and believe your child has
 provided personal data through the App, please contact us at eahm3595@gmail.com and we will take
 appropriate steps to address it.
 
@@ -195,7 +194,7 @@ appropriate steps to address it.
 
 ### 9. Data Security
 
-All data you enter into the App is stored locally on your device's storage'. We do not operate
+All data you enter into the App is stored locally on your device's storage. We do not operate
 servers that store your personal hydration data. However, no method of electronic storage is
 completely secure, and we encourage you to protect your device with the recommended security
 techniques.
@@ -286,7 +285,7 @@ The App offers a one-time in-app purchase to permanently remove advertisements (
 completing a purchase:
 
 - You receive a non-transferable entitlement to the ad-free version of the App on the store you made
-  the purchase. RevenueCat se encarga del manejo de compra y restauracion.
+  the purchase. RevenueCat handles purchase management and restoration.
 - When the purchase is processed by Google Play it is done in accordance with Google's Terms of
   Service.
 - All payment handling is managed by Google Play and RevenueCat. We do not store your payment
@@ -295,14 +294,14 @@ completing a purchase:
 #### 4.2 Restoring Purchases
 
 If you reinstall the App or switch to a new device, you can restore your purchase via **Settings →
-Restore Purchases**, para mas informacion sobre la restauracion por favor revisa los terminos en
-RevenueCat.
+Restore Purchases**. For more information about purchase restoration, please review RevenueCat's
+terms.
 
 #### 4.3 Refunds
 
-Todas las compras estan sujetas a la tienda donde se realize la compra.
+All purchases are subject to the refund policy of the store where the purchase was made.
 
-To all purchases done thorugh google play store, these are subject to Google Play's refund policy.
+All purchases made through the Google Play Store are subject to Google Play's refund policy.
 We are unable to issue refunds directly. To request a refund, visit the Google Play order history at
 play.google.com/store/account/orderhistory within the eligible refund window (typically 48 hours of
 purchase).
