@@ -195,6 +195,8 @@ El archivo se llama `drinkwater_backup.json` en la carpeta privada/app del prove
 
 ```kotlin
 object BackupMigrationManager {
+    val currentSchema: Int = 1   // incrementar con cada cambio estructural
+
     fun migrate(raw: JsonObject, fromSchema: Int, toSchema: Int): JsonObject
 }
 ```
@@ -202,10 +204,113 @@ object BackupMigrationManager {
 - Cada migración es `BackupMigration(from: Int, to: Int, migrate: (JsonObject) -> JsonObject)`.
 - Se aplican encadenadas: si el archivo tiene `schemaVersion = 1` y la app está en schema 3,
   se aplican 1→2 y luego 2→3.
-- Si `schemaVersion > currentSchema` (backup de una versión futura), se lanza
-  `BackupError.IncompatibleVersion` y se muestra error al usuario.
 - Al agregar un campo nuevo a las entidades locales también se debe registrar la migración
   que rellene el default en archivos viejos.
+- La validación de compatibilidad se hace **antes** de intentar migrar (ver sección siguiente).
+
+---
+
+## Compatibilidad de versiones en restore
+
+### Regla de decisión
+
+Antes de deserializar o migrar cualquier backup, `RestoreBackupUseCase` compara
+`backup.metadata.schemaVersion` con `BackupMigrationManager.currentSchema`:
+
+```
+backupSchema < currentSchema  →  migrar hacia adelante y restaurar   ✓
+backupSchema == currentSchema →  restaurar directamente               ✓
+backupSchema > currentSchema  →  rechazar, mostrar IncompatibleVersionDialog  ✗
+```
+
+La tercera rama significa que el backup fue creado con **una versión más nueva de la app**
+que la que el usuario tiene instalada. Los datos podrían contener campos que esta versión
+desconoce, por lo que restaurar podría corromper la base de datos local. No se intenta la
+restauración bajo ninguna circunstancia.
+
+### Código de la validación
+
+```kotlin
+class RestoreBackupUseCase(
+    private val provider: CloudBackupProvider,
+    private val serializer: BackupSerializer,
+    private val migrationManager: BackupMigrationManager,
+    private val database: AppDatabase,
+) {
+    suspend operator fun invoke(): Result<Unit, BackupError> {
+        val backupFile = provider.download().getOrElse { return Err(it) }
+        val remoteSchema = backupFile.metadata.schemaVersion
+
+        if (remoteSchema > migrationManager.currentSchema) {
+            return Err(BackupError.IncompatibleVersion(remoteSchema))
+        }
+
+        val migratedData = migrationManager.migrate(
+            raw = backupFile.rawData,
+            fromSchema = remoteSchema,
+            toSchema = migrationManager.currentSchema,
+        )
+
+        return serializer.deserializeAndImport(migratedData, database)
+    }
+}
+```
+
+### `IncompatibleVersionDialog` — UI
+
+Este diálogo solo aparece cuando `backupSchema > currentSchema`. Se muestra en todos los
+contextos donde se intenta restaurar (manual desde Settings, automático al reinstalar).
+
+```
+╔══════════════════════════════════════════════╗
+║  Actualiza la app para restaurar             ║
+╠══════════════════════════════════════════════╣
+║  Tu copia de seguridad fue creada con una    ║
+║  versión más nueva de la app.                ║
+║                                              ║
+║  Para no perder datos, actualiza la app y    ║
+║  luego vuelve a restaurar.                   ║
+║                                              ║
+║  Tus datos locales actuales no se            ║
+║  modificaron.                                ║
+╠══════════════════════════════════════════════╣
+║  [Actualizar app]          [Cancelar]        ║
+╚══════════════════════════════════════════════╝
+```
+
+- "Actualizar app" → abre la ficha de la app en Google Play Store.
+- "Cancelar" → cierra el diálogo. No se modifica nada: ni los datos locales ni el backup remoto.
+- El diálogo **nunca** ofrece un botón de "restaurar de todas formas". No hay forma de forzar
+  una restauración incompatible.
+
+### Dónde aparece este diálogo
+
+| Contexto                                | Disparador                                         | Comportamiento posterior                                                                      |
+|-----------------------------------------|----------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| Restore manual (Settings)               | Usuario toca "Restaurar desde la nube"             | Muestra diálogo; si cancela, vuelve a Settings sin cambios                                    |
+| Restauración al reinstalar (silenciosa) | `CheckBackupStatusUseCase` detecta schema mayor    | Muestra diálogo antes de llegar al home; si cancela, entra al home con datos locales intactos |
+| Conflicto local vs. nube → "Usar nube"  | Usuario elige el backup en `RestoreConflictDialog` | Reemplaza el `RestoreConflictDialog` con `IncompatibleVersionDialog`                          |
+
+En ningún caso se muestra primero el conflicto y luego falla silenciosamente: la verificación
+de schema ocurre antes de mostrar cualquier opción de restauración al usuario.
+
+### Strings para este caso
+
+```xml
+
+<string name="backup_incompatible_title">Actualiza la app para restaurar</string><string
+name="backup_incompatible_body">Tu copia de seguridad fue creada con una versión más nueva de la
+app.\n\nActualiza la app y luego vuelve a restaurar. Tus datos actuales no se modificaron.
+</string><string name="backup_incompatible_update">Actualizar app</string><string
+name="backup_incompatible_cancel">Cancelar
+</string>
+```
+
+### Archivo a crear
+
+| Archivo                                                | Descripción                                          |
+|--------------------------------------------------------|------------------------------------------------------|
+| `feature/settings/backup/IncompatibleVersionDialog.kt` | Diálogo de versión incompatible con CTA a Play Store |
 
 ---
 
@@ -363,17 +468,24 @@ onboardingCompleted == false  →  onboarding normal
 onboardingCompleted == true y backupEnabled == false  →  home
 onboardingCompleted == true y backupEnabled == true
     ↓
-CheckBackupStatusUseCase (con el proveedor que tenía guardado)
+CheckBackupStatusUseCase (con el proveedor guardado)
     ↓ hay datos remotos?
     ├── NO  →  home normal
     └── SÍ
-          ↓ hay datos locales?
-          ├── NO  →  restaurar silenciosamente, ir a home
-          └── SÍ  →  mostrar RestoreConflictDialog
-                        ├── "Usar nube"   →  sobreescribir local con backup, ir a home
-                        ├── "Usar local"  →  subir datos locales al cloud, ir a home
-                        └── "Cancelar"    →  ir a home sin cambios
+          ↓ ¿backupSchema > currentSchema?
+          ├── SÍ →  IncompatibleVersionDialog → cancelar → home (datos locales intactos)
+          └── NO (backupSchema <= currentSchema → se puede restaurar)
+                ↓ hay datos locales?
+                ├── NO  →  restaurar silenciosamente (con migraciones si aplica), ir a home
+                └── SÍ  →  mostrar RestoreConflictDialog
+                              ├── "Usar nube"   →  migrar si aplica → sobreescribir local, ir a home
+                              ├── "Usar local"  →  subir datos locales al cloud, ir a home
+                              └── "Cancelar"    →  ir a home sin cambios
 ```
+
+La comprobación de `schemaVersion` ocurre **siempre antes** de mostrar cualquier opción
+de restauración. El usuario nunca ve el `RestoreConflictDialog` para un backup que la app
+no puede leer.
 
 ---
 
@@ -411,7 +523,7 @@ el contexto en que ocurre.
 | `UploadFailed`               | Snackbar genérico              | Silencioso + reintento WorkManager              | Mensaje inline + saltar     | N/A                                 |
 | `DownloadFailed`             | N/A                            | N/A                                             | N/A                         | Snackbar + reintentar               |
 | `FileNotFound`               | Snackbar informativo           | N/A                                             | N/A                         | Mensaje: "No hay backup disponible" |
-| `IncompatibleVersion`        | Diálogo: actualiza la app      | Diálogo                                         | N/A                         | Diálogo: actualiza la app           |
+| `IncompatibleVersion`        | `IncompatibleVersionDialog`    | `IncompatibleVersionDialog`                     | N/A (no se restaura aquí)   | `IncompatibleVersionDialog`         |
 | `MigrationFailed`            | Diálogo + contactar soporte    | Diálogo                                         | N/A                         | Diálogo + contactar soporte         |
 | `AuthCancelled`              | Ignorar                        | N/A                                             | Volver al paso sin acción   | N/A                                 |
 
@@ -730,40 +842,41 @@ name="backup_error_auth_failed">No se pudo iniciar sesión
 
 ## Archivos a crear
 
-| Archivo                                            | Descripción                                         |
-|----------------------------------------------------|-----------------------------------------------------|
-| `core/backup/CloudProviderType.kt`                 | Enum con `GOOGLE_DRIVE`, `DROPBOX` y su `id` String |
-| `core/backup/CloudUser.kt`                         | Data class: `displayName`, `providerType`           |
-| `core/backup/BackupMetadata.kt`                    | Data class del bloque `metadata` del JSON           |
-| `core/backup/BackupFile.kt`                        | Wrapper: `metadata + rawData: JsonObject`           |
-| `core/backup/BackupError.kt`                       | Sealed interface de errores                         |
-| `core/backup/CloudBackupProvider.kt`               | Interface abstracta del proveedor                   |
-| `core/backup/BackupProviderRegistry.kt`            | Resolución del proveedor activo por tipo            |
-| `core/backup/GoogleDriveBackupProvider.kt`         | Implementación Drive (REST API + `GoogleSignIn`)    |
-| `core/backup/DropboxBackupProvider.kt`             | Implementación Dropbox (SDK v7, OAuth PKCE)         |
-| `core/backup/BackupSerializer.kt`                  | Serialización/deserialización JSON ↔ entidades Room |
-| `core/backup/BackupMigration.kt`                   | Data class para una migración individual            |
-| `core/backup/BackupMigrationManager.kt`            | Registro y ejecución encadenada de migraciones      |
-| `core/backup/BackupRepository.kt`                  | Interface de alto nivel                             |
-| `core/backup/BackupRepositoryImpl.kt`              | Orquesta registry + serializer + migration          |
-| `core/backup/ConnectBackupUseCase.kt`              | Auth + primera sync                                 |
-| `core/backup/SyncBackupUseCase.kt`                 | Exporta DB local → serializa → sube                 |
-| `core/backup/RestoreBackupUseCase.kt`              | Descarga → deserializa → migra → importa a Room     |
-| `core/backup/CheckBackupStatusUseCase.kt`          | Retorna si hay backup remoto y su metadata          |
-| `core/backup/DisconnectBackupUseCase.kt`           | Cierra sesión + cancela WorkManager                 |
-| `core/backup/CloudBackupWorker.kt`                 | `CoroutineWorker` que llama a `SyncBackupUseCase`   |
-| `core/backup/BackupScheduler.kt`                   | Abstracción sobre WorkManager                       |
-| `feature/onboarding/ui/steps/StepBackup.kt`        | Paso de onboarding para activar backup              |
-| `feature/settings/backup/BackupSettingsSection.kt` | Sección de Settings                                 |
-| `feature/settings/backup/ProviderPickerSheet.kt`   | Bottom Sheet selector de proveedor                  |
-| `feature/settings/backup/RestoreConflictDialog.kt` | Diálogo de conflicto local vs. nube                 |
-| `feature/dev/backup/BackupDevState.kt`             | State del playground                                |
-| `feature/dev/backup/BackupDevAction.kt`            | Actions del playground                              |
-| `feature/dev/backup/BackupDevEvent.kt`             | Events del playground                               |
-| `feature/dev/backup/BackupDevViewModel.kt`         | ViewModel del playground                            |
-| `feature/dev/backup/BackupDevScreen.kt`            | Pantalla del playground                             |
-| `feature/dev/backup/BackupDevRoot.kt`              | Root composable del playground                      |
-| `di/BackupModule.kt`                               | Módulo Koin con todas las dependencias de backup    |
+| Archivo                                                | Descripción                                          |
+|--------------------------------------------------------|------------------------------------------------------|
+| `core/backup/CloudProviderType.kt`                     | Enum con `GOOGLE_DRIVE`, `DROPBOX` y su `id` String  |
+| `core/backup/CloudUser.kt`                             | Data class: `displayName`, `providerType`            |
+| `core/backup/BackupMetadata.kt`                        | Data class del bloque `metadata` del JSON            |
+| `core/backup/BackupFile.kt`                            | Wrapper: `metadata + rawData: JsonObject`            |
+| `core/backup/BackupError.kt`                           | Sealed interface de errores                          |
+| `core/backup/CloudBackupProvider.kt`                   | Interface abstracta del proveedor                    |
+| `core/backup/BackupProviderRegistry.kt`                | Resolución del proveedor activo por tipo             |
+| `core/backup/GoogleDriveBackupProvider.kt`             | Implementación Drive (REST API + `GoogleSignIn`)     |
+| `core/backup/DropboxBackupProvider.kt`                 | Implementación Dropbox (SDK v7, OAuth PKCE)          |
+| `core/backup/BackupSerializer.kt`                      | Serialización/deserialización JSON ↔ entidades Room  |
+| `core/backup/BackupMigration.kt`                       | Data class para una migración individual             |
+| `core/backup/BackupMigrationManager.kt`                | Registro y ejecución encadenada de migraciones       |
+| `core/backup/BackupRepository.kt`                      | Interface de alto nivel                              |
+| `core/backup/BackupRepositoryImpl.kt`                  | Orquesta registry + serializer + migration           |
+| `core/backup/ConnectBackupUseCase.kt`                  | Auth + primera sync                                  |
+| `core/backup/SyncBackupUseCase.kt`                     | Exporta DB local → serializa → sube                  |
+| `core/backup/RestoreBackupUseCase.kt`                  | Descarga → deserializa → migra → importa a Room      |
+| `core/backup/CheckBackupStatusUseCase.kt`              | Retorna si hay backup remoto y su metadata           |
+| `core/backup/DisconnectBackupUseCase.kt`               | Cierra sesión + cancela WorkManager                  |
+| `core/backup/CloudBackupWorker.kt`                     | `CoroutineWorker` que llama a `SyncBackupUseCase`    |
+| `core/backup/BackupScheduler.kt`                       | Abstracción sobre WorkManager                        |
+| `feature/onboarding/ui/steps/StepBackup.kt`            | Paso de onboarding para activar backup               |
+| `feature/settings/backup/BackupSettingsSection.kt`     | Sección de Settings                                  |
+| `feature/settings/backup/ProviderPickerSheet.kt`       | Bottom Sheet selector de proveedor                   |
+| `feature/settings/backup/RestoreConflictDialog.kt`     | Diálogo de conflicto local vs. nube                  |
+| `feature/settings/backup/IncompatibleVersionDialog.kt` | Diálogo de versión incompatible con CTA a Play Store |
+| `feature/dev/backup/BackupDevState.kt`                 | State del playground                                 |
+| `feature/dev/backup/BackupDevAction.kt`                | Actions del playground                               |
+| `feature/dev/backup/BackupDevEvent.kt`                 | Events del playground                                |
+| `feature/dev/backup/BackupDevViewModel.kt`             | ViewModel del playground                             |
+| `feature/dev/backup/BackupDevScreen.kt`                | Pantalla del playground                              |
+| `feature/dev/backup/BackupDevRoot.kt`                  | Root composable del playground                       |
+| `di/BackupModule.kt`                                   | Módulo Koin con todas las dependencias de backup     |
 
 ---
 
