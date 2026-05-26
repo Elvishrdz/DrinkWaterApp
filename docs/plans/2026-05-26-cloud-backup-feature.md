@@ -419,7 +419,13 @@ Cuando el feature flag está desactivado: `byStep(10) → Summary` y `totalSteps
 - Icono + nombre del proveedor activo (Google Drive o Dropbox).
 - Nombre de la cuenta conectada (Display Name).
 - Última sincronización: fecha y hora / "Nunca sincronizado".
-- Botón "Sincronizar ahora" (spinner durante la operación).
+- **Área de estado de sync** — reactiva a `BackupSyncState` (ver sección de concurrencia):
+    - `Idle`: botón "Sincronizar ahora" habilitado.
+    - `InProgress`: `LinearProgressIndicator` + texto "Sincronizando…" + botón deshabilitado. Se
+      muestra tanto si la sync la inició el usuario como si la inició WorkManager en segundo plano.
+    - `UpToDate`: texto "Sin cambios, todo está actualizado" (skip por hash idéntico).
+    - `Success`: texto "Sincronizado correctamente".
+    - `Error`: banner de error (ver sección de manejo de errores).
 - Selector de intervalo automático: Diario / Cada 3 días / Semanal / Solo manual.
 - Opción "Restaurar desde la nube" (con diálogo de confirmación).
 - Botón "Cambiar proveedor" → desconecta el actual y abre `ProviderPickerSheet`.
@@ -439,11 +445,112 @@ class CloudBackupWorker(
 }
 ```
 
-- `PeriodicWorkRequest` con `BACKUP_WORK_TAG` único.
+- **Nombre único**: `BACKUP_SYNC_WORK_NAME = "cloud_backup_sync"`. Tanto el `PeriodicWorkRequest` (
+  automático) como el `OneTimeWorkRequest` (manual iniciado desde Settings) usan este mismo nombre.
+- Al encolar el sync manual:
+  `WorkManager.enqueueUniqueWork(BACKUP_SYNC_WORK_NAME, ExistingWorkPolicy.KEEP, oneTimeRequest)` —
+  si ya hay un trabajo en curso, la solicitud se descarta automáticamente.
+- Al encolar el periódico:
+  `enqueueUniquePeriodicWork(BACKUP_SYNC_WORK_NAME, ExistingPeriodicWorkPolicy.KEEP, periodicRequest)`.
 - Constraints: `NetworkType.CONNECTED`.
-- Al completar, guarda `lastSyncAt` en `PrefsStorage`.
-- Backoff exponencial en fallo (máx 3 intentos antes de reportar error en UI).
-- Al desactivar backup o cambiar de proveedor: `WorkManager.cancelUniqueWork(BACKUP_WORK_TAG)`.
+- Al completar sin error, guarda `lastSyncAt` en `PrefsStorage` y limpia `KEY_BACKUP_LAST_ERROR`.
+- Backoff exponencial en fallo genérico (máx 3 intentos). Para `QuotaExceeded`: **no reintentar** (
+  ver sección de errores).
+- Al desactivar backup o cambiar de proveedor:`WorkManager.cancelUniqueWork(BACKUP_SYNC_WORK_NAME)`.
+
+---
+
+## Concurrencia y detección de cambios
+
+### Prevención de syncs simultáneas
+
+`SyncBackupUseCase` usa un `Mutex` para garantizar que solo una sync se ejecute a la vez,
+independientemente de si la lanzó el usuario o WorkManager:
+
+```kotlin
+class SyncBackupUseCase(private val mutex: Mutex /* + demás dependencias */) {
+    suspend operator fun invoke(): Result<SyncResult, BackupError> {
+        if (!mutex.tryLock()) return Ok(SyncResult.AlreadyInProgress)
+        try {
+            // serializar → comparar hash → subir si hay cambios
+        } finally {
+            mutex.unlock()
+        }
+    }
+}
+
+sealed interface SyncResult {
+    data object Uploaded : SyncResult
+    data object SkippedNoChanges : SyncResult
+    data object AlreadyInProgress : SyncResult
+}
+```
+
+El `Mutex` se registra como `single { Mutex() }` en el módulo Koin de backup y se inyecta
+en `SyncBackupUseCase`. Al ser un `single`, es la misma instancia para WorkManager y para
+las llamadas desde ViewModel.
+
+### `BackupSyncState` — estado reactivo para la UI
+
+```kotlin
+sealed interface BackupSyncState {
+    data object Idle : BackupSyncState
+    data object InProgress : BackupSyncState
+    data object UpToDate : BackupSyncState
+    data class Success(val syncedAt: Instant) : BackupSyncState
+    data class Error(val error: BackupError) : BackupSyncState
+}
+```
+
+Expuesto desde `BackupRepository` como `val syncState: StateFlow<BackupSyncState>`.
+`SyncBackupUseCase` actualiza este flow al adquirir/liberar el mutex y al concluir la
+operación.
+
+### Observar WorkManager desde el ViewModel de Settings
+
+Para cubrir el caso donde WorkManager arranca mientras la app está en segundo plano (y el
+mutex en memoria ya no aplica), el ViewModel combina ambas fuentes:
+
+```kotlin
+val isSyncing: StateFlow<Boolean> = combine(
+    backupRepository.syncState.map { it is BackupSyncState.InProgress },
+    workManager.getWorkInfosForUniqueWorkFlow(BACKUP_SYNC_WORK_NAME)
+        .map { infos -> infos.any { it.state == WorkInfo.State.RUNNING } },
+) { repoSyncing, workerRunning -> repoSyncing || workerRunning }
+    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
+```
+
+La UI reacciona a `isSyncing` para mostrar el `LinearProgressIndicator` y deshabilitar el
+botón "Sincronizar ahora".
+
+---
+
+### Detección de cambios antes de subir
+
+Antes de hacer el upload, `SyncBackupUseCase` calcula un hash del contenido serializado y
+lo compara con el del último backup exitoso guardado en `PrefsStorage`. Si son iguales, no
+hay nada nuevo que subir.
+
+**Flujo completo de `SyncBackupUseCase`:**
+
+```
+1. tryLock(mutex) → si falla: return AlreadyInProgress
+2. Emit BackupSyncState.InProgress
+3. Serializar datos locales → content: String
+4. Calcular newHash = SHA-256(content).take(32)
+5. Leer storedHash de PrefsStorage
+6. Si newHash == storedHash:
+       → Emit BackupSyncState.UpToDate
+       → return SkippedNoChanges          (sin llamada de red)
+7. Upload(content) → si falla: Emit Error, return Err
+8. Guardar newHash en KEY_BACKUP_CONTENT_HASH
+9. Guardar now() en KEY_BACKUP_LAST_SYNC_AT
+10. Emit BackupSyncState.Success(syncedAt = now())
+11. return Uploaded
+```
+
+El hash usa SHA-256 truncado a los primeros 32 caracteres hex (16 bytes) — suficiente para
+detectar cualquier cambio, sin costo criptográfico relevante dado el tamaño del archivo.
 
 ---
 
@@ -455,6 +562,7 @@ KEY_BACKUP_PROVIDER: String              // "google_drive" | "dropbox"
 KEY_BACKUP_LAST_SYNC_AT: Long?           // Epoch ms de la última sync exitosa
 KEY_BACKUP_AUTO_INTERVAL_DAYS: Int       // 1 | 3 | 7 | 0 (solo manual)
 KEY_BACKUP_USER_DISPLAY_NAME: String?    // Nombre para mostrar en Settings
+KEY_BACKUP_CONTENT_HASH: String?         // Hash SHA-256 truncado del último backup subido
 ```
 
 ---
@@ -835,6 +943,8 @@ name="backup_settings_last_sync_never">Nunca sincronizado
 name="backup_settings_sync_now">Sincronizar ahora
 </string><string name="backup_settings_syncing">Sincronizando…</string><string
 name="backup_settings_sync_success">Sincronizado correctamente
+</string><string name="backup_settings_sync_up_to_date">Sin cambios, todo está actualizado
+</string><string name="backup_settings_sync_in_progress_worker">Sincronización automática en curso…
 </string><string name="backup_settings_restore">Restaurar desde la nube</string><string
 name="backup_settings_change_provider">Cambiar proveedor
 </string><string name="backup_settings_disconnect">Desconectar cuenta</string><string
