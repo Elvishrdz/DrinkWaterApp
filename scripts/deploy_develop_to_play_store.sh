@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Trigger the deployment workflow to the given track in Google Developer Console.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
