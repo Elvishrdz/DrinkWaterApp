@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Drink Water — Reminders Kit</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link rel="stylesheet" href="../../colors_and_type.css"/>
+<link rel="stylesheet" href="../mobile/components.css"/>
+<link rel="stylesheet" href="../mobile/screens.css"/>
+<link rel="stylesheet" href="reminders.css"/>
+<style>
+  body { background: var(--ink-100); padding: 24px; min-height: 100vh; }
+  .stage { display: flex; flex-wrap: wrap; gap: 32px; justify-content: center; align-items: flex-start; }
+  .frame-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .frame-label {
+    font-family: var(--font-mono); font-size: 11px; color: var(--fg-2);
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .tab-host { width: 100%; height: 100%; display: flex; flex-direction: column; }
+  .tab-host > .dw-screen { flex: 1; min-height: 0; }
+  .kit-header {
+    max-width: 720px; margin: 0 auto 28px auto; text-align: center;
+  }
+  .kit-header .eyebrow {
+    font-family: var(--font-mono); font-size: 11px; color: var(--brand-magenta);
+    letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 6px;
+  }
+  .kit-header h1 {
+    font-family: var(--font-display); font-weight: 700; font-size: 26px;
+    color: var(--fg-1); margin: 0 0 6px 0;
+  }
+  .kit-header p {
+    font-family: var(--font-body); font-size: 14px; color: var(--fg-2);
+    max-width: 540px; margin: 0 auto; line-height: 1.5;
+  }
+  .scenario-bar {
+    display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 14px 0 0 0;
+  }
+  .scn-btn {
+    padding: 7px 13px; border-radius: 999px; border: 1.5px solid var(--brand-magenta);
+    background: var(--paper); color: var(--brand-magenta); cursor: pointer;
+    font-family: var(--font-rounded); font-weight: 700; font-size: 11px;
+    letter-spacing: 0.04em;
+  }
+  .scn-btn.active { background: var(--brand-magenta); color: #fff; box-shadow: var(--shadow-magenta);}
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="../mobile/android-frame.jsx"></script>
+<script type="text/babel" src="../mobile/Components.jsx"></script>
+<script type="text/babel" src="Reminders.jsx"></script>
+<script type="text/babel" src="Timeline.jsx"></script>
+<script type="text/babel" src="Blocks.jsx"></script>
+<script type="text/babel" src="RemindersScreen.jsx"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState } = React;
+
+/* Stub renderers for other tabs so the bottom menu integration is real. */
+const StubScreen = ({ tab }) => {
+  const meta = {
+    today:    { title: "Today",    sub: "Hero log + drink CTA",  icon: "drop"     },
+    history:  { title: "History",  sub: "Per-day records",       icon: "clock"    },
+    stats:    { title: "Stats",    sub: "Weekly insights",       icon: "chart"    },
+    settings: { title: "Settings", sub: "Goal, units, profile",  icon: "settings" },
+  }[tab];
+  return (
+    <div className="dw-screen rem-stub">
+      <div className="rem-stub-icon">
+        <Icon name={meta.icon} size={28} color="var(--brand-water)"/>
+      </div>
+      <h2>{meta.title}</h2>
+      <p>This kit focuses on <b>Reminders</b>. Tap the bell tab to see the new screen.</p>
+    </div>
+  );
+};
+
+function App() {
+  const [tab, setTab] = useState("reminders");
+
+  /* ----- canonical defaults for the demo ----- */
+  const goalMl = 2200;
+  const [now, setNow] = useState(10 * 60 + 42);   /* demo "current time": 10:42 a.m. */
+  const [today, setToday] = useState(1);          /* Tuesday (0=Mon..6=Sun) */
+  const [notif, setNotif] = useState(true);
+  const [activeDays, setActiveDays] = useState([true,true,true,true,true,true,true]);
+
+  /* Profile model: { all: <profile>, [dayIdx]: <profile> }.
+     A profile carries its own mode + auto inputs + schedule.
+     "all" is the default that applies to any day without an override. */
+  const makeProfile = (over) => ({
+    mode: "auto", autoMode: "interval",
+    start: 7*60, end: 22*60, interval: 90, amount: 220,
+    schedule: genByInterval(7*60, 22*60, 90, goalMl),
+    ...over,
+  });
+  const [profiles, setProfiles] = useState({ all: makeProfile() });
+  const [scope, setScope] = useState("all");
+  const current = profiles[scope] || profiles.all;
+  const todayProfile = profiles[String(today)] || profiles.all;
+
+  const updateCurrent = (patch) => setProfiles(p => {
+    const base = p[scope] || p.all;
+    const next = typeof patch === "function" ? patch(base) : { ...base, ...patch };
+    return { ...p, [scope]: next };
+  });
+  const createOverride = (dayIdx) => {
+    const k = String(dayIdx);
+    setProfiles(p => p[k] ? p : ({ ...p, [k]: JSON.parse(JSON.stringify(p.all)) }));
+    setScope(k);
+  };
+  const removeOverride = (dayIdx) => {
+    const k = String(dayIdx);
+    setProfiles(p => { const n = { ...p }; delete n[k]; return n; });
+    setScope(s => s === k ? "all" : s);
+  };
+
+  /* ---- scenario presets ---- */
+  const scenarios = [
+    { id: "auto-int", label: "Auto · By interval", apply: () => {
+        setProfiles({ all: makeProfile({ mode:"auto", autoMode:"interval", interval:90 }) });
+        setScope("all"); setNotif(true); setToday(1);
+        setActiveDays([true,true,true,true,true,true,true]); setNow(10*60+42);
+    }},
+    { id: "auto-amt", label: "Auto · By amount", apply: () => {
+        setProfiles({ all: makeProfile({ mode:"auto", autoMode:"amount", amount:250,
+          schedule: genByAmount(7*60, 22*60, 250, goalMl) }) });
+        setScope("all"); setNotif(true); setToday(1);
+        setActiveDays([true,true,true,true,true,true,true]); setNow(10*60+42);
+    }},
+    { id: "manual",   label: "Manual edits", apply: () => {
+        setProfiles({ all: makeProfile({ mode:"manual", schedule: [
+          { id: "m-1", time: 7*60+30,  amount: 250 },
+          { id: "m-2", time: 9*60+30,  amount: 300 },
+          { id: "m-3", time: 12*60+15, amount: 350 },
+          { id: "m-4", time: 14*60+30, amount: 300 },
+          { id: "m-5", time: 17*60,    amount: 250 },
+          { id: "m-6", time: 19*60+30, amount: 250 },
+          { id: "m-7", time: 21*60+30, amount: 200 },
+        ]}) });
+        setScope("all"); setNotif(true); setToday(1);
+        setActiveDays([true,true,true,false,true,true,true]); setNow(13*60+5);
+    }},
+    { id: "perday",   label: "Per-day custom", apply: () => {
+        setProfiles({
+          all: makeProfile({ mode:"auto", autoMode:"interval", interval:90 }),
+          /* Saturday: gym day, more frequent and bigger */
+          "5": makeProfile({ mode:"auto", autoMode:"interval",
+            start: 6*60, end: 23*60, interval: 75,
+            schedule: genByInterval(6*60, 23*60, 75, goalMl) }),
+          /* Sunday: relaxed — bigger glasses, fewer reminders */
+          "6": makeProfile({ mode:"auto", autoMode:"amount", amount:400,
+            start: 9*60, end: 22*60,
+            schedule: genByAmount(9*60, 22*60, 400, goalMl) }),
+        });
+        setScope("5"); setNotif(true); setToday(5);  /* show Saturday today */
+        setActiveDays([true,true,true,true,true,true,true]); setNow(10*60+42);
+    }},
+    { id: "invalid",  label: "Invalid config", apply: () => {
+        setProfiles({ all: makeProfile({ mode:"auto", autoMode:"amount",
+          start: 9*60, end: 9*60+30, amount: 1200,
+          schedule: genByAmount(9*60, 9*60+30, 1200, goalMl) }) });
+        setScope("all"); setNotif(true); setToday(1);
+        setActiveDays([true,true,true,true,true,true,true]); setNow(9*60+10);
+    }},
+    { id: "paused",   label: "Paused (Thu off)", apply: () => {
+        setProfiles({ all: makeProfile({ mode:"auto", autoMode:"interval", interval:90 }) });
+        setScope("all"); setNotif(true); setToday(3);
+        setActiveDays([true,true,true,false,true,true,true]); setNow(10*60+42);
+    }},
+  ];
+  const [scn, setScn] = useState("auto-int");
+
+  const renderScreen = () => {
+    if (tab !== "reminders") return <StubScreen tab={tab}/>;
+    return (
+      <RemindersScreen
+        goalMl={goalMl}
+        now={now}
+        today={today}
+        notif={notif} setNotif={setNotif}
+        activeDays={activeDays} setActiveDays={setActiveDays}
+        scope={scope} setScope={setScope}
+        profiles={profiles}
+        onCreateOverride={createOverride}
+        onRemoveOverride={removeOverride}
+        todayProfile={todayProfile}
+        mode={current.mode} setMode={(v) => updateCurrent({mode:v})}
+        autoMode={current.autoMode} setAutoMode={(v) => updateCurrent({autoMode:v})}
+        start={current.start} setStart={(v) => updateCurrent({start:v})}
+        end={current.end} setEnd={(v) => updateCurrent({end:v})}
+        interval={current.interval} setInterval_={(v) => updateCurrent({interval:v})}
+        amount={current.amount} setAmount={(v) => updateCurrent({amount:v})}
+        schedule={current.schedule}
+        setSchedule={(v) => updateCurrent(b => ({ ...b, schedule: typeof v === "function" ? v(b.schedule) : v }))}
+      />
+    );
+  };
+
+  return (
+    <>
+      <div className="kit-header">
+        <div className="eyebrow">UI Kit · New Screen</div>
+        <h1>Reminders</h1>
+        <p>A dedicated hydration-scheduling surface, slotted into the existing bottom menu. Generates schedules automatically or lets you sculpt them by hand — with live validation.</p>
+        <div className="scenario-bar">
+          {scenarios.map(s => (
+            <button key={s.id}
+              className={`scn-btn ${scn === s.id ? "active" : ""}`}
+              onClick={() => { setScn(s.id); s.apply(); setTab("reminders"); }}>
+              {s.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="stage">
+        <div className="frame-wrap">
+          <AndroidDevice width={390} height={780}>
+            <div className="tab-host">
+              {renderScreen()}
+              <TabBarRem active={tab} onChange={setTab}/>
+            </div>
+          </AndroidDevice>
+          <div className="frame-label">Reminders · integrated bottom menu</div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
