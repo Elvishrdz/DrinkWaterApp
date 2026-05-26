@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/gh_helpers.sh"
+
 TRACKS=("internal" "alpha" "beta" "production")
 
 echo "Select deployment track:"
@@ -33,4 +36,4 @@ gh workflow run release.yml --field "track=$TRACK" --field "update_listing=$UPDA
 
 echo ""
 echo "Workflow triggered. Monitor progress at:"
-echo "  https://github.com/$(gh repo view --json nameWithOwner -q .nameWithOwner)/actions"
+print_actions_url
