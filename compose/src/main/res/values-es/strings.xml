@@ -584,10 +584,12 @@
     <string name="stats_best_date_achieved">Alcanzado: %s</string>
     <plurals name="stats_best_date_days_ago">
         <item quantity="one">Alcanzado: hace %d día</item>
+        <item quantity="other">Alcanzado: hace %d días</item>
         <item quantity="many">Alcanzado: hace %d días</item>
     </plurals>
     <plurals name="stats_best_date_months_ago">
         <item quantity="one">Alcanzado: hace %d mes</item>
+        <item quantity="other">Alcanzado: hace %d meses</item>
         <item quantity="many">Alcanzado: hace %d meses</item>
     </plurals>
 

@@ -588,10 +588,12 @@
     <plurals name="stats_best_date_days_ago">
         <item quantity="one">Achieved: %d day ago</item>
         <item quantity="many">Achieved: %d days ago</item>
+        <item quantity="other">Achieved: %d days ago</item>
     </plurals>
     <plurals name="stats_best_date_months_ago">
         <item quantity="one">Achieved: %d month ago</item>
         <item quantity="many">Achieved: %d months ago</item>
+        <item quantity="other">Achieved: %d months ago</item>
     </plurals>
 
     <!-- History — Screen -->
