@@ -502,7 +502,7 @@ sealed interface BackupError : DataError {
     data class MigrationFailed(val cause: Throwable) : BackupError
     data object AuthCancelled : BackupError
     data object AuthFailed : BackupError
-    data class QuotaExceeded(val provider: CloudProviderType) : BackupError
+    data class QuotaExceeded(val provider: CloudProviderType, val fileSizeBytes: Long) : BackupError
     data object NoProviderSelected : BackupError
     data object ProviderNotAvailable : BackupError
 }
@@ -535,19 +535,35 @@ un banner mientras el error no se resuelva. Al completar una sync exitosa, el fl
 
 ### `QuotaExceeded` — flujo detallado
 
-Este error merece un tratamiento especial porque el usuario necesita entender qué pasó, por
-qué el backup ocupa tan poco y qué debe hacer.
+#### Cálculo del tamaño real del archivo
+
+La cadena JSON ya está en memoria cuando se intenta el upload. Antes de llamar a
+`provider.upload()`, `SyncBackupUseCase` calcula el tamaño exacto en bytes:
+
+```kotlin
+val content: String = serializer.serialize(snapshot)
+val fileSizeBytes = content.toByteArray(Charsets.UTF_8).size.toLong()
+
+val uploadResult = provider.upload(content, metadata)
+if (uploadResult is Err && uploadResult.error is BackupError.QuotaExceeded) {
+    return Err(BackupError.QuotaExceeded(provider = activeProvider, fileSizeBytes = fileSizeBytes))
+}
+```
+
+No hay I/O adicional: la serialización ya ocurrió y la cadena está en heap. El tamaño se
+formatea en `BackupErrorMapper` como una cadena legible ("48 KB", "1,2 MB") antes de
+construir el `UiText`. El diálogo muestra el valor real, no un tope fijo.
 
 #### Contexto 1 — Sync manual (Settings)
 
-Mostrar `QuotaExceededDialog`:
+Mostrar `QuotaExceededDialog` con el tamaño real del archivo:
 
 ```
 ╔════════════════════════════════════════════╗
 ║  Sin espacio en Google Drive               ║
 ╠════════════════════════════════════════════╣
-║  Tu copia de seguridad ocupa menos de      ║
-║  200 KB, pero tu Google Drive está lleno.  ║
+║  Tu copia de seguridad ocupa 48 KB,        ║
+║  pero tu Google Drive está lleno.          ║
 ║                                            ║
 ║  Libera espacio en Google Drive para que   ║
 ║  tu progreso pueda guardarse.              ║
@@ -623,19 +639,22 @@ una sync completa sin error.
 Añadir a los strings existentes del plan:
 
 ```xml
-<!-- Quota exceeded — diálogo -->
+<!-- Quota exceeded — diálogo
+     %1$s = nombre del proveedor (ej. "Google Drive")
+     %2$s = tamaño formateado del archivo (ej. "48 KB") -->
 <string name="backup_error_quota_title">Sin espacio en %1$s</string><string
-name="backup_error_quota_body">Tu copia de seguridad ocupa menos de 200 KB, pero tu %1$s está
-lleno.\n\nLibera espacio en %1$s para que tu progreso pueda guardarse. Tus datos locales están
-seguros.
+name="backup_error_quota_body">Tu copia de seguridad ocupa %2$s, pero tu %1$s está lleno.\n\nLibera
+espacio en %1$s para que tu progreso pueda guardarse. Tus datos locales están seguros.
 </string><string name="backup_error_quota_manage_space">Gestionar espacio</string><string
 name="backup_error_quota_understood">Entendido
 </string>
 
-    <!-- Quota exceeded — banner en Settings (sync background fallida) -->
+    <!-- Quota exceeded — banner en Settings (sync background fallida)
+         %1$s = nombre del proveedor -->
 <string name="backup_error_quota_banner">Sin espacio en %1$s. Toca para saber más.</string>
 
-    <!-- Quota exceeded — inline en onboarding -->
+    <!-- Quota exceeded — inline en onboarding
+         %1$s = nombre del proveedor -->
 <string name="backup_error_quota_onboarding">%1$s no tiene espacio suficiente. Tus datos se
 guardarán solo localmente por ahora.
 </string>
@@ -683,8 +702,36 @@ object BackupErrorMapper {
 enum class BackupErrorContext { MANUAL_SYNC, AUTO_SYNC, ONBOARDING, RESTORE }
 ```
 
-El mapper recibe el `CloudProviderType` del error (cuando aplica) y construye el string
-con el nombre del proveedor ya resuelto, listo para mostrar en UI.
+Para `QuotaExceeded`, el mapper formatea `fileSizeBytes` en una cadena legible antes de
+construir el `UiText`:
+
+```kotlin
+when (error) {
+    is BackupError.QuotaExceeded -> {
+        val providerName = error.provider.displayName()      // ej. "Google Drive" o "Dropbox"
+        val sizeLabel = formatFileSize(error.fileSizeBytes)  // ej. "48 KB" o "1,2 MB"
+        UiText.StringResource(R.string.backup_error_quota_body, providerName, sizeLabel)
+    }
+    else -> { /* otros errores */
+    }
+}
+```
+
+#### `formatFileSize(bytes: Long): String`
+
+Función pura en el mapper (sin dependencia de `Context`):
+
+```kotlin
+private fun formatFileSize(bytes: Long): String = when {
+    bytes < 1024L -> "$bytes B"
+    bytes < 1024L * 1024 -> "${bytes / 1024} KB"
+    else -> "${"%.1f".format(bytes / (1024.0 * 1024))} MB"
+}
+```
+
+Umbral de KB: cualquier valor < 1 MB se muestra en KB redondeado al entero más cercano.
+Para los tamaños esperados del backup (< 2 MB en práctica), el resultado siempre será
+en KB salvo casos extremos con años de historial muy denso.
 
 ---
 
