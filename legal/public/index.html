@@ -290,6 +290,7 @@
         <div class="lang-switcher">
             <button class="lang-btn active" onclick="setLang('en')">EN</button>
             <button class="lang-btn" onclick="setLang('es')">ES</button>
+            <button class="lang-btn" onclick="setLang('de')">DE</button>
         </div>
     </div>
 </header>
@@ -300,10 +301,12 @@
         <button class="tab-btn active" id="tab-privacy" onclick="setTab('privacy')">
             <span class="lang-content active" data-lang="en">Privacy Policy</span>
             <span class="lang-content" data-lang="es">Política de Privacidad</span>
+            <span class="lang-content" data-lang="de">Datenschutzrichtlinie</span>
         </button>
         <button class="tab-btn" id="tab-terms" onclick="setTab('terms')">
             <span class="lang-content active" data-lang="en">Terms of Use</span>
             <span class="lang-content" data-lang="es">Términos de Uso</span>
+            <span class="lang-content" data-lang="de">Nutzungsbedingungen</span>
         </button>
     </div>
 </div>
@@ -949,6 +952,349 @@
                     href="mailto:eahm3595@gmail.com">eahm3595@gmail.com</a><br>
                 <strong>App:</strong> Drink Water App (com.eahm.drinkwaterapp)</p>
         </div>
+
+        <!-- GERMAN -->
+        <div class="lang-content" data-lang="de">
+            <span class="part-heading">Teil 1</span>
+            <h1>Datenschutzrichtlinie</h1>
+            <div class="meta">
+                <span>Gültig ab: 25. Mai 2026</span>
+                <span>Letzte Aktualisierung: 25. Mai 2026</span>
+                <span>Kontakt: <a href="mailto:eahm3595@gmail.com">eahm3595@gmail.com</a></span>
+            </div>
+
+            <h2>1. Einleitung</h2>
+            <p>Drink Water App („wir", „uns" oder „die App") ist eine Anwendung zur Verfolgung der
+                Flüssigkeitszufuhr, die als unabhängiges Projekt entwickelt und betrieben wird.
+                Diese
+                Datenschutzrichtlinie erläutert, welche Informationen bei der Nutzung der App
+                erhoben werden, wie sie verwendet werden und welche Kontrolle du darüber hast.</p>
+            <p>Durch die Installation oder Nutzung von Drink Water App stimmst du den in dieser
+                Richtlinie beschriebenen Praktiken zu. Wenn du nicht einverstanden bist,
+                deinstalliere die App bitte.</p>
+
+            <h2>2. Informationen, die wir erheben</h2>
+
+            <h3>2.1 Von dir bereitgestellte Informationen — lokal auf deinem Gerät gespeichert</h3>
+            <p>Beim Einrichten der App und bei der normalen Nutzung fragt die App nach:</p>
+            <div class="table-wrap">
+                <table>
+                    <tr>
+                        <th>Datum</th>
+                        <th>Zweck</th>
+                    </tr>
+                    <tr>
+                        <td>Name</td>
+                        <td>Personalisierung des App-Erlebnisses</td>
+                    </tr>
+                    <tr>
+                        <td>Geschlecht</td>
+                        <td>Berechnung eines empfohlenen täglichen Hydrationsziels</td>
+                    </tr>
+                    <tr>
+                        <td>Gewicht (kg oder lbs)</td>
+                        <td>Berechnung eines empfohlenen täglichen Hydrationsziels</td>
+                    </tr>
+                    <tr>
+                        <td>Aktivitätsniveau</td>
+                        <td>Berechnung eines empfohlenen täglichen Hydrationsziels</td>
+                    </tr>
+                    <tr>
+                        <td>Aufwach- und Schlafenszeit</td>
+                        <td>Trinkerinnerungen innerhalb der aktiven Stunden planen</td>
+                    </tr>
+                    <tr>
+                        <td>Erinnerungshäufigkeit</td>
+                        <td>Steuern, wie oft Benachrichtigungen gesendet werden</td>
+                    </tr>
+                    <tr>
+                        <td>Einheitenpräferenz (ml / oz / Tassen)</td>
+                        <td>Messungen im bevorzugten Format anzeigen</td>
+                    </tr>
+                </table>
+            </div>
+            <p><strong>Alle oben genannten Daten werden ausschließlich auf deinem Gerät
+                gespeichert</strong> und verwenden Android DataStore (verschlüsselter lokaler
+                Speicher). Sie werden niemals an unsere Server oder Dritte übertragen.</p>
+
+            <h3>2.2 App-Nutzungsdaten — lokal auf deinem Gerät gespeichert</h3>
+            <p>Die App erfasst bei der Nutzung folgende Daten:</p>
+            <ul>
+                <li><strong>Wasseraufnahmeprotokolle:</strong> Menge, Zeitstempel und Eintragstyp
+                    (manuell, aus Benachrichtigung oder übersprungen).
+                </li>
+                <li><strong>Tägliche Hydrationsziele:</strong> Zielmengen und Gültigkeitsdaten.
+                </li>
+                <li><strong>Serien:</strong> Beste aufeinanderfolgende Tage mit erreichtem Ziel und
+                    beste Trinktags-Serien.
+                </li>
+                <li><strong>Trink-Presets:</strong> Benutzerdefinierte Schnellzugabebeträge, die du
+                    erstellst.
+                </li>
+            </ul>
+            <p>Diese Daten werden in einer lokalen Room-Datenbank auf deinem Gerät gespeichert. Sie
+                werden nicht mit einem Cloud-Dienst synchronisiert und sind weder für uns noch für
+                Dritte zugänglich.</p>
+
+            <h3>2.3 Anonyme Nutzungsanalysen — optional, abwählbar</h3>
+            <p>Mit deiner Zustimmung sendet die App anonyme Nutzungsereignisse an
+                <strong>Mixpanel</strong>, um uns zu helfen zu verstehen, welche Funktionen genutzt
+                werden, und die App zu verbessern. Konkret:</p>
+            <ul>
+                <li>App geöffnet / Einrichtung gestartet, abgeschlossen oder abgebrochen</li>
+                <li>Trinkmenge erfasst</li>
+                <li>Benutzerdefiniertes Preset erstellt</li>
+                <li>Schnellzugriff-Panel für Presets geöffnet</li>
+            </ul>
+            <p><strong>Keine persönlichen Daten, Wasserprotokoll-Inhalte oder identifizierbare
+                Informationen werden in diesen Ereignissen übermittelt.</strong> Jedem Gerät wird
+                eine zufällige anonyme ID zugewiesen, die nicht mit deinem Namen, deiner E-Mail oder
+                einer anderen Identität verknüpft ist.</p>
+            <ul>
+                <li>Mixpanel-Daten werden auf Servern in der <strong>Europäischen Union</strong>
+                    verarbeitet.
+                </li>
+                <li>Du kannst dich jederzeit unter <strong>Einstellungen → Datenschutz und Recht →
+                    Nutzungsverfolgung</strong> abmelden.
+                </li>
+                <li>Nach dem Abmelden werden keine weiteren Ereignisse gesendet und die anonyme ID
+                    wird zurückgesetzt.
+                </li>
+            </ul>
+
+            <h3>2.4 Absturzberichte</h3>
+            <p>Die App verwendet <strong>Firebase Crashlytics</strong> (Google), um bei
+                unerwarteten Abstürzen automatisch Absturzberichte zu erfassen. Diese Berichte
+                enthalten:</p>
+            <ul>
+                <li>Stack-Traces (Codeposition des Fehlers)</li>
+                <li>Gerätemodell und Android-Version</li>
+                <li>App-Version</li>
+                <li>Zeitpunkt des Absturzes</li>
+            </ul>
+            <p>Absturzberichte enthalten keine persönlichen Daten oder Wasserprotokolle. Sie werden
+                ausschließlich zur Identifizierung und Behebung von Fehlern verwendet.</p>
+
+            <h3>2.5 Werbedaten</h3>
+            <p>Wenn du die kostenlose Version der App verwendest, schaltet <strong>Google
+                AdMob</strong> Werbeanzeigen. AdMob kann Gerätewerbungs-IDs erfassen und diese
+                verwenden, um relevante Anzeigen zu zeigen, entsprechend der
+                Google-Datenschutzrichtlinie. Du kannst deine Werbe-ID in den Google-Einstellungen
+                deines Geräts zurücksetzen oder einschränken.</p>
+            <p>Der Kauf von <strong>Werbung entfernen</strong> deaktiviert dauerhaft alle Anzeigen
+                und das damit verbundene Tracking.</p>
+
+            <h3>2.6 Kaufinformationen</h3>
+            <p>In-App-Käufe werden über <strong>RevenueCat</strong> abgewickelt, das Transaktionen
+                validiert und deinen Anspruch auf die werbefreie Version verwaltet. RevenueCat
+                erhält:</p>
+            <ul>
+                <li>Google Play-Kauftokens (von Google ausgestellt, nicht von uns)</li>
+                <li>Deinen Berechtigungsstatus (ob Werbung entfernt wurde)</li>
+            </ul>
+            <p>RevenueCat erhält weder deinen Namen, Wasserprotokolle noch persönliche
+                Profildaten.</p>
+
+            <h2>3. Angeforderte Berechtigungen</h2>
+            <div class="table-wrap">
+                <table>
+                    <tr>
+                        <th>Berechtigung</th>
+                        <th>Warum sie benötigt wird</th>
+                    </tr>
+                    <tr>
+                        <td><code>POST_NOTIFICATIONS</code></td>
+                        <td>Trinkerinnerungen senden</td>
+                    </tr>
+                    <tr>
+                        <td><code>SCHEDULE_EXACT_ALARM</code></td>
+                        <td>Erinnerungen zur geplanten Zeit zuverlässig zustellen</td>
+                    </tr>
+                    <tr>
+                        <td><code>RECEIVE_BOOT_COMPLETED</code></td>
+                        <td>Geplante Erinnerungen nach einem Neustart des Geräts
+                            wiederherstellen
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>SYSTEM_ALERT_WINDOW</code></td>
+                        <td>Eine Glückwunsch-Einblendung beim Erreichen des Tagesziels
+                            anzeigen
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>INTERNET</code></td>
+                        <td>Für Werbung (kostenlose Version), Analysen und Kaufvalidierung
+                            erforderlich
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <p>Es werden keine Standort-, Kontakt-, Kamera-, Mikrofon- oder
+                Gesundheitsberechtigungen angefordert.</p>
+
+            <h2>4. Wie wir deine Informationen nutzen</h2>
+            <div class="table-wrap">
+                <table>
+                    <tr>
+                        <th>Zweck</th>
+                        <th>Verwendete Daten</th>
+                        <th>Rechtsgrundlage</th>
+                    </tr>
+                    <tr>
+                        <td>Bereitstellung der Kernfunktionen zur Hydrationsverfolgung</td>
+                        <td>Alle lokal gespeicherten Daten</td>
+                        <td>Vertrag</td>
+                    </tr>
+                    <tr>
+                        <td>Trinkerinnerungen senden</td>
+                        <td>Aktive Stunden, Erinnerungshäufigkeit</td>
+                        <td>Vertrag</td>
+                    </tr>
+                    <tr>
+                        <td>Personalisierte Werbung anzeigen (kostenlose Version)</td>
+                        <td>AdMob-Gerätewerbungs-ID</td>
+                        <td>Berechtigtes Interesse / Einwilligung</td>
+                    </tr>
+                    <tr>
+                        <td>Funktionsnutzung verstehen und die App verbessern</td>
+                        <td>Anonyme Mixpanel-Ereignisse</td>
+                        <td>Einwilligung (opt-in, widerrufbar)</td>
+                    </tr>
+                    <tr>
+                        <td>Abstürze und Fehler beheben</td>
+                        <td>Firebase Crashlytics-Berichte</td>
+                        <td>Berechtigtes Interesse</td>
+                    </tr>
+                    <tr>
+                        <td>In-App-Käufe verarbeiten</td>
+                        <td>RevenueCat-Kauftokens</td>
+                        <td>Vertrag</td>
+                    </tr>
+                </table>
+            </div>
+            <p>Wir verwenden deine Daten nicht für Profilerstellung, automatisierte
+                Entscheidungsfindung oder andere als die oben genannten Zwecke.</p>
+
+            <h2>5. Datenweitergabe und Offenlegung</h2>
+            <p>Wir verkaufen, vermieten oder handeln nicht mit deinen persönlichen Daten.</p>
+            <div class="table-wrap">
+                <table>
+                    <tr>
+                        <th>Dienst</th>
+                        <th>Rolle</th>
+                        <th>Weitergegebene Daten</th>
+                        <th>Datenschutzrichtlinie</th>
+                    </tr>
+                    <tr>
+                        <td>Google Firebase (Crashlytics)</td>
+                        <td>Absturzberichte</td>
+                        <td>Geräteinformationen, Absturztraces</td>
+                        <td><a href="https://firebase.google.com/support/privacy"
+                               target="_blank">firebase.google.com</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Mixpanel</td>
+                        <td>Analysen (opt-in)</td>
+                        <td>Anonyme Ereignisse, zufällige Geräte-ID</td>
+                        <td><a href="https://mixpanel.com/legal/privacy-policy"
+                               target="_blank">mixpanel.com</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Google AdMob</td>
+                        <td>Werbung (kostenlose Version)</td>
+                        <td>Werbe-ID</td>
+                        <td><a href="https://policies.google.com/privacy"
+                               target="_blank">policies.google.com</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>RevenueCat</td>
+                        <td>Kaufverwaltung</td>
+                        <td>Google Play-Kauftokens</td>
+                        <td><a href="https://www.revenuecat.com/privacy"
+                               target="_blank">revenuecat.com</a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <p>Wir können deine Informationen auch offenlegen, wenn dies gesetzlich oder durch
+                Gerichtsbeschluss verlangt wird, oder um die Rechte, Sicherheit oder das Eigentum
+                von Nutzern oder der Öffentlichkeit zu schützen.</p>
+
+            <h2>6. Datenspeicherung und Löschung</h2>
+            <ul>
+                <li><strong>Lokale App-Daten</strong> verbleiben auf deinem Gerät, bis du die App
+                    deinstallierst oder „Alle Daten löschen" in den Einstellungen verwendest.
+                </li>
+                <li><strong>Mixpanel-Analysedaten</strong> werden gemäß deren Richtlinien
+                    gespeichert (in der Regel 5 Jahre). Du kannst dich jederzeit abmelden, um
+                    weitere Erfassung zu stoppen.
+                </li>
+                <li><strong>Crashlytics-Berichte</strong> werden von Google gemäß den
+                    Firebase-Richtlinien aufbewahrt.
+                </li>
+                <li><strong>RevenueCat-Kaufaufzeichnungen</strong> werden gemäß den
+                    App-Store-Bedingungen und dem anwendbaren Recht aufbewahrt.
+                </li>
+            </ul>
+
+            <h2>7. Diese App ist keine medizinische Anwendung</h2>
+            <div class="callout">
+                Drink Water App ist ein persönliches Wellness-Hilfsmittel. Sie ist <strong>kein
+                Medizinprodukt</strong> und bietet keine medizinische Beratung, Diagnose oder
+                Behandlung. Das tägliche Wasserziel ist eine Schätzung und kein Ersatz für den Rat
+                eines qualifizierten medizinischen Fachpersonals.
+            </div>
+
+            <h2>8. Datenschutz für Kinder</h2>
+            <p>Die App richtet sich nicht an Kinder unter 13 Jahren. Wir erheben wissentlich keine
+                persönlichen Daten von Kindern unter 13 Jahren. Wenn du glaubst, dass dein Kind
+                persönliche Daten über die App bereitgestellt hat, kontaktiere uns unter <a
+                        href="mailto:eahm3595@gmail.com">eahm3595@gmail.com</a>.</p>
+
+            <h2>9. Datensicherheit</h2>
+            <p>Alle persönlichen Daten, die du in die App eingibst, werden lokal auf deinem Gerät
+                mit Androids verschlüsseltem DataStore gespeichert. Wir betreiben keine Server, auf
+                denen deine persönlichen Hydrationsdaten gespeichert werden. Wir empfehlen dir, dein
+                Gerät mit einer Bildschirmsperre zu schützen.</p>
+
+            <h2>10. Deine Rechte</h2>
+            <p>Je nach deinem Wohnsitzland hast du möglicherweise das Recht auf:</p>
+            <ul>
+                <li><strong>Auskunft</strong> — alle deine Daten sind innerhalb der App selbst
+                    einsehbar.
+                </li>
+                <li><strong>Berichtigung</strong> — Daten über die Einstellungen und
+                    Onboarding-Bildschirme der App bearbeiten.
+                </li>
+                <li><strong>Löschung</strong> — Einstellungen → Daten löschen verwenden oder die
+                    App deinstallieren.
+                </li>
+                <li><strong>Einwilligung widerrufen</strong> für Analysen — Einstellungen →
+                    Datenschutz und Recht → Nutzungsverfolgung.
+                </li>
+                <li><strong>Widerspruch oder Einschränkung</strong> der Verarbeitung — kontaktiere
+                    uns für Anfragen, die über die App hinausgehen.
+                </li>
+            </ul>
+            <p><strong>EWR-Nutzer:</strong> Du kannst eine Beschwerde bei deiner lokalen
+                Datenschutzbehörde einreichen.</p>
+            <p><strong>Kalifornien (CCPA):</strong> Wir verkaufen keine persönlichen Daten im Sinne
+                des CCPA.</p>
+
+            <h2>11. Änderungen dieser Richtlinie</h2>
+            <p>Wir können diese Datenschutzrichtlinie von Zeit zu Zeit aktualisieren. Wesentliche
+                Änderungen werden beim nächsten App-Start innerhalb der App mitgeteilt. Die weitere
+                Nutzung gilt als Zustimmung zur aktualisierten Richtlinie.</p>
+
+            <h2>12. Kontakt</h2>
+            <p><strong>E-Mail:</strong> <a
+                    href="mailto:eahm3595@gmail.com">eahm3595@gmail.com</a><br>
+                <strong>App:</strong> Drink Water App (com.eahm.drinkwaterapp)</p>
+        </div>
     </div>
 
     <!-- ═══════════════ TERMS OF USE ═══════════════ -->
@@ -1238,6 +1584,163 @@
 
             <h2>14. Contacto</h2>
             <p><strong>Email:</strong> <a
+                    href="mailto:eahm3595@gmail.com">eahm3595@gmail.com</a><br>
+                <strong>App:</strong> Drink Water App (com.eahm.drinkwaterapp)</p>
+        </div>
+
+        <!-- GERMAN -->
+        <div class="lang-content" data-lang="de">
+            <span class="part-heading">Teil 2</span>
+            <h1>Nutzungsbedingungen</h1>
+            <div class="meta">
+                <span>Gültig ab: 25. Mai 2026</span>
+                <span>Letzte Aktualisierung: 25. Mai 2026</span>
+                <span>Kontakt: <a href="mailto:eahm3595@gmail.com">eahm3595@gmail.com</a></span>
+            </div>
+
+            <h2>1. Zustimmung zu den Bedingungen</h2>
+            <p>Durch das Herunterladen, Installieren oder Verwenden von Drink Water App (die „App")
+                stimmst du zu, an diese Nutzungsbedingungen („Bedingungen") gebunden zu sein. Wenn
+                du diesen Bedingungen nicht zustimmst, verwende die App nicht.</p>
+            <p>Diese Bedingungen gelten für die Android-Version von Drink Water App, die im Google
+                Play Store verfügbar ist.</p>
+
+            <h2>2. Nutzungslizenz</h2>
+            <p>Wir gewähren dir eine persönliche, nicht-exklusive, nicht übertragbare und
+                widerrufliche Lizenz zur Nutzung der App auf deinem Android-Gerät ausschließlich für
+                persönliche, nicht-kommerzielle Zwecke.</p>
+            <p>Du darfst nicht:</p>
+            <ul>
+                <li>Die App oder deren Inhalte kopieren, modifizieren oder verteilen</li>
+                <li>Die App zurückentwickeln, dekompilieren oder disassemblieren</li>
+                <li>Die App für rechtswidrige Zwecke verwenden</li>
+                <li>Versuchen, unbefugten Zugriff auf mit der App verbundene Systeme oder Netzwerke
+                    zu erlangen
+                </li>
+                <li>Automatisierte Tools verwenden, um Daten aus der App zu extrahieren oder mit
+                    ihr zu interagieren
+                </li>
+            </ul>
+
+            <h2>3. App-Funktionen und Verfügbarkeit</h2>
+            <p>Die App wird „wie besehen" und „nach Verfügbarkeit" bereitgestellt. Wir behalten uns
+                das Recht vor, Funktionen oder die gesamte App jederzeit ohne vorherige Ankündigung
+                zu ändern, auszusetzen oder einzustellen.</p>
+            <p>Die App erfordert eine aktive Internetverbindung für bestimmte Funktionen (Werbung,
+                Analysen und Kaufvalidierung). Die Kernfunktionen zur Hydrationsverfolgung
+                funktionieren offline.</p>
+
+            <h2>4. In-App-Käufe</h2>
+
+            <h3>4.1 Werbung entfernen — Einmalkauf</h3>
+            <p>Die App bietet einen einmaligen In-App-Kauf zum dauerhaften Entfernen von
+                Werbeanzeigen. Mit Abschluss eines Kaufs:</p>
+            <ul>
+                <li>Erhältst du einen nicht übertragbaren Anspruch auf die werbefreie Version für
+                    dein Google-Konto.
+                </li>
+                <li>Wird der Kauf von Google Play gemäß den Google-Nutzungsbedingungen
+                    verarbeitet.
+                </li>
+                <li>Wird die gesamte Zahlungsabwicklung von Google Play und RevenueCat verwaltet.
+                    Wir speichern keine Zahlungsinformationen von dir.
+                </li>
+            </ul>
+
+            <h3>4.2 Käufe wiederherstellen</h3>
+            <p>Wenn du die App neu installierst oder das Gerät wechselst, stelle deinen Kauf über
+                <strong>Einstellungen → Käufe wiederherstellen</strong> wieder her, sofern du mit
+                demselben Google-Konto angemeldet bist, das für den ursprünglichen Kauf verwendet
+                wurde.</p>
+
+            <h3>4.3 Rückerstattungen</h3>
+            <p>Alle Käufe unterliegen der Rückerstattungsrichtlinie von Google Play. Wir können
+                keine Rückerstattungen direkt ausstellen. Um eine Rückerstattung anzufordern,
+                besuche <a href="https://play.google.com/store/account/orderhistory"
+                           target="_blank">play.google.com/store/account/orderhistory</a> innerhalb
+                des zulässigen Rückerstattungszeitraums (in der Regel 48 Stunden nach dem
+                Kauf).</p>
+
+            <h2>5. Nutzergenerierte Daten</h2>
+            <p>Alle Daten, die du in die App eingibst (Wasserprotokolle, Ziele, benutzerdefinierte
+                Presets, persönliches Profil), gehören dir und werden ausschließlich auf deinem
+                Gerät gespeichert. Wir erheben keinen Anspruch auf diese Daten. Du bist für deren
+                Sicherung verantwortlich. Das Deinstallieren der App löscht diese Daten
+                dauerhaft.</p>
+
+            <h2>6. Benachrichtigungen und Erinnerungen</h2>
+            <p>Durch die Erteilung der Benachrichtigungsberechtigung autorisierst du die App,
+                Trinkerinnerungen mit der von dir konfigurierten Häufigkeit und während der aktiven
+                Stunden zu senden. Du kannst Benachrichtigungen jederzeit über die App-Einstellungen
+                oder die Systembenachrichtigungseinstellungen deines Geräts ändern oder
+                deaktivieren.</p>
+            <p>Die genaue Alarmplanung kann durch die Android-Akkuoptimierungseinstellungen auf
+                deinem Gerät beeinflusst werden.</p>
+
+            <h2>7. Gewährleistungsausschluss</h2>
+            <p><strong>Die App wird „wie besehen" ohne jegliche Gewährleistung
+                bereitgestellt</strong>, weder ausdrücklich noch stillschweigend, einschließlich,
+                aber nicht beschränkt auf stillschweigende Gewährleistungen der Marktgängigkeit,
+                Eignung für einen bestimmten Zweck oder Nichtverletzung.</p>
+            <p>Wir garantieren nicht, dass:</p>
+            <ul>
+                <li>Die App ununterbrochen, fehlerfrei oder frei von schädlichen Komponenten ist
+                </li>
+                <li>Die Hydrationsempfehlungen für deine spezifische medizinische oder
+                    physiologische Situation zutreffend sind
+                </li>
+                <li>Die App deine spezifischen Anforderungen erfüllt</li>
+            </ul>
+            <div class="callout">
+                <strong>Drink Water App ist keine medizinische Anwendung.</strong> Die
+                Hydrationszielberechnungen und Erinnerungen dienen ausschließlich allgemeinen
+                Wellnesszwecken und stellen keine medizinische Beratung dar. Konsultiere immer einen
+                qualifizierten Gesundheitsdienstleister für gesundheitsbezogene Entscheidungen.
+            </div>
+
+            <h2>8. Haftungsbeschränkung</h2>
+            <p>Im größtmöglichen gesetzlich zulässigen Umfang haften wir nicht für indirekte,
+                zufällige, besondere, Folge- oder Strafschäden, einschließlich:</p>
+            <ul>
+                <li>Datenverlust</li>
+                <li>Umsatz- oder Gewinnverlust</li>
+                <li>Gesundheitliche Folgen im Zusammenhang mit der Nutzung oder Nichtnutzung der
+                    App-Empfehlungen
+                </li>
+                <li>Schäden durch Nichtverfügbarkeit oder Unterbrechung der App</li>
+            </ul>
+            <p>Unsere Gesamthaftung für jegliche Ansprüche übersteigt nicht den Betrag, den du uns
+                in den zwölf Monaten vor dem Anspruch gezahlt hast.</p>
+
+            <h2>9. Dienste von Drittanbietern</h2>
+            <p>Die App integriert Google AdMob, Firebase Crashlytics, Mixpanel und RevenueCat. Deine
+                Nutzung dieser Dienste unterliegt deren jeweiligen Nutzungsbedingungen und
+                Datenschutzrichtlinien. Wir sind nicht verantwortlich für die Praktiken dieser
+                Drittanbieter.</p>
+
+            <h2>10. Geistiges Eigentum</h2>
+            <p>Alle Inhalte der App — einschließlich Schnittstellendesign, Icons, Grafiken, Texte
+                und zugrundeliegender Code — sind Eigentum des Entwicklers und durch anwendbare
+                Gesetze zum geistigen Eigentum geschützt. Nichts in diesen Bedingungen gewährt dir
+                Rechte zur Nutzung unserer Marken, Handelsnamen oder unseres Brandings.</p>
+
+            <h2>11. Änderungen der Bedingungen</h2>
+            <p>Wir behalten uns das Recht vor, diese Bedingungen jederzeit zu ändern. Wesentliche
+                Änderungen werden innerhalb der App kommuniziert. Die weitere Nutzung nach
+                Inkrafttreten von Änderungen gilt als deine Zustimmung zu den überarbeiteten
+                Bedingungen.</p>
+
+            <h2>12. Anwendbares Recht</h2>
+            <p>Diese Bedingungen unterliegen dem Recht von Nicaragua, ohne Rücksicht auf
+                Kollisionsnormen. Alle Streitigkeiten unterliegen der ausschließlichen
+                Gerichtsbarkeit der zuständigen Gerichte Nicaraguas.</p>
+
+            <h2>13. Salvatorische Klausel</h2>
+            <p>Sollte eine Bestimmung dieser Bedingungen als ungültig oder nicht durchsetzbar
+                befunden werden, bleiben die übrigen Bestimmungen in vollem Umfang in Kraft.</p>
+
+            <h2>14. Kontakt</h2>
+            <p><strong>E-Mail:</strong> <a
                     href="mailto:eahm3595@gmail.com">eahm3595@gmail.com</a><br>
                 <strong>App:</strong> Drink Water App (com.eahm.drinkwaterapp)</p>
         </div>
