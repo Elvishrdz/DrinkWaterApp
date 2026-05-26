@@ -96,7 +96,9 @@ class BackupProviderRegistry(
 ```
 
 Inyectado vía Koin. `BackupRepositoryImpl` lee el proveedor activo desde `PrefsStorage` y
-lo resuelve a través del registry en cada operación.
+lo resuelve a través del registry en cada operación. Si `KEY_BACKUP_PROVIDER` está vacío o
+no configurado, todas las operaciones devuelven `Err(BackupError.NoProviderSelected)` de
+forma inmediata, sin llamar a ningún SDK.
 
 ### Interfaz `CloudBackupProvider`
 
@@ -197,11 +199,16 @@ El archivo se llama `drinkwater_backup.json` en la carpeta privada/app del prove
 
 ```kotlin
 object BackupMigrationManager {
-    val currentSchema: Int = 1   // incrementar con cada cambio estructural
+    const val currentSchema: Int = 1   // incrementar con cada cambio estructural
 
     fun migrate(raw: JsonObject, fromSchema: Int, toSchema: Int): JsonObject
 }
 ```
+
+> `BackupMigrationManager` es un `object` Kotlin (singleton global). Se pasa directamente a los
+> use cases que lo necesitan (`RestoreBackupUseCase`, `CheckBackupStatusUseCase`). En Koin se
+> puede registrar como `single<BackupMigrationManager> { BackupMigrationManager }` para facilitar
+> el reemplazo en tests.
 
 - Cada migración es `BackupMigration(from: Int, to: Int, migrate: (JsonObject) -> JsonObject)`.
 - Se aplican encadenadas: si el archivo tiene `schemaVersion = 1` y la app está en schema 3,
@@ -287,14 +294,15 @@ contextos donde se intenta restaurar (manual desde Settings, automático al rein
 
 ### Dónde aparece este diálogo
 
-| Contexto                                | Disparador                                         | Comportamiento posterior                                                                      |
-|-----------------------------------------|----------------------------------------------------|-----------------------------------------------------------------------------------------------|
-| Restore manual (Settings)               | Usuario toca "Restaurar desde la nube"             | Muestra diálogo; si cancela, vuelve a Settings sin cambios                                    |
-| Restauración al reinstalar (silenciosa) | `CheckBackupStatusUseCase` detecta schema mayor    | Muestra diálogo antes de llegar al home; si cancela, entra al home con datos locales intactos |
-| Conflicto local vs. nube → "Usar nube"  | Usuario elige el backup en `RestoreConflictDialog` | Reemplaza el `RestoreConflictDialog` con `IncompatibleVersionDialog`                          |
+| Contexto                                | Disparador                                      | Comportamiento posterior                                                                      |
+|-----------------------------------------|-------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| Restore manual (Settings)               | Usuario toca "Restaurar desde la nube"          | Muestra diálogo; si cancela, vuelve a Settings sin cambios                                    |
+| Restauración al reinstalar (silenciosa) | `CheckBackupStatusUseCase` detecta schema mayor | Muestra diálogo antes de llegar al home; si cancela, entra al home con datos locales intactos |
 
-En ningún caso se muestra primero el conflicto y luego falla silenciosamente: la verificación
-de schema ocurre antes de mostrar cualquier opción de restauración al usuario.
+> **Importante:** La comprobación de `schemaVersion` ocurre **antes** de mostrar
+> `RestoreConflictDialog`. Si el backup es incompatible, el usuario ve `IncompatibleVersionDialog`
+> directamente y **nunca** llega al diálogo de conflicto. `RestoreConflictDialog` solo aparece
+> cuando el backup ya pasó la comprobación (`backupSchema <= currentSchema`).
 
 ### Strings para este caso
 
@@ -302,8 +310,10 @@ de schema ocurre antes de mostrar cualquier opción de restauración al usuario.
 
 <string name="backup_incompatible_title">Actualiza la app para restaurar</string><string
 name="backup_incompatible_body">Tu copia de seguridad fue creada con una versión más nueva de la
-app.\n\nActualiza la app y luego vuelve a restaurar. Tus datos actuales no se modificaron.
-</string><string name="backup_incompatible_update">Actualizar app</string><string
+app (versión interna %1$d).\n\nActualiza la app y luego vuelve a restaurar. Tus datos actuales no
+se modificaron.
+</string><!-- %1$d = schemaVersion del backup remoto -->
+<string name="backup_incompatible_update">Actualizar app</string><string
 name="backup_incompatible_cancel">Cancelar
 </string>
 ```
@@ -428,7 +438,13 @@ Después de auth exitosa con Proveedor B y backup encontrado allí:
 #### Sub-estado D — No hay backup en ningún proveedor
 
 - Texto: "No encontramos backups en ningún servicio."
-- Botón único: "Continuar" → avanza al Summary sin backup.
+- Botón único: "Continuar" → cierra sesión en **ambos** proveedores (el usuario no tenía backup en
+  ninguno; no tiene sentido quedarse conectado sin datos) → avanza al Summary sin backup.
+
+#### Sub-estado C, Opción 3 — "Continuar sin backup"
+
+Al elegir este link (visible en C), el usuario descarta ambos proveedores. La app cierra
+sesión en Proveedor A y en Proveedor B y avanza al Summary sin backup configurado.
 
 #### Manejo de errores en auth del segundo proveedor
 
@@ -488,16 +504,18 @@ class MigrateBackupUseCase(
 **Flujo interno:**
 
 ```
-1. tryLock(mutex) → si falla: return AlreadyInProgress
-2. Emit BackupSyncState.InProgress
-3. source provider: download() → rawContent: String
-4. Si FileNotFound en origen: return Err(BackupError.MigrationNoSourceBackup)
-5. destination provider: upload(rawContent, metadata actualizado)
-6. Actualizar KEY_BACKUP_PROVIDER → destination.id
-7. Actualizar KEY_BACKUP_CONTENT_HASH con hash del rawContent
-8. Actualizar KEY_BACKUP_LAST_SYNC_AT
-9. Emit BackupSyncState.Success
-10. return Ok
+1. Precondición: source != destination (el caller garantiza esto; IllegalArgumentException si no)
+2. tryLock(mutex) → si falla: return AlreadyInProgress
+3. Emit BackupSyncState.InProgress
+4. source provider: download() → rawContent: String
+5. Si FileNotFound en origen: return Err(BackupError.MigrationNoSourceBackup)
+6. destination provider: upload(rawContent, metadata actualizado)
+   — si falla: el proveedor activo NO cambia; return Err(error)
+7. Actualizar KEY_BACKUP_PROVIDER → destination.id
+8. Actualizar KEY_BACKUP_CONTENT_HASH con hash del rawContent
+9. Actualizar KEY_BACKUP_LAST_SYNC_AT
+10. Emit BackupSyncState.Success
+11. return Ok
 ```
 
 La metadata se actualiza al subir: `provider` pasa a ser el destino, `savedAt` se actualiza
@@ -529,9 +547,11 @@ Se abre al tocar "Cambiar proveedor". Muestra el contexto actual y ofrece dos ca
 - El proveedor destino se muestra directamente (solo hay dos proveedores; si el activo es
   Drive, el destino es Dropbox y viceversa). No se abre `ProviderPickerSheet` aquí.
 - Si el usuario elige "Migrar backup": auth con el destino → `MigrationProgressDialog` →
-  resultado.
-- Si elige "Cambiar sin migrar": auth con el destino → desconectar el origen → primera sync
-  en el nuevo proveedor (flujo existente de `ConnectBackupUseCase`).
+  resultado. Si la auth falla o se cancela, el sheet muestra el error y el proveedor activo
+  **no cambia** (el usuario sigue con el proveedor original).
+- Si elige "Cambiar sin migrar": auth con el destino → si auth exitosa: `ConnectBackupUseCase`
+  con el nuevo proveedor (que incluye desconectar el anterior y hacer primera sync). Si la auth
+  falla o se cancela, el sheet muestra el error y el proveedor activo no cambia.
 
 ### `MigrationProgressDialog` — UX durante la copia
 
@@ -650,18 +670,33 @@ class CloudBackupWorker(
 }
 ```
 
-- **Nombre único**: `BACKUP_SYNC_WORK_NAME = "cloud_backup_sync"`. Tanto el `PeriodicWorkRequest` (
-  automático) como el `OneTimeWorkRequest` (manual iniciado desde Settings) usan este mismo nombre.
+- **Nombres únicos** (dos constantes separadas para evitar que el trabajo manual cancele el
+  periódico):
+  ```
+  BACKUP_SYNC_WORK_PERIODIC = "cloud_backup_sync_periodic"
+  BACKUP_SYNC_WORK_MANUAL   = "cloud_backup_sync_manual"
+  ```
 - Al encolar el sync manual:
-  `WorkManager.enqueueUniqueWork(BACKUP_SYNC_WORK_NAME, ExistingWorkPolicy.KEEP, oneTimeRequest)` —
-  si ya hay un trabajo en curso, la solicitud se descarta automáticamente.
+  `WorkManager.enqueueUniqueWork(BACKUP_SYNC_WORK_MANUAL, ExistingWorkPolicy.KEEP, oneTimeRequest)` —
+  si ya hay un trabajo manual en curso, la solicitud se descarta.
 - Al encolar el periódico:
-  `enqueueUniquePeriodicWork(BACKUP_SYNC_WORK_NAME, ExistingPeriodicWorkPolicy.KEEP, periodicRequest)`.
-- Constraints: `NetworkType.CONNECTED`.
-- Al completar sin error, guarda `lastSyncAt` en `PrefsStorage` y limpia `KEY_BACKUP_LAST_ERROR`.
-- Backoff exponencial en fallo genérico (máx 3 intentos). Para `QuotaExceeded`: **no reintentar** (
-  ver sección de errores).
-- Al desactivar backup o cambiar de proveedor:`WorkManager.cancelUniqueWork(BACKUP_SYNC_WORK_NAME)`.
+  `enqueueUniquePeriodicWork(BACKUP_SYNC_WORK_PERIODIC, ExistingPeriodicWorkPolicy.KEEP, periodicRequest)`.
+- Constraints: `NetworkType.CONNECTED`. (Nota: incluye redes metered; red unmetered se puede añadir
+  como opción en Settings en una versión futura.)
+- `CloudBackupWorker.doWork()` llama `SyncBackupUseCase`, que persiste `lastSyncAt` y limpia
+  `KEY_BACKUP_LAST_ERROR` al completar. El worker solo convierte el `Result` a `Result.success()`
+  o `Result.failure()`.
+- Política de reintento según error:
+    - **Error genérico** (`UploadFailed`, `NetworkUnavailable`): `Result.retry()` con backoff
+      exponencial (máx 3 intentos).
+    - **`QuotaExceeded`**: `Result.failure()` — no reintentar (no se resolverá sola).
+    - **`AuthFailed` / `NotSignedIn`**: `Result.failure()` — no reintentar (requiere acción del
+      usuario). Escribe `KEY_BACKUP_LAST_ERROR = "auth_failed"` para el banner en Settings.
+- Al desactivar backup o cambiar de proveedor:
+  ```
+  WorkManager.cancelUniqueWork(BACKUP_SYNC_WORK_PERIODIC)
+  WorkManager.cancelUniqueWork(BACKUP_SYNC_WORK_MANUAL)
+  ```
 
 ---
 
@@ -695,6 +730,12 @@ El `Mutex` se registra como `single { Mutex() }` en el módulo Koin de backup y 
 en `SyncBackupUseCase`. Al ser un `single`, es la misma instancia para WorkManager y para
 las llamadas desde ViewModel.
 
+> **Nota sobre procesos:** El `Mutex` en memoria solo protege concurrencia dentro del mismo
+> proceso Android. `CloudBackupWorker` no configura un proceso separado (`android:process`) en
+> `AndroidManifest.xml`, así que WorkManager corre en el proceso principal. El nombre único de
+> trabajo (`ExistingWorkPolicy.KEEP`) actúa como guarda adicional a nivel de sistema operativo
+> para evitar encolar duplicados desde distintos contextos.
+
 ### `BackupSyncState` — estado reactivo para la UI
 
 ```kotlin
@@ -711,6 +752,14 @@ Expuesto desde `BackupRepository` como `val syncState: StateFlow<BackupSyncState
 `SyncBackupUseCase` actualiza este flow al adquirir/liberar el mutex y al concluir la
 operación.
 
+**Transiciones de estados terminales:**
+
+- `Success` y `UpToDate` son estados transitorios. El ViewModel de Settings los muestra durante
+  3 segundos y luego los limpia a `Idle` con un `delay(3_000)` + emit `Idle`.
+- `Error` persiste hasta que una sync exitosa la reemplace con `Success` o `UpToDate`.
+- La "última sincronización" se muestra siempre desde `KEY_BACKUP_LAST_SYNC_AT` (no desde el
+  estado en memoria), de modo que el timestamp persiste entre sesiones.
+
 ### Observar WorkManager desde el ViewModel de Settings
 
 Para cubrir el caso donde WorkManager arranca mientras la app está en segundo plano (y el
@@ -719,9 +768,11 @@ mutex en memoria ya no aplica), el ViewModel combina ambas fuentes:
 ```kotlin
 val isSyncing: StateFlow<Boolean> = combine(
     backupRepository.syncState.map { it is BackupSyncState.InProgress },
-    workManager.getWorkInfosForUniqueWorkFlow(BACKUP_SYNC_WORK_NAME)
+    workManager.getWorkInfosForUniqueWorkFlow(BACKUP_SYNC_WORK_PERIODIC)
         .map { infos -> infos.any { it.state == WorkInfo.State.RUNNING } },
-) { repoSyncing, workerRunning -> repoSyncing || workerRunning }
+    workManager.getWorkInfosForUniqueWorkFlow(BACKUP_SYNC_WORK_MANUAL)
+        .map { infos -> infos.any { it.state == WorkInfo.State.RUNNING } },
+) { repoSyncing, periodicRunning, manualRunning -> repoSyncing || periodicRunning || manualRunning }
     .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
 ```
 
@@ -759,15 +810,38 @@ detectar cualquier cambio, sin costo criptográfico relevante dado el tamaño de
 
 ---
 
+## `ConnectBackupUseCase` — flujo y persistencia
+
+**Flujo interno:**
+
+```
+1. Si hay proveedor activo previo: signOut() del proveedor anterior
+   (los datos remotos de ese proveedor no se borran)
+2. signIn(provider) → cloudUser: CloudUser
+3. Primera SyncBackupUseCase → si falla QuotaExceeded: desconectar y retornar error
+4. Persistir en PrefsStorage:
+   KEY_BACKUP_PROVIDER         = provider.id
+   KEY_BACKUP_USER_DISPLAY_NAME = cloudUser.displayName
+   KEY_BACKUP_ENABLED          = true   ← solo se escribe true aquí
+   KEY_BACKUP_CONTENT_HASH     = hash de los datos subidos (lo persiste SyncBackupUseCase)
+   KEY_BACKUP_LAST_SYNC_AT     = now()  (lo persiste SyncBackupUseCase)
+```
+
+`KEY_BACKUP_ENABLED` solo se pone a `true` cuando `ConnectBackupUseCase` completa con éxito.
+Se pone a `false` (o se borra) en `DisconnectBackupUseCase`.
+
+---
+
 ## Almacenamiento de estado en `PrefsStorage`
 
 ```
-KEY_BACKUP_ENABLED: Boolean              // ¿El usuario activó backup?
+KEY_BACKUP_ENABLED: Boolean              // ¿El usuario activó backup? true solo tras ConnectBackupUseCase exitoso
 KEY_BACKUP_PROVIDER: String              // "google_drive" | "dropbox"
 KEY_BACKUP_LAST_SYNC_AT: Long?           // Epoch ms de la última sync exitosa
 KEY_BACKUP_AUTO_INTERVAL_DAYS: Int       // 1 | 3 | 7 | 0 (solo manual)
-KEY_BACKUP_USER_DISPLAY_NAME: String?    // Nombre para mostrar en Settings
+KEY_BACKUP_USER_DISPLAY_NAME: String?    // Nombre de cuenta; persiste ConnectBackupUseCase
 KEY_BACKUP_CONTENT_HASH: String?         // Hash SHA-256 truncado del último backup subido
+KEY_BACKUP_LAST_ERROR: String?           // null | "quota_exceeded" | "auth_failed" | "network" | "upload_failed"
 ```
 
 ---
@@ -799,6 +873,33 @@ CheckBackupStatusUseCase (con el proveedor guardado)
 La comprobación de `schemaVersion` ocurre **siempre antes** de mostrar cualquier opción
 de restauración. El usuario nunca ve el `RestoreConflictDialog` para un backup que la app
 no puede leer.
+
+---
+
+## `CheckBackupStatusUseCase` — tipo de retorno
+
+```kotlin
+data class RemoteBackupStatus(
+    val metadata: BackupMetadata,
+    val isCompatible: Boolean,   // metadata.schemaVersion <= BackupMigrationManager.currentSchema
+)
+
+class CheckBackupStatusUseCase(
+    private val registry: BackupProviderRegistry,
+    private val prefs: PrefsStorage,
+    private val migrationManager: BackupMigrationManager,
+) {
+    /**
+     * Returns [Ok(RemoteBackupStatus)] si existe backup remoto para el proveedor activo.
+     * Returns [Ok(null)] si no existe archivo remoto (FileNotFound).
+     * Returns [Err] en error de red, auth, o si no hay proveedor seleccionado.
+     */
+    suspend operator fun invoke(): Result<RemoteBackupStatus?, BackupError>
+}
+```
+
+Si `isCompatible == false`, la capa de presentación muestra `IncompatibleVersionDialog` y
+no intenta la restauración.
 
 ---
 
@@ -936,15 +1037,9 @@ el backup más tarde desde Ajustes cuando liberes espacio.
 
 ### Estado de error persistido (`PrefsStorage`)
 
-Nueva clave añadida al listado de la sección de PrefsStorage:
-
-```
-KEY_BACKUP_LAST_ERROR: String?   // null | "quota_exceeded" | "auth_failed" | "network" | "upload_failed"
-```
-
-Esta clave solo se escribe durante syncs automáticas (background). Las syncs manuales y de
-onboarding muestran el error directamente en UI sin pasar por prefs. Se limpia cada vez que
-una sync completa sin error.
+`KEY_BACKUP_LAST_ERROR` (ya definida en la sección de PrefsStorage) solo se escribe durante
+syncs automáticas (background). Las syncs manuales y de onboarding muestran el error
+directamente en UI sin pasar por prefs. Se limpia cada vez que una sync completa sin error.
 
 ---
 
@@ -982,13 +1077,8 @@ sincronizando.
 <string name="backup_error_network_banner">Sin conexión. Se sincronizará cuando vuelva la red.
 </string>
 
-    <!-- Versión incompatible — diálogo -->
-<string name="backup_error_incompatible_title">Backup de versión más nueva</string><string
-name="backup_error_incompatible_body">Este backup fue creado con una versión más reciente de la app
-(versión interna %1$d). Actualiza la app para poder restaurarlo.
-</string><string name="backup_error_incompatible_update">Actualizar app</string><string
-name="backup_error_incompatible_cancel">Cancelar
-</string>
+    <!-- Versión incompatible — diálogo (usar strings backup_incompatible_* definidos en sección
+         "Compatibilidad de versiones en restore"; no duplicar aquí) -->
 
     <!-- Migración fallida — diálogo -->
 <string name="backup_error_migration_title">Error al procesar el backup</string><string
@@ -1234,6 +1324,7 @@ name="backup_error_auth_failed">No se pudo iniciar sesión
 | `core/backup/RestoreBackupUseCase.kt`                  | Descarga → deserializa → migra → importa a Room        |
 | `core/backup/CheckBackupStatusUseCase.kt`              | Retorna si hay backup remoto y su metadata             |
 | `core/backup/DisconnectBackupUseCase.kt`               | Cierra sesión + cancela WorkManager                    |
+| `core/backup/BackupErrorMapper.kt`                     | Mapea `BackupError` + `BackupErrorContext` a `UiText`  |
 | `core/backup/CloudBackupWorker.kt`                     | `CoroutineWorker` que llama a `SyncBackupUseCase`      |
 | `core/backup/BackupScheduler.kt`                       | Abstracción sobre WorkManager                          |
 | `feature/onboarding/ui/steps/StepBackup.kt`            | Paso de onboarding con 4 sub-estados (A/B/C/D)         |
@@ -1257,7 +1348,7 @@ name="backup_error_auth_failed">No se pudo iniciar sesión
 
 | Archivo                                     | Cambio                                                                                               |
 |---------------------------------------------|------------------------------------------------------------------------------------------------------|
-| `AndroidBuildConfigConventionPlugin.kt`     | Agregar `FEATURE_CLOUD_BACKUP` por variante                                                          |
+| `AndroidBuildConfigConventionPlugin.kt`     | Agregar `FEATURE_CLOUD_BACKUP` por variante + `DROPBOX_APP_KEY` (valor de `local.properties` / env)  |
 | `core/config/FeatureFlags.kt`               | Agregar `cloudBackupEnabled`                                                                         |
 | `core/data/datastore/PrefsStorage.kt`       | Agregar keys de backup (enabled, provider, lastSync, interval, displayName)                          |
 | `feature/onboarding/OnboardingState.kt`     | Agregar `OnboardingSteps.CloudBackup`, actualizar `byStep` y `totalSteps`                            |
@@ -1344,14 +1435,16 @@ name="backup_error_auth_failed">No se pudo iniciar sesión
 ### General
 
 - El usuario solo puede tener **un proveedor activo** a la vez.
-- Cambiar de proveedor en v1 es manual: desconectar → conectar nuevo. No hay migración automática
-  entre proveedores (el archivo anterior en el proveedor viejo no se borra automáticamente).
-- El contenido del archivo JSON es idéntico entre proveedores. En el futuro se podría migrar de uno
-  a otro descargando y subiendo.
+- Cambiar de proveedor se hace desde `ChangeProviderSheet` en Settings: el usuario puede migrar
+  el backup (copia de archivo) o cambiar limpio. El archivo en el proveedor anterior no se elimina
+  automáticamente en ningún caso.
+- El contenido del archivo JSON es idéntico entre proveedores; la migración es una copia de bytes
+  sin deserialización.
 - **Privacidad**: documentar en la Privacy Policy que el backup contiene datos de uso de la app y se
   almacena en el servicio elegido por el usuario.
 - **Tamaño**: para usuarios típicos (<365 días), el JSON pesa < 200 KB. Sin compresión en v1.
 - **WorkManager mínimo**: Android no garantiza intervals < 15 minutos. "Diaria" =
-  `repeatInterval = 1, TimeUnit.DAYS`.
+  `repeatInterval = 1, TimeUnit.DAYS`. En práctica, Doze Mode puede retrasar la ejecución
+  varias horas; esto es aceptable para un backup de datos de salud.
 - **Token refresh**: ambos SDKs manejan token refresh automáticamente. Si el token expira y no se
   puede refrescar, lanzar `BackupError.AuthFailed` y mostrar CTA para reconectar.
