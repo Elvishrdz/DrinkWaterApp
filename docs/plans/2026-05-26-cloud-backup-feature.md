@@ -18,17 +18,18 @@ El feature empieza protegido por un **feature flag de solo DEBUG** y tendrá su 
 
 ## Comportamiento esperado
 
-| Escenario                    | Detalle                                                                                                                                                                         |
-|------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Usuario **sin backup**       | App funciona exactamente igual que hoy (solo local).                                                                                                                            |
-| Activar backup (primera vez) | Muestra selector de proveedor (Google Drive / Dropbox) → inicia auth del proveedor elegido → crea archivo → sincroniza datos locales al cloud.                                  |
-| Backup desde onboarding      | Nuevo paso opcional al final del onboarding. Muestra selector de proveedor. Si el usuario acepta, completa auth y hace primer sync antes de terminar el onboarding.             |
-| Sync manual                  | Botón en Settings → Cloud Backup → "Sincronizar ahora".                                                                                                                         |
-| Sync automático              | WorkManager `PeriodicWorkRequest` con intervalo configurable (cada día / cada 3 días / cada semana).                                                                            |
-| Restaurar al reinstalar      | App detecta backup remoto → diálogo: "Usar datos de la nube" o "Empezar desde cero".                                                                                            |
-| Conflicto local vs. nube     | Diálogo explícito: "Tienes datos locales y datos en la nube. ¿Cuáles quieres usar?" con opción de cancelar.                                                                     |
-| Cambiar de proveedor         | En Settings: desconectar proveedor actual → conectar proveedor nuevo. No hay migración automática entre proveedores en v1 (el usuario puede hacer sync manual tras reconectar). |
-| Desactivar backup            | En Settings puede desconectar la cuenta. Los datos locales se mantienen; el archivo remoto no se borra.                                                                         |
+| Escenario                    | Detalle                                                                                                                                                                              |
+|------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Usuario **sin backup**       | App funciona exactamente igual que hoy (solo local).                                                                                                                                 |
+| Activar backup (primera vez) | Muestra selector de proveedor (Google Drive / Dropbox) → inicia auth del proveedor elegido → crea archivo → sincroniza datos locales al cloud.                                       |
+| Backup desde onboarding      | Nuevo paso opcional al final del onboarding. Muestra selector de proveedor. Si el usuario acepta, completa auth y hace primer sync antes de terminar el onboarding.                  |
+| Sync manual                  | Botón en Settings → Cloud Backup → "Sincronizar ahora".                                                                                                                              |
+| Sync automático              | WorkManager `PeriodicWorkRequest` con intervalo configurable (cada día / cada 3 días / cada semana).                                                                                 |
+| Restaurar al reinstalar      | App detecta backup remoto → diálogo: "Usar datos de la nube" o "Empezar desde cero".                                                                                                 |
+| Conflicto local vs. nube     | Diálogo explícito: "Tienes datos locales y datos en la nube. ¿Cuáles quieres usar?" con opción de cancelar.                                                                          |
+| Cambiar de proveedor         | En Settings: `ChangeProviderSheet` ofrece **Migrar backup** (copia el archivo al nuevo proveedor) o **Cambiar sin migrar** (empieza limpio en el nuevo).                             |
+| Migrar backup en onboarding  | Si el usuario autentica Proveedor A y no hay backup, se ofrece verificar el otro proveedor. Si hay backup allí, puede migrar al proveedor elegido o simplemente usarlo directamente. |
+| Desactivar backup            | En Settings puede desconectar la cuenta. Los datos locales se mantienen; el archivo remoto no se borra.                                                                              |
 
 ---
 
@@ -39,6 +40,7 @@ El feature empieza protegido por un **feature flag de solo DEBUG** y tendrá su 
 │                    Presentation layer                    │
 │  OnboardingStep(Backup)  ·  BackupSettingsSection        │
 │  ProviderPickerSheet     ·  RestoreConflictDialog        │
+│  ChangeProviderSheet     ·  MigrationProgressDialog      │
 │  DevBackupPlayground                                     │
 └───────────────────────────┬─────────────────────────────┘
                             │
@@ -46,7 +48,7 @@ El feature empieza protegido por un **feature flag de solo DEBUG** y tendrá su 
 │                 BackupViewModel / UseCases               │
 │  SyncBackupUseCase    · RestoreBackupUseCase             │
 │  CheckBackupStatusUseCase · DisconnectBackupUseCase      │
-│  ConnectBackupUseCase                                    │
+│  ConnectBackupUseCase · MigrateBackupUseCase             │
 └───────────────────────────┬─────────────────────────────┘
                             │
 ┌───────────────────────────▼─────────────────────────────┐
@@ -392,18 +394,46 @@ data object CloudBackup : OnboardingSteps   // solo visible si FeatureFlags.clou
 
 Cuando el feature flag está desactivado: `byStep(10) → Summary` y `totalSteps = 10` (sin cambio).
 
-### Contenido del paso `StepBackup`
+### Contenido del paso `StepBackup` — sub-estados
+
+El paso tiene cuatro sub-estados internos manejados por `OnboardingViewModel`.
+
+#### Sub-estado A — Selección inicial
 
 - **Título**: "¿Quieres guardar tu progreso en la nube?"
-- **Subtítulo**: Breve explicación de qué se guarda y que es opcional.
-- **Área central**: dos tarjetas con Google Drive y Dropbox (mismo diseño que `ChoiceCard` del
-  onboarding).
-- **Botón primario**: "Conectar" → abre `ProviderPickerSheet` si ningún proveedor está
-  pre-seleccionado,
-  o lanza directamente el auth si el usuario ya eligió uno en la tarjeta.
-- **Botón secundario / link**: "Ahora no" → continúa sin backup.
-- Estado de carga mientras ocurre auth.
-- Si la auth falla: mensaje de error con opción de reintentar o saltar.
+- Dos tarjetas: Google Drive y Dropbox (mismo diseño que `ChoiceCard`).
+- Botón "Conectar" → auth con el proveedor elegido.
+- Link "Ahora no" → continúa sin backup.
+
+#### Sub-estado B — No se encontró backup en el proveedor elegido
+
+Ocurre cuando la auth fue exitosa pero `CheckBackupStatusUseCase` no encontra archivo remoto.
+
+- Texto: "No encontramos backup en [Proveedor A]."
+- Opción principal: "Continuar con [Proveedor A]" → hace primera sync y avanza al Summary.
+- Opción secundaria (link): "¿Tienes backup en [Proveedor B]?" → auth con Proveedor B.
+    - `[Proveedor B]` es siempre el otro proveedor (el que el usuario **no** eligió primero).
+
+#### Sub-estado C — Backup encontrado en el otro proveedor
+
+Después de auth exitosa con Proveedor B y backup encontrado allí:
+
+- Texto: "Encontramos un backup en [Proveedor B]."
+- **Opción 1** (recomendada): "Migrar backup a [Proveedor A]" → copia el archivo de B a A,
+  usa A como proveedor activo. Muestra `MigrationProgressDialog`.
+- **Opción 2**: "Usar [Proveedor B] en su lugar" → cambia el proveedor activo a B, restaura
+  desde B. No hay copia; simplemente se usa B.
+- **Opción 3** (link): "Continuar sin backup" → descarta ambos, avanza sin backup.
+
+#### Sub-estado D — No hay backup en ningún proveedor
+
+- Texto: "No encontramos backups en ningún servicio."
+- Botón único: "Continuar" → avanza al Summary sin backup.
+
+#### Manejo de errores en auth del segundo proveedor
+
+Si la auth con el segundo proveedor falla o se cancela, volver al Sub-estado B sin perder
+la autenticación ya obtenida con el primero.
 
 ---
 
@@ -428,8 +458,183 @@ Cuando el feature flag está desactivado: `byStep(10) → Summary` y `totalSteps
     - `Error`: banner de error (ver sección de manejo de errores).
 - Selector de intervalo automático: Diario / Cada 3 días / Semanal / Solo manual.
 - Opción "Restaurar desde la nube" (con diálogo de confirmación).
-- Botón "Cambiar proveedor" → desconecta el actual y abre `ProviderPickerSheet`.
+- Botón "Cambiar proveedor" → abre `ChangeProviderSheet` (ver sección de migración).
 - Botón destructivo "Desconectar cuenta" (con diálogo de confirmación).
+
+---
+
+## Migración de backup entre proveedores
+
+### Concepto clave
+
+La migración es una **copia de archivo**, no una importación de datos. `MigrateBackupUseCase`
+descarga el JSON crudo del proveedor origen y lo sube sin modificar al proveedor destino.
+No hay deserialización ni validación de schema: se copian los bytes tal cual. La compatibilidad
+de schema solo importa cuando se restaura a la base de datos local.
+
+```kotlin
+class MigrateBackupUseCase(
+    private val registry: BackupProviderRegistry,
+    private val prefs: PrefsStorage,
+    private val mutex: Mutex,
+) {
+    suspend operator fun invoke(
+        source: CloudProviderType,
+        destination: CloudProviderType,
+    ): Result<Unit, BackupError>
+}
+```
+
+**Flujo interno:**
+
+```
+1. tryLock(mutex) → si falla: return AlreadyInProgress
+2. Emit BackupSyncState.InProgress
+3. source provider: download() → rawContent: String
+4. Si FileNotFound en origen: return Err(BackupError.MigrationNoSourceBackup)
+5. destination provider: upload(rawContent, metadata actualizado)
+6. Actualizar KEY_BACKUP_PROVIDER → destination.id
+7. Actualizar KEY_BACKUP_CONTENT_HASH con hash del rawContent
+8. Actualizar KEY_BACKUP_LAST_SYNC_AT
+9. Emit BackupSyncState.Success
+10. return Ok
+```
+
+La metadata se actualiza al subir: `provider` pasa a ser el destino, `savedAt` se actualiza
+al momento de la copia. El resto de los campos del bloque `metadata` se preservan del archivo
+original (schemaVersion, appVersionName, etc.).
+
+### `ChangeProviderSheet` — UX en Settings
+
+Se abre al tocar "Cambiar proveedor". Muestra el contexto actual y ofrece dos caminos:
+
+```
+╔══════════════════════════════════════════════════╗
+║  Cambiar proveedor de copia de seguridad         ║
+╠══════════════════════════════════════════════════╣
+║  Actualmente usas: [icono] Google Drive          ║
+╠══════════════════════════════════════════════════╣
+║  ● Migrar backup a Dropbox          (recomendado)║
+║    Tu backup se copia a Dropbox. La             ║
+║    copia en Google Drive no se elimina.          ║
+╠──────────────────────────────────────────────────╣
+║  ○ Cambiar sin migrar                            ║
+║    Empiezas desde cero en Dropbox.               ║
+║    Tu backup en Google Drive queda allí.         ║
+╠══════════════════════════════════════════════════╣
+║  Cancelar                                        ║
+╚══════════════════════════════════════════════════╝
+```
+
+- El proveedor destino se muestra directamente (solo hay dos proveedores; si el activo es
+  Drive, el destino es Dropbox y viceversa). No se abre `ProviderPickerSheet` aquí.
+- Si el usuario elige "Migrar backup": auth con el destino → `MigrationProgressDialog` →
+  resultado.
+- Si elige "Cambiar sin migrar": auth con el destino → desconectar el origen → primera sync
+  en el nuevo proveedor (flujo existente de `ConnectBackupUseCase`).
+
+### `MigrationProgressDialog` — UX durante la copia
+
+```
+╔══════════════════════════════════════════════════╗
+║  Migrando tu backup…                             ║
+╠══════════════════════════════════════════════════╣
+║  Copiando de Google Drive a Dropbox              ║
+║  ████████████░░░░░░░░  descargando…              ║
+╠══════════════════════════════════════════════════╣
+║  (no cancelable mientras esté en progreso)       ║
+╚══════════════════════════════════════════════════╝
+```
+
+Progreso en dos fases (indeterminado, ya que no hay tamaño previo conocido):
+
+- Fase 1: "Descargando de [origen]…"
+- Fase 2: "Subiendo a [destino]…"
+
+Al completar, el diálogo cambia a pantalla de éxito:
+
+```
+╔══════════════════════════════════════════════════╗
+║  ✓ Backup migrado a Dropbox                      ║
+╠══════════════════════════════════════════════════╣
+║  La copia en Google Drive sigue guardada allí.   ║
+║  Puedes eliminarla desde Google Drive si ya no   ║
+║  la necesitas.                                   ║
+╠══════════════════════════════════════════════════╣
+║  [Listo]                                         ║
+╚══════════════════════════════════════════════════╝
+```
+
+Si la migración falla (error de red, quota en destino, etc.), el diálogo muestra el error
+correspondiente con botón "Reintentar" y "Cancelar". El proveedor activo **no cambia** hasta
+que la migración complete con éxito.
+
+### Errores específicos de migración
+
+Agregar a `BackupError`:
+
+```kotlin
+data object MigrationNoSourceBackup : BackupError  // no hay archivo en el origen para copiar
+```
+
+El resto de errores de migración reutilizan los existentes: `NetworkUnavailable`,
+`QuotaExceeded(destination)`, `UploadFailed`, `DownloadFailed`, `AuthFailed`.
+
+Agregar a `BackupErrorContext`:
+
+```kotlin
+enum class BackupErrorContext { MANUAL_SYNC, AUTO_SYNC, ONBOARDING, RESTORE, MIGRATION }
+```
+
+El mapper mapea `MigrationNoSourceBackup` a:
+> "No encontramos un backup en [origen] para copiar. El proveedor puede haber cambiado o
+> el archivo fue eliminado."
+
+### Strings de migración
+
+```xml
+<!-- ChangeProviderSheet -->
+<string name="backup_change_provider_title">Cambiar proveedor de copia de seguridad</string><string
+name="backup_change_provider_current">Actualmente usas: %1$s
+</string><string name="backup_change_provider_migrate_title">Migrar backup a %1$s</string><string
+name="backup_change_provider_migrate_desc">Tu backup se copia a %1$s. La copia en %2$s no se
+elimina.
+</string><string name="backup_change_provider_switch_title">Cambiar sin migrar</string><string
+name="backup_change_provider_switch_desc">Empiezas desde cero en %1$s. Tu backup en %2$s queda allí.
+</string><string name="backup_change_provider_cancel">Cancelar</string>
+
+    <!-- MigrationProgressDialog -->
+<string name="backup_migration_title">Migrando tu backup…</string><string
+name="backup_migration_copying">Copiando de %1$s a %2$s
+</string><string name="backup_migration_phase_download">Descargando de %1$s…</string><string
+name="backup_migration_phase_upload">Subiendo a %1$s…
+</string><string name="backup_migration_success_title">Backup migrado a %1$s</string><string
+name="backup_migration_success_body">La copia en %2$s sigue guardada allí. Puedes eliminarla desde
+%2$s si ya no la necesitas.
+</string><string name="backup_migration_done">Listo</string><string name="backup_migration_retry">
+Reintentar
+</string><string name="backup_migration_cancel">Cancelar</string>
+
+    <!-- Onboarding — sub-estado B: no backup en proveedor elegido -->
+<string name="backup_onb_no_backup_found">No encontramos backup en %1$s.</string><string
+name="backup_onb_continue_with_provider">Continuar con %1$s
+</string><string name="backup_onb_check_other_provider">¿Tienes backup en %1$s?</string>
+
+    <!-- Onboarding — sub-estado C: backup encontrado en otro proveedor -->
+<string name="backup_onb_found_in_other">Encontramos un backup en %1$s.</string><string
+name="backup_onb_migrate_to_chosen">Migrar backup a %1$s
+</string><string name="backup_onb_use_other_provider">Usar %1$s en su lugar</string><string
+name="backup_onb_continue_no_backup">Continuar sin backup
+</string>
+
+    <!-- Onboarding — sub-estado D: sin backup en ningún proveedor -->
+<string name="backup_onb_no_backup_anywhere">No encontramos backups en ningún servicio.</string>
+
+    <!-- Error: sin backup en origen para migrar -->
+<string name="backup_error_migration_no_source">No encontramos un backup en %1$s para copiar. El
+archivo puede haber sido eliminado.
+</string>
+```
 
 ---
 
@@ -613,6 +818,7 @@ sealed interface BackupError : DataError {
     data class QuotaExceeded(val provider: CloudProviderType, val fileSizeBytes: Long) : BackupError
     data object NoProviderSelected : BackupError
     data object ProviderNotAvailable : BackupError
+    data object MigrationNoSourceBackup : BackupError
 }
 ```
 
@@ -807,7 +1013,7 @@ object BackupErrorMapper {
     fun toUiText(error: BackupError, context: BackupErrorContext): UiText
 }
 
-enum class BackupErrorContext { MANUAL_SYNC, AUTO_SYNC, ONBOARDING, RESTORE }
+enum class BackupErrorContext { MANUAL_SYNC, AUTO_SYNC, ONBOARDING, RESTORE, MIGRATION }
 ```
 
 Para `QuotaExceeded`, el mapper formatea `fileSizeBytes` en una cadena legible antes de
@@ -867,12 +1073,19 @@ BackupDevScreen
   ├── [Botón] Ver metadata remota (Dropbox)
   ├── [Botón] Eliminar archivo remoto (Dropbox)
   │
+  ├── ── Migración entre proveedores ──
+  ├── [Botón] Migrar Google Drive → Dropbox
+  ├── [Botón] Migrar Dropbox → Google Drive
+  ├── [Botón] Simular MigrationNoSourceBackup (origen sin archivo)
+  ├── [Botón] Simular fallo en descarga durante migración
+  ├── [Botón] Simular QuotaExceeded en destino durante migración
+  │
   ├── ── Simulaciones ──
   ├── [Botón] Simular conflicto local vs. nube
   ├── [Botón] Corromper backup (schema viejo → migración hacia adelante)
   ├── [Botón] Corromper backup (schema futuro → IncompatibleVersion)
   ├── [Botón] Simular fallo de red
-  ├── [Botón] Simular QuotaExceeded
+  ├── [Botón] Simular QuotaExceeded en sync normal
   │
   └── [Log] Output de cada operación en pantalla (scrollable)
 ```
@@ -999,41 +1212,44 @@ name="backup_error_auth_failed">No se pudo iniciar sesión
 
 ## Archivos a crear
 
-| Archivo                                                | Descripción                                          |
-|--------------------------------------------------------|------------------------------------------------------|
-| `core/backup/CloudProviderType.kt`                     | Enum con `GOOGLE_DRIVE`, `DROPBOX` y su `id` String  |
-| `core/backup/CloudUser.kt`                             | Data class: `displayName`, `providerType`            |
-| `core/backup/BackupMetadata.kt`                        | Data class del bloque `metadata` del JSON            |
-| `core/backup/BackupFile.kt`                            | Wrapper: `metadata + rawData: JsonObject`            |
-| `core/backup/BackupError.kt`                           | Sealed interface de errores                          |
-| `core/backup/CloudBackupProvider.kt`                   | Interface abstracta del proveedor                    |
-| `core/backup/BackupProviderRegistry.kt`                | Resolución del proveedor activo por tipo             |
-| `core/backup/GoogleDriveBackupProvider.kt`             | Implementación Drive (REST API + `GoogleSignIn`)     |
-| `core/backup/DropboxBackupProvider.kt`                 | Implementación Dropbox (SDK v7, OAuth PKCE)          |
-| `core/backup/BackupSerializer.kt`                      | Serialización/deserialización JSON ↔ entidades Room  |
-| `core/backup/BackupMigration.kt`                       | Data class para una migración individual             |
-| `core/backup/BackupMigrationManager.kt`                | Registro y ejecución encadenada de migraciones       |
-| `core/backup/BackupRepository.kt`                      | Interface de alto nivel                              |
-| `core/backup/BackupRepositoryImpl.kt`                  | Orquesta registry + serializer + migration           |
-| `core/backup/ConnectBackupUseCase.kt`                  | Auth + primera sync                                  |
-| `core/backup/SyncBackupUseCase.kt`                     | Exporta DB local → serializa → sube                  |
-| `core/backup/RestoreBackupUseCase.kt`                  | Descarga → deserializa → migra → importa a Room      |
-| `core/backup/CheckBackupStatusUseCase.kt`              | Retorna si hay backup remoto y su metadata           |
-| `core/backup/DisconnectBackupUseCase.kt`               | Cierra sesión + cancela WorkManager                  |
-| `core/backup/CloudBackupWorker.kt`                     | `CoroutineWorker` que llama a `SyncBackupUseCase`    |
-| `core/backup/BackupScheduler.kt`                       | Abstracción sobre WorkManager                        |
-| `feature/onboarding/ui/steps/StepBackup.kt`            | Paso de onboarding para activar backup               |
-| `feature/settings/backup/BackupSettingsSection.kt`     | Sección de Settings                                  |
-| `feature/settings/backup/ProviderPickerSheet.kt`       | Bottom Sheet selector de proveedor                   |
-| `feature/settings/backup/RestoreConflictDialog.kt`     | Diálogo de conflicto local vs. nube                  |
-| `feature/settings/backup/IncompatibleVersionDialog.kt` | Diálogo de versión incompatible con CTA a Play Store |
-| `feature/dev/backup/BackupDevState.kt`                 | State del playground                                 |
-| `feature/dev/backup/BackupDevAction.kt`                | Actions del playground                               |
-| `feature/dev/backup/BackupDevEvent.kt`                 | Events del playground                                |
-| `feature/dev/backup/BackupDevViewModel.kt`             | ViewModel del playground                             |
-| `feature/dev/backup/BackupDevScreen.kt`                | Pantalla del playground                              |
-| `feature/dev/backup/BackupDevRoot.kt`                  | Root composable del playground                       |
-| `di/BackupModule.kt`                                   | Módulo Koin con todas las dependencias de backup     |
+| Archivo                                                | Descripción                                            |
+|--------------------------------------------------------|--------------------------------------------------------|
+| `core/backup/CloudProviderType.kt`                     | Enum con `GOOGLE_DRIVE`, `DROPBOX` y su `id` String    |
+| `core/backup/CloudUser.kt`                             | Data class: `displayName`, `providerType`              |
+| `core/backup/BackupMetadata.kt`                        | Data class del bloque `metadata` del JSON              |
+| `core/backup/BackupFile.kt`                            | Wrapper: `metadata + rawData: JsonObject`              |
+| `core/backup/BackupError.kt`                           | Sealed interface de errores                            |
+| `core/backup/CloudBackupProvider.kt`                   | Interface abstracta del proveedor                      |
+| `core/backup/BackupProviderRegistry.kt`                | Resolución del proveedor activo por tipo               |
+| `core/backup/GoogleDriveBackupProvider.kt`             | Implementación Drive (REST API + `GoogleSignIn`)       |
+| `core/backup/DropboxBackupProvider.kt`                 | Implementación Dropbox (SDK v7, OAuth PKCE)            |
+| `core/backup/BackupSerializer.kt`                      | Serialización/deserialización JSON ↔ entidades Room    |
+| `core/backup/BackupMigration.kt`                       | Data class para una migración individual               |
+| `core/backup/BackupMigrationManager.kt`                | Registro y ejecución encadenada de migraciones         |
+| `core/backup/BackupRepository.kt`                      | Interface de alto nivel                                |
+| `core/backup/BackupRepositoryImpl.kt`                  | Orquesta registry + serializer + migration             |
+| `core/backup/ConnectBackupUseCase.kt`                  | Auth + primera sync                                    |
+| `core/backup/MigrateBackupUseCase.kt`                  | Copia de archivo entre proveedores sin deserializar    |
+| `core/backup/SyncBackupUseCase.kt`                     | Exporta DB local → serializa → sube                    |
+| `core/backup/RestoreBackupUseCase.kt`                  | Descarga → deserializa → migra → importa a Room        |
+| `core/backup/CheckBackupStatusUseCase.kt`              | Retorna si hay backup remoto y su metadata             |
+| `core/backup/DisconnectBackupUseCase.kt`               | Cierra sesión + cancela WorkManager                    |
+| `core/backup/CloudBackupWorker.kt`                     | `CoroutineWorker` que llama a `SyncBackupUseCase`      |
+| `core/backup/BackupScheduler.kt`                       | Abstracción sobre WorkManager                          |
+| `feature/onboarding/ui/steps/StepBackup.kt`            | Paso de onboarding con 4 sub-estados (A/B/C/D)         |
+| `feature/settings/backup/BackupSettingsSection.kt`     | Sección de Settings                                    |
+| `feature/settings/backup/ProviderPickerSheet.kt`       | Bottom Sheet selector de proveedor                     |
+| `feature/settings/backup/ChangeProviderSheet.kt`       | Sheet para cambiar proveedor: migrar o cambiar limpio  |
+| `feature/settings/backup/MigrationProgressDialog.kt`   | Progreso + resultado de la migración entre proveedores |
+| `feature/settings/backup/RestoreConflictDialog.kt`     | Diálogo de conflicto local vs. nube                    |
+| `feature/settings/backup/IncompatibleVersionDialog.kt` | Diálogo de versión incompatible con CTA a Play Store   |
+| `feature/dev/backup/BackupDevState.kt`                 | State del playground                                   |
+| `feature/dev/backup/BackupDevAction.kt`                | Actions del playground                                 |
+| `feature/dev/backup/BackupDevEvent.kt`                 | Events del playground                                  |
+| `feature/dev/backup/BackupDevViewModel.kt`             | ViewModel del playground                               |
+| `feature/dev/backup/BackupDevScreen.kt`                | Pantalla del playground                                |
+| `feature/dev/backup/BackupDevRoot.kt`                  | Root composable del playground                         |
+| `di/BackupModule.kt`                                   | Módulo Koin con todas las dependencias de backup       |
 
 ---
 
@@ -1045,7 +1261,7 @@ name="backup_error_auth_failed">No se pudo iniciar sesión
 | `core/config/FeatureFlags.kt`               | Agregar `cloudBackupEnabled`                                                                         |
 | `core/data/datastore/PrefsStorage.kt`       | Agregar keys de backup (enabled, provider, lastSync, interval, displayName)                          |
 | `feature/onboarding/OnboardingState.kt`     | Agregar `OnboardingSteps.CloudBackup`, actualizar `byStep` y `totalSteps`                            |
-| `feature/onboarding/OnboardingViewModel.kt` | Agregar `skipBackup()` y `connectBackup(provider)`                                                   |
+| `feature/onboarding/OnboardingViewModel.kt` | Agregar sub-estados A/B/C/D del paso backup + `migrateInOnboarding()` + `checkOtherProvider()`       |
 | `feature/onboarding/OnboardingScreen.kt`    | Agregar rama para `OnboardingSteps.CloudBackup`                                                      |
 | `feature/settings/SettingsScreen.kt`        | Agregar `BackupSettingsSection` (detrás de feature flag)                                             |
 | `feature/settings/SettingsViewModel.kt`     | Exponer estado de backup y acciones                                                                  |
@@ -1071,7 +1287,7 @@ name="backup_error_auth_failed">No se pudo iniciar sesión
 7. `GoogleDriveBackupProvider` (Drive REST API + `GoogleSignIn`).
 8. `DropboxBackupProvider` (SDK v7, OAuth PKCE).
 9. `ConnectBackupUseCase`, `SyncBackupUseCase`, `RestoreBackupUseCase`,
-   `CheckBackupStatusUseCase`, `DisconnectBackupUseCase`.
+   `CheckBackupStatusUseCase`, `DisconnectBackupUseCase`, `MigrateBackupUseCase`.
 10. `CloudBackupWorker` + `BackupScheduler`.
 11. Koin `BackupModule`.
 12. Nuevas keys en `PrefsStorage`.
@@ -1084,11 +1300,12 @@ name="backup_error_auth_failed">No se pudo iniciar sesión
 
 ### Fase 3 — UI de producción
 
-1. `ProviderPickerSheet`.
-2. `StepBackup` en onboarding + cambios en `OnboardingState/ViewModel/Screen`.
-3. `BackupSettingsSection` + `RestoreConflictDialog`.
-4. Cambios en `SettingsScreen/ViewModel`.
-5. Lógica de restauración al inicio de la app (detección en `MainViewModel`).
+1. `ProviderPickerSheet` + `ChangeProviderSheet`.
+2. `StepBackup` (4 sub-estados) + cambios en `OnboardingState/ViewModel/Screen`.
+3. `MigrationProgressDialog`.
+4. `BackupSettingsSection` + `RestoreConflictDialog` + `IncompatibleVersionDialog`.
+5. Cambios en `SettingsScreen/ViewModel`.
+6. Lógica de restauración + detección de migración al inicio de la app (`MainViewModel`).
 
 ### Fase 4 — Strings y traducciones
 
