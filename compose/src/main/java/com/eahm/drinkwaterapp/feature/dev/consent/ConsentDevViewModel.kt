@@ -3,7 +3,7 @@ package com.eahm.drinkwaterapp.feature.dev.consent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
-import com.eahm.drinkwaterapp.core.config.PrivacyPolicyConfig
+import com.eahm.drinkwaterapp.core.config.PrivacyPolicyTermsOfServiceConfig
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -26,7 +26,7 @@ internal class ConsentDevViewModel(
             trackingConsentDecided = trackingDecided,
             isTracking = trackingService.isTracking(),
             privacyPolicyVersionAccepted = versionAccepted,
-            currentPolicyDate = PrivacyPolicyConfig.CURRENT_POLICY_DATE,
+            currentPolicyDate = PrivacyPolicyTermsOfServiceConfig.CURRENT_POLICY_DATE,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ConsentDevState.Loading)
 
@@ -56,6 +56,8 @@ internal class ConsentDevViewModel(
     }
 
     fun acceptPolicyVersionNow() {
-        viewModelScope.launch { prefs.setPrivacyPolicyVersionAccepted(PrivacyPolicyConfig.CURRENT_POLICY_DATE) }
+        viewModelScope.launch {
+            prefs.setPrivacyPolicyVersionAccepted(PrivacyPolicyTermsOfServiceConfig.CURRENT_POLICY_DATE)
+        }
     }
 }

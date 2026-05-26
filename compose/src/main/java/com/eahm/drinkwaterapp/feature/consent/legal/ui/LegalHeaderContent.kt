@@ -34,8 +34,14 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.eahm.drinkwaterapp.R
+import com.eahm.drinkwaterapp.core.config.PrivacyPolicyTermsOfServiceConfig
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.feature.consent.ui.ConsentDefaults
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.toJavaLocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.Locale
 
 @Composable
 internal fun LegalHeaderContent(
@@ -132,7 +138,10 @@ internal fun LegalHeaderContent(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = stringResource(R.string.consent_legal_updated),
+                text = stringResource(
+                    R.string.consent_legal_updated_at,
+                    PrivacyPolicyTermsOfServiceConfig.effectiveDate.formatted(),
+                ),
                 color = Color.White.copy(alpha = 0.80f),
                 style = MaterialTheme.typography.labelSmall,
                 letterSpacing = 0.04.em,
@@ -160,6 +169,14 @@ internal fun LegalHeaderContent(
 
         Spacer(Modifier.height(contentPadding.calculateBottomPadding()))
     }
+}
+
+private fun LocalDate.formatted(): String {
+    return toJavaLocalDate().format(
+        DateTimeFormatter
+            .ofLocalizedDate(FormatStyle.MEDIUM)
+            .withLocale(Locale.getDefault())
+    )
 }
 
 private class CenteredPreviewProvider : PreviewParameterProvider<Boolean> {

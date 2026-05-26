@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.eahm.drinkwaterapp.R
+import com.eahm.drinkwaterapp.core.config.PrivacyPolicyTermsOfServiceConfig
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 
 @Composable
@@ -27,7 +28,7 @@ internal fun LegalWebLinkButton(
 
     Row(
         modifier = modifier
-            .clickable { uriHandler.openUri("https://www.freeprivacypolicy.com/privacy/view/04c015dc119a00b1ec8a21df46a9bfb1") }
+            .clickable { uriHandler.openUri(PrivacyPolicyTermsOfServiceConfig.LEGAL_URL) }
             .padding(horizontal = 4.dp, vertical = 2.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
         verticalAlignment = Alignment.CenterVertically,

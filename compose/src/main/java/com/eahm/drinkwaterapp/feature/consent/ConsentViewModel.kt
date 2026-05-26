@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingService.Companion.OptOutSource
-import com.eahm.drinkwaterapp.core.config.PrivacyPolicyConfig
+import com.eahm.drinkwaterapp.core.config.PrivacyPolicyTermsOfServiceConfig
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,9 +43,9 @@ internal class ConsentViewModel(
         prefsStorage.getPrivacyPolicyAcceptedAt(),
     ) { showStepCounter, policyVersionAccepted, isTrackingEnabled, toggle, acceptedAt ->
         val showNewBadge =
-            acceptedAt != null && policyVersionAccepted != PrivacyPolicyConfig.CURRENT_POLICY_DATE
+            acceptedAt != null && policyVersionAccepted != PrivacyPolicyTermsOfServiceConfig.CURRENT_POLICY_DATE
 
-        if (policyVersionAccepted == PrivacyPolicyConfig.CURRENT_POLICY_DATE) {
+        if (policyVersionAccepted == PrivacyPolicyTermsOfServiceConfig.CURRENT_POLICY_DATE) {
             ConsentState.Data(
                 step = ConsentStep.TRACKING_REQUEST,
                 showStepCounter = showStepCounter == true,
@@ -80,7 +80,7 @@ internal class ConsentViewModel(
             ConsentAction.AcceptPrivacyPolicy -> {
                 viewModelScope.launch {
                     prefsStorage.setPrivacyPolicyAccepted(System.currentTimeMillis())
-                    prefsStorage.setPrivacyPolicyVersionAccepted(PrivacyPolicyConfig.CURRENT_POLICY_DATE)
+                    prefsStorage.setPrivacyPolicyVersionAccepted(PrivacyPolicyTermsOfServiceConfig.CURRENT_POLICY_DATE)
                     val alreadyDecidedTracking =
                         prefsStorage.getTrackingConsentDecided().firstOrNull() == true
                     if (alreadyDecidedTracking) onCompleteSteps()

@@ -9,7 +9,149 @@
     <string name="share_app_title">Share DrinkWater app with your friends!</string>
 
     <!-- Consent — Privacy policy -->
-    <string name="privacy_policy_local_content"><![CDATA[<p>"<p>Effective date: May 08, 2019</p> <p>Drink Water App (\"us\", \"we\", or \"our\") operates the Drink Water App mobile application (the \"Service\").</p> <p>This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our Service and the choices you have associated with that data. Our Privacy Policy for Drink Water App is created with the help of the&nbsp;<a href=\"https://www.freeprivacypolicy.com/free-privacy-policy-generator.php\">Free Privacy Policy Generator</a>.</p> <p>We use your data to provide and improve the Service. By using the Service, you agree to the collection and use of information in accordance with this policy. Unless otherwise defined in this Privacy Policy, terms used in this Privacy Policy have the same meanings as in our Terms and Conditions.</p> <h2>Information Collection And Use</h2> <p>We collect several different types of information for various purposes to provide and improve our Service to you.</p> <h3>Types of Data Collected</h3> <h4>Personal Data</h4> <p>While using our Service, we may ask you to provide us with certain personally identifiable information that can be used to contact or identify you (\"Personal Data\"). Personally identifiable information may include, but is not limited to:</p> <ul> <li>Email address</li> <li>First name and last name</li> <li>Cookies and Usage Data</li> </ul> <h4>Usage Data</h4> <p>When you access the Service by or through a mobile device, we may collect certain information automatically, including, but not limited to, the type of mobile device you use, your mobile device unique ID, the IP address of your mobile device, your mobile operating system, the type of mobile Internet browser you use, unique device identifiers and other diagnostic data (\"Usage Data\").</p> <h4>Tracking &amp; Cookies Data</h4> <p>We use cookies and similar tracking technologies to track the activity on our Service and hold certain information.</p> <p>Cookies are files with small amount of data which may include an anonymous unique identifier. Cookies are sent to your browser from a website and stored on your device. Tracking technologies also used are beacons, tags, and scripts to collect and track information and to improve and analyze our Service.</p> <p>You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent. However, if you do not accept cookies, you may not be able to use some portions of our Service.</p> <p>Examples of Cookies we use:</p> <ul> <li><strong>Session Cookies.</strong>&nbsp;We use Session Cookies to operate our Service.</li> <li><strong>Preference Cookies.</strong>&nbsp;We use Preference Cookies to remember your preferences and various settings.</li> <li><strong>Security Cookies.</strong>&nbsp;We use Security Cookies for security purposes.</li> </ul> <h2>Use of Data</h2> <p>Drink Water App uses the collected data for various purposes:</p> <ul> <li>To provide and maintain the Service</li> <li>To notify you about changes to our Service</li> <li>To allow you to participate in interactive features of our Service when you choose to do so</li> <li>To provide customer care and support</li> <li>To provide analysis or valuable information so that we can improve the Service</li> <li>To monitor the usage of the Service</li> <li>To detect, prevent and address technical issues</li> </ul> <h2>Transfer Of Data</h2> <p>Your information, including Personal Data, may be transferred to &mdash; and maintained on &mdash; computers located outside of your state, province, country or other governmental jurisdiction where the data protection laws may differ than those from your jurisdiction.</p> <p>If you are located outside Nicaragua and choose to provide information to us, please note that we transfer the data, including Personal Data, to Nicaragua and process it there.</p> <p>Your consent to this Privacy Policy followed by your submission of such information represents your agreement to that transfer.</p> <p>Drink Water App will take all steps reasonably necessary to ensure that your data is treated securely and in accordance with this Privacy Policy and no transfer of your Personal Data will take place to an organization or a country unless there are adequate controls in place including the security of your data and other personal information.</p> <h2>Disclosure Of Data</h2> <h3>Legal Requirements</h3> <p>Drink Water App may disclose your Personal Data in the good faith belief that such action is necessary to:</p> <ul> <li>To comply with a legal obligation</li> <li>To protect and defend the rights or property of Drink Water App</li> <li>To prevent or investigate possible wrongdoing in connection with the Service</li> <li>To protect the personal safety of users of the Service or the public</li> <li>To protect against legal liability</li> </ul> <h2>Security Of Data</h2> <p>The security of your data is important to us, but remember that no method of transmission over the Internet, or method of electronic storage is 100% secure. While we strive to use commercially acceptable means to protect your Personal Data, we cannot guarantee its absolute security.</p> <h2>Service Providers</h2> <p>We may employ third party companies and individuals to facilitate our Service (\"Service Providers\"), to provide the Service on our behalf, to perform Service-related services or to assist us in analyzing how our Service is used.</p> <p>These third parties have access to your Personal Data only to perform these tasks on our behalf and are obligated not to disclose or use it for any other purpose.</p> <h2>Links To Other Sites</h2> <p>Our Service may contain links to other sites that are not operated by us. If you click on a third party link, you will be directed to that third party's site. We strongly advise you to review the Privacy Policy of every site you visit.</p> <p>We have no control over and assume no responsibility for the content, privacy policies or practices of any third party sites or services.</p> <h2>Children's Privacy</h2> <p>Our Service does not address anyone under the age of 18 (\"Children\").</p> <p>We do not knowingly collect personally identifiable information from anyone under the age of 18. If you are a parent or guardian and you are aware that your Children has provided us with Personal Data, please contact us. If we become aware that we have collected Personal Data from children without verification of parental consent, we take steps to remove that information from our servers.</p> <h2>Changes To This Privacy Policy</h2> <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page.</p> <p>We will let you know via email and/or a prominent notice on our Service, prior to the change becoming effective and update the \"effective date\" at the top of this Privacy Policy.</p> <p>You are advised to review this Privacy Policy periodically for any changes. Changes to this Privacy Policy are effective when they are posted on this page.</p> <h2>Contact Us</h2> <p>If you have any questions about this Privacy Policy, please contact us:</p> <ul> <li>By email: eahm3595@gmail.com</li> </ul>"</p>]]></string>
+    <string name="privacy_policy_local_content"><![CDATA[<h1>Privacy Policy</h1>
+<p>Effective date: May 25, 2026 &bull; Last updated: May 25, 2026 &bull; Contact: eahm3595@gmail.com</p>
+<h2>1. Introduction</h2>
+<p>Drink Water App is a hydration tracking application developed and operated as an independent project. This Privacy Policy explains what information is collected when you use the App, how it is used, and what controls you have over it.</p>
+<p>By installing or using Drink Water App, you agree to the practices described in this policy. If you do not agree, please uninstall the App.</p>
+<h2>2. Information We Collect</h2>
+<h3>2.1 Information You Provide</h3>
+<p>Stored locally on your device. During onboarding and normal use, the App asks for:</p>
+<ul>
+<li><b>Name</b> &mdash; personalize the in-app experience</li>
+<li><b>Gender</b> &mdash; calculate a recommended daily hydration goal</li>
+<li><b>Weight (kg or lbs)</b> &mdash; calculate a recommended daily hydration goal</li>
+<li><b>Activity level</b> &mdash; calculate a recommended daily hydration goal</li>
+<li><b>Wake time / sleep time</b> &mdash; schedule drink reminders within active hours</li>
+<li><b>Reminder frequency</b> &mdash; control how often notifications are sent</li>
+<li><b>Unit preference (ml / oz)</b> &mdash; display measurements in your preferred format</li>
+</ul>
+<p><b>All of the above is stored exclusively on your device</b> using Android DataStore (encrypted local storage). It is never transmitted to our servers or any third party.</p>
+<h3>2.2 App Usage Data</h3>
+<p>Stored locally on your device. The App records:</p>
+<ul>
+<li><b>Water intake logs:</b> amount, timestamp, and entry type (manual, from notification, or skipped).</li>
+<li><b>Daily hydration goals:</b> target amounts and effective dates.</li>
+<li><b>Streaks:</b> best consecutive days meeting your goal.</li>
+<li><b>Drink presets:</b> custom quick-add amounts you create.</li>
+</ul>
+<p>This data is stored in a local Room database. It is not synced to any cloud service and is not accessible by us or any third party.</p>
+<h3>2.3 Anonymous Usage Analytics</h3>
+<p>Optional, opt-out available. With your consent, the App sends anonymous usage events to <b>Mixpanel</b> to help us understand which features are used. No personal data, water log content, or identifiable information is included. Each device is assigned a random anonymous ID not linked to your identity.</p>
+<ul>
+<li>Mixpanel data is processed on servers in the <b>European Union</b>.</li>
+<li>Opt out at any time: <b>Settings &rarr; Privacy &amp; Legal &rarr; Usage Tracking</b>.</li>
+<li>Once opted out, no further events are sent and the anonymous ID is reset.</li>
+</ul>
+<h3>2.4 Crash Reports</h3>
+<p>The App uses <b>Firebase Crashlytics</b> (Google) to automatically collect crash reports containing device model, Android version, app version, and stack traces. No personal data or water logs are included.</p>
+<h3>2.5 Advertising Data</h3>
+<p>The free version uses <b>Google AdMob</b>, which may collect device advertising identifiers to show relevant ads. Purchasing <b>Remove Ads</b> permanently disables all ads and associated tracking.</p>
+<h3>2.6 Purchase Information</h3>
+<p>In-app purchases are processed through <b>RevenueCat</b>, which receives Google Play purchase tokens and your entitlement status. RevenueCat does not receive your name, water logs, or personal profile data.</p>
+<h2>3. Permissions Requested</h2>
+<ul>
+<li><b>POST_NOTIFICATIONS</b> &mdash; send drink water reminder notifications</li>
+<li><b>SCHEDULE_EXACT_ALARM</b> &mdash; deliver reminders at the precise scheduled time</li>
+<li><b>RECEIVE_BOOT_COMPLETED</b> &mdash; restore scheduled reminders after device restart</li>
+<li><b>SYSTEM_ALERT_WINDOW</b> &mdash; show a goal-reached celebration overlay above other apps</li>
+<li><b>INTERNET</b> &mdash; required for ads (free version), analytics, and purchase validation</li>
+</ul>
+<p>No location, contact, camera, microphone, or health permissions are requested.</p>
+<h2>4. How We Use Your Information</h2>
+<ul>
+<li>Deliver core hydration tracking features &mdash; all locally stored data</li>
+<li>Send drink reminders &mdash; active hours, reminder frequency</li>
+<li>Show personalized ads (free version) &mdash; AdMob device advertising ID</li>
+<li>Understand feature usage and improve the App &mdash; anonymous Mixpanel events (opt-in)</li>
+<li>Fix crashes and bugs &mdash; Firebase Crashlytics reports</li>
+<li>Process in-app purchases &mdash; RevenueCat purchase tokens</li>
+</ul>
+<p>We do not use your data for profiling, automated decision-making, or any purpose beyond those listed above.</p>
+<h2>5. Data Sharing and Disclosure</h2>
+<p>We do not sell, rent, or trade your personal information.</p>
+<ul>
+<li><b>Google Firebase (Crashlytics)</b> &mdash; crash reporting &mdash; device info, crash traces</li>
+<li><b>Mixpanel</b> &mdash; analytics (opt-in only) &mdash; anonymous events, random device ID</li>
+<li><b>Google AdMob</b> &mdash; advertising (free version only) &mdash; advertising ID</li>
+<li><b>RevenueCat</b> &mdash; purchase management &mdash; Google Play purchase tokens</li>
+</ul>
+<p>We may also disclose information if required by law or to protect the rights, safety, or property of users or the public.</p>
+<h2>6. Data Retention and Deletion</h2>
+<ul>
+<li><b>Local app data</b> remains on your device until you uninstall the App or use Settings &rarr; Clear all data.</li>
+<li><b>Mixpanel analytics</b> data retained per Mixpanel policy (typically 5 years). Opt out anytime to stop future collection.</li>
+<li><b>Crashlytics</b> reports retained by Google per Firebase policies.</li>
+<li><b>RevenueCat</b> purchase records retained as required by app store terms and applicable law.</li>
+</ul>
+<h2>7. Not a Medical Application</h2>
+<p>Drink Water App is a personal wellness utility. It is <b>not a medical device</b> and does not provide medical advice, diagnosis, or treatment. The daily water goal is an estimate and is not a substitute for advice from a qualified healthcare professional.</p>
+<h2>8. Children</h2>
+<p>The App is not directed to children under 13. We do not knowingly collect personal information from children under 13. If you believe your child has provided data through the App, contact us at eahm3595@gmail.com.</p>
+<h2>9. Data Security</h2>
+<p>All personal data is stored locally using Android encrypted DataStore. We do not operate servers that store your hydration data. We encourage you to protect your device with a screen lock.</p>
+<h2>10. Your Rights</h2>
+<ul>
+<li><b>Access</b> &mdash; all your data is visible within the App itself.</li>
+<li><b>Correct</b> &mdash; edit data via the App settings and onboarding screens.</li>
+<li><b>Delete</b> &mdash; use Settings &rarr; Clear Data, or uninstall the App.</li>
+<li><b>Withdraw consent</b> for analytics &mdash; Settings &rarr; Privacy &amp; Legal &rarr; Usage Tracking.</li>
+<li><b>Object or restrict</b> processing &mdash; contact us for requests beyond what the App covers.</li>
+</ul>
+<p><b>EEA users:</b> you may lodge a complaint with your local data protection authority.</p>
+<p><b>California (CCPA):</b> we do not sell personal information as defined by the CCPA.</p>
+<h2>11. Changes to This Policy</h2>
+<p>We may update this Privacy Policy from time to time. Material changes will be communicated within the App on next launch. Continued use constitutes acceptance of the updated policy.</p>
+<h2>12. Contact</h2>
+<p><b>Email:</b> eahm3595@gmail.com &bull; <b>App:</b> Drink Water App (com.eahm.drinkwaterapp)</p>
+<br>
+<h1>Terms of Use</h1>
+<p>Effective date: May 25, 2026 &bull; Last updated: May 25, 2026 &bull; Contact: eahm3595@gmail.com</p>
+<h2>1. Acceptance of Terms</h2>
+<p>By downloading, installing, or using Drink Water App (the &quot;App&quot;), you agree to be bound by these Terms of Use. If you do not agree to these Terms, do not use the App.</p>
+<p>These Terms apply to the Android version of Drink Water App available on the Google Play Store.</p>
+<h2>2. License to Use</h2>
+<p>We grant you a personal, non-exclusive, non-transferable, revocable license to use the App on your Android device solely for personal, non-commercial purposes. You may not:</p>
+<ul>
+<li>Copy, modify, or distribute the App or any of its content</li>
+<li>Reverse-engineer, decompile, or disassemble the App</li>
+<li>Use the App for any unlawful purpose</li>
+<li>Attempt to gain unauthorized access to any system or network connected to the App</li>
+<li>Use automated tools to scrape, extract, or interact with the App</li>
+</ul>
+<h2>3. App Features and Availability</h2>
+<p>The App is provided on an &quot;as is&quot; and &quot;as available&quot; basis. We reserve the right to modify, suspend, or discontinue any feature or the entire App at any time without notice.</p>
+<p>Core hydration tracking features work offline. Ads, analytics, and purchase validation require an internet connection.</p>
+<h2>4. In-App Purchases</h2>
+<h3>4.1 Remove Ads &mdash; one-time purchase</h3>
+<p>The App offers a one-time purchase to permanently remove advertisements. The purchase is processed by Google Play and managed by RevenueCat. We do not store your payment information.</p>
+<h3>4.2 Restoring Purchases</h3>
+<p>Restore your purchase via <b>Settings &rarr; Restore Purchases</b>, provided you are signed in to the same Google account used for the original purchase.</p>
+<h3>4.3 Refunds</h3>
+<p>All purchases are subject to Google Play refund policy (typically 48 hours after purchase). We are unable to issue refunds directly.</p>
+<h2>5. User-Generated Data</h2>
+<p>All data you enter (water logs, goals, custom presets, personal profile) is owned by you and stored exclusively on your device. Uninstalling the App permanently deletes this data.</p>
+<h2>6. Notifications and Reminders</h2>
+<p>By granting notification permission, you authorize the App to send drink reminders at the frequency and during the active hours you configure. You can modify or disable notifications at any time through the App Settings or your device system settings.</p>
+<h2>7. Disclaimer of Warranties</h2>
+<p><b>The App is provided &quot;as is&quot; without warranties of any kind</b>, either express or implied, including but not limited to implied warranties of merchantability or fitness for a particular purpose.</p>
+<p>We do not warrant that the App will be uninterrupted or error-free, or that hydration recommendations are accurate for your specific medical or physiological situation.</p>
+<p><b>Drink Water App is not a medical application.</b> The hydration goal calculations and reminders are for general wellness purposes only and do not constitute medical advice. Always consult a qualified healthcare provider for health-related decisions.</p>
+<h2>8. Limitation of Liability</h2>
+<p>To the fullest extent permitted by applicable law, we shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including loss of data, loss of revenue, health outcomes related to the App recommendations, or damages from the App unavailability.</p>
+<p>Our total liability for any claim shall not exceed the amount you paid us in the twelve months preceding the claim.</p>
+<h2>9. Third-Party Services</h2>
+<p>The App integrates Google AdMob, Firebase Crashlytics, Mixpanel, and RevenueCat. Your use of these services is subject to their respective terms and privacy policies. We are not responsible for the practices of these third-party services.</p>
+<h2>10. Intellectual Property</h2>
+<p>All content in the App &mdash; including interface design, icons, graphics, text, and underlying code &mdash; is the property of the developer and protected by applicable intellectual property laws.</p>
+<h2>11. Changes to the Terms</h2>
+<p>We reserve the right to modify these Terms at any time. Material changes will be communicated within the App. Continued use after changes take effect constitutes your acceptance of the revised Terms.</p>
+<h2>12. Governing Law</h2>
+<p>These Terms are governed by the laws of Nicaragua, without regard to conflict of law principles. Any disputes shall be subject to the exclusive jurisdiction of the competent courts of Nicaragua.</p>
+<h2>13. Severability</h2>
+<p>If any provision of these Terms is found to be invalid or unenforceable, the remaining provisions will continue in full force and effect.</p>
+<h2>14. Contact</h2>
+<p><b>Email:</b> eahm3595@gmail.com &bull; <b>App:</b> Drink Water App (com.eahm.drinkwaterapp)</p>]]></string>
 
     <!-- Consent — Track request screen -->
     <string name="consent_track_step">Step 2 of 2</string>
@@ -27,7 +169,7 @@
     <!-- Consent — Legal screen -->
     <string name="consent_legal_step">Step 1 of 2</string>
     <string name="consent_legal_title">Privacy Policy &amp; Terms of use</string>
-    <string name="consent_legal_updated">Last updated · May 12, 2026</string>
+    <string name="consent_legal_updated_at">Last updated · %1$s</string>
     <string name="consent_legal_new_badge">New</string>
     <string name="consent_legal_lede">Take a moment to read our terms of use and privacy policy to use DrinkWater app.</string>
     <string name="consent_legal_web_link">Read the latest version</string>
