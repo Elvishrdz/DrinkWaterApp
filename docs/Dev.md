@@ -2,6 +2,7 @@ Development
 
 urgent fixes
 
+- [x] Fix goal celebration card in phone landscape. with no enough space crashes when trying to drag the component
 - [x]  despues de aceptar overlay permission al regresar a la app no seguimos al siguiente paso.
 
 Next release priorities
