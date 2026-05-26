@@ -1,0 +1,644 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="channel_description">Erinnerungen zum Trinken von Wasser</string>
+
+    <string name="volume_unit_mililiters">mL</string>
+    <string name="skip">Überspringen</string>
+    <string name="notification_drink_amount_formatted">+%1$s%2$s</string>
+    <string name="share_app_title">Teile DrinkWater mit deinen Freunden!</string>
+
+    <!-- Zustimmung — Datenschutzrichtlinie -->
+    <string name="privacy_policy_local_content"><![CDATA[<p>"<p>Gültig ab: 08. Mai 2019</p> <p>Drink Water App (\"wir\", \"uns\" oder \"unser\") betreibt die mobile Anwendung Drink Water App (der \"Dienst\").</p> <p>Diese Seite informiert dich über unsere Richtlinien bezüglich der Erhebung, Nutzung und Weitergabe personenbezogener Daten bei der Nutzung unseres Dienstes sowie über die dir zur Verfügung stehenden Wahlmöglichkeiten in Bezug auf diese Daten. Unsere Datenschutzerklärung für Drink Water App wurde mithilfe des&nbsp;<a href=\"https://www.freeprivacypolicy.com/free-privacy-policy-generator.php\">Kostenlosen Datenschutzerklärungsgenerators</a> erstellt.</p> <p>Wir verwenden deine Daten, um den Dienst bereitzustellen und zu verbessern. Durch die Nutzung des Dienstes stimmst du der Erhebung und Verwendung von Informationen gemäß dieser Richtlinie zu. Sofern in dieser Datenschutzerklärung nicht anders definiert, haben die hier verwendeten Begriffe dieselbe Bedeutung wie in unseren Nutzungsbedingungen.</p> <h2>Informationserhebung und Verwendung</h2> <p>Wir erheben verschiedene Arten von Informationen für verschiedene Zwecke, um dir den Dienst bereitzustellen und zu verbessern.</p> <h3>Arten der erhobenen Daten</h3> <h4>Personenbezogene Daten</h4> <p>Bei der Nutzung unseres Dienstes können wir dich bitten, uns bestimmte personenbezogene Informationen bereitzustellen, die zur Kontaktaufnahme oder Identifizierung genutzt werden können (\"Personenbezogene Daten\"). Personenbezogene Informationen können unter anderem Folgendes umfassen:</p> <ul> <li>E-Mail-Adresse</li> <li>Vor- und Nachname</li> <li>Cookies und Nutzungsdaten</li> </ul> <h4>Nutzungsdaten</h4> <p>Wenn du über ein mobiles Gerät auf den Dienst zugreifst, können wir bestimmte Informationen automatisch erheben, einschließlich des Typs des verwendeten mobilen Geräts, der eindeutigen ID deines mobilen Geräts, der IP-Adresse deines mobilen Geräts, deines mobilen Betriebssystems, des Typs des verwendeten mobilen Internetbrowsers, eindeutiger Gerätekennungen und anderer Diagnosedaten (\"Nutzungsdaten\").</p> <h4>Tracking- und Cookie-Daten</h4> <p>Wir verwenden Cookies und ähnliche Tracking-Technologien, um die Aktivität in unserem Dienst zu verfolgen und bestimmte Informationen zu speichern.</p> <p>Cookies sind Dateien mit einer kleinen Datenmenge, die einen anonymen eindeutigen Bezeichner enthalten können. Cookies werden von einer Website an deinen Browser gesendet und auf deinem Gerät gespeichert. Weitere verwendete Tracking-Technologien sind Beacons, Tags und Skripte zum Erheben und Verfolgen von Informationen sowie zur Verbesserung und Analyse unseres Dienstes.</p> <p>Du kannst deinen Browser anweisen, alle Cookies abzulehnen oder anzuzeigen, wenn ein Cookie gesendet wird. Wenn du keine Cookies akzeptierst, kannst du möglicherweise einige Bereiche unseres Dienstes nicht nutzen.</p> <p>Beispiele für von uns verwendete Cookies:</p> <ul> <li><strong>Sitzungs-Cookies.</strong>&nbsp;Wir verwenden Sitzungs-Cookies, um unseren Dienst zu betreiben.</li> <li><strong>Präferenz-Cookies.</strong>&nbsp;Wir verwenden Präferenz-Cookies, um deine Präferenzen und verschiedene Einstellungen zu speichern.</li> <li><strong>Sicherheits-Cookies.</strong>&nbsp;Wir verwenden Sicherheits-Cookies für Sicherheitszwecke.</li> </ul> <h2>Datenverwendung</h2> <p>Drink Water App verwendet die erhobenen Daten für verschiedene Zwecke:</p> <ul> <li>Um den Dienst bereitzustellen und aufrechtzuerhalten</li> <li>Um dich über Änderungen an unserem Dienst zu informieren</li> <li>Um dir die Teilnahme an interaktiven Funktionen unseres Dienstes zu ermöglichen</li> <li>Um Kundenbetreuung und Support anzubieten</li> <li>Um Analysen oder wertvolle Informationen bereitzustellen, damit wir den Dienst verbessern können</li> <li>Um die Nutzung des Dienstes zu überwachen</li> <li>Um technische Probleme zu erkennen, zu verhindern und zu beheben</li> </ul> <h2>Datenübertragung</h2> <p>Deine Informationen, einschließlich personenbezogener Daten, können auf Computer übertragen und dort gespeichert werden, die sich außerhalb deines Bundeslandes, deiner Provinz, deines Landes oder einer anderen staatlichen Gerichtsbarkeit befinden, wo die Datenschutzgesetze von denen deiner Gerichtsbarkeit abweichen können.</p> <p>Wenn du dich außerhalb von Nicaragua befindest und uns Informationen zur Verfügung stellst, beachte bitte, dass wir die Daten, einschließlich personenbezogener Daten, nach Nicaragua übertragen und dort verarbeiten.</p> <p>Deine Zustimmung zu dieser Datenschutzerklärung gefolgt von der Übermittlung solcher Informationen stellt deine Zustimmung zu dieser Übertragung dar.</p> <p>Drink Water App wird alle vernünftigerweise erforderlichen Schritte unternehmen, um sicherzustellen, dass deine Daten sicher und gemäß dieser Datenschutzerklärung behandelt werden, und es wird keine Übertragung deiner personenbezogenen Daten an eine Organisation oder ein Land stattfinden, es sei denn, es sind angemessene Kontrollen vorhanden, einschließlich der Sicherheit deiner Daten und anderer personenbezogener Informationen.</p> <h2>Datenweitergabe</h2> <h3>Gesetzliche Anforderungen</h3> <p>Drink Water App kann deine personenbezogenen Daten in gutem Glauben weitergeben, wenn dies nach Ansicht des Unternehmens erforderlich ist, um:</p> <ul> <li>Einer gesetzlichen Verpflichtung nachzukommen</li> <li>Die Rechte oder das Eigentum von Drink Water App zu schützen und zu verteidigen</li> <li>Mögliche Verstöße im Zusammenhang mit dem Dienst zu verhindern oder zu untersuchen</li> <li>Die persönliche Sicherheit der Nutzer des Dienstes oder der Öffentlichkeit zu schützen</li> <li>Sich vor rechtlicher Haftung zu schützen</li> </ul> <h2>Datensicherheit</h2> <p>Die Sicherheit deiner Daten ist uns wichtig, aber bedenke, dass keine Übertragungsmethode über das Internet oder elektronische Speichermethode zu 100% sicher ist. Obwohl wir uns bemühen, wirtschaftlich akzeptable Mittel zum Schutz deiner personenbezogenen Daten einzusetzen, können wir ihre absolute Sicherheit nicht garantieren.</p> <h2>Dienstanbieter</h2> <p>Wir können Drittunternehmen und Einzelpersonen beauftragen, unseren Dienst zu unterstützen (\"Dienstanbieter\"), den Dienst in unserem Namen zu erbringen, dienstverwandte Leistungen zu erbringen oder uns dabei zu helfen, die Nutzung unseres Dienstes zu analysieren.</p> <p>Diese Dritten haben nur zur Ausführung dieser Aufgaben in unserem Namen Zugang zu deinen personenbezogenen Daten und sind verpflichtet, sie nicht für andere Zwecke offenzulegen oder zu verwenden.</p> <h2>Links zu anderen Websites</h2> <p>Unser Dienst kann Links zu anderen Websites enthalten, die nicht von uns betrieben werden. Wenn du auf einen Link eines Dritten klickst, wirst du zur Website dieses Dritten weitergeleitet. Wir empfehlen dir dringend, die Datenschutzerklärung jeder Website zu lesen, die du besuchst.</p> <p>Wir haben keine Kontrolle über und übernehmen keine Verantwortung für den Inhalt, die Datenschutzrichtlinien oder Praktiken von Websites oder Diensten Dritter.</p> <h2>Datenschutz für Minderjährige</h2> <p>Unser Dienst richtet sich nicht an Personen unter 18 Jahren (\"Minderjährige\").</p> <p>Wir erheben wissentlich keine personenbezogenen Daten von Personen unter 18 Jahren. Wenn du ein Elternteil oder Vormund bist und weißt, dass dein Kind uns personenbezogene Daten bereitgestellt hat, kontaktiere uns bitte. Wenn wir erfahren, dass wir personenbezogene Daten von Minderjährigen ohne Überprüfung der elterlichen Einwilligung erhoben haben, ergreifen wir Schritte, um diese Informationen von unseren Servern zu entfernen.</p> <h2>Änderungen dieser Datenschutzerklärung</h2> <p>Wir können unsere Datenschutzerklärung von Zeit zu Zeit aktualisieren. Wir werden dich über alle Änderungen informieren, indem wir die neue Datenschutzerklärung auf dieser Seite veröffentlichen.</p> <p>Wir werden dich per E-Mail und/oder durch einen auffälligen Hinweis in unserem Dienst informieren, bevor die Änderung wirksam wird, und das \"Gültigkeitsdatum\" oben in dieser Datenschutzerklärung aktualisieren.</p> <p>Wir empfehlen dir, diese Datenschutzerklärung regelmäßig auf Änderungen zu überprüfen. Änderungen dieser Datenschutzerklärung werden wirksam, wenn sie auf dieser Seite veröffentlicht werden.</p> <h2>Kontakt</h2> <p>Wenn du Fragen zu dieser Datenschutzerklärung hast, kontaktiere uns bitte:</p> <ul> <li>Per E-Mail: eahm3595@gmail.com</li> </ul>"</p>]]></string>
+
+    <!-- Zustimmung — Tracking-Bildschirm -->
+    <string name="consent_track_step">Schritt 2 von 2</string>
+    <string name="consent_track_title">Hilf uns, die App zu verbessern</string>
+    <string name="consent_track_lede">Teile anonyme Nutzungsdaten, damit wir sehen können, welche Funktionen beliebt sind und welche verbessert werden müssen. Nur Metriken, kein Name, keine E-Mail von dir.</string>
+    <string name="consent_track_feature_usage_title">Funktionsnutzung</string>
+    <string name="consent_track_feature_usage_desc">Wir möchten aus einer allgemeinen Sicht wissen, was funktioniert und was nicht.</string>
+    <string name="consent_track_feature_private_title">Nie mit dir verknüpft</string>
+    <string name="consent_track_feature_private_desc">Wir verwenden eine zufällig generierte ID, die NICHT mit deinen Informationen verknüpft ist.</string>
+    <string name="consent_track_feature_control_title">Jederzeit deaktivierbar</string>
+    <string name="consent_track_feature_control_desc">Deaktiviere es jederzeit unter Einstellungen → Datenschutz und Rechtliches → Nutzungsdaten teilen</string>
+    <string name="consent_track_active">Tracking ist aktiv. Du kannst es unter Einstellungen → Datenschutz und Rechtliches deaktivieren.</string>
+    <string name="consent_track_cta_allow">Anonyme Daten teilen</string>
+
+    <!-- Zustimmung — Rechtlicher Bildschirm -->
+    <string name="consent_legal_step">Schritt 1 von 2</string>
+    <string name="consent_legal_title">Datenschutzerklärung und Nutzungsbedingungen</string>
+    <string name="consent_legal_updated">Letzte Aktualisierung · 12. Mai 2026</string>
+    <string name="consent_legal_new_badge">Neu</string>
+    <string name="consent_legal_lede">Nimm dir einen Moment, um unsere Nutzungsbedingungen und Datenschutzerklärung zu lesen, bevor du DrinkWater verwendest.</string>
+    <string name="consent_legal_web_link">Aktuelle Version lesen</string>
+    <string name="consent_legal_agree">Ich habe die Datenschutzerklärung und die Nutzungsbedingungen gelesen und stimme ihnen zu.</string>
+    <string name="consent_legal_cta">Akzeptieren und weiter</string>
+
+    <!-- Allgemein — Aktionen -->
+    <string name="action_cancel">Abbrechen</string>
+    <string name="action_save">Speichern</string>
+    <string name="action_ok">OK</string>
+    <string name="action_close">Schließen</string>
+    <string name="action_undo">Rückgängig</string>
+    <string name="action_not_now">Nicht jetzt</string>
+    <string name="action_retry">Erneut versuchen</string>
+    <string name="error_title">Etwas ist schiefgelaufen</string>
+    <string name="error_fetch_offerings">Kaufoptionen konnten nicht geladen werden. Bitte überprüfe deine Verbindung und versuche es erneut.</string>
+    <string name="action_open_settings">Einstellungen öffnen</string>
+    <string name="action_continue_to_settings">Weiter zu den Einstellungen</string>
+
+    <!-- Allgemein — Beschriftungen -->
+    <string name="label_today">Heute</string>
+    <string name="dev_title">Dev</string>
+    <string name="label_daily_goal">Tagesziel</string>
+    <string name="label_start_time">Startzeit</string>
+    <string name="label_end_time">Endzeit</string>
+
+    <!-- Zeitauswahl-Dialog -->
+    <string name="time_selector_title_hour">Stunde auswählen</string>
+    <string name="time_selector_title_minute">Minute auswählen</string>
+    <string name="time_selector_title_time">Uhrzeit auswählen</string>
+    <string name="time_selector_format_ampm" translatable="false">am/pm</string>
+    <string name="time_selector_format_24h" translatable="false">24h</string>
+    <string name="time_selector_message_start_time">Erinnerungen beginnen täglich zu dieser Zeit.</string>
+    <string name="time_selector_message_end_time">Erinnerungen enden täglich nach dieser Zeit.</string>
+
+    <!-- Allgemein — Benachrichtigungsberechtigung -->
+    <string name="notif_disabled_title">Benachrichtigungen deaktiviert</string>
+    <string name="notif_disabled_body">Um Trinkerinnerungen zu erhalten, aktiviere die Benachrichtigungen für %1$s in den Einstellungen deines Telefons.</string>
+
+    <!-- Allgemein — Overlay-Berechtigung -->
+    <string name="overlay_allow_over_other_apps">Anzeige über anderen Apps erlauben</string>
+
+    <!-- Onboarding — Geteilt -->
+    <string name="onb_step_counter">%1$d von %2$d</string>
+    <string name="onb_cta_continue">Weiter</string>
+
+    <!-- Onboarding — Intro -->
+    <string name="onb_intro_title">Lass uns eine gute Gewohnheit aufbauen</string>
+    <string name="onb_intro_subtitle">In den nächsten Schritten richten wir schnell dein Hydrationsziel und deine Erinnerungen ein.</string>
+    <string name="onb_intro_cta_text">Loslegen</string>
+    <string name="onb_intro_card_goal_title">Dein Tagesziel</string>
+    <string name="onb_intro_card_goal_description">Entscheide genau, wie viel du erreichen möchtest.</string>
+    <string name="onb_intro_card_reminders_title">Tägliche Erinnerungen</string>
+    <string name="onb_intro_card_reminders_description">Benachrichtigungen, die dich wissen lassen, wann ein guter Zeitpunkt ist, etwas zu trinken.</string>
+    <string name="onb_intro_card_stats_title">Verlauf und Statistiken</string>
+    <string name="onb_intro_card_stats_description">Überblick über deinen Fortschritt. Baue einen gesunden Alltag auf, einen Tag nach dem anderen.</string>
+
+    <!-- Onboarding — Ziel festlegen -->
+    <string name="onb_goal_title">Lege dein Tagesziel fest</string>
+    <string name="onb_set_goal_subtitle">Definiere, wie viel du pro Tag erreichen möchtest.</string>
+    <string name="onb_set_goal_cta">Mein Ziel festlegen</string>
+
+    <!-- Onboarding — Name -->
+    <string name="onb_name_title">Wie heißt du?</string>
+    <string name="onb_name_subtitle">Wir verwenden deinen Namen, um dich auf dem Startbildschirm zu begrüßen.</string>
+    <string name="onb_name_placeholder">Dein Name</string>
+
+    <!-- Onboarding — Geschlecht -->
+    <string name="onb_gender_title">Ein bisschen über dich</string>
+    <string name="onb_gender_subtitle">Hilft uns, deine Hydratationsformel zu verfeinern. Du kannst dies überspringen.</string>
+    <string name="onb_gender_option_female">Weiblich</string>
+    <string name="onb_gender_option_male">Männlich</string>
+    <string name="onb_gender_option_prefer_not_to_say">Keine Angabe</string>
+
+    <!-- Onboarding — Gewicht -->
+    <string name="onb_weight_title">Was ist dein Gewicht?</string>
+    <string name="onb_weight_subtitle">Wir verwenden dies, um dein tägliches Wasserziel zu berechnen.</string>
+
+    <!-- Onboarding — Aktivität -->
+    <string name="onb_activity_title">Wie aktiv bist du?</string>
+    <string name="onb_activity_subtitle">An aktiven Tagen wird etwa 15% mehr Wasser benötigt als an Ruhetagen.</string>
+    <string name="onb_activity_light_title">Wenig aktiv</string>
+    <string name="onb_activity_light_subtitle">Überwiegend sitzend, kaum Sport</string>
+    <string name="onb_activity_moderate_title">Mäßig aktiv</string>
+    <string name="onb_activity_moderate_subtitle">Spaziergänge, leichtes Training 2 bis 3 Mal pro Woche</string>
+    <string name="onb_activity_active_title">Sehr aktiv</string>
+    <string name="onb_activity_active_subtitle">Tägliches Training oder körperlich aktiver Beruf</string>
+
+    <!-- Onboarding — Zielergebnis -->
+    <string name="onb_goal_result_title">Dein Tagesziel</string>
+    <string name="onb_goal_result_subtitle">Angepasst an dein Gewicht und deinen Aktivitätslevel.</string>
+    <string name="onb_goal_result_cta">Sieht gut aus</string>
+    <string name="onb_goal_result_glasses_about">Das sind ungefähr </string>
+    <string name="onb_goal_result_glasses_suffix"> über deinen Tag verteilt.</string>
+
+    <!-- Onboarding — Startzeit -->
+    <string name="onb_wake_title">Wann startest du deinen Tag?</string>
+    <string name="onb_wake_subtitle">Ab dieser Zeit beginnen wir, dir Erinnerungen zu senden.</string>
+    <string name="onb_wake_same_time_error">Die Zeit kann nicht dieselbe wie die Endzeit sein.</string>
+
+    <!-- Onboarding — Endzeit -->
+    <string name="onb_sleep_title">Und wann endet dein Tag?</string>
+    <string name="onb_sleep_subtitle">Erinnerungen enden zu dieser Zeit, aber du kannst jederzeit Wasser trinken.</string>
+    <string name="onb_sleep_same_time_error">Die Zeit kann nicht dieselbe wie die Startzeit sein</string>
+
+    <!-- Onboarding — Intervall -->
+    <string name="onb_interval_title">Wie oft sollen wir dich erinnern?</string>
+    <string name="onb_interval_subtitle">Die Intervalle werden versuchen, diese Einstellung einzuhalten, können aber variieren. Du kannst diesen Wert jederzeit in den App-Einstellungen ändern.</string>
+    <string name="onb_interval_30_title">Alle 30 Minuten</string>
+    <string name="onb_interval_30_subtitle">Am regelmäßigsten</string>
+    <string name="onb_interval_45_title">Alle 45 Minuten</string>
+    <string name="onb_interval_45_subtitle">Empfohlen</string>
+    <string name="onb_interval_60_title">Jede Stunde</string>
+    <string name="onb_interval_60_subtitle">Dezent</string>
+    <string name="onb_interval_120_title">Alle 2 Stunden</string>
+    <string name="onb_interval_120_subtitle">Minimal</string>
+    <string name="onb_interval_custom_title">Ich wähle selbst</string>
+    <string name="onb_interval_custom_subtitle">Wähle dein eigenes Intervall</string>
+
+    <!-- Onboarding — Benachrichtigungen: Berechtigung -->
+    <string name="onb_notifs_permission_title">Bleib auf Kurs</string>
+    <string name="onb_notifs_permission_subtitle">Wir senden dir ungefähr alle %1$s eine Erinnerung, damit du nie vergisst, Wasser zu trinken.</string>
+    <string name="onb_notifs_permission_cta_skip">Vielleicht später</string>
+    <string name="onb_notifs_permission_cta_allow">Benachrichtigungen erlauben</string>
+    <string name="onb_notifs_permission_card_title">Zeit für einen Schluck!</string>
+    <string name="onb_notifs_permission_card_body">Trink jetzt, um hydratisiert zu bleiben.</string>
+    <!-- Onboarding — Benachrichtigungen: Konfiguration -->
+    <string name="onb_notifs_config_title">Schnell trinken</string>
+    <string name="onb_notifs_config_subtitle">Willst du die App nicht öffnen? Tippe auf diesen Wert in der Benachrichtigung und wir speichern den Eintrag für dich.</string>
+    <string name="onb_notifs_config_hint">Dies kann jederzeit in den App-Einstellungen geändert werden.</string>
+
+    <!-- Onboarding — Overlay: Anfrage -->
+    <string name="onb_overlay_request_title">Feiern, überall</string>
+    <string name="onb_overlay_request_subtitle">Die Feierkarte erscheint, wenn du dein Tagesziel aus der App oder einer Erinnerung heraus erreichst. Erlaube die Anzeige über anderen Apps, damit sie auf deinem Gerät erscheint.</string>
+    <string name="onb_overlay_request_cta_skip">Vorerst überspringen</string>
+    <!-- Onboarding — Overlay: Gewährt -->
+    <string name="onb_overlay_granted_title">Zielerreichungs-Feiern sind aktiv</string>
+    <string name="onb_overlay_granted_subtitle">Eine Feierkarte erscheint jedes Mal, wenn du dein tägliches Wasserziel erreichst.</string>
+
+    <!-- Onboarding — Overlay: Schritte -->
+    <string name="onb_overlay_steps_header">So aktivierst du es</string>
+    <string name="onb_overlay_step_1">Tippe unten auf \"Anzeige über anderen Apps erlauben\".</string>
+    <string name="onb_overlay_step_2">Finde %1$s in der Liste.</string>
+    <string name="onb_overlay_step_3">Aktiviere \"Anzeige über anderen Apps erlauben\".</string>
+    <string name="onb_overlay_step_4">Drücke zurück, wir machen automatisch weiter.</string>
+
+    <!-- Onboarding — Overlay: Funktionszeilen -->
+    <string name="onb_overlay_feature_app_label">In der App</string>
+    <string name="onb_overlay_feature_app_description">Erfasse ein Getränk, das dein Ziel erfüllt, und die Feierkarte erscheint.</string>
+    <string name="onb_overlay_feature_reminder_label">Aus einer Erinnerung</string>
+    <string name="onb_overlay_feature_reminder_description">Tippe auf deine Wassermenge in einer Benachrichtigung und wenn du dein Ziel erreichst, schwebt die Karte über der App, die du gerade verwendest.</string>
+    <!-- Onboarding — Overlay: Kartenvorschau -->
+    <string name="onb_overlay_card_preview_title">Tagesziel erreicht!</string>
+    <string name="onb_overlay_card_preview_body">Du hast deine 2,0 L getrunken, weiter so</string>
+    <string name="onb_overlay_card_preview_stat_goal">Ziel</string>
+    <string name="onb_overlay_card_preview_stat_drinks">Getränke</string>
+    <string name="onb_overlay_card_preview_stat_streak">Tage in Folge</string>
+
+    <!-- Onboarding — Genauer Alarm: Anfrage -->
+    <string name="onb_exact_alarm_title">Alarme, die pünktlich ankommen</string>
+    <string name="onb_exact_alarm_subtitle">Erlaube der App, genaue Alarme zu planen, damit deine Erinnerungen genau dann ausgelöst werden, wenn du sie erwartest.</string>
+    <string name="onb_exact_alarm_cta_allow">Genaue Alarme erlauben</string>
+    <string name="onb_exact_alarm_cta_skip">Überspringen, ungefähres Timing verwenden</string>
+    <!-- Onboarding — Genauer Alarm: Gewährt -->
+    <string name="onb_exact_alarm_granted_title">Genaue Alarme sind aktiv</string>
+    <string name="onb_exact_alarm_granted_subtitle">Deine Erinnerungen werden genau nach Plan ausgelöst, jedes Mal.</string>
+    <!-- Onboarding — Genauer Alarm: Schritte -->
+    <string name="onb_exact_alarm_steps_header">So aktivierst du es</string>
+    <string name="onb_exact_alarm_step_1">Tippe unten auf \"Genaue Alarme erlauben\".</string>
+    <string name="onb_exact_alarm_step_2">Finde %1$s in der Liste.</string>
+    <string name="onb_exact_alarm_step_3">Aktiviere \"Alarme und Erinnerungen\".</string>
+    <string name="onb_exact_alarm_step_4">Drücke zurück, wir machen automatisch weiter.</string>
+    <!-- Onboarding — Genauer Alarm: Vorteile -->
+    <string name="onb_exact_alarm_benefit_timing_label">Löst zum richtigen Moment aus</string>
+    <string name="onb_exact_alarm_benefit_timing_description">Erinnerungen kommen genau dann an, wenn sie geplant sind, ohne Systemverzögerungen.</string>
+    <string name="onb_exact_alarm_benefit_reliable_label">Zuverlässig und konsistent</string>
+    <string name="onb_exact_alarm_benefit_reliable_description">Erinnert dich genau nach Plan, auch wenn andere Apps im Hintergrund laufen.</string>
+    <string name="onb_exact_alarm_benefit_habit_label">Baut eine beständige Gewohnheit auf</string>
+    <string name="onb_exact_alarm_benefit_habit_description">Regelmäßiges Timing macht es leichter, deine Hydration den ganzen Tag über zu merken und zu verfolgen.</string>
+
+    <!-- Onboarding — Einheiten -->
+    <string name="onb_units_title">Wähle deine Einheiten</string>
+    <string name="onb_units_subtitle">Wähle aus, wie deine Wasseraufnahme in der App angezeigt werden soll.</string>
+    <string name="onb_units_ml_title">Nur Milliliter (mL)</string>
+    <string name="onb_units_auto_liters_title">Automatisch Liter (mL und L)</string>
+    <string name="onb_units_auto_liters_subtitle">Zeigt Liter an, wenn der Wert 1000 mL oder mehr erreicht</string>
+    <string name="onb_units_fl_oz_title">Nur Flüssigkeitsunzen (fl oz)</string>
+
+    <!-- Onboarding — Fertig -->
+    <string name="onb_done_title">Alles bereit!</string>
+    <string name="onb_done_title_with_name">Alles bereit, %1$s!</string>
+    <string name="onb_done_subtitle">Hier ist deine Einrichtung, ändere sie jederzeit in den App-Einstellungen.</string>
+    <string name="onb_done_cta">Los geht\'s</string>
+    <string name="onb_done_row_reminder">Erinnerung</string>
+    <string name="onb_done_interval_min">alle %1$d Min.</string>
+    <string name="onb_done_interval_hour">alle %1$d Std.</string>
+    <string name="onb_done_interval_hour_min">alle %1$d Std. %2$d Min.</string>
+
+    <!-- Einstellungen — Bildschirm -->
+    <string name="settings_title">Einstellungen</string>
+    <string name="settings_section_hydration">HYDRATION</string>
+    <string name="settings_section_reminders">ERINNERUNGEN</string>
+    <string name="settings_section_overlays">OVERLAYS</string>
+    <string name="settings_section_privacy_legal">DATENSCHUTZ UND RECHTLICHES</string>
+    <string name="settings_section_premium">PREMIUM</string>
+    <string name="settings_section_about">ÜBER</string>
+
+    <!-- Einstellungen — Zeilenbeschriftungen -->
+    <string name="settings_row_units">Einheiten</string>
+    <string name="settings_row_notifications">Benachrichtigungen</string>
+    <string name="settings_row_interval">Intervall</string>
+    <string name="settings_row_notification_amount">Benachrichtigungsmenge</string>
+    <string name="settings_row_time_format">Zeitformat</string>
+    <string name="settings_row_language">Sprache</string>
+    <string name="settings_language_system">Systemstandard</string>
+    <string name="settings_language_apply">Änderungen übernehmen</string>
+    <string name="settings_time_format_auto">Automatisch</string>
+    <string name="settings_time_format_auto_description">Folgt der Gebietsschema-Einstellung deines Geräts</string>
+    <string name="settings_time_format_12h_description">Immer AM / PM anzeigen</string>
+    <string name="settings_time_format_24h_description">Immer 24-Stunden-Format anzeigen</string>
+    <string name="settings_group_app">APP</string>
+    <string name="settings_unit_preference_title">Volumeneinheiten</string>
+    <string name="settings_unit_ml">Milliliter (mL)</string>
+    <string name="settings_unit_ml_desc">Immer in Millilitern anzeigen</string>
+    <string name="settings_unit_auto_liters">Automatisch Liter (mL / L)</string>
+    <string name="settings_unit_auto_liters_desc">Zeigt mL unter 1000, L darüber</string>
+    <string name="settings_unit_fl_oz">Flüssigkeitsunzen (fl oz)</string>
+    <string name="settings_unit_fl_oz_desc">Flüssigkeitsunzen</string>
+    <string name="settings_row_goal_celebrations">Feiern bei Zielerreichung</string>
+    <string name="settings_row_reminder_type">Erinnerungstyp</string>
+    <string name="settings_row_reminder_status">Genau</string>
+    <string name="settings_row_reminder_status_approximate">Ungefähr</string>
+    <string name="settings_row_remove_ads">Werbung entfernen</string>
+    <string name="settings_row_share">Mit Freunden teilen</string>
+    <string name="settings_row_rate">App bewerten</string>
+    <string name="settings_row_request_feature">Funktion anfragen</string>
+    <string name="settings_row_report_problem">Problem melden</string>
+    <string name="settings_row_share_usage_data">Nutzungsdaten teilen</string>
+    <string name="settings_row_privacy_policy_terms_of_use">Datenschutzerklärung und Nutzungsbedingungen</string>
+    <string name="settings_row_reset_data">Alle Daten zurücksetzen</string>
+
+    <!-- Einstellungen — Nachgestellte Zeilenwerte -->
+    <string name="settings_interval_value">alle %1$d Min.</string>
+    <string name="settings_notification_amount_value">+%1$d mL</string>
+
+    <!-- Einstellungen — Teilen -->
+    <string name="settings_share_text">Bleib hydratisiert! Ich nutze %1$s, um meine tägliche Wasseraufnahme zu verfolgen. Schau es dir an!\n%2$s</string>
+
+    <!-- Einstellungen — Funktionsanfrage -->
+    <string name="feature_request_subject">Neue Funktionsanfrage für %1$s</string>
+    <string name="feature_request_body">Hallo Entwickler von %1$s.\nIch möchte folgende Funktion für ein zukünftiges App-Update anfragen:\n\n</string>
+
+    <!-- Einstellungen — Problemmeldung -->
+    <string name="problem_report_subject">Problemmeldung in %1$s</string>
+    <string name="problem_report_body">Hallo Entwickler von %1$s.\nIch möchte das folgende App-Problem melden:\n\n</string>
+
+    <!-- Einstellungen — Tracking-widerrufen-Dialog -->
+    <string name="settings_revoke_tracking_title">Nutzungsdaten nicht mehr teilen?</string>
+    <string name="settings_revoke_tracking_body">Nutzungsdaten helfen uns, deine App-Erfahrung zu verbessern, indem wir verstehen, wie die App genutzt wird. Bist du sicher, dass du dies deaktivieren möchtest?</string>
+    <string name="settings_revoke_tracking_cta_confirm">Deaktivieren</string>
+
+    <!-- Einstellungen — Daten-zurücksetzen-Dialog -->
+    <string name="settings_clear_data_body">Dies löscht dauerhaft deinen gesamten Trinkverlauf, deine Tagesziele und Einstellungen. Die App wird danach neu gestartet.\n\nDiese Aktion kann nicht rückgängig gemacht werden.</string>
+    <string name="settings_clear_data_cta_countdown">ALLE DATEN LÖSCHEN (%1$d)</string>
+    <string name="settings_clear_data_cta_confirm">ALLE DATEN JETZT LÖSCHEN</string>
+
+    <!-- Einstellungen — Benachrichtigungen-deaktivieren-Dialog -->
+    <string name="settings_notif_disable_title">Benachrichtigungen deaktivieren</string>
+    <string name="settings_notif_disable_body">Um Trinkerinnerungen zu deaktivieren, deaktiviere die Benachrichtigungen für %1$s in den Einstellungen deines Telefons.\n\n1. Tippe unten auf \"Weiter zu den Einstellungen\".\n2. Deaktiviere die Benachrichtigungen für diese App.\n3. Drücke zurück, um wiederzukehren.</string>
+
+    <!-- Einstellungen — Genaue Erinnerungen Dialog -->
+    <string name="settings_reminder_type_enable_title">Genaue Erinnerungen aktivieren</string>
+    <string name="settings_reminder_type_enable_instructions">Um Erinnerungen zu erhalten, die pünktlich ausgelöst werden, erlaube genaue Erinnerungen für %1$s.\n\n1. Tippe unten auf \"Weiter zu den Einstellungen\".\n2. Finde %1$s in der Liste.\n3. Aktiviere \"Alarme und Erinnerungen\".\n\nDrücke dann zurück, um wiederzukehren.</string>
+    <string name="settings_reminder_type_disable_title">Genaue Erinnerungen deaktivieren</string>
+    <string name="settings_reminder_type_disable_instructions">Um zurück zu ungefährem Timing zu wechseln, entferne die Berechtigung für genaue Erinnerungen.\n\n1. Tippe unten auf \"Weiter zu den Einstellungen\".\n2. Finde %1$s in der Liste.\n3. Deaktiviere \"Alarme und Erinnerungen\".\n\nErinnerungen kommen weiterhin an, können aber leicht verzögert sein.</string>
+
+    <!-- Einstellungen — Overlay-Dialog -->
+    <string name="settings_overlay_disable_title">Anzeige über anderen Apps deaktivieren</string>
+    <string name="settings_overlay_allow_instructions">Um die Zielerreichungs-Feier anzuzeigen, benötigen wir die Berechtigung zur Anzeige über anderen Apps.\n\n1. Finde die App in der App-Liste in den Einstellungen.\n2. Aktiviere \"Anzeige über anderen Apps erlauben\".\n\nDrücke dann zurück und kehre zur App zurück.</string>
+    <string name="settings_overlay_disable_instructions">Um die Zielerreichungs-Feier zu deaktivieren, musst du die Berechtigung manuell entfernen.\n\n1. Finde die App in der App-Liste in den Einstellungen.\n2. Deaktiviere \"Anzeige über anderen Apps erlauben\".\n\nDrücke zurück und kehre zur App zurück.</string>
+
+    <!-- Einstellungen — Werbung-entfernen-Sheet -->
+    <string name="settings_remove_ads_title">Werbung entfernen</string>
+    <string name="settings_remove_ads_body">Genieße DrinkWater völlig werbefrei mit einem einmaligen Kauf. Verknüpft mit deinem App-Store-Konto, jederzeit auf jedem Gerät wiederherstellbar.</string>
+    <string name="settings_remove_ads_cta">Werbung entfernen</string>
+    <string name="settings_remove_ads_cta_with_price">Werbung entfernen · %1$s</string>
+    <string name="settings_remove_ads_restore_cta">Kauf wiederherstellen</string>
+    <string name="settings_remove_ads_error">Etwas ist schiefgelaufen: %1$s</string>
+    <string name="settings_remove_ads_nothing_to_restore">Kein früherer Kauf für dieses Konto gefunden.</string>
+
+    <!-- Einstellungen — Kauf-erfolgreich-Dialog -->
+    <string name="settings_purchase_success_title">Werbung entfernt!</string>
+    <string name="settings_purchase_success_body">Vielen Dank, dass du DrinkWaterApp unterstützt.\nGenieße die App vollständig werbefrei!</string>
+    <string name="settings_purchase_success_cta">Super, danke!</string>
+
+    <!-- Einstellungen — Wiederherstellung-erfolgreich-Dialog -->
+    <string name="settings_restore_success_title">Kauf wiederhergestellt!</string>
+    <string name="settings_restore_success_body">Dein werbefreier Kauf wurde wiederhergestellt.\nGenieße DrinkWater ohne Werbung!</string>
+    <string name="settings_restore_success_cta">Verstanden!</string>
+
+    <!-- Einstellungen — Intervall-Sheet -->
+    <string name="settings_interval_sheet_title">Erinnerungsintervall</string>
+    <string name="settings_stepper_custom_hint">Oder gib einen Wert ein</string>
+    <string name="settings_interval_window_hint">Aktives Fenster: %1$s · Max: %2$d Min.</string>
+
+    <!-- Einstellungen — Benachrichtigungsmenge-Sheet -->
+    <string name="settings_notif_amount_hint">Die Menge, die in Benachrichtigungen erscheint, um schnell zu erfassen, dass du Wasser getrunken hast.</string>
+
+    <!-- Einstellungen — Einheiten-Sheet -->
+    <string name="settings_unit_metric_label">Milliliter</string>
+    <string name="settings_unit_metric_sublabel">mL · kg</string>
+    <string name="settings_unit_imperial_label">Imperial</string>
+    <string name="settings_unit_imperial_sublabel">fl. oz · lbs</string>
+
+    <!-- Trinken — Startbildschirm -->
+    <string name="drink_streak_label">%1$d Tage in Folge</string>
+    <string name="drink_remaining_prefix">Dir fehlen noch </string>
+    <string name="drink_remaining_suffix"> bis zum heutigen Ziel</string>
+    <string name="drink_goal_reached">Ziel erreicht</string>
+    <string name="drink_goal_reached_suffix">trink weiter, um voraus zu bleiben</string>
+    <string name="drink_next_alarm_prefix">Nächster Alarm in </string>
+    <string name="drink_alarm_firing_now">Alarm wird gleich ausgelöst</string>
+    <string name="drink_alarm_firing_approx">Alarm wird jeden Moment ausgelöst</string>
+    <string name="drink_outside_active_hours">Erinnerungen pausiert. Du kannst trotzdem manuell erfassen.</string>
+
+    <!-- Trinken — Fortschrittsring -->
+    <string name="drink_progress_goal_label">von %1$s</string>
+
+    <!-- Trinken — Verlaufsbereich -->
+    <string name="drink_log_see_all">ALLE ANZEIGEN</string>
+    <string name="drink_log_empty_state">Erfasse ein Getränk, um es hier zu sehen.</string>
+    <string name="first_drink_dialog_title">Erstes Getränk erfasst!</string>
+    <string name="first_drink_dialog_body">Dein Getränk wurde zum heutigen Verlauf hinzugefügt.\n\nFehler gemacht? Gehe zum Verlauf und lösche den Eintrag dort.</string>
+    <string name="first_drink_dialog_cta">Verstanden</string>
+    <string name="drink_log_entry_amount">%1$s mL</string>
+
+    <!-- Trinken — Getränk hinzufügen Sheet -->
+    <string name="drink_add_more_label">Mehr</string>
+    <string name="drink_suggestions_title">Trinkvorschläge</string>
+    <string name="drink_suggestions_close_desc">Schließen</string>
+    <string name="drink_custom_amount_label">Benutzerdefinierte Menge in Millilitern</string>
+    <string name="drink_custom_amount_label_ml">Menge (mL)</string>
+    <string name="drink_custom_amount_label_l">Menge (L)</string>
+    <string name="drink_custom_amount_label_fl_oz">Menge (fl oz)</string>
+    <string name="drink_suggestion_removed">Vorschlag entfernt</string>
+    <string name="drink_action_create">Erstellen</string>
+    <string name="drink_action_drink">Trinken</string>
+    <string name="drink_suggestions_info_desc">So funktioniert es</string>
+    <string name="drink_suggestions_info_title">So funktionieren Vorschläge</string>
+    <string name="drink_suggestions_info_quick_presets">Die ersten 3 Vorschläge erscheinen als Schnellzugriffsschaltflächen auf deinem Hauptbildschirm.</string>
+    <string name="drink_suggestions_info_reorder">Halte einen Vorschlag gedrückt und ziehe ihn, um die Reihenfolge zu ändern.</string>
+    <string name="drink_suggestions_info_delete">Ziehe einen Vorschlag nach unten zum Papierkorb, um ihn zu löschen.</string>
+    <string name="drink_suggestions_info_add">Nutze das Eingabefeld und die Schaltflächen unten, um neue Vorschläge hinzuzufügen oder direkt eine benutzerdefinierte Menge zu trinken, ohne sie zu speichern.</string>
+    <string name="drink_suggestions_info_ok">Verstanden</string>
+
+    <!-- Trinken — Alarmkarten -->
+    <string name="drink_alarm_reminders_title">Erinnerungen</string>
+    <string name="drink_alarm_reminders_title_approx">Ungefähre Erinnerungen</string>
+    <string name="drink_alarm_no_permission_body">Aktiviere sie, um deine Trinkerinnerungen pünktlich zu erhalten.</string>
+    <string name="drink_alarm_not_configured_title">Kein Alarmplan</string>
+    <string name="drink_alarm_not_configured_body">Konfiguriere deine aktiven Stunden in den Einstellungen, um Erinnerungen zu erhalten.</string>
+    <string name="drink_alarm_status_active">Aktive Stunden</string>
+    <string name="drink_alarm_status_resting">Ruhezeit</string>
+    <string name="drink_alarm_summary_drinks">Getränke</string>
+    <string name="drink_alarm_summary_every">Alle</string>
+    <string name="drink_alarm_summary_every_approx">Ca. alle</string>
+    <string name="drink_alarm_summary_next">Nächste</string>
+    <string name="drink_alarm_summary_next_approx">Nächste ca.</string>
+    <string name="drink_alarm_summary_starts">Beginnt</string>
+
+    <!-- Trinken — Preset löschen -->
+    <string name="drink_delete_drop_desc">Hier ablegen zum Löschen</string>
+
+    <!-- Statistiken — Bildschirm -->
+    <string name="stats_title">Statistiken</string>
+
+    <!-- Statistiken — Zeitraum-Selektor -->
+    <string name="stats_period_week">Woche</string>
+    <string name="stats_period_month">Monat</string>
+    <string name="stats_period_year">Jahr</string>
+
+    <!-- Statistiken — Zeitraumkontextbeschriftungen -->
+    <string name="stats_period_label_week">Diese Woche</string>
+    <string name="stats_period_label_month">Diesen Monat</string>
+    <string name="stats_period_label_year">Dieses Jahr</string>
+
+    <!-- Statistiken — Zusammenfassungskarte -->
+    <string name="stats_summary_avg_label">Ø %1$s</string>
+    <string name="stats_summary_unit">mL/Tag</string>
+    <string name="stats_summary_vs_previous">vs. vorheriger Zeitraum</string>
+    <string name="stats_summary_consistent_week">Hervorragend! Du hast die Werte der letzten Woche erreicht. Weiter so!</string>
+    <string name="stats_summary_consistent_month">Hervorragend! Du hast die Werte des letzten Monats erreicht. Weiter so!</string>
+    <string name="stats_summary_consistent_year">Hervorragend! Du hast die Werte des letzten Jahres erreicht. Weiter so!</string>
+    <string name="stats_summary_first_week">Meine erste Woche</string>
+    <string name="stats_summary_first_month">Mein erster Monat</string>
+    <string name="stats_summary_first_year">Mein erstes Jahr</string>
+
+    <!-- Statistiken — Balkendiagramm -->
+    <string name="stats_chart_no_data">Keine Daten für diesen Zeitraum</string>
+    <string name="stats_chart_daily_intake">Tägliche Aufnahme</string>
+    <string name="stats_chart_monthly_intake">Monatliche Aufnahme</string>
+    <string name="stats_chart_prev_period_desc">Vorheriger Zeitraum</string>
+    <string name="stats_chart_next_period_desc">Nächster Zeitraum</string>
+    <string name="stats_chart_goal_met">Ziel erreicht</string>
+    <string name="stats_chart_below_goal">Erreichte Menge</string>
+    <string name="stats_chart_tooltip_amount">%1$d mL</string>
+    <string name="stats_chart_tooltip_goal">/ %1$d mL</string>
+
+    <!-- Statistiken — Minikarten -->
+    <string name="stats_mini_drink_streak">Trinkserie</string>
+    <string name="stats_mini_best_streak">Beste Serie</string>
+    <string name="stats_mini_goal_streak">Zielserie</string>
+    <string name="stats_mini_best_goal_streak">Beste Zielserie</string>
+    <string name="stats_mini_personal_best">Persönlicher Rekord</string>
+    <string name="stats_best_date_today">Erreicht: Heute</string>
+    <string name="stats_best_date_achieved">Erreicht: %s</string>
+    <plurals name="stats_best_date_days_ago">
+        <item quantity="one">Erreicht: vor %d Tag</item>
+        <item quantity="other">Erreicht: vor %d Tagen</item>
+    </plurals>
+    <plurals name="stats_best_date_months_ago">
+        <item quantity="one">Erreicht: vor %d Monat</item>
+        <item quantity="other">Erreicht: vor %d Monaten</item>
+    </plurals>
+
+    <!-- Verlauf — Bildschirm -->
+    <string name="history_title">Verlauf</string>
+    <string name="history_pick_date_desc">Datum auswählen</string>
+
+    <!-- Verlauf — Leerer Zustand -->
+    <string name="history_empty_title">Keine Getränke erfasst</string>
+    <string name="history_empty_body">Wähle einen anderen Tag oder gehe zu „Heute", um einen Eintrag hinzuzufügen.</string>
+
+    <!-- Verlauf — Tageszeit-Beschriftungen -->
+    <string name="history_part_morning">Morgen</string>
+    <string name="history_part_afternoon">Nachmittag</string>
+    <string name="history_part_evening">Abend</string>
+    <string name="history_part_night">Nacht</string>
+
+    <!-- Verlauf — Zeitraum-Beschriftungen -->
+    <string name="history_time_am">vorm.</string>
+    <string name="history_time_pm">nachm.</string>
+
+    <!-- Verlauf — Eintragsaktionen -->
+    <string name="history_action_edit">Bearbeiten</string>
+    <string name="history_action_delete">Löschen</string>
+    <string name="history_action_edit_amount">Menge bearbeiten</string>
+    <string name="history_action_edit_time">Zeit bearbeiten</string>
+    <string name="history_edit_amount_title">Menge bearbeiten</string>
+    <string name="history_edit_time_message">Wähle eine neue Zeit für diesen Eintrag</string>
+
+    <!-- Verlauf — Tagesnavigation -->
+    <string name="history_nav_prev_day_desc">Vorheriger Tag</string>
+    <string name="history_nav_next_day_desc">Nächster Tag</string>
+
+    <!-- Verlauf — v1-Abschnittsbeschriftungen -->
+    <string name="history_section_select_date">DATUM WÄHLEN</string>
+    <string name="history_select_date_label">Datum auswählen</string>
+    <string name="history_section_summary">ZUSAMMENFASSUNG</string>
+    <string name="history_section_logs">EINTRÄGE</string>
+
+    <!-- Verlauf — v1-Zusammenfassungschips -->
+    <string name="history_stat_consumed">Getrunken</string>
+    <string name="history_stat_goal">Ziel</string>
+
+    <!-- Verlauf — v1-Zeitstrahl -->
+    <string name="history_timeline_now">JETZT</string>
+
+    <!-- Verlauf — Bearbeiten-Dialog -->
+    <string name="history_edit_dialog_title">Getränk bearbeiten</string>
+    <string name="history_edit_amount_label">Menge</string>
+
+    <!-- Verlauf — Zusammenfassungskarte (Plural) -->
+    <plurals name="history_summary_drink_count">
+        <item quantity="one">%1$d Getränk · %2$d%% des Ziels</item>
+        <item quantity="other">%1$d Getränke · %2$d%% des Ziels</item>
+    </plurals>
+
+    <!-- Benachrichtigungen — Geplante Erinnerungstexte -->
+    <!-- Tagesbeginn-Nachrichten (zur konfigurierten Startzeit) -->
+    <string name="notif_msg_start_1">Bereit, ein Glas nach dem anderen</string>
+    <string name="notif_msg_start_2">Ein neuer Zeitraum beginnt jetzt</string>
+    <string name="notif_msg_start_3">Fangen wir mit einem frischen Glas Wasser an</string>
+
+    <!-- Tagesende-Nachrichten (zur konfigurierten Endzeit) -->
+    <string name="notif_msg_end_1">Dies ist die letzte Erinnerung</string>
+    <string name="notif_msg_end_2">Lass uns mit einem weiteren Glas Wasser abschließen</string>
+    <string name="notif_msg_end_3">Zeitraum vorbei. Öffne die App, um deine Einträge zu sehen</string>
+
+    <!-- Uhrzeitbereich-Nachrichten — Variante A (funktional / motivierend) -->
+    <string name="notif_msg_h0_a">Auch nachts braucht dein Körper Wasser</string>
+    <string name="notif_msg_h4_a">Starte deinen Morgen mit einem Glas Wasser</string>
+    <string name="notif_msg_h6_a">Ein Glas Wasser bringt deinen Stoffwechsel in Gang</string>
+    <string name="notif_msg_h8_a">Trink, bevor der Tag richtig losgeht</string>
+    <string name="notif_msg_h9_a">Trink weiter, um scharf und konzentriert zu bleiben</string>
+    <string name="notif_msg_h10_a">Lass den Vormittag nicht ohne Trinken vergehen</string>
+    <string name="notif_msg_h12_a">Begleite dein Mittagessen mit einem Glas Wasser</string>
+    <string name="notif_msg_h13_a">Bleib den Nachmittag über fokussiert mit Wasser</string>
+    <string name="notif_msg_h15_a">Ein Glas Wasser kann jetzt sofort deine Energie steigern</string>
+    <string name="notif_msg_h16_a">Fast fertig? Trink noch Wasser, bevor du gehst</string>
+    <string name="notif_msg_h18_a">Entspann dich und trink nach einem langen Tag</string>
+    <string name="notif_msg_h20_a">Ein weiteres Glas hilft deinem Körper beim Entspannen</string>
+    <string name="notif_msg_h22_a">Ein kleines Glas vor dem Schlafen hält dich die Nacht über frisch</string>
+
+    <!-- Uhrzeitbereich-Nachrichten — Variante B (locker / gesprächig) -->
+    <string name="notif_msg_h0_b">Durstig um diese Stunde? Trink einen Schluck</string>
+    <string name="notif_msg_h4_b">In diesen frühen Stunden kann ein wenig Wasser sehr erfrischend sein</string>
+    <string name="notif_msg_h6_b">Kaffee oder ein Glas Wasser? Schwere Entscheidung</string>
+    <string name="notif_msg_h8_b">Früh trinken hilft dir, deinen Tag gut zu beginnen</string>
+    <string name="notif_msg_h9_b">Denk daran, hydratisiert zu bleiben</string>
+    <string name="notif_msg_h10_b">Noch ein Glas vor dem Mittagessen?</string>
+    <string name="notif_msg_h12_b">Halbzeit! Lass uns mehr erfassen</string>
+    <string name="notif_msg_h13_b">Denk daran, diesen Nachmittag hydratisiert zu bleiben</string>
+    <string name="notif_msg_h15_b">Wie wäre es mit einem weiteren Glas, bevor der Nachmittag endet?</string>
+    <string name="notif_msg_h16_b">Es geht nicht darum, ein Ziel zu erreichen, sondern Wasser zu trinken</string>
+    <string name="notif_msg_h18_b">Zeit zum Entspannen und für ein weiteres Glas</string>
+    <string name="notif_msg_h20_b">Trink nachts mit Maß</string>
+    <string name="notif_msg_h22_b">Schon gegessen? Ein Glas Wasser hilft der Verdauung</string>
+
+    <!-- Benachrichtigungen — Titelnachrichten -->
+    <!-- Tagesbeginn / Tagesende -->
+    <string name="notif_title_start_a">Guten Morgen! Fangen wir hydratisiert an.</string>
+    <string name="notif_title_start_b">Hey! Starte deinen Tag mit Wasser.</string>
+    <string name="notif_title_end_a">Tolle Arbeit heute! Sieh deinen Fortschritt.</string>
+    <string name="notif_title_end_b">Das war\'s für heute! Gut gemacht.</string>
+    <!-- Variante A — motivierend / energetisch -->
+    <string name="notif_title_h0_a">Noch wach? Bleib hydratisiert!</string>
+    <string name="notif_title_h4_a">Frühaufsteher! Zeit zum Trinken.</string>
+    <string name="notif_title_h6_a">Guten Morgen! Fang deinen Tag richtig an.</string>
+    <string name="notif_title_h8_a">Zeit für den Morgenboost!</string>
+    <string name="notif_title_h9_a">Vormittägliches Einchecken!</string>
+    <string name="notif_title_h10_a">Bleib am Ball!</string>
+    <string name="notif_title_h12_a">Mittagshydration!</string>
+    <string name="notif_title_h13_a">Nachmittagserinnerung!</string>
+    <string name="notif_title_h15_a">Dem Nachmittagstief trotzen!</string>
+    <string name="notif_title_h16_a">Fast geschafft, weiter trinken!</string>
+    <string name="notif_title_h18_a">Abendliche Hydrationskontrolle!</string>
+    <string name="notif_title_h20_a">Entspannst du dich? Weiter trinken.</string>
+    <string name="notif_title_h22_a">Letzter Schluck des Tages!</string>
+    <!-- Variante B — gesprächig / freundlich -->
+    <string name="notif_title_h0_b">Noch spät wach? Vergiss dein Wasser nicht.</string>
+    <string name="notif_title_h4_b">Frühaufsteher! Zeit für Wasser.</string>
+    <string name="notif_title_h6_b">Morgen! Erst Wasser?</string>
+    <string name="notif_title_h8_b">Der Morgen läuft. Wie viel trinkst du schon?</string>
+    <string name="notif_title_h9_b">Vor Mittag: trinkst du genug?</string>
+    <string name="notif_title_h10_b">Fast Mittag. Zeit für eine Trinkpause.</string>
+    <string name="notif_title_h12_b">Mittag! Wasser zum Mittagessen?</string>
+    <string name="notif_title_h13_b">Beschäftigter Nachmittag? Wasser hilft.</string>
+    <string name="notif_title_h15_b">Nachmittägliche Trinkbilanz!</string>
+    <string name="notif_title_h16_b">Fast fertig, noch ein Glas!</string>
+    <string name="notif_title_h18_b">Ruhiger Abend. Wie wäre es mit Wasser?</string>
+    <string name="notif_title_h20_b">Entspannungszeit, und Wasser dazu!</string>
+    <string name="notif_title_h22_b">Fast Schlafenszeit. Letztes Glas?</string>
+
+    <!-- Benachrichtigungen — Erweiterter Text -->
+    <!-- Tagesbeginn / Tagesende -->
+    <string name="notif_big_start_a">Nach einer ganzen Nacht Schlaf hat dein Körper von Natur aus wenig Flüssigkeit. Den Morgen mit Wasser zu beginnen hydratisiert deine Zellen, kurbelt deinen Stoffwechsel an und setzt den Grundstein für einen gesunden Tag. Du schaffst das!</string>
+    <string name="notif_big_start_b">Aufgewacht? Dein Körper ist stundenlang ohne Wasser ausgekommen, während du geschlafen hast. Ein Glas jetzt ist der einfachste Erfolg deines Tages.</string>
+    <string name="notif_big_end_a">Du hast den Tag durchgehalten! Öffne die App, um eine Zusammenfassung deiner Hydration zu sehen. Feiere die Erfolge und finde Wege, es morgen noch besser zu machen.</string>
+    <string name="notif_big_end_b">Du hast das Ende deines Tages erreicht! Öffne die App, um zu sehen, wie du abgeschnitten hast. Jedes Glas zählt.</string>
+    <!-- Variante A — sachlich / informativ -->
+    <string name="notif_big_h0_a">Du bist noch wach und dein Körper arbeitet weiterhin hart. Ein Glas Wasser jetzt hilft dabei, deinen Fokus aufrechtzuerhalten, unterstützt deine Organe und ersetzt Flüssigkeit, auch nachts.</string>
+    <string name="notif_big_h4_a">Frühe Morgenstunden sind kraftvoll. Nach Stunden des Schlafs ist dein Körper bereit, erfrischt zu werden. Mit einem Glas Wasser zu beginnen hydratisiert deine Zellen und gibt deinem ganzen Tag einen energetisierenden Ton.</string>
+    <string name="notif_big_h6_a">Guten Morgen! Nach 7 bis 8 Stunden Schlaf wacht dein Körper natürlich leicht dehydriert auf. Gleich Wasser zu trinken kurbelt deinen Stoffwechsel an, aktiviert deine Organe und hilft dir, wach und bereit zu sein.</string>
+    <string name="notif_big_h8_a">Dein Morgen läuft auf Hochtouren! Hydratisiert zu bleiben schärft den Fokus, stabilisiert deine Energie und hilft deinem Gehirn, Bestleistungen zu erbringen. Nimm ein Glas und komm gut durch den Morgen.</string>
+    <string name="notif_big_h9_a">Wusstest du? Schon leichte Dehydration ab etwa 1 bis 2% kann die Konzentration und die Stimmung spürbar beeinflussen. Trink weiterhin Wasser am Vormittag, um auf dem Laufenden zu bleiben.</string>
+    <string name="notif_big_h10_a">Der späte Vormittag ist der ideale Zeitpunkt, um gesunde Gewohnheiten aufzubauen. Regelmäßige Hydration hilft dabei, Giftstoffe auszuspülen, das Immunsystem zu unterstützen und die Haut frisch zu halten. Zeit für ein weiteres Glas!</string>
+    <string name="notif_big_h12_a">Mittagszeit! Wasser fördert die Verdauung und hilft deinem Körper, die Nährstoffe aus deiner Mahlzeit besser aufzunehmen. Trink ein Glas vor oder während des Mittagessens für die besten Ergebnisse.</string>
+    <string name="notif_big_h13_a">Der frühe Nachmittag kann sich träge anfühlen, Energieeinbrüche nach dem Mittagessen sind sehr häufig. Gut hydratisiert zu bleiben hilft dabei, die Körpertemperatur zu regulieren und den Geist wach zu halten. Trink und mach weiter!</string>
+    <string name="notif_big_h15_a">Fühlst du dich heute Nachmittag etwas träge? Das könnte einfach Dehydration sein. Ein Glas Wasser ist oft alles, was du brauchst, um Geist und Körper wieder in Schwung zu bringen und mit Energie durch den Rest des Tages zu kommen.</string>
+    <string name="notif_big_h16_a">Du bist auf der Zielgeraden! Beständige Hydration über den Tag hilft, Kopfschmerzen zu vermeiden, die Energie aufrechtzuerhalten und deine Nieren gesund zu halten. Vergiss dein Wasser nicht, du bist fast am Ziel!</string>
+    <string name="notif_big_h18_a">Der Abend ist ein großartiger Zeitpunkt zum Nachdenken und Auftanken. Wasser nach dem Abendessen fördert die Verdauung, hilft dem Körper, sich vom Tag zu erholen, und bereitet dich auf einen erholsamen Schlaf vor.</string>
+    <string name="notif_big_h20_a">Wenn du dich für die Nacht ausklingst, hilft sanfte Hydration deinem Körper, sich von allem zu erholen, was du heute getan hast. Ein Glas jetzt ist genau richtig. Dein Körper wird es dir morgen früh danken.</string>
+    <string name="notif_big_h22_a">Bevor du einschläfst, hilft ein kleines Glas Wasser deinem Körper, die Nacht über hydratisiert zu bleiben. Du hast heute großartige Arbeit geleistet. Ruh dich gut aus und wach erfrischt auf!</string>
+    <!-- Variante B — locker / kurz -->
+    <string name="notif_big_h0_b">Noch wach? Dein Körper arbeitet auch in der Ruhe. Ein schneller Schluck hält alles am Laufen.</string>
+    <string name="notif_big_h4_b">Vor dem Sonnenaufgang auf? Fang mit etwas Wasser an und du wirst den Unterschied den ganzen Morgen spüren.</string>
+    <string name="notif_big_h6_b">Morgen! Dein Körper ist stundenlang ohne Wasser ausgekommen. Ein Glas jetzt ist dein einfachster erster Erfolg.</string>
+    <string name="notif_big_h8_b">Der Morgen läuft besser mit Wasser. Nur so gesagt.</string>
+    <string name="notif_big_h9_b">Kurze Vormittagserinnerung: Wasser hält dein Gehirn scharf und deine Energie stabil.</string>
+    <string name="notif_big_h10_b">Fast Mittagszeit! Ein Glas Wasser jetzt hilft dir, gut gelaunt anzukommen.</string>
+    <string name="notif_big_h12_b">Mittagessen ist besser mit Wasser. Es hilft, schneller zu verdauen und hält das Nachmittagstief fern.</string>
+    <string name="notif_big_h13_b">Mittagstief? Das könnte Dehydration sein. Ein Glas Wasser löst das meistens.</string>
+    <string name="notif_big_h15_b">Nachmittagstief? Trink Wasser, bevor du zur nächsten Kleinigkeit greifst. Vielleicht brauchst du nur Hydration.</string>
+    <string name="notif_big_h16_b">Auf der Zielgeraden? Wasser hält deine Energie und deinen Fokus bis zum Schluss oben.</string>
+    <string name="notif_big_h18_b">Der Tag klingt aus. Ein Glas Wasser jetzt hilft deinem Körper, sich zu erholen und sorgt für eine gute Nacht.</string>
+    <string name="notif_big_h20_b">Mach es heute Abend ruhig. Ein sanftes Glas Wasser ist alles, was dein Körper zum Entspannen braucht.</string>
+    <string name="notif_big_h22_b">Bald Schlafenszeit. Ein kleines Glas Wasser hilft deinem Körper, die Nacht über ausgeglichen zu bleiben. Schlaf gut!</string>
+
+    <!-- Zieloverlay — Ocean-Stil (3 zufällige Textvarianten) -->
+    <string name="goal_overlay_ocean_eyebrow">Tagesziel</string>
+    <string name="goal_overlay_ocean_v1_headline">Du hast es geschafft!\nHeute gehört deinem zukünftigen Ich.</string>
+    <string name="goal_overlay_ocean_v1_sub">Jedes Glas hat gezählt, und dazu der Fokus, die Energie, die Ruhe.</string>
+    <string name="goal_overlay_ocean_v1_cta">Prost darauf</string>
+    <string name="goal_overlay_ocean_v2_headline">Hydration abgeschlossen!\nGut gemacht heute.</string>
+    <string name="goal_overlay_ocean_v2_sub">Du hast dich um dich gekümmert, ein Glas nach dem anderen. So entstehen Gewohnheiten.</string>
+    <string name="goal_overlay_ocean_v2_cta">Weiter so</string>
+    <string name="goal_overlay_ocean_v3_headline">Ziel erreicht!\nDein Körper bedankt sich.</string>
+    <string name="goal_overlay_ocean_v3_sub">Hydration ist die Grundlage jedes großartigen Tages. Du hast dir deine aufgebaut.</string>
+    <string name="goal_overlay_ocean_v3_cta">Toll</string>
+    <!-- Zieloverlay — Statistikbeschriftungen -->
+    <string name="goal_overlay_stat_reached">Erreicht</string>
+    <string name="goal_overlay_stat_glasses">Gläser</string>
+    <string name="goal_overlay_stat_streak">Serie</string>
+    <string name="goal_overlay_share_progress">Fortschritt teilen</string>
+
+    <!-- Validierungsfehler -->
+    <string name="validation_error_empty">Das Feld darf nicht leer sein</string>
+    <string name="validation_error_invalid_number">Gib eine gültige Zahl ein</string>
+    <string name="validation_error_min_value">Der Wert muss größer als %s sein</string>
+    <string name="validation_error_max_value">Der Wert muss kleiner als %s sein</string>
+    <string name="validation_error_min_length">Die Länge muss größer als %s sein</string>
+    <string name="validation_error_max_length">Die Länge muss kleiner als %s sein</string>
+
+</resources>
