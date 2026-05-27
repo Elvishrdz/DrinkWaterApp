@@ -5,7 +5,7 @@
 
     <style name="Theme.DrinkWaterApp.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/blue_water</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/app_logo</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_screen_icon</item>
         <item name="windowSplashScreenIconBackgroundColor">@color/blue_water</item>
         <item name="postSplashScreenTheme">@style/Theme.DrinkWaterApp</item>
     </style>
