@@ -27,10 +27,10 @@ Out of scope
 
 App Release
 
-- [] preparar app sin ads, con registros mock para sacar las capturas de pantalla
-- [] listing: preparar capturas
-- [] listing: preparar recursos de imagenes
-- [] listing: preparar description y title en diferentes idiomas
+- [x] preparar app sin ads, con registros mock para sacar las capturas de pantalla
+- [x] listing: preparar capturas
+- [x] listing: preparar recursos de imagenes
+- [x] listing: preparar description y title en diferentes idiomas
 
 Priorities Tier 1
 
@@ -53,7 +53,7 @@ Priorities Tier 1
   app.
 - [] app: agregar icono monochrome
 - [] fix insets
-- [] fix splash screen (losing aspect ratio) app: corregir splash screen
+- [x] fix splash screen (losing aspect ratio) app: corregir splash screen
 - [x] add more banners in app screens (adaptive banners)
 - [x] Usar otro banner id para banners en history y stats
 - [x] Expandir width de banners
@@ -66,7 +66,7 @@ Priorities Tier 1
   días hace 1 mes. Más de un mes no se muestra
 - [x] Revisar traduccion en ingles que no existan guiones de IA mire unos en notificaciones en
   ingles.
-- [] Agregar aleman a idiomas
+- [x] Agregar aleman a idiomas
 - [] Probar restaurar compra. Que pasa si un usuario compra desinstala e instala otra vez? Se
   restaura con la cuenta de Google o con el id único generado? Probar y agregar comentario.
 - [x] ocultar countdown cuando notificaciones estan desactivadas
