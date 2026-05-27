@@ -111,6 +111,8 @@ import com.eahm.drinkwaterapp.feature.settings.ui.UnitsBottomSheet
 import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorDialog
 import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
 import kotlinx.coroutines.delay
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import java.util.Locale
 
@@ -126,6 +128,7 @@ internal fun SettingsScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
+    val trackingService = koinInject<TrackingService>()
 
     var showClearDataDialog by rememberSaveable { mutableStateOf(false) }
     var showRevokeTrackingDialog by rememberSaveable { mutableStateOf(false) }
@@ -222,14 +225,29 @@ internal fun SettingsScreen(
         onNotificationAmountChanged = viewModel::onNotificationAmountChanged,
         onStartTimeChanged = viewModel::onStartTimeChanged,
         onEndTimeChanged = viewModel::onEndTimeChanged,
-        onShareTap = context::startAppShareIntent,
-        onRateTap = context::openPlayStoreUrl,
-        onRequestFeatureTap = context::startFeatureRequestIntent,
-        onReportProblemTap = context::startReportProblemIntent,
+        onShareTap = {
+            trackingService.trackSettingsShareTapped()
+            context.startAppShareIntent()
+        },
+        onRateTap = {
+            trackingService.trackSettingsRateAppTapped()
+            context.openPlayStoreUrl()
+        },
+        onRequestFeatureTap = {
+            trackingService.trackSettingsFeatureRequestTapped()
+            context.startFeatureRequestIntent()
+        },
+        onReportProblemTap = {
+            trackingService.trackSettingsReportProblemTapped()
+            context.startReportProblemIntent()
+        },
         onGoalCelebrationsToggled = { handleDrawOverlayToggle() },
         onExactAlarmTap = ::handleExactAlarmTap,
         onClearDataTap = { showClearDataDialog = true },
-        onRemoveAdsTap = viewModel::onFetchOfferings,
+        onRemoveAdsTap = {
+            trackingService.trackSettingsRemoveAdsTapped()
+            viewModel.onFetchOfferings()
+        },
         onTimeFormatChanged = viewModel::onTimeFormatPreferenceChanged,
         onUnitPreferenceChanged = viewModel::onUnitPreferenceChanged,
         onLanguageChanged = viewModel::onLanguageChanged,
@@ -271,6 +289,7 @@ internal fun SettingsScreen(
             onDismiss = { showDisableNotificationsDialog = false },
             onGoToSettings = {
                 showDisableNotificationsDialog = false
+                trackingService.trackSettingsNotificationsDisabled()
 
                 val intent = Intent()
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -293,6 +312,7 @@ internal fun SettingsScreen(
             onDismiss = { showClearDataDialog = false },
             onConfirm = {
                 showClearDataDialog = false
+                trackingService.trackSettingsResetAllDataConfirmed()
                 viewModel.clearAllData()
             },
         )
@@ -315,6 +335,7 @@ internal fun SettingsScreen(
             onDismiss = { showOverlayInstructionsDialog = false },
             onGoToSettings = {
                 showOverlayInstructionsDialog = false
+                trackingService.trackSettingsGoalReachedOpened()
                 val intent = Intent(
                     Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                     "package:${context.packageName}".toUri(),
@@ -331,6 +352,7 @@ internal fun SettingsScreen(
             onDismiss = { showExactAlarmInstructionsDialog = false },
             onGoToSettings = {
                 showExactAlarmInstructionsDialog = false
+                trackingService.trackSettingsReminderTypeOpened()
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     exactAlarmLauncher.launch(
                         Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)

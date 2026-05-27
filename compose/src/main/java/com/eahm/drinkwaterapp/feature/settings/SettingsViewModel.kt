@@ -175,6 +175,7 @@ internal class SettingsViewModel(
     }
 
     fun onGoalChanged(goalMl: Float) {
+        trackingService.trackSettingsDailyGoalChanged(goalMl)
         viewModelScope.launch {
             setGoalFromToday(goalMl)
             drinkAlarmManagerV2.restoreAlarm(source = "settings-goal-changed")
@@ -194,6 +195,7 @@ internal class SettingsViewModel(
     }
 
     fun onNotificationAmountChanged(ml: Float) {
+        trackingService.trackSettingsQuickDrinkChanged(ml)
         viewModelScope.launch {
             prefsStorage.setAmountPerDrink(ml)
         }
@@ -213,6 +215,7 @@ internal class SettingsViewModel(
             _state.update { it.copy(timeRangeError = null) }
             prefsStorage.setStartTime(newStart)
             drinkAlarmManagerV2.restoreAlarm(source = "settings-start-time-changed")
+            trackingService.trackSettingsStartTimeChanged(time.hour, time.minute)
         }
     }
 
@@ -230,6 +233,7 @@ internal class SettingsViewModel(
             _state.update { it.copy(timeRangeError = null) }
             prefsStorage.setEndTime(newEnd)
             drinkAlarmManagerV2.restoreAlarm(source = "settings-end-time-changed")
+            trackingService.trackSettingsEndTimeChanged(time.hour, time.minute)
         }
     }
 
@@ -238,6 +242,7 @@ internal class SettingsViewModel(
     }
 
     fun onUnitPreferenceChanged(pref: UnitPreference) {
+        trackingService.trackSettingsVolumeUnitChanged(pref.name.lowercase())
         viewModelScope.launch { prefsStorage.setUnitPreference(pref) }
     }
 

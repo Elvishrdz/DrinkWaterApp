@@ -7,12 +7,26 @@ import com.eahm.drinkwaterapp.analytics.tracking.TrackingDrink.Companion.EVENT_D
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingDrink.Companion.EVENT_PRESET_BOTTOM_SHEET_OPENED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingDrink.Companion.EVENT_PRESET_CREATED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingHistory.Companion.EVENT_HISTORY_DELETE_TAPPED
-import com.eahm.drinkwaterapp.analytics.tracking.TrackingStats.Companion.EVENT_STATS_BAR_TAPPED
-import com.eahm.drinkwaterapp.analytics.tracking.TrackingStats.Companion.EVENT_STATS_PERIOD_SELECTED
-import com.eahm.drinkwaterapp.analytics.tracking.TrackingStats.Companion.EVENT_STATS_PERSONAL_BEST_TAPPED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingHistory.Companion.EVENT_HISTORY_EDIT_AMOUNT_TAPPED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingHistory.Companion.EVENT_HISTORY_EDIT_TIME_TAPPED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingHistory.Companion.EVENT_HISTORY_FILTER_CHANGED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingSettings.Companion.EVENT_SETTINGS_DAILY_GOAL_CHANGED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingSettings.Companion.EVENT_SETTINGS_END_TIME_CHANGED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingSettings.Companion.EVENT_SETTINGS_FEATURE_REQUEST_TAPPED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingSettings.Companion.EVENT_SETTINGS_GOAL_REACHED_OPENED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingSettings.Companion.EVENT_SETTINGS_NOTIFICATIONS_DISABLED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingSettings.Companion.EVENT_SETTINGS_QUICK_DRINK_CHANGED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingSettings.Companion.EVENT_SETTINGS_RATE_APP_TAPPED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingSettings.Companion.EVENT_SETTINGS_REMINDER_TYPE_OPENED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingSettings.Companion.EVENT_SETTINGS_REMOVE_ADS_TAPPED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingSettings.Companion.EVENT_SETTINGS_REPORT_PROBLEM_TAPPED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingSettings.Companion.EVENT_SETTINGS_RESET_ALL_DATA_CONFIRMED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingSettings.Companion.EVENT_SETTINGS_SHARE_TAPPED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingSettings.Companion.EVENT_SETTINGS_START_TIME_CHANGED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingSettings.Companion.EVENT_SETTINGS_VOLUME_UNIT_CHANGED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingStats.Companion.EVENT_STATS_BAR_TAPPED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingStats.Companion.EVENT_STATS_PERIOD_SELECTED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingStats.Companion.EVENT_STATS_PERSONAL_BEST_TAPPED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingNavigation.Companion.EVENT_SCREEN_VIEWED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_ABANDONED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_COMPLETED
@@ -168,5 +182,73 @@ internal class MixpanelTrackingService(
 
     override fun trackStatsPersonalBestTapped() {
         sendEvent(EVENT_STATS_PERSONAL_BEST_TAPPED)
+    }
+
+    override fun trackSettingsDailyGoalChanged(goalMl: Float) {
+        sendEvent(EVENT_SETTINGS_DAILY_GOAL_CHANGED, JSONObject().apply {
+            put("goal_ml", goalMl)
+        })
+    }
+
+    override fun trackSettingsRemoveAdsTapped() {
+        sendEvent(EVENT_SETTINGS_REMOVE_ADS_TAPPED)
+    }
+
+    override fun trackSettingsVolumeUnitChanged(unit: String) {
+        sendEvent(EVENT_SETTINGS_VOLUME_UNIT_CHANGED, JSONObject().apply {
+            put("unit", unit)
+        })
+    }
+
+    override fun trackSettingsReminderTypeOpened() {
+        sendEvent(EVENT_SETTINGS_REMINDER_TYPE_OPENED)
+    }
+
+    override fun trackSettingsNotificationsDisabled() {
+        sendEvent(EVENT_SETTINGS_NOTIFICATIONS_DISABLED)
+    }
+
+    override fun trackSettingsQuickDrinkChanged(amountMl: Float) {
+        sendEvent(EVENT_SETTINGS_QUICK_DRINK_CHANGED, JSONObject().apply {
+            put("amount_ml", amountMl)
+        })
+    }
+
+    override fun trackSettingsStartTimeChanged(hour: Int, minute: Int) {
+        sendEvent(EVENT_SETTINGS_START_TIME_CHANGED, JSONObject().apply {
+            put("hour", hour)
+            put("minute", minute)
+        })
+    }
+
+    override fun trackSettingsEndTimeChanged(hour: Int, minute: Int) {
+        sendEvent(EVENT_SETTINGS_END_TIME_CHANGED, JSONObject().apply {
+            put("hour", hour)
+            put("minute", minute)
+        })
+    }
+
+    override fun trackSettingsGoalReachedOpened() {
+        sendEvent(EVENT_SETTINGS_GOAL_REACHED_OPENED)
+    }
+
+    override fun trackSettingsShareTapped() {
+        sendEvent(EVENT_SETTINGS_SHARE_TAPPED)
+    }
+
+    override fun trackSettingsRateAppTapped() {
+        sendEvent(EVENT_SETTINGS_RATE_APP_TAPPED)
+    }
+
+    override fun trackSettingsFeatureRequestTapped() {
+        sendEvent(EVENT_SETTINGS_FEATURE_REQUEST_TAPPED)
+    }
+
+    override fun trackSettingsReportProblemTapped() {
+        sendEvent(EVENT_SETTINGS_REPORT_PROBLEM_TAPPED)
+    }
+
+    override fun trackSettingsResetAllDataConfirmed() {
+        sendEvent(EVENT_SETTINGS_RESET_ALL_DATA_CONFIRMED)
     }
 }
