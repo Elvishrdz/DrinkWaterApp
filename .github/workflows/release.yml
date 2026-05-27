@@ -57,7 +57,7 @@ jobs:
           releaseFiles: compose/build/outputs/bundle/release/*.aab
           mappingFile: compose/build/outputs/mapping/release/mapping.txt
           tracks: ${{ github.event.inputs.track }}
-          whatsNewDirectory: changelogs/
+          whatsNewDirectory: release-notes/
           changesNotSentForReview: ${{ github.event.inputs.track == 'production' }}
 
       - name: Clean up keystore
