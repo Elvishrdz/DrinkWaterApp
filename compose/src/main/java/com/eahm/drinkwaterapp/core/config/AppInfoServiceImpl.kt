@@ -10,5 +10,6 @@ val appInfoModule = module {
 internal class AppInfoServiceImpl : AppInfoService {
 
     override val versionName: String = BuildConfig.VERSION_NAME
-    override val buildVariant: String = BuildConfig.BUILD_TYPE
+    override val buildVariant: String =
+        if (BuildConfig.BUILD_TYPE == "release") "" else BuildConfig.BUILD_TYPE
 }

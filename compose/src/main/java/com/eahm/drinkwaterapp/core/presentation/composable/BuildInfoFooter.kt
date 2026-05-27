@@ -20,7 +20,13 @@ fun BuildInfoFooter(
     modifier: Modifier = Modifier,
 ) {
     Text(
-        text = "v$appVersion · $buildVariant",
+        text = StringBuilder().apply {
+            append(appVersion)
+            if (buildVariant.isNotEmpty()) {
+                append(" · ")
+                append(buildVariant)
+            }
+        }.toString(),
         fontFamily = JetBrainsMono,
         fontSize = 11.sp,
         color = DwInk400,
