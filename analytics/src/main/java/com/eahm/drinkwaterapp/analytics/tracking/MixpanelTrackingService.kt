@@ -28,6 +28,9 @@ import com.eahm.drinkwaterapp.analytics.tracking.TrackingStats.Companion.EVENT_S
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingStats.Companion.EVENT_STATS_PERIOD_SELECTED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingStats.Companion.EVENT_STATS_PERSONAL_BEST_TAPPED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingNavigation.Companion.EVENT_SCREEN_VIEWED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingNotification.Companion.EVENT_NOTIFICATION_DRINK_TAPPED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingNotification.Companion.EVENT_NOTIFICATION_OPENED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingNotification.Companion.EVENT_NOTIFICATION_SKIP_TAPPED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_ABANDONED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_COMPLETED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_STARTED
@@ -250,5 +253,17 @@ internal class MixpanelTrackingService(
 
     override fun trackSettingsResetAllDataConfirmed() {
         sendEvent(EVENT_SETTINGS_RESET_ALL_DATA_CONFIRMED)
+    }
+
+    override fun trackNotificationSkipTapped() {
+        sendEvent(EVENT_NOTIFICATION_SKIP_TAPPED)
+    }
+
+    override fun trackNotificationDrinkTapped() {
+        sendEvent(EVENT_NOTIFICATION_DRINK_TAPPED)
+    }
+
+    override fun trackNotificationOpened() {
+        sendEvent(EVENT_NOTIFICATION_OPENED)
     }
 }

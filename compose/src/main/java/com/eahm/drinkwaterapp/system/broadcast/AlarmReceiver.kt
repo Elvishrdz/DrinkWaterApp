@@ -9,6 +9,7 @@ import android.provider.Settings
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import com.eahm.drinkwaterapp.core.data.datastore.initialAmountPerDrink
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
 import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManagerV2
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStatsObserver
@@ -40,6 +41,9 @@ class AlarmReceiver : BroadcastReceiver() {
 
     private val drinkAlarmManagerV2
         get() = GlobalContext.get().get<DrinkAlarmManagerV2>()
+
+    private val trackingService
+        get() = GlobalContext.get().get<TrackingService>()
 
     override fun onReceive(context: Context, intent: Intent) = goAsync { _ ->
         Log.i("AlarmReceiverLogs", "onReceive: Intent:${intent.action}")
@@ -102,6 +106,7 @@ class AlarmReceiver : BroadcastReceiver() {
                         DrinkNotification.AMOUNT_PER_DRINK_ML,
                         initialAmountPerDrink
                     )
+                    trackingService.trackNotificationDrinkTapped()
                     registerDrink(context, amountPerDrink)
                     drinkAlarmManagerV2.restoreAlarm(source = "notification-drink")
                     removeNotificationFromSystem(context, intent)
@@ -110,6 +115,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
             SkipDrink.action -> {
                 if (code == SkipDrink.code) {
+                    trackingService.trackNotificationSkipTapped()
                     drinkAlarmManagerV2.restoreAlarm(source = "notification-skip")
                     removeNotificationFromSystem(context, intent)
                 }
