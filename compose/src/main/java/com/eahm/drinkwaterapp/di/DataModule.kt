@@ -29,5 +29,6 @@ internal val dataModule = module {
     includes(streakModule)
     includes(billingModule)
     includes(trackingServiceModule)
+    includes(backupModule)
     singleOf(::TrackingFlushInitializer) bind AppInitializer::class
 }

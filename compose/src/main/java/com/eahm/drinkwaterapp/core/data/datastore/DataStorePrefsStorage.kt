@@ -10,27 +10,29 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.eahm.drinkwaterapp.backup.BackupPreferences
 import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
 import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
 import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
-import org.koin.core.module.dsl.singleOf
-import org.koin.dsl.bind
 import org.koin.dsl.module
 
 val prefsStorageModule = module {
-    singleOf(::DataStorePrefsStorage) bind PrefsStorage::class
+    single<DataStorePrefsStorage> { DataStorePrefsStorage(get()) }
+    single<PrefsStorage> { get<DataStorePrefsStorage>() }
+    single<BackupPreferences> { get<DataStorePrefsStorage>() }
 }
 
 val initialInterval = ActiveTime(0, 45)
 const val initialAmountPerDrink = 150f
 
-private class DataStorePrefsStorage(
+internal class DataStorePrefsStorage(
     private val dataStore: DataStore<Preferences>,
-) : PrefsStorage {
+) : PrefsStorage, BackupPreferences {
 
     private val initialDrinkSuggestions = setOf(
         DrinkSuggestion(1, 50f),
@@ -60,6 +62,15 @@ private class DataStorePrefsStorage(
     private val firstDrinkDialogSeenKey = booleanPreferencesKey("FIRST_DRINK_DIALOG_SEEN")
     private val waterAnimationEnabledKey = booleanPreferencesKey("WATER_ANIMATION_ENABLED")
     private val activeDaysKey = stringPreferencesKey("ACTIVE_DAYS")
+
+    // Backup keys
+    private val backupEnabledKey = booleanPreferencesKey("BACKUP_ENABLED")
+    private val backupProviderKey = stringPreferencesKey("BACKUP_PROVIDER")
+    private val backupLastSyncAtKey = longPreferencesKey("BACKUP_LAST_SYNC_AT")
+    private val backupAutoIntervalDaysKey = intPreferencesKey("BACKUP_AUTO_INTERVAL_DAYS")
+    private val backupUserDisplayNameKey = stringPreferencesKey("BACKUP_USER_DISPLAY_NAME")
+    private val backupContentHashKey = stringPreferencesKey("BACKUP_CONTENT_HASH")
+    private val backupLastErrorKey = stringPreferencesKey("BACKUP_LAST_ERROR")
 
     private val json = Json {
         ignoreUnknownKeys = true
@@ -333,10 +344,83 @@ private class DataStorePrefsStorage(
         }
     }
 
+    // --- Backup prefs implementation ---
+
+    override suspend fun getBackupEnabled(): Boolean =
+        dataStore.data.map { it[backupEnabledKey] ?: false }.first()
+
+    override suspend fun setBackupEnabled(enabled: Boolean) {
+        dataStore.edit { it[backupEnabledKey] = enabled }
+    }
+
+    override suspend fun getBackupProvider(): String? =
+        dataStore.data.map { it[backupProviderKey] }.first()
+
+    override suspend fun setBackupProvider(id: String) {
+        dataStore.edit { it[backupProviderKey] = id }
+    }
+
+    override suspend fun getBackupLastSyncAt(): Long? =
+        dataStore.data.map { it[backupLastSyncAtKey] }.first()
+
+    override suspend fun setBackupLastSyncAt(millis: Long) {
+        dataStore.edit { it[backupLastSyncAtKey] = millis }
+    }
+
+    override suspend fun getBackupAutoIntervalDays(): Int =
+        dataStore.data.map { it[backupAutoIntervalDaysKey] ?: 1 }.first()
+
+    override suspend fun setBackupAutoIntervalDays(days: Int) {
+        dataStore.edit { it[backupAutoIntervalDaysKey] = days }
+    }
+
+    override suspend fun getBackupUserDisplayName(): String? =
+        dataStore.data.map { it[backupUserDisplayNameKey] }.first()
+
+    override suspend fun setBackupUserDisplayName(name: String?) {
+        dataStore.edit { prefs ->
+            if (name != null) prefs[backupUserDisplayNameKey] = name
+            else prefs.remove(backupUserDisplayNameKey)
+        }
+    }
+
+    override suspend fun getBackupContentHash(): String? =
+        dataStore.data.map { it[backupContentHashKey] }.first()
+
+    override suspend fun setBackupContentHash(hash: String?) {
+        dataStore.edit { prefs ->
+            if (hash != null) prefs[backupContentHashKey] = hash
+            else prefs.remove(backupContentHashKey)
+        }
+    }
+
+    override suspend fun getBackupLastError(): String? =
+        dataStore.data.map { it[backupLastErrorKey] }.first()
+
+    override suspend fun setBackupLastError(code: String?) {
+        dataStore.edit { prefs ->
+            if (code != null) prefs[backupLastErrorKey] = code
+            else prefs.remove(backupLastErrorKey)
+        }
+    }
+
+    override suspend fun clearBackupKeys() {
+        dataStore.edit { prefs ->
+            prefs.remove(backupEnabledKey)
+            prefs.remove(backupProviderKey)
+            prefs.remove(backupLastSyncAtKey)
+            prefs.remove(backupAutoIntervalDaysKey)
+            prefs.remove(backupUserDisplayNameKey)
+            prefs.remove(backupContentHashKey)
+            prefs.remove(backupLastErrorKey)
+        }
+    }
+
     override suspend fun clear() {
         clearPrivacyPolicyAccepted()
         clearPrivacyPolicyVersionAccepted()
         clearTrackingConsentDecided()
+        clearBackupKeys()
         dataStore.edit {
             it.remove(onboardingCompletedKey)
             it.remove(usernameKey)

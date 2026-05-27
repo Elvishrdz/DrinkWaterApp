@@ -23,12 +23,33 @@ android {
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
     }
+
+    buildTypes {
+        debug {
+            buildConfigField("boolean", "FEATURE_CLOUD_BACKUP", "true")
+        }
+        getByName("staging") {
+            buildConfigField("boolean", "FEATURE_CLOUD_BACKUP", "false")
+        }
+        getByName("qa") {
+            buildConfigField("boolean", "FEATURE_CLOUD_BACKUP", "false")
+        }
+        release {
+            buildConfigField("boolean", "FEATURE_CLOUD_BACKUP", "false")
+        }
+    }
 }
 
 dependencies {
     coreLibraryDesugaring(libs.desugar.jdk.libs)
     implementation(project(":ads"))
     implementation(project(":analytics"))
+    implementation(project(":backup"))
+
+    // Ktor — needed for BackupModule to wire GoogleDriveBackupProvider's HttpClient
+    implementation(libs.ktor.client.android)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.lifecycle.runtime.ktx)
