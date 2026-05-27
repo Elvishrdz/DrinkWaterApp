@@ -7,6 +7,9 @@ import com.eahm.drinkwaterapp.analytics.tracking.TrackingDrink.Companion.EVENT_D
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingDrink.Companion.EVENT_PRESET_BOTTOM_SHEET_OPENED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingDrink.Companion.EVENT_PRESET_CREATED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingHistory.Companion.EVENT_HISTORY_DELETE_TAPPED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingStats.Companion.EVENT_STATS_BAR_TAPPED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingStats.Companion.EVENT_STATS_PERIOD_SELECTED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingStats.Companion.EVENT_STATS_PERSONAL_BEST_TAPPED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingHistory.Companion.EVENT_HISTORY_EDIT_AMOUNT_TAPPED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingHistory.Companion.EVENT_HISTORY_EDIT_TIME_TAPPED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingHistory.Companion.EVENT_HISTORY_FILTER_CHANGED
@@ -151,5 +154,19 @@ internal class MixpanelTrackingService(
 
     override fun trackHistoryFilterChanged() {
         sendEvent(EVENT_HISTORY_FILTER_CHANGED)
+    }
+
+    override fun trackStatsPeriodSelected(period: String) {
+        sendEvent(EVENT_STATS_PERIOD_SELECTED, JSONObject().apply {
+            put("period", period)
+        })
+    }
+
+    override fun trackStatsBarTapped() {
+        sendEvent(EVENT_STATS_BAR_TAPPED)
+    }
+
+    override fun trackStatsPersonalBestTapped() {
+        sendEvent(EVENT_STATS_PERSONAL_BEST_TAPPED)
     }
 }

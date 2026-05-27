@@ -98,6 +98,7 @@ fun WeeklyBarChart(
     onPageChanged: (page: Int) -> Unit,
     modifier: Modifier = Modifier,
     unitPreference: UnitPreference = UnitPreference.ML,
+    onBarTapped: () -> Unit = {},
 ) {
     if (pages.isEmpty()) return
 
@@ -179,6 +180,7 @@ fun WeeklyBarChart(
                     entries = page.entries,
                     isCurrentPage = pageIndex == pagerState.currentPage,
                     unitPreference = unitPreference,
+                    onBarTapped = onBarTapped,
                 )
             }
         }
@@ -286,6 +288,7 @@ private fun BarChartPage(
     isCurrentPage: Boolean,
     modifier: Modifier = Modifier,
     unitPreference: UnitPreference = UnitPreference.ML,
+    onBarTapped: () -> Unit = {},
 ) {
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
 
@@ -319,7 +322,9 @@ private fun BarChartPage(
                 isSelected = selectedIndex == index,
                 unitPreference = unitPreference,
                 onClick = {
-                    selectedIndex = if (selectedIndex == index) null else index
+                    val selecting = selectedIndex != index
+                    selectedIndex = if (selecting) index else null
+                    if (selecting) onBarTapped()
                 },
                 modifier = Modifier.weight(1f),
             )

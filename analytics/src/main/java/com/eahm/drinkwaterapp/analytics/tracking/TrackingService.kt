@@ -4,7 +4,8 @@ interface TrackingService
     : TrackingOnboarding,
     TrackingDrink,
     TrackingNavigation,
-    TrackingHistory {
+    TrackingHistory,
+    TrackingStats {
 
     fun startTracking()
 

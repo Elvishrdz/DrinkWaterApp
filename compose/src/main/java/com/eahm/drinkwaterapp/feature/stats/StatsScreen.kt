@@ -31,6 +31,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.ads.banner.InlineBannerAd
 import com.eahm.drinkwaterapp.ads.banner.rememberStatsScreenComponentBannerAdState
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingStats
 import com.eahm.drinkwaterapp.core.billing.PurchaseManager
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk50
@@ -53,6 +55,7 @@ internal fun StatsScreen(
     val state by viewModel.state.collectAsState()
     val calendarState by calendarViewModel.state.collectAsState()
     val purchaseManager = koinInject<PurchaseManager>()
+    val trackingService = koinInject<TrackingService>()
     val isAdFree by purchaseManager.isAdFree.collectAsStateWithLifecycle()
 
     Scaffold { innerPadding ->
@@ -61,6 +64,12 @@ internal fun StatsScreen(
             calendarState = calendarState,
             isAdFree = isAdFree,
             onPeriodSelected = { period ->
+                val periodName = when (period) {
+                    StatsPeriod.WEEK -> TrackingStats.PERIOD_WEEK
+                    StatsPeriod.MONTH -> TrackingStats.PERIOD_MONTH
+                    StatsPeriod.YEAR -> TrackingStats.PERIOD_YEAR
+                }
+                trackingService.trackStatsPeriodSelected(periodName)
                 viewModel.onPeriodSelected(period)
                 // Keep calendar view mode in sync: year toggle → year calendar, else → month
                 calendarViewModel.setViewMode(
@@ -71,6 +80,8 @@ internal fun StatsScreen(
             onCalendarPrevious = calendarViewModel::navigatePrevious,
             onCalendarNext = calendarViewModel::navigateNext,
             onCalendarViewModeToggle = calendarViewModel::setViewMode,
+            onBarTapped = trackingService::trackStatsBarTapped,
+            onPersonalBestTapped = trackingService::trackStatsPersonalBestTapped,
             modifier = Modifier
                 .padding(innerPadding),
         )
@@ -87,6 +98,8 @@ internal fun StatsContent(
     onCalendarPrevious: () -> Unit,
     onCalendarNext: () -> Unit,
     onCalendarViewModeToggle: (CalendarViewMode) -> Unit,
+    onBarTapped: () -> Unit = {},
+    onPersonalBestTapped: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val bannerAdState = rememberStatsScreenComponentBannerAdState(enabled = !isAdFree)
@@ -194,6 +207,7 @@ internal fun StatsContent(
                 pages = state.pages,
                 onPageChanged = onChartPageChanged,
                 unitPreference = state.unitPreference,
+                onBarTapped = onBarTapped,
                 modifier = Modifier.padding(horizontal = 18.dp)
             )
         }
@@ -207,6 +221,7 @@ internal fun StatsContent(
                 personalBestMl = state.personalBestMl,
                 personalBestDate = state.personalBestDate,
                 unitPreference = state.unitPreference,
+                onPersonalBestTapped = onPersonalBestTapped,
                 modifier = Modifier.padding(horizontal = 18.dp)
             )
         }

@@ -62,6 +62,7 @@ fun MiniStatsCards(
     modifier: Modifier = Modifier,
     personalBestDate: LocalDate? = null,
     unitPreference: UnitPreference = UnitPreference.ML,
+    onPersonalBestTapped: () -> Unit = {},
 ) {
     val today = remember {
         Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
@@ -138,7 +139,11 @@ fun MiniStatsCards(
                         label = stringResource(R.string.stats_mini_personal_best),
                         modifier = Modifier.fillMaxWidth(),
                         onClick = if (personalBestDate != null) {
-                            { tooltipVisible = !tooltipVisible }
+                            {
+                                val showing = !tooltipVisible
+                                tooltipVisible = showing
+                                if (showing) onPersonalBestTapped()
+                            }
                         } else null,
                     )
                     if (tooltipVisible && personalBestDate != null && daysAgo != null) {
