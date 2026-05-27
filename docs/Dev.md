@@ -2,7 +2,8 @@ Development
 
 urgent fixes
 
-- [x] Fix goal celebration card in phone landscape. with no enough space crashes when trying to drag the component
+- [x] Fix goal celebration card in phone landscape. with no enough space crashes when trying to drag
+  the component
 - [x]  despues de aceptar overlay permission al regresar a la app no seguimos al siguiente paso.
 
 Next release priorities
@@ -34,6 +35,8 @@ App Release
 
 Priorities Tier 1
 
+- [] agregar ellipsis a bottom menus. cuando el texto es muy largo. y centrar iconos y texto en 1
+  sola linea.
 - [] al aceptar una nueva politica de privacidad, y si ya esta aprovado el tracking, no mostrar esta
   pantalla. actualmente aparece rapidamente antes de quitarse cuando se aceptan nuevas politicas de
   privacidad en la app
