@@ -646,6 +646,62 @@
     <string name="goal_overlay_stat_streak">Streak</string>
     <string name="goal_overlay_share_progress">Share progress</string>
 
+    <!-- Backup — Settings section -->
+    <string name="backup_section_title">CLOUD BACKUP</string>
+    <string name="backup_row_provider">Backup provider</string>
+    <string name="backup_status_not_connected">Not connected</string>
+    <string name="backup_status_syncing">Syncing…</string>
+    <string name="backup_row_sync_now">Sync now</string>
+    <string name="backup_row_last_sync">Last backup</string>
+    <string name="backup_last_sync_never">Never</string>
+    <string name="backup_last_sync_value">%1$s</string>
+    <string name="backup_row_disconnect">Disconnect</string>
+
+    <!-- Backup — Provider picker sheet -->
+    <string name="backup_picker_title">Choose a backup provider</string>
+    <string name="backup_picker_google_drive">Google Drive</string>
+    <string name="backup_picker_dropbox">Dropbox</string>
+
+    <!-- Backup — Disconnect dialog -->
+    <string name="backup_disconnect_title">Disconnect backup?</string>
+    <string name="backup_disconnect_body">Your data will remain on the cloud, but auto-sync will be disabled until you reconnect.</string>
+    <string name="backup_disconnect_confirm">Disconnect</string>
+
+    <!-- Backup — Restore conflict dialog -->
+    <string name="backup_conflict_title">Data conflict</string>
+    <string name="backup_conflict_body">You have local data and a cloud backup. Which one do you want to keep?</string>
+    <string name="backup_conflict_use_cloud">Use cloud backup</string>
+    <string name="backup_conflict_use_local">Keep local data</string>
+
+    <!-- Backup — Incompatible version dialog -->
+    <string name="backup_incompatible_title">App update required</string>
+    <string name="backup_incompatible_body">This backup was created with a newer version of the app. Please update to restore it.</string>
+    <string name="backup_incompatible_cta">Update app</string>
+
+    <!-- Backup — Quota exceeded dialog -->
+    <string name="backup_quota_title">Storage limit reached</string>
+    <string name="backup_quota_body">Your %1$s backup (%2$s) exceeds the available storage space.</string>
+    <string name="backup_quota_manage">Manage storage</string>
+
+    <!-- Backup — Migration progress dialog -->
+    <string name="backup_migration_title">Migrating backup…</string>
+    <string name="backup_migration_body">Transferring your data to the new provider.</string>
+    <string name="backup_migration_success">Migration complete</string>
+    <string name="backup_migration_error">Migration failed</string>
+
+    <!-- Backup — Change provider sheet -->
+    <string name="backup_change_title">Change backup provider</string>
+    <string name="backup_change_current">Currently connected to: %1$s</string>
+    <string name="backup_change_migrate">Migrate data to %1$s</string>
+    <string name="backup_change_switch">Switch without migrating</string>
+
+    <!-- Backup — Onboarding step -->
+    <string name="backup_onb_title">Keep your data safe</string>
+    <string name="backup_onb_subtitle">Back up your history to the cloud and restore it on any device.</string>
+    <string name="backup_onb_google_drive">Connect Google Drive</string>
+    <string name="backup_onb_dropbox">Connect Dropbox</string>
+    <string name="backup_onb_skip">Skip for now</string>
+
     <!-- Validation errors -->
     <string name="validation_error_empty">Field cannot be empty</string>
     <string name="validation_error_invalid_number">Provide a valid number</string>

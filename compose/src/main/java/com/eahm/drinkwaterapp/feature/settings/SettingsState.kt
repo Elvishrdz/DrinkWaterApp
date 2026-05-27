@@ -6,6 +6,7 @@ import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
 import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
 import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.eahm.drinkwaterapp.core.presentation.UnitPreference
+import com.eahm.drinkwaterapp.feature.settings.backup.BackupUiState
 import com.revenuecat.purchases.Package as RcPackage
 
 @Immutable
@@ -39,6 +40,7 @@ data class SettingsState(
     val timeFormatPreference: TimeFormatPreference = TimeFormatPreference.SYSTEM,
     val unitPreference: UnitPreference = UnitPreference.ML,
     val currentLocaleTag: String = "",  // "" = system default; "en-US", "es-Es" otherwise
+    val backupUiState: BackupUiState = BackupUiState(),
 )
 
 enum class WaterUnit(val label: String) {

@@ -67,6 +67,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.eahm.drinkwaterapp.R
+import com.eahm.drinkwaterapp.backup.CloudProviderType
 import com.eahm.drinkwaterapp.core.billing.PurchaseState
 import com.eahm.drinkwaterapp.core.config.FeatureFlags
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
@@ -94,6 +95,8 @@ import com.eahm.drinkwaterapp.core.domain.extension.sanitizeZeroDecimals
 import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.core.presentation.composable.BuildInfoFooter
+import com.eahm.drinkwaterapp.feature.settings.backup.BackupSettingsSection
+import com.eahm.drinkwaterapp.feature.settings.backup.ProviderPickerSheet
 import com.eahm.drinkwaterapp.feature.settings.extension.openPlayStoreUrl
 import com.eahm.drinkwaterapp.feature.settings.extension.openPrivacyPolicyAndTermsOfUse
 import com.eahm.drinkwaterapp.feature.settings.extension.startAppShareIntent
@@ -256,6 +259,9 @@ internal fun SettingsScreen(
             else showRevokeTrackingDialog = true
         },
         onPrivacyPolicyAndTermsOfUseTap = context::openPrivacyPolicyAndTermsOfUse,
+        onConnectBackupTap = viewModel::onConnectBackup,
+        onSyncNowTap = viewModel::onSyncNow,
+        onDisconnectBackupTap = viewModel::onDisconnectBackup,
         modifier = modifier,
     )
 
@@ -414,6 +420,9 @@ internal fun SettingsContent(
     onLanguageChanged: (String) -> Unit,
     onTrackingToggled: (Boolean) -> Unit,
     onPrivacyPolicyAndTermsOfUseTap: () -> Unit,
+    onConnectBackupTap: (CloudProviderType) -> Unit = {},
+    onSyncNowTap: () -> Unit = {},
+    onDisconnectBackupTap: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -439,6 +448,8 @@ internal fun SettingsContent(
     var showTimeFormatSheet by rememberSaveable { mutableStateOf(false) }
     var showUnitSheet by rememberSaveable { mutableStateOf(false) }
     var showLanguageDialog by rememberSaveable { mutableStateOf(false) }
+    var showProviderPickerSheet by rememberSaveable { mutableStateOf(false) }
+    var showDisconnectBackupDialog by rememberSaveable { mutableStateOf(false) }
 
     Scaffold { innerPadding ->
         LazyColumn(
@@ -505,6 +516,17 @@ internal fun SettingsContent(
                             RowChevronTrailing()
                         }
                     }
+                }
+            }
+
+            if (FeatureFlags.cloudBackupEnabled) {
+                item {
+                    BackupSettingsSection(
+                        state = state.backupUiState,
+                        onConnectTap = { showProviderPickerSheet = true },
+                        onSyncNowTap = onSyncNowTap,
+                        onDisconnectTap = { showDisconnectBackupDialog = true },
+                    )
                 }
             }
 
@@ -837,6 +859,28 @@ internal fun SettingsContent(
             current = state.currentLocaleTag,
             onLanguageSelected = onLanguageChanged,
             onDismiss = { showLanguageDialog = false },
+        )
+    }
+
+    // ── Backup provider picker sheet ──────────────────────────────────────────
+    if (showProviderPickerSheet) {
+        ProviderPickerSheet(
+            onProviderSelected = { provider ->
+                showProviderPickerSheet = false
+                onConnectBackupTap(provider)
+            },
+            onDismiss = { showProviderPickerSheet = false },
+        )
+    }
+
+    // ── Backup disconnect dialog ──────────────────────────────────────────────
+    if (showDisconnectBackupDialog) {
+        DisconnectBackupDialog(
+            onDismiss = { showDisconnectBackupDialog = false },
+            onConfirm = {
+                showDisconnectBackupDialog = false
+                onDisconnectBackupTap()
+            },
         )
     }
 }
@@ -1667,6 +1711,52 @@ private fun RestoreSuccessDialog(onDismiss: () -> Unit) {
 
             DwPrimaryButton(
                 text = stringResource(R.string.settings_restore_success_cta),
+                onClick = onDismiss,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+}
+
+// ── Disconnect backup dialog ──────────────────────────────────────────────────
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DisconnectBackupDialog(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+) {
+    BasicAlertDialog(onDismissRequest = onDismiss) {
+        Column(
+            modifier = Modifier
+                .clip(RoundedCornerShape(20.dp))
+                .background(color = MaterialTheme.colorScheme.background)
+                .padding(24.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.backup_disconnect_title),
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+            Spacer(Modifier.height(10.dp))
+            Text(
+                text = stringResource(R.string.backup_disconnect_body),
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp,
+                color = DwInk500,
+            )
+            Spacer(Modifier.height(24.dp))
+            DwPrimaryButton(
+                text = stringResource(R.string.backup_disconnect_confirm),
+                onClick = onConfirm,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(Modifier.height(8.dp))
+            DwSecondaryButton(
+                text = stringResource(R.string.action_cancel),
                 onClick = onDismiss,
                 modifier = Modifier.fillMaxWidth(),
             )

@@ -1,5 +1,6 @@
 package com.eahm.drinkwaterapp.feature.onboarding
 
+import com.eahm.drinkwaterapp.core.config.FeatureFlags
 import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
 import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.eahm.drinkwaterapp.core.presentation.UnitPreference
@@ -63,13 +64,16 @@ sealed interface OnboardingSteps {
 
     data object Celebrations : OnboardingSteps
 
+    data object CloudBackup : OnboardingSteps
+
     data object Summary : OnboardingSteps
 
     companion object
 }
 
 
-internal val OnboardingSteps.Companion.totalSteps: Int get() = 10
+internal val OnboardingSteps.Companion.totalSteps: Int
+    get() = if (FeatureFlags.cloudBackupEnabled) 11 else 10
 
 fun OnboardingSteps.Companion.byStep(step: Int) = when (step) {
     1 -> OnboardingSteps.Intro
@@ -83,6 +87,7 @@ fun OnboardingSteps.Companion.byStep(step: Int) = when (step) {
     8 -> OnboardingSteps.RemindersSteps.ExactAlarm
     9 -> OnboardingSteps.Celebrations
 
-    totalSteps -> OnboardingSteps.Summary
+    10 -> if (FeatureFlags.cloudBackupEnabled) OnboardingSteps.CloudBackup else OnboardingSteps.Summary
+    11 -> OnboardingSteps.Summary
     else -> OnboardingSteps.Intro
 }

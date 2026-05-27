@@ -644,6 +644,62 @@
     <string name="goal_overlay_stat_streak">Serie</string>
     <string name="goal_overlay_share_progress">Fortschritt teilen</string>
 
+    <!-- Backup — Einstellungsbereich -->
+    <string name="backup_section_title">CLOUD-BACKUP</string>
+    <string name="backup_row_provider">Backup-Anbieter</string>
+    <string name="backup_status_not_connected">Nicht verbunden</string>
+    <string name="backup_status_syncing">Wird synchronisiert…</string>
+    <string name="backup_row_sync_now">Jetzt synchronisieren</string>
+    <string name="backup_row_last_sync">Letztes Backup</string>
+    <string name="backup_last_sync_never">Nie</string>
+    <string name="backup_last_sync_value">%1$s</string>
+    <string name="backup_row_disconnect">Trennen</string>
+
+    <!-- Backup — Anbieter-Auswahlblatt -->
+    <string name="backup_picker_title">Backup-Anbieter wählen</string>
+    <string name="backup_picker_google_drive">Google Drive</string>
+    <string name="backup_picker_dropbox">Dropbox</string>
+
+    <!-- Backup — Trenn-Dialog -->
+    <string name="backup_disconnect_title">Backup trennen?</string>
+    <string name="backup_disconnect_body">Deine Daten bleiben in der Cloud, aber die automatische Synchronisierung wird deaktiviert, bis du dich erneut verbindest.</string>
+    <string name="backup_disconnect_confirm">Trennen</string>
+
+    <!-- Backup — Datenkonflikts-Dialog -->
+    <string name="backup_conflict_title">Datenkonflikt</string>
+    <string name="backup_conflict_body">Du hast lokale Daten und ein Cloud-Backup. Welches möchtest du behalten?</string>
+    <string name="backup_conflict_use_cloud">Cloud-Backup verwenden</string>
+    <string name="backup_conflict_use_local">Lokale Daten behalten</string>
+
+    <!-- Backup — Inkompatible Version Dialog -->
+    <string name="backup_incompatible_title">App-Update erforderlich</string>
+    <string name="backup_incompatible_body">Dieses Backup wurde mit einer neueren App-Version erstellt. Bitte aktualisiere die App, um es wiederherzustellen.</string>
+    <string name="backup_incompatible_cta">App aktualisieren</string>
+
+    <!-- Backup — Kontingent überschritten Dialog -->
+    <string name="backup_quota_title">Speicherlimit erreicht</string>
+    <string name="backup_quota_body">Dein %1$s-Backup (%2$s) überschreitet den verfügbaren Speicherplatz.</string>
+    <string name="backup_quota_manage">Speicher verwalten</string>
+
+    <!-- Backup — Migrationsdialog -->
+    <string name="backup_migration_title">Backup wird migriert…</string>
+    <string name="backup_migration_body">Deine Daten werden zum neuen Anbieter übertragen.</string>
+    <string name="backup_migration_success">Migration abgeschlossen</string>
+    <string name="backup_migration_error">Migration fehlgeschlagen</string>
+
+    <!-- Backup — Anbieter wechseln Blatt -->
+    <string name="backup_change_title">Backup-Anbieter wechseln</string>
+    <string name="backup_change_current">Aktuell verbunden mit: %1$s</string>
+    <string name="backup_change_migrate">Daten zu %1$s migrieren</string>
+    <string name="backup_change_switch">Wechseln ohne Migration</string>
+
+    <!-- Backup — Onboarding-Schritt -->
+    <string name="backup_onb_title">Halte deine Daten sicher</string>
+    <string name="backup_onb_subtitle">Sichere deinen Verlauf in der Cloud und stelle ihn auf jedem Gerät wieder her.</string>
+    <string name="backup_onb_google_drive">Google Drive verbinden</string>
+    <string name="backup_onb_dropbox">Dropbox verbinden</string>
+    <string name="backup_onb_skip">Vorerst überspringen</string>
+
     <!-- Validierungsfehler -->
     <string name="validation_error_empty">Das Feld darf nicht leer sein</string>
     <string name="validation_error_invalid_number">Gib eine gültige Zahl ein</string>

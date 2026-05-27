@@ -13,6 +13,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingService.Companion.OptOutSource
+import com.eahm.drinkwaterapp.backup.BackupPreferences
+import com.eahm.drinkwaterapp.backup.BackupRepository
+import com.eahm.drinkwaterapp.backup.BackupScheduler
+import com.eahm.drinkwaterapp.backup.BackupSyncState
+import com.eahm.drinkwaterapp.backup.CloudProviderType
 import com.eahm.drinkwaterapp.core.billing.PurchaseManager
 import com.eahm.drinkwaterapp.core.config.AppInfoService
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
@@ -25,6 +30,7 @@ import com.eahm.drinkwaterapp.core.database.entity.DailyGoalEntity
 import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.feature.drink.DateTimeZoneChangedObserver
+import com.eahm.drinkwaterapp.feature.settings.backup.BackupUiState
 import com.eahm.drinkwaterapp.feature.settings.data.ActiveTimes
 import com.eahm.drinkwaterapp.ui.inputfield.validateText
 import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
@@ -54,9 +60,31 @@ internal class SettingsViewModel(
     appInfoService: AppInfoService,
     private val purchaseManager: PurchaseManager,
     private val trackingService: TrackingService,
+    private val backupRepository: BackupRepository,
+    private val backupPreferences: BackupPreferences,
+    private val backupScheduler: BackupScheduler,
 ) : ViewModel() {
 
     private val dao = database.getDailyGoalDao()
+
+    private val _backupUiState = MutableStateFlow(BackupUiState())
+
+    init {
+        viewModelScope.launch { refreshBackupState() }
+    }
+
+    private suspend fun refreshBackupState() {
+        val providerId = backupPreferences.getBackupProvider()
+        val providerType = providerId?.let { CloudProviderType.fromId(it) }
+        val lastSyncAt = backupPreferences.getBackupLastSyncAt()
+        _backupUiState.update {
+            it.copy(
+                isConnected = providerType != null,
+                providerType = providerType,
+                lastSyncAt = lastSyncAt,
+            )
+        }
+    }
 
     private val activeTimes = combine(
         prefsStorage.getStartTime(),
@@ -153,6 +181,16 @@ internal class SettingsViewModel(
         }
         .combine(_currentLocaleTag) { state, localeTag ->
             state.copy(currentLocaleTag = localeTag)
+        }
+        .combine(_backupUiState) { state, backup ->
+            state.copy(backupUiState = backup)
+        }
+        .combine(backupRepository.syncState) { state, syncState ->
+            state.copy(
+                backupUiState = state.backupUiState.copy(
+                    isSyncing = syncState is BackupSyncState.InProgress,
+                )
+            )
         }
         .stateIn(
             scope = viewModelScope,
@@ -317,6 +355,28 @@ internal class SettingsViewModel(
 
     fun onRestorePurchase() {
         purchaseManager.restore()
+    }
+
+    fun onConnectBackup(providerType: CloudProviderType) {
+        viewModelScope.launch {
+            backupRepository.connect(application, providerType)
+            refreshBackupState()
+        }
+    }
+
+    fun onDisconnectBackup() {
+        viewModelScope.launch {
+            backupRepository.disconnect(application)
+            backupScheduler.cancelAll()
+            refreshBackupState()
+        }
+    }
+
+    fun onSyncNow() {
+        viewModelScope.launch {
+            backupRepository.sync(application)
+            refreshBackupState()
+        }
     }
 
     private suspend fun setGoalFromToday(goalMl: Float) {

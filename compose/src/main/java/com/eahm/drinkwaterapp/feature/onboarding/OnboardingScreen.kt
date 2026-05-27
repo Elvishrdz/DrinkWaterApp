@@ -22,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps.Celebrations
+import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps.CloudBackup
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps.DailyGoal
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps.Intro
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps.RemindersSteps
@@ -30,6 +31,7 @@ import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps.Units
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.LocalOnboardingProgress
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbShell
 import com.eahm.drinkwaterapp.feature.onboarding.ui.steps.OnboardingStep
+import com.eahm.drinkwaterapp.feature.onboarding.ui.steps.stepBackup
 import com.eahm.drinkwaterapp.feature.onboarding.ui.steps.stepDone
 import com.eahm.drinkwaterapp.feature.onboarding.ui.steps.stepExactAlarm
 import com.eahm.drinkwaterapp.feature.onboarding.ui.steps.stepInterval
@@ -173,6 +175,13 @@ internal fun OnboardingScreen(
 
         Celebrations -> stepOverlay(
             onContinue = viewModel::nextStep,
+            onBack = viewModel::prevStep,
+        )
+
+        CloudBackup -> stepBackup(
+            onSkip = viewModel::skipBackup,
+            onConnectGoogle = viewModel::nextStep,
+            onConnectDropbox = viewModel::nextStep,
             onBack = viewModel::prevStep,
         )
 

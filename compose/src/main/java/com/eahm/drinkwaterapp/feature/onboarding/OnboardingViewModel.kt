@@ -115,6 +115,8 @@ internal class OnboardingViewModel(
     fun nextStep() = _state.update { it.copy(step = it.step + 1) }
     fun prevStep() = _state.update { it.copy(step = (it.step - 1).coerceAtLeast(1)) }
 
+    fun skipBackup() = nextStep()
+
     fun finishOnboarding(onComplete: () -> Unit) {
         onboardingCompleted = true
         viewModelScope.launch {

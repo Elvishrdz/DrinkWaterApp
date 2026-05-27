@@ -646,6 +646,62 @@
     <string name="goal_overlay_stat_streak">Racha</string>
     <string name="goal_overlay_share_progress">Compartir progreso</string>
 
+    <!-- Copia de seguridad — Sección de ajustes -->
+    <string name="backup_section_title">COPIA EN LA NUBE</string>
+    <string name="backup_row_provider">Proveedor de copia</string>
+    <string name="backup_status_not_connected">No conectado</string>
+    <string name="backup_status_syncing">Sincronizando…</string>
+    <string name="backup_row_sync_now">Sincronizar ahora</string>
+    <string name="backup_row_last_sync">Última copia</string>
+    <string name="backup_last_sync_never">Nunca</string>
+    <string name="backup_last_sync_value">%1$s</string>
+    <string name="backup_row_disconnect">Desconectar</string>
+
+    <!-- Copia de seguridad — Hoja de selección de proveedor -->
+    <string name="backup_picker_title">Elige un proveedor de copia</string>
+    <string name="backup_picker_google_drive">Google Drive</string>
+    <string name="backup_picker_dropbox">Dropbox</string>
+
+    <!-- Copia de seguridad — Diálogo de desconexión -->
+    <string name="backup_disconnect_title">¿Desconectar copia de seguridad?</string>
+    <string name="backup_disconnect_body">Tus datos permanecerán en la nube, pero la sincronización automática se desactivará hasta que te vuelvas a conectar.</string>
+    <string name="backup_disconnect_confirm">Desconectar</string>
+
+    <!-- Copia de seguridad — Diálogo de conflicto de datos -->
+    <string name="backup_conflict_title">Conflicto de datos</string>
+    <string name="backup_conflict_body">Tienes datos locales y una copia en la nube. ¿Cuál quieres conservar?</string>
+    <string name="backup_conflict_use_cloud">Usar copia en la nube</string>
+    <string name="backup_conflict_use_local">Mantener datos locales</string>
+
+    <!-- Copia de seguridad — Diálogo de versión incompatible -->
+    <string name="backup_incompatible_title">Actualización requerida</string>
+    <string name="backup_incompatible_body">Esta copia fue creada con una versión más reciente de la app. Actualiza para restaurarla.</string>
+    <string name="backup_incompatible_cta">Actualizar app</string>
+
+    <!-- Copia de seguridad — Diálogo de cuota superada -->
+    <string name="backup_quota_title">Límite de almacenamiento alcanzado</string>
+    <string name="backup_quota_body">Tu copia de %1$s (%2$s) supera el espacio de almacenamiento disponible.</string>
+    <string name="backup_quota_manage">Gestionar almacenamiento</string>
+
+    <!-- Copia de seguridad — Diálogo de progreso de migración -->
+    <string name="backup_migration_title">Migrando copia…</string>
+    <string name="backup_migration_body">Transfiriendo tus datos al nuevo proveedor.</string>
+    <string name="backup_migration_success">Migración completada</string>
+    <string name="backup_migration_error">Error en la migración</string>
+
+    <!-- Copia de seguridad — Hoja de cambio de proveedor -->
+    <string name="backup_change_title">Cambiar proveedor de copia</string>
+    <string name="backup_change_current">Conectado actualmente a: %1$s</string>
+    <string name="backup_change_migrate">Migrar datos a %1$s</string>
+    <string name="backup_change_switch">Cambiar sin migrar</string>
+
+    <!-- Copia de seguridad — Paso de incorporación -->
+    <string name="backup_onb_title">Mantén tus datos seguros</string>
+    <string name="backup_onb_subtitle">Haz una copia de tu historial en la nube y recupéralo en cualquier dispositivo.</string>
+    <string name="backup_onb_google_drive">Conectar Google Drive</string>
+    <string name="backup_onb_dropbox">Conectar Dropbox</string>
+    <string name="backup_onb_skip">Omitir por ahora</string>
+
     <!-- Validation errors -->
     <string name="validation_error_empty">El campo no puede estar vacío</string>
     <string name="validation_error_invalid_number">Ingresa un número válido</string>
