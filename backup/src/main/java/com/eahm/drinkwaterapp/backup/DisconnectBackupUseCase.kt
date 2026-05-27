@@ -7,7 +7,7 @@ class DisconnectBackupUseCase(
     private val prefs: BackupPreferences,
     private val scheduler: BackupScheduler,
 ) {
-    suspend operator fun invoke(context: Context): BackupResult<Unit> {
+    suspend operator fun invoke(context: Context?): BackupResult<Unit> {
         val providerId = prefs.getBackupProvider()
         val type = providerId?.let { CloudProviderType.fromId(it) }
 

@@ -8,7 +8,7 @@ class MigrateBackupUseCase(
     private val prefs: BackupPreferences,
 ) {
     suspend operator fun invoke(
-        context: Context,
+        context: Context?,
         from: CloudBackupProvider,
         to: CloudBackupProvider,
     ): BackupResult<Unit> {

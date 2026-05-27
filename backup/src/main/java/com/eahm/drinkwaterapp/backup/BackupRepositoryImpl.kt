@@ -28,7 +28,7 @@ class BackupRepositoryImpl(
     }
 
     override suspend fun connect(
-        context: Context,
+        context: Context?,
         providerType: CloudProviderType,
     ): BackupResult<CloudUser> {
         _syncState.value = BackupSyncState.InProgress
@@ -40,7 +40,7 @@ class BackupRepositoryImpl(
         }
     }
 
-    override suspend fun sync(context: Context): BackupResult<SyncResult> {
+    override suspend fun sync(context: Context?): BackupResult<SyncResult> {
         if (_syncState.value is BackupSyncState.InProgress) {
             return BackupResult.Success(SyncResult.AlreadyInProgress)
         }
@@ -58,23 +58,23 @@ class BackupRepositoryImpl(
         }
     }
 
-    override suspend fun restore(context: Context): BackupResult<Unit> {
+    override suspend fun restore(context: Context?): BackupResult<Unit> {
         val provider = resolveProvider()
         if (provider is BackupResult.Failure) return provider
         return restoreUseCase(context, (provider as BackupResult.Success).value)
     }
 
-    override suspend fun checkRemoteStatus(context: Context): BackupResult<RemoteBackupStatus?> {
+    override suspend fun checkRemoteStatus(context: Context?): BackupResult<RemoteBackupStatus?> {
         val provider = resolveProvider()
         if (provider is BackupResult.Failure) return provider
         return checkStatusUseCase(context, (provider as BackupResult.Success).value)
     }
 
-    override suspend fun disconnect(context: Context): BackupResult<Unit> =
+    override suspend fun disconnect(context: Context?): BackupResult<Unit> =
         disconnectUseCase(context)
 
     override suspend fun migrateProvider(
-        context: Context,
+        context: Context?,
         from: CloudProviderType,
         to: CloudProviderType,
     ): BackupResult<Unit> {

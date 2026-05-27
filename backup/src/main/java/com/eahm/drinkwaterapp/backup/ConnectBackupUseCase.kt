@@ -8,7 +8,7 @@ class ConnectBackupUseCase(
     private val syncUseCase: SyncBackupUseCase,
 ) {
     suspend operator fun invoke(
-        context: Context,
+        context: Context?,
         providerType: CloudProviderType,
     ): BackupResult<CloudUser> {
         // Sign out from current provider if different

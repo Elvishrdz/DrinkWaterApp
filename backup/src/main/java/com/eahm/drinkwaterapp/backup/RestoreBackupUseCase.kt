@@ -6,7 +6,7 @@ class RestoreBackupUseCase(
     private val dataSource: BackupDataSource,
 ) {
     suspend operator fun invoke(
-        context: Context,
+        context: Context?,
         provider: CloudBackupProvider,
     ): BackupResult<Unit> {
         val downloadResult = provider.download(context)

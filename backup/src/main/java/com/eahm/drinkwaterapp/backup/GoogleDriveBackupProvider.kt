@@ -42,18 +42,19 @@ class GoogleDriveBackupProvider(
             .requestEmail()
             .build()
 
-    override fun getSignInIntent(context: Context): Intent? {
-        val account = GoogleSignIn.getLastSignedInAccount(context)
+    override fun getSignInIntent(context: Context?): Intent? {
+        val ctx = context!!
+        val account = GoogleSignIn.getLastSignedInAccount(ctx)
         if (account != null && GoogleSignIn.hasPermissions(
                 account,
                 Scope(APPDATA_SCOPE)
             )
         ) return null
-        return GoogleSignIn.getClient(context, buildSignInOptions()).signInIntent
+        return GoogleSignIn.getClient(ctx, buildSignInOptions()).signInIntent
     }
 
     override suspend fun handleSignInResult(
-        context: Context,
+        context: Context?,
         resultCode: Int,
         data: Intent?,
     ): BackupResult<CloudUser> = runCatching {
@@ -69,10 +70,11 @@ class GoogleDriveBackupProvider(
                 providerType = providerType,
             )
         )
-    }.getOrElse { e -> BackupResult.Failure(BackupError.AuthFailed) }
+    }.getOrElse { BackupResult.Failure(BackupError.AuthFailed) }
 
-    override suspend fun silentSignIn(context: Context): BackupResult<CloudUser> = runCatching {
-        val account = GoogleSignIn.getLastSignedInAccount(context)
+    override suspend fun silentSignIn(context: Context?): BackupResult<CloudUser> = runCatching {
+        val ctx = context!!
+        val account = GoogleSignIn.getLastSignedInAccount(ctx)
             ?: return BackupResult.Failure(BackupError.NotSignedIn)
         if (!GoogleSignIn.hasPermissions(account, Scope(APPDATA_SCOPE))) {
             return BackupResult.Failure(BackupError.NotSignedIn)
@@ -86,8 +88,9 @@ class GoogleDriveBackupProvider(
         )
     }.getOrElse { e -> BackupResult.Failure(BackupError.Unknown(e)) }
 
-    override suspend fun signOut(context: Context): BackupResult<Unit> = runCatching {
-        val client = GoogleSignIn.getClient(context, buildSignInOptions())
+    override suspend fun signOut(context: Context?): BackupResult<Unit> = runCatching {
+        val ctx = context!!
+        val client = GoogleSignIn.getClient(ctx, buildSignInOptions())
         suspendCancellableCoroutine { cont ->
             client.signOut()
                 .addOnSuccessListener { cont.resume(BackupResult.Success(Unit)) }
@@ -95,13 +98,15 @@ class GoogleDriveBackupProvider(
         }
     }.getOrElse { e -> BackupResult.Failure(BackupError.Unknown(e)) }
 
-    override suspend fun isSignedIn(context: Context): Boolean {
-        val account = GoogleSignIn.getLastSignedInAccount(context) ?: return false
+    override suspend fun isSignedIn(context: Context?): Boolean {
+        val ctx = context!!
+        val account = GoogleSignIn.getLastSignedInAccount(ctx) ?: return false
         return GoogleSignIn.hasPermissions(account, Scope(APPDATA_SCOPE))
     }
 
-    override suspend fun getCurrentUser(context: Context): CloudUser? {
-        val account = GoogleSignIn.getLastSignedInAccount(context) ?: return null
+    override suspend fun getCurrentUser(context: Context?): CloudUser? {
+        val ctx = context!!
+        val account = GoogleSignIn.getLastSignedInAccount(ctx) ?: return null
         if (!GoogleSignIn.hasPermissions(account, Scope(APPDATA_SCOPE))) return null
         return CloudUser(
             displayName = account.displayName ?: "",
@@ -110,8 +115,8 @@ class GoogleDriveBackupProvider(
         )
     }
 
-    private suspend fun getAccessToken(context: Context): String? =
-        GoogleSignIn.getLastSignedInAccount(context)?.serverAuthCode
+    private suspend fun getAccessToken(context: Context?): String? =
+        GoogleSignIn.getLastSignedInAccount(context!!)?.serverAuthCode
 
     private suspend fun findBackupFileId(token: String): String? {
         val response = httpClient.get("$DRIVE_BASE/drive/v3/files") {
@@ -127,8 +132,8 @@ class GoogleDriveBackupProvider(
             ?.jsonObject?.get("id")?.jsonPrimitive?.content
     }
 
-    override suspend fun upload(context: Context, data: String): BackupResult<Unit> = runCatching {
-        val token = GoogleSignIn.getLastSignedInAccount(context)?.serverAuthCode
+    override suspend fun upload(context: Context?, data: String): BackupResult<Unit> = runCatching {
+        val token = GoogleSignIn.getLastSignedInAccount(context!!)?.serverAuthCode
             ?: return BackupResult.Failure(BackupError.NotSignedIn)
 
         val existingId = findBackupFileId(token)
@@ -167,8 +172,8 @@ class GoogleDriveBackupProvider(
         else BackupResult.Failure(BackupError.UploadFailed(e))
     }
 
-    override suspend fun download(context: Context): BackupResult<BackupFile> = runCatching {
-        val token = GoogleSignIn.getLastSignedInAccount(context)?.serverAuthCode
+    override suspend fun download(context: Context?): BackupResult<BackupFile> = runCatching {
+        val token = GoogleSignIn.getLastSignedInAccount(context!!)?.serverAuthCode
             ?: return BackupResult.Failure(BackupError.NotSignedIn)
 
         val fileId = findBackupFileId(token)
@@ -186,9 +191,9 @@ class GoogleDriveBackupProvider(
         BackupResult.Success(BackupFile(metadata = metadata, rawData = rawJson))
     }.getOrElse { e -> BackupResult.Failure(BackupError.DownloadFailed(e)) }
 
-    override suspend fun getRemoteMetadata(context: Context): BackupResult<BackupMetadata?> =
+    override suspend fun getRemoteMetadata(context: Context?): BackupResult<BackupMetadata?> =
         runCatching {
-            val token = GoogleSignIn.getLastSignedInAccount(context)?.serverAuthCode
+            val token = GoogleSignIn.getLastSignedInAccount(context!!)?.serverAuthCode
                 ?: return BackupResult.Failure(BackupError.NotSignedIn)
             val fileId = findBackupFileId(token) ?: return BackupResult.Success(null)
             when (val result = download(context)) {
@@ -197,8 +202,8 @@ class GoogleDriveBackupProvider(
             }
         }.getOrElse { e -> BackupResult.Failure(BackupError.Unknown(e)) }
 
-    override suspend fun deleteRemoteFile(context: Context): BackupResult<Unit> = runCatching {
-        val token = GoogleSignIn.getLastSignedInAccount(context)?.serverAuthCode
+    override suspend fun deleteRemoteFile(context: Context?): BackupResult<Unit> = runCatching {
+        val token = GoogleSignIn.getLastSignedInAccount(context!!)?.serverAuthCode
             ?: return BackupResult.Failure(BackupError.NotSignedIn)
         val fileId = findBackupFileId(token) ?: return BackupResult.Success(Unit)
         val response = httpClient.delete("$DRIVE_BASE/drive/v3/files/$fileId") {

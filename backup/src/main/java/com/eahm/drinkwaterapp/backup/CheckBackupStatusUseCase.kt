@@ -4,7 +4,7 @@ import android.content.Context
 
 class CheckBackupStatusUseCase {
     suspend operator fun invoke(
-        context: Context,
+        context: Context?,
         provider: CloudBackupProvider,
     ): BackupResult<RemoteBackupStatus?> {
         return when (val result = provider.getRemoteMetadata(context)) {

@@ -10,7 +10,7 @@ class SyncBackupUseCase(
     private val prefs: BackupPreferences,
 ) {
     suspend operator fun invoke(
-        context: Context,
+        context: Context?,
         provider: CloudBackupProvider,
     ): BackupResult<SyncResult> {
         if (!mutex.tryLock()) return BackupResult.Success(SyncResult.AlreadyInProgress)

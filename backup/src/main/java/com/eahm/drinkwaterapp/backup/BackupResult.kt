@@ -6,9 +6,9 @@ sealed class BackupResult<out T> {
 
     data class Failure(val error: BackupError) : BackupResult<Nothing>()
 
-    fun getOrElse(default: @UnsafeVariance T): T = when (this) {
+    fun getOrElse(default: () -> @UnsafeVariance T): T = when (this) {
         is Success -> value
-        is Failure -> default
+        is Failure -> default()
     }
 
     fun <R> map(transform: (T) -> R): BackupResult<R> = when (this) {
