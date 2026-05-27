@@ -37,21 +37,31 @@ El feature empieza protegido por un **feature flag de solo DEBUG** y tendrá su 
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    Presentation layer                    │
+│                 MÓDULO :compose                          │
+│  ─────────────── Presentation layer ──────────────────  │
 │  OnboardingStep(Backup)  ·  BackupSettingsSection        │
 │  ProviderPickerSheet     ·  RestoreConflictDialog        │
 │  ChangeProviderSheet     ·  MigrationProgressDialog      │
 │  DevBackupPlayground                                     │
+│  ────────────────────────────────────────────────────── │
+│  BackupViewModel / UseCases (consume interfaces de       │
+│  :backup; los ViewModels viven en :compose)              │
+│  ────────────────────────────────────────────────────── │
+│  Bridge impls: BackupSerializer (→ BackupDataSource)     │
+│                DataStorePrefsStorage (→ BackupPreferences)│
+│  BackupErrorMapper (necesita UiText / R.string.*)        │
 └───────────────────────────┬─────────────────────────────┘
-                            │
+                            │  implementation(project(":backup"))
 ┌───────────────────────────▼─────────────────────────────┐
-│                 BackupViewModel / UseCases               │
-│  SyncBackupUseCase    · RestoreBackupUseCase             │
-│  CheckBackupStatusUseCase · DisconnectBackupUseCase      │
-│  ConnectBackupUseCase · MigrateBackupUseCase             │
-└───────────────────────────┬─────────────────────────────┘
-                            │
-┌───────────────────────────▼─────────────────────────────┐
+│                 MÓDULO :backup                           │
+│  ─────────────────────────────────────────────────────  │
+│  Use cases: SyncBackupUseCase · RestoreBackupUseCase     │
+│             CheckBackupStatusUseCase                     │
+│             ConnectBackupUseCase · DisconnectBackupUseCase│
+│             MigrateBackupUseCase                         │
+│  ─────────────────────────────────────────────────────  │
+│  Interfaces puente: BackupDataSource · BackupPreferences │
+│  ─────────────────────────────────────────────────────  │
 │                   BackupRepository                       │
 │  interface: connect, upload, download, getMetadata,      │
 │             disconnect, deleteRemoteFile                 │
@@ -59,8 +69,8 @@ El feature empieza protegido por un **feature flag de solo DEBUG** y tendrá su 
                    │  resuelve proveedor activo vía
                    │  BackupProviderRegistry
         ┌──────────▼────────────────┐    ┌─────────────────────┐
-        │  CloudBackupProvider      │    │  BackupSerializer   │
-        │  interface                │    │  + MigrationManager │
+        │  CloudBackupProvider      │    │  BackupMigrationMgr  │
+        │  interface                │    │  + BackupMigration   │
         └──────┬────────────────────┘    └─────────────────────┘
                │
    ┌───────────┴──────────────┐
@@ -69,6 +79,56 @@ El feature empieza protegido por un **feature flag de solo DEBUG** y tendrá su 
 GoogleDriveBackupProvider   DropboxBackupProvider
 (App Data folder)           (App Folder)
 ```
+
+## Módulo `:backup`
+
+Toda la lógica de negocio del feature (modelos, providers, use cases, worker, DI core) vive en
+un módulo Gradle independiente `:backup` (`com.eahm.drinkwaterapp.backup`). El módulo `:compose`
+depende de él y aporta:
+
+- Implementaciones concretas de las interfaces puente (`BackupDataSource`, `BackupPreferences`)
+- `BackupErrorMapper` (necesita `UiText` / `R.string.*` de `:compose`)
+- Toda la UI: ViewModels, screens, dialogs, onboarding step
+
+### Interfaces puente
+
+Para que `:backup` no dependa de Room ni DataStore (que viven en `:compose`), se definen dos
+interfaces en `:backup`:
+
+**`BackupDataSource`** — abstrae la serialización / deserialización desde la base de datos:
+
+```kotlin
+interface BackupDataSource {
+    suspend fun serialize(): String
+    suspend fun deserializeAndImport(data: JsonObject): BackupResult<Unit>
+}
+```
+
+Implementada por `BackupSerializer` en `:compose`.
+
+**`BackupPreferences`** — abstrae las 7 claves de prefs relacionadas con backup:
+
+```kotlin
+interface BackupPreferences {
+    suspend fun getBackupEnabled(): Boolean
+    suspend fun setBackupEnabled(enabled: Boolean)
+    suspend fun getBackupProvider(): String?
+    suspend fun setBackupProvider(id: String)
+    suspend fun getBackupLastSyncAt(): Long?
+    suspend fun setBackupLastSyncAt(millis: Long)
+    suspend fun getBackupAutoIntervalDays(): Int
+    suspend fun setBackupAutoIntervalDays(days: Int)
+    suspend fun getBackupUserDisplayName(): String?
+    suspend fun setBackupUserDisplayName(name: String?)
+    suspend fun getBackupContentHash(): String?
+    suspend fun setBackupContentHash(hash: String?)
+    suspend fun getBackupLastError(): String?
+    suspend fun setBackupLastError(code: String?)
+    suspend fun clearBackupKeys()
+}
+```
+
+Implementada por `DataStorePrefsStorage` en `:compose` (adicionalmente a `PrefsStorage`).
 
 ### `CloudProviderType` — enum de proveedores
 
@@ -1302,66 +1362,75 @@ name="backup_error_auth_failed">No se pudo iniciar sesión
 
 ## Archivos a crear
 
-| Archivo                                                | Descripción                                            |
-|--------------------------------------------------------|--------------------------------------------------------|
-| `core/backup/CloudProviderType.kt`                     | Enum con `GOOGLE_DRIVE`, `DROPBOX` y su `id` String    |
-| `core/backup/CloudUser.kt`                             | Data class: `displayName`, `providerType`              |
-| `core/backup/BackupMetadata.kt`                        | Data class del bloque `metadata` del JSON              |
-| `core/backup/BackupFile.kt`                            | Wrapper: `metadata + rawData: JsonObject`              |
-| `core/backup/BackupError.kt`                           | Sealed interface de errores                            |
-| `core/backup/CloudBackupProvider.kt`                   | Interface abstracta del proveedor                      |
-| `core/backup/BackupProviderRegistry.kt`                | Resolución del proveedor activo por tipo               |
-| `core/backup/GoogleDriveBackupProvider.kt`             | Implementación Drive (REST API + `GoogleSignIn`)       |
-| `core/backup/DropboxBackupProvider.kt`                 | Implementación Dropbox (SDK v7, OAuth PKCE)            |
-| `core/backup/BackupSerializer.kt`                      | Serialización/deserialización JSON ↔ entidades Room    |
-| `core/backup/BackupMigration.kt`                       | Data class para una migración individual               |
-| `core/backup/BackupMigrationManager.kt`                | Registro y ejecución encadenada de migraciones         |
-| `core/backup/BackupRepository.kt`                      | Interface de alto nivel                                |
-| `core/backup/BackupRepositoryImpl.kt`                  | Orquesta registry + serializer + migration             |
-| `core/backup/ConnectBackupUseCase.kt`                  | Auth + primera sync                                    |
-| `core/backup/MigrateBackupUseCase.kt`                  | Copia de archivo entre proveedores sin deserializar    |
-| `core/backup/SyncBackupUseCase.kt`                     | Exporta DB local → serializa → sube                    |
-| `core/backup/RestoreBackupUseCase.kt`                  | Descarga → deserializa → migra → importa a Room        |
-| `core/backup/CheckBackupStatusUseCase.kt`              | Retorna si hay backup remoto y su metadata             |
-| `core/backup/DisconnectBackupUseCase.kt`               | Cierra sesión + cancela WorkManager                    |
-| `core/backup/BackupErrorMapper.kt`                     | Mapea `BackupError` + `BackupErrorContext` a `UiText`  |
-| `core/backup/CloudBackupWorker.kt`                     | `CoroutineWorker` que llama a `SyncBackupUseCase`      |
-| `core/backup/BackupScheduler.kt`                       | Abstracción sobre WorkManager                          |
-| `feature/onboarding/ui/steps/StepBackup.kt`            | Paso de onboarding con 4 sub-estados (A/B/C/D)         |
-| `feature/settings/backup/BackupSettingsSection.kt`     | Sección de Settings                                    |
-| `feature/settings/backup/ProviderPickerSheet.kt`       | Bottom Sheet selector de proveedor                     |
-| `feature/settings/backup/ChangeProviderSheet.kt`       | Sheet para cambiar proveedor: migrar o cambiar limpio  |
-| `feature/settings/backup/MigrationProgressDialog.kt`   | Progreso + resultado de la migración entre proveedores |
-| `feature/settings/backup/RestoreConflictDialog.kt`     | Diálogo de conflicto local vs. nube                    |
-| `feature/settings/backup/IncompatibleVersionDialog.kt` | Diálogo de versión incompatible con CTA a Play Store   |
-| `feature/dev/backup/BackupDevState.kt`                 | State del playground                                   |
-| `feature/dev/backup/BackupDevAction.kt`                | Actions del playground                                 |
-| `feature/dev/backup/BackupDevEvent.kt`                 | Events del playground                                  |
-| `feature/dev/backup/BackupDevViewModel.kt`             | ViewModel del playground                               |
-| `feature/dev/backup/BackupDevScreen.kt`                | Pantalla del playground                                |
-| `feature/dev/backup/BackupDevRoot.kt`                  | Root composable del playground                         |
-| `di/BackupModule.kt`                                   | Módulo Koin con todas las dependencias de backup       |
+| Módulo     | Archivo                                                | Descripción                                                                          |
+|------------|--------------------------------------------------------|--------------------------------------------------------------------------------------|
+| `:backup`  | `core/backup/CloudProviderType.kt`                     | Enum con `GOOGLE_DRIVE`, `DROPBOX` y su `id` String                                  |
+| `:backup`  | `core/backup/CloudUser.kt`                             | Data class: `displayName`, `providerType`                                            |
+| `:backup`  | `core/backup/BackupMetadata.kt`                        | Data class del bloque `metadata` del JSON                                            |
+| `:backup`  | `core/backup/BackupFile.kt`                            | Wrapper: `metadata + rawData: JsonObject`                                            |
+| `:backup`  | `core/backup/BackupError.kt`                           | Sealed interface de errores                                                          |
+| `:backup`  | `core/backup/BackupDataSource.kt`                      | Interface puente: abstrae serialización/deserialización desde DB                     |
+| `:backup`  | `core/backup/BackupPreferences.kt`                     | Interface puente: abstrae las 7 claves de prefs relacionadas con backup              |
+| `:backup`  | `core/backup/CloudBackupProvider.kt`                   | Interface abstracta del proveedor                                                    |
+| `:backup`  | `core/backup/BackupProviderRegistry.kt`                | Resolución del proveedor activo por tipo                                             |
+| `:backup`  | `core/backup/GoogleDriveBackupProvider.kt`             | Implementación Drive (REST API + `GoogleSignIn`)                                     |
+| `:backup`  | `core/backup/DropboxBackupProvider.kt`                 | Implementación Dropbox (SDK v7, OAuth PKCE)                                          |
+| `:backup`  | `core/backup/BackupMigration.kt`                       | Data class para una migración individual                                             |
+| `:backup`  | `core/backup/BackupMigrationManager.kt`                | Registro y ejecución encadenada de migraciones                                       |
+| `:backup`  | `core/backup/BackupRepository.kt`                      | Interface de alto nivel                                                              |
+| `:backup`  | `core/backup/BackupRepositoryImpl.kt`                  | Orquesta registry + serializer + migration                                           |
+| `:backup`  | `core/backup/ConnectBackupUseCase.kt`                  | Auth + primera sync                                                                  |
+| `:backup`  | `core/backup/MigrateBackupUseCase.kt`                  | Copia de archivo entre proveedores sin deserializar                                  |
+| `:backup`  | `core/backup/SyncBackupUseCase.kt`                     | Exporta DB local → serializa → sube                                                  |
+| `:backup`  | `core/backup/RestoreBackupUseCase.kt`                  | Descarga → deserializa → migra → importa a Room                                      |
+| `:backup`  | `core/backup/CheckBackupStatusUseCase.kt`              | Retorna si hay backup remoto y su metadata                                           |
+| `:backup`  | `core/backup/DisconnectBackupUseCase.kt`               | Cierra sesión + cancela WorkManager                                                  |
+| `:backup`  | `core/backup/CloudBackupWorker.kt`                     | `CoroutineWorker` que llama a `SyncBackupUseCase`                                    |
+| `:backup`  | `core/backup/BackupScheduler.kt`                       | Abstracción sobre WorkManager                                                        |
+| `:backup`  | `di/BackupCoreModule.kt`                               | Módulo Koin core: Mutex, Json, providers, use cases, repo, worker — sin bridge impls |
+| `:compose` | `core/backup/BackupSerializer.kt`                      | Implementa `BackupDataSource`; usa Room + PrefsStorage de `:compose`                 |
+| `:compose` | `di/BackupModule.kt`                                   | Koin: `includes(backupCoreModule)` + bind `BackupSerializer → BackupDataSource`      |
+| `:compose` | `core/backup/BackupErrorMapper.kt`                     | Mapea `BackupError` + `BackupErrorContext` a `UiText` (necesita `R.string.*`)        |
+| `:compose` | `feature/onboarding/ui/steps/StepBackup.kt`            | Paso de onboarding con 4 sub-estados (A/B/C/D)                                       |
+| `:compose` | `feature/settings/backup/BackupSettingsSection.kt`     | Sección de Settings                                                                  |
+| `:compose` | `feature/settings/backup/ProviderPickerSheet.kt`       | Bottom Sheet selector de proveedor                                                   |
+| `:compose` | `feature/settings/backup/ChangeProviderSheet.kt`       | Sheet para cambiar proveedor: migrar o cambiar limpio                                |
+| `:compose` | `feature/settings/backup/MigrationProgressDialog.kt`   | Progreso + resultado de la migración entre proveedores                               |
+| `:compose` | `feature/settings/backup/RestoreConflictDialog.kt`     | Diálogo de conflicto local vs. nube                                                  |
+| `:compose` | `feature/settings/backup/IncompatibleVersionDialog.kt` | Diálogo de versión incompatible con CTA a Play Store                                 |
+| `:compose` | `feature/dev/backup/BackupDevState.kt`                 | State del playground                                                                 |
+| `:compose` | `feature/dev/backup/BackupDevAction.kt`                | Actions del playground                                                               |
+| `:compose` | `feature/dev/backup/BackupDevEvent.kt`                 | Events del playground                                                                |
+| `:compose` | `feature/dev/backup/BackupDevViewModel.kt`             | ViewModel del playground                                                             |
+| `:compose` | `feature/dev/backup/BackupDevScreen.kt`                | Pantalla del playground                                                              |
+| `:compose` | `feature/dev/backup/BackupDevRoot.kt`                  | Root composable del playground                                                       |
+
+> Rutas base: `:backup` → `backup/src/main/java/com/eahm/drinkwaterapp/backup/` |
+> `:compose` → `compose/src/main/java/com/eahm/drinkwaterapp/`
 
 ---
 
 ## Archivos a modificar
 
-| Archivo                                     | Cambio                                                                                               |
-|---------------------------------------------|------------------------------------------------------------------------------------------------------|
-| `AndroidBuildConfigConventionPlugin.kt`     | Agregar `FEATURE_CLOUD_BACKUP` por variante + `DROPBOX_APP_KEY` (valor de `local.properties` / env)  |
-| `core/config/FeatureFlags.kt`               | Agregar `cloudBackupEnabled`                                                                         |
-| `core/data/datastore/PrefsStorage.kt`       | Agregar keys de backup (enabled, provider, lastSync, interval, displayName)                          |
-| `feature/onboarding/OnboardingState.kt`     | Agregar `OnboardingSteps.CloudBackup`, actualizar `byStep` y `totalSteps`                            |
-| `feature/onboarding/OnboardingViewModel.kt` | Agregar sub-estados A/B/C/D del paso backup + `migrateInOnboarding()` + `checkOtherProvider()`       |
-| `feature/onboarding/OnboardingScreen.kt`    | Agregar rama para `OnboardingSteps.CloudBackup`                                                      |
-| `feature/settings/SettingsScreen.kt`        | Agregar `BackupSettingsSection` (detrás de feature flag)                                             |
-| `feature/settings/SettingsViewModel.kt`     | Exponer estado de backup y acciones                                                                  |
-| `feature/dev/DevScreen.kt`                  | Agregar entrada "Cloud Backup" al menú dev (detrás de feature flag)                                  |
-| `di/DataModule.kt`                          | Incluir `backupModule`                                                                               |
-| `di/FeatureModule.kt`                       | Registrar ViewModels de backup settings y dev                                                        |
-| `compose/build.gradle.kts`                  | Agregar dependencias Dropbox SDK                                                                     |
-| `gradle/libs.versions.toml`                 | Versiones y referencias Dropbox                                                                      |
-| `AndroidManifest.xml`                       | Registrar `CloudBackupWorker`; agregar `intent-filter` con scheme custom para Dropbox OAuth callback |
+| Archivo                                        | Cambio                                                                                                                                 |
+|------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|
+| `AndroidBuildConfigConventionPlugin.kt`        | Agregar `FEATURE_CLOUD_BACKUP` por variante + `DROPBOX_APP_KEY` (valor de `local.properties` / env)                                    |
+| `core/config/FeatureFlags.kt`                  | Agregar `cloudBackupEnabled`                                                                                                           |
+| `core/data/datastore/PrefsStorage.kt`          | Agregar keys de backup (enabled, provider, lastSync, interval, displayName)                                                            |
+| `core/data/datastore/DataStorePrefsStorage.kt` | Implementar adicionalmente `BackupPreferences` (las 7 claves de backup)                                                                |
+| `feature/onboarding/OnboardingState.kt`        | Agregar `OnboardingSteps.CloudBackup`, actualizar `byStep` y `totalSteps`                                                              |
+| `feature/onboarding/OnboardingViewModel.kt`    | Agregar sub-estados A/B/C/D del paso backup + `migrateInOnboarding()` + `checkOtherProvider()`                                         |
+| `feature/onboarding/OnboardingScreen.kt`       | Agregar rama para `OnboardingSteps.CloudBackup`                                                                                        |
+| `feature/settings/SettingsScreen.kt`           | Agregar `BackupSettingsSection` (detrás de feature flag)                                                                               |
+| `feature/settings/SettingsViewModel.kt`        | Exponer estado de backup y acciones                                                                                                    |
+| `feature/dev/DevScreen.kt`                     | Agregar entrada "Cloud Backup" al menú dev (detrás de feature flag)                                                                    |
+| `di/DataModule.kt`                             | Incluir `backupModule` (el de `:compose`, que a su vez incluye `backupCoreModule`)                                                     |
+| `di/FeatureModule.kt`                          | Registrar ViewModels de backup settings y dev                                                                                          |
+| `settings.gradle.kts`                          | Agregar `include(":backup")`                                                                                                           |
+| `backup/build.gradle.kts`                      | Crear con `drinkwater.android.library` + dependencias del módulo (WorkManager, Ktor, Dropbox, play-services-auth, Koin, serialization) |
+| `backup/src/main/AndroidManifest.xml`          | Crear con INTERNET permission, AuthActivity (Dropbox OAuth), CloudBackupWorker declaration                                             |
+| `compose/build.gradle.kts`                     | Agregar `implementation(project(":backup"))` (las deps que pasan a `:backup` se eliminan de aquí)                                      |
+| `gradle/libs.versions.toml`                    | Versiones y referencias Dropbox                                                                                                        |
 
 ---
 
@@ -1380,7 +1449,7 @@ name="backup_error_auth_failed">No se pudo iniciar sesión
 9. `ConnectBackupUseCase`, `SyncBackupUseCase`, `RestoreBackupUseCase`,
    `CheckBackupStatusUseCase`, `DisconnectBackupUseCase`, `MigrateBackupUseCase`.
 10. `CloudBackupWorker` + `BackupScheduler`.
-11. Koin `BackupModule`.
+11. Koin `BackupCoreModule` (en `:backup`) + `BackupModule` (en `:compose`).
 12. Nuevas keys en `PrefsStorage`.
 
 ### Fase 2 — Dev Playground
