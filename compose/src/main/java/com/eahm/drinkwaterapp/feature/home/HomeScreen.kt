@@ -25,6 +25,7 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaul
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -39,6 +40,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.eahm.drinkwaterapp.ads.banner.InlineBannerAd
 import com.eahm.drinkwaterapp.ads.banner.InlineBannerAdState
 import com.eahm.drinkwaterapp.ads.banner.rememberBelowMainScreenBannerAdState
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingNavigation
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
 import com.eahm.drinkwaterapp.core.billing.PurchaseManager
 import com.eahm.drinkwaterapp.core.config.BuildEnvironment
 import com.eahm.drinkwaterapp.core.data.confetti.ConfettiController
@@ -61,11 +64,23 @@ import org.koin.compose.koinInject
 internal fun HomeScreen() {
     val confettiController = koinInject<ConfettiController>()
     val purchaseManager = koinInject<PurchaseManager>()
+    val trackingService = koinInject<TrackingService>()
     val state by confettiController.state.collectAsStateWithLifecycle()
     val isAdFree by purchaseManager.isAdFree.collectAsStateWithLifecycle()
     var currentDestination by rememberSaveable { mutableStateOf(HomeDestination.TODAY) }
 
     val bannerAdState = rememberBelowMainScreenBannerAdState(enabled = !isAdFree)
+
+    LaunchedEffect(currentDestination) {
+        val screen = when (currentDestination) {
+            HomeDestination.TODAY -> TrackingNavigation.SCREEN_TODAY
+            HomeDestination.HISTORY -> TrackingNavigation.SCREEN_HISTORY
+            HomeDestination.STATS -> TrackingNavigation.SCREEN_STATS
+            HomeDestination.SETTINGS -> TrackingNavigation.SCREEN_SETTINGS
+            HomeDestination.DEV -> return@LaunchedEffect
+        }
+        trackingService.trackScreenViewed(screen)
+    }
 
     BackHandler(enabled = currentDestination != HomeDestination.TODAY) {
         currentDestination = HomeDestination.TODAY

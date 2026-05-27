@@ -6,6 +6,7 @@ import com.eahm.drinkwaterapp.analytics.BuildConfig
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingDrink.Companion.EVENT_DRINK_RECORDED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingDrink.Companion.EVENT_PRESET_BOTTOM_SHEET_OPENED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingDrink.Companion.EVENT_PRESET_CREATED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingNavigation.Companion.EVENT_SCREEN_VIEWED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_ABANDONED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_COMPLETED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_STARTED
@@ -123,6 +124,12 @@ internal class MixpanelTrackingService(
     override fun trackPresetBottomSheetOpened(presetCount: Int) {
         sendEvent(EVENT_PRESET_BOTTOM_SHEET_OPENED, JSONObject().apply {
             put("preset_count", presetCount)
+        })
+    }
+
+    override fun trackScreenViewed(screen: String) {
+        sendEvent(EVENT_SCREEN_VIEWED, JSONObject().apply {
+            put("screen", screen)
         })
     }
 }
