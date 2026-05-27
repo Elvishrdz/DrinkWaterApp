@@ -13,7 +13,7 @@ internal fun Context.startReportProblemIntent() {
         val uniqueCode = "PR100"
         val appName = getString(R.string.app_name)
         val subjectValue = getString(R.string.problem_report_subject, appName)
-        val subjectData = "subject=$uniqueCode:$subjectValue"
+        val subjectData = "subject=$uniqueCode: $subjectValue"
 
         val bodyValue = getString(R.string.problem_report_body, appName)
         val bodyData = "body=$bodyValue"

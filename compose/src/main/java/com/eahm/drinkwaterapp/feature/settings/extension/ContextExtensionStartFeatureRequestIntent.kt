@@ -13,7 +13,7 @@ internal fun Context.startFeatureRequestIntent() {
         val uniqueCode = "FR200"
         val appName = getString(R.string.app_name)
         val subjectValue = getString(R.string.feature_request_subject, appName)
-        val subjectData = "subject=$uniqueCode:$subjectValue"
+        val subjectData = "subject=$uniqueCode: $subjectValue"
 
         val bodyValue = getString(R.string.feature_request_body, appName)
         val bodyData = "body=$bodyValue"
