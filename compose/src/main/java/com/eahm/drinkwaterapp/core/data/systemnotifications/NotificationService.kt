@@ -146,7 +146,7 @@ object NotificationService {
         val notiColor: Int
         val notiSmallIcon: Int
         val notiLargeIcon: Bitmap? =
-            BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_app_2)
+            BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher)
 
         // TODO: if (SettingsClass().isGoalReached()) {
         if (false) {

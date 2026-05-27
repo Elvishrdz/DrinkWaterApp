@@ -112,7 +112,7 @@ internal object DrinkNotification {
         val smallIconResId = getSmallIconResId(goalReached, code)
 
         val largeIconResId = if (goalReached) {
-            R.mipmap.ic_app_2
+            R.mipmap.ic_launcher
         } else {
             R.mipmap.ic_launcher
         }
