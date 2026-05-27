@@ -388,14 +388,18 @@ name="backup_incompatible_cancel">Cancelar
 
 ## Feature flag
 
-Agregar en `AndroidBuildConfigConventionPlugin.kt`:
+`FEATURE_CLOUD_BACKUP` se define directamente en **`compose/build.gradle.kts`** dentro de
+`buildTypes {}`, **no** en `AndroidBuildConfigConventionPlugin.kt`:
 
 ```kotlin
-// DEBUG
-buildConfigField("boolean", "FEATURE_CLOUD_BACKUP", "true")
-
-// STAGING, QA, RELEASE
-buildConfigField("boolean", "FEATURE_CLOUD_BACKUP", "false")
+// compose/build.gradle.kts
+buildTypes {
+    debug {
+        buildConfigField("boolean", "FEATURE_CLOUD_BACKUP", "true")
+    }
+    // En staging / QA / release (cada buildType existente):
+    // buildConfigField("boolean", "FEATURE_CLOUD_BACKUP", "false")
+}
 ```
 
 Y en `FeatureFlags.kt`:
@@ -403,6 +407,12 @@ Y en `FeatureFlags.kt`:
 ```kotlin
 val cloudBackupEnabled: Boolean = BuildConfig.FEATURE_CLOUD_BACKUP
 ```
+
+`DROPBOX_APP_KEY` se define en **`backup/build.gradle.kts`** (con
+`buildFeatures { buildConfig = true }`),
+leyendo `dropbox.app.key` de `local.properties`. El mismo valor se expone como
+`manifestPlaceholders["dropboxAppKey"]` para resolver el scheme `db-${dropboxAppKey}` en el
+manifest del módulo `:backup`.
 
 Todo el código de backup se compila siempre, pero la UI solo se muestra si
 `FeatureFlags.cloudBackupEnabled == true`. Esto evita dead-code en release mientras el
@@ -1412,25 +1422,24 @@ name="backup_error_auth_failed">No se pudo iniciar sesión
 
 ## Archivos a modificar
 
-| Archivo                                        | Cambio                                                                                                                                 |
-|------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|
-| `AndroidBuildConfigConventionPlugin.kt`        | Agregar `FEATURE_CLOUD_BACKUP` por variante + `DROPBOX_APP_KEY` (valor de `local.properties` / env)                                    |
-| `core/config/FeatureFlags.kt`                  | Agregar `cloudBackupEnabled`                                                                                                           |
-| `core/data/datastore/PrefsStorage.kt`          | Agregar keys de backup (enabled, provider, lastSync, interval, displayName)                                                            |
-| `core/data/datastore/DataStorePrefsStorage.kt` | Implementar adicionalmente `BackupPreferences` (las 7 claves de backup)                                                                |
-| `feature/onboarding/OnboardingState.kt`        | Agregar `OnboardingSteps.CloudBackup`, actualizar `byStep` y `totalSteps`                                                              |
-| `feature/onboarding/OnboardingViewModel.kt`    | Agregar sub-estados A/B/C/D del paso backup + `migrateInOnboarding()` + `checkOtherProvider()`                                         |
-| `feature/onboarding/OnboardingScreen.kt`       | Agregar rama para `OnboardingSteps.CloudBackup`                                                                                        |
-| `feature/settings/SettingsScreen.kt`           | Agregar `BackupSettingsSection` (detrás de feature flag)                                                                               |
-| `feature/settings/SettingsViewModel.kt`        | Exponer estado de backup y acciones                                                                                                    |
-| `feature/dev/DevScreen.kt`                     | Agregar entrada "Cloud Backup" al menú dev (detrás de feature flag)                                                                    |
-| `di/DataModule.kt`                             | Incluir `backupModule` (el de `:compose`, que a su vez incluye `backupCoreModule`)                                                     |
-| `di/FeatureModule.kt`                          | Registrar ViewModels de backup settings y dev                                                                                          |
-| `settings.gradle.kts`                          | Agregar `include(":backup")`                                                                                                           |
-| `backup/build.gradle.kts`                      | Crear con `drinkwater.android.library` + dependencias del módulo (WorkManager, Ktor, Dropbox, play-services-auth, Koin, serialization) |
-| `backup/src/main/AndroidManifest.xml`          | Crear con INTERNET permission, AuthActivity (Dropbox OAuth), CloudBackupWorker declaration                                             |
-| `compose/build.gradle.kts`                     | Agregar `implementation(project(":backup"))` (las deps que pasan a `:backup` se eliminan de aquí)                                      |
-| `gradle/libs.versions.toml`                    | Versiones y referencias Dropbox                                                                                                        |
+| Archivo                                        | Cambio                                                                                                                          |
+|------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|
+| `compose/build.gradle.kts`                     | Agregar `FEATURE_CLOUD_BACKUP` por build type en `buildTypes {}` + `implementation(project(":backup"))`                         |
+| `backup/build.gradle.kts`                      | Crear: `drinkwater.android.library` + deps + `buildConfig = true` + `DROPBOX_APP_KEY` buildConfigField + `manifestPlaceholders` |
+| `core/config/FeatureFlags.kt`                  | Agregar `cloudBackupEnabled`                                                                                                    |
+| `core/data/datastore/PrefsStorage.kt`          | Agregar keys de backup (enabled, provider, lastSync, interval, displayName)                                                     |
+| `core/data/datastore/DataStorePrefsStorage.kt` | Implementar adicionalmente `BackupPreferences` (las 7 claves de backup)                                                         |
+| `feature/onboarding/OnboardingState.kt`        | Agregar `OnboardingSteps.CloudBackup`, actualizar `byStep` y `totalSteps`                                                       |
+| `feature/onboarding/OnboardingViewModel.kt`    | Agregar sub-estados A/B/C/D del paso backup + `migrateInOnboarding()` + `checkOtherProvider()`                                  |
+| `feature/onboarding/OnboardingScreen.kt`       | Agregar rama para `OnboardingSteps.CloudBackup`                                                                                 |
+| `feature/settings/SettingsScreen.kt`           | Agregar `BackupSettingsSection` (detrás de feature flag)                                                                        |
+| `feature/settings/SettingsViewModel.kt`        | Exponer estado de backup y acciones                                                                                             |
+| `feature/dev/DevScreen.kt`                     | Agregar entrada "Cloud Backup" al menú dev (detrás de feature flag)                                                             |
+| `di/DataModule.kt`                             | Incluir `backupModule` (el de `:compose`, que a su vez incluye `backupCoreModule`)                                              |
+| `di/FeatureModule.kt`                          | Registrar ViewModels de backup settings y dev                                                                                   |
+| `settings.gradle.kts`                          | Agregar `include(":backup")`                                                                                                    |
+| `backup/src/main/AndroidManifest.xml`          | Crear con INTERNET permission, AuthActivity (Dropbox OAuth, scheme `db-${dropboxAppKey}`), CloudBackupWorker declaration        |
+| `gradle/libs.versions.toml`                    | Versiones y referencias: workManager, ktor, playServicesAuth, dropboxSdk                                                        |
 
 ---
 

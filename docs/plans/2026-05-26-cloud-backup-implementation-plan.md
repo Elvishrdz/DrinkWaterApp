@@ -26,7 +26,6 @@ Everything must compile after each phase.
 - `compose/build.gradle.kts`
 - `settings.gradle.kts`
 - `backup/build.gradle.kts` (new file — create during Fase 1)
-- `build-logic/src/main/kotlin/AndroidBuildConfigConventionPlugin.kt`
 - `compose/src/main/java/com/eahm/drinkwaterapp/core/config/FeatureFlags.kt`
 - `compose/src/main/java/com/eahm/drinkwaterapp/core/data/datastore/PrefsStorage.kt`
 - `compose/src/main/java/com/eahm/drinkwaterapp/core/data/datastore/DataStorePrefsStorage.kt`
@@ -57,7 +56,15 @@ plugins {
     id("drinkwater.android.library")
     id("org.jetbrains.kotlin.plugin.serialization")
 }
-android { namespace = "com.eahm.drinkwaterapp.backup" }
+android {
+    namespace = "com.eahm.drinkwaterapp.backup"
+    buildFeatures { buildConfig = true }
+    defaultConfig {
+        val dropboxAppKey = project.properties["dropbox.app.key"] as? String ?: ""
+        buildConfigField("String", "DROPBOX_APP_KEY", "\"$dropboxAppKey\"")
+        manifestPlaceholders["dropboxAppKey"] = dropboxAppKey
+    }
+}
 dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.ktor.client.android)
@@ -72,7 +79,16 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.koin.core.coroutines)
     implementation(libs.koin.androidx.workmanager)
+    // Tests
+    testImplementation(libs.junit)
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
 }
+```
+
+`local.properties` (no commitear):
+
+```
+dropbox.app.key=YOUR_DROPBOX_APP_KEY
 ```
 
 **`backup/src/main/AndroidManifest.xml`** (new file — namespace only, no activities/permissions
@@ -134,7 +150,7 @@ android:launchMode="singleTask">
     <action android:name="android.intent.action.VIEW" />
     <category android:name="android.intent.category.DEFAULT" />
     <category android:name="android.intent.category.BROWSABLE" />
-    <data android:scheme="db-${BuildConfig.DROPBOX_APP_KEY}" />
+    <data android:scheme="db-${dropboxAppKey}" />
 </intent-filter>
 </activity>
 
@@ -150,18 +166,30 @@ android:authorities="${applicationId}.androidx-startup" android:exported="false"
 
 ### 2. Build config + FeatureFlags
 
-**`AndroidBuildConfigConventionPlugin.kt`**: read `dropbox.app.key` from local.properties; add to
-all variants:
+`FEATURE_CLOUD_BACKUP` y `DROPBOX_APP_KEY` se definen **directamente en los módulos** que los usan.
+`AndroidBuildConfigConventionPlugin.kt` **no se toca**.
+
+**`DROPBOX_APP_KEY`** ya está definido en `backup/build.gradle.kts` (ver step 0):
+
+- `BuildConfig.DROPBOX_APP_KEY` disponible en código Kotlin del módulo `:backup`
+- `${dropboxAppKey}` resuelto como `manifestPlaceholder` en el manifest del módulo
+
+**`FEATURE_CLOUD_BACKUP`** va en **`compose/build.gradle.kts`** dentro de `buildTypes {}`:
 
 ```kotlin
-buildConfigField("boolean", "FEATURE_CLOUD_BACKUP", "true")   // DEBUG
-buildConfigField("boolean", "FEATURE_CLOUD_BACKUP", "false")  // STAGING / QA / RELEASE
-buildConfigField("String", "DROPBOX_APP_KEY", "\"$dropboxAppKey\"") // all variants
+buildTypes {
+    debug {
+        buildConfigField("boolean", "FEATURE_CLOUD_BACKUP", "true")
+    }
+    // En cada build type de staging / QA / release que ya exista:
+    // buildConfigField("boolean", "FEATURE_CLOUD_BACKUP", "false")
+}
 ```
 
-**`FeatureFlags.kt`**: add `val cloudBackupEnabled: Boolean = BuildConfig.FEATURE_CLOUD_BACKUP`
+> `BuildConfig.FEATURE_CLOUD_BACKUP` solo existe en `:compose`, donde vive `FeatureFlags.kt`.
+> El módulo `:backup` no necesita esta flag — toda decisión de UI se toma en `:compose`.
 
-User update: set this build config fields directly in the build.gradle module.
+**`FeatureFlags.kt`**: add `val cloudBackupEnabled: Boolean = BuildConfig.FEATURE_CLOUD_BACKUP`
 
 ---
 
@@ -293,6 +321,111 @@ implements BackupDataSource (uses AppDatabase + PrefsStorage from `:compose`).
 
 ---
 
+## FASE 1.5 — Unit tests de infraestructura
+
+Verifican la lógica de negocio de `:backup` en aislamiento, **sin emulador ni SDK real**.
+Se ejecutan con `./gradlew :backup:test` tras completar FASE 1.
+
+Path: `backup/src/test/java/com/eahm/drinkwaterapp/backup/`
+
+No se usa librería de mocking — solo fakes en Kotlin puro.
+
+### Fakes
+
+| Archivo                      | Implements            | Comportamiento                                                                          |
+|------------------------------|-----------------------|-----------------------------------------------------------------------------------------|
+| `FakeBackupPreferences.kt`   | `BackupPreferences`   | Map en memoria de todas las claves; `clearBackupKeys()` limpia el map                   |
+| `FakeBackupDataSource.kt`    | `BackupDataSource`    | `serialize()` retorna JSON configurable; registra si `deserializeAndImport` fue llamado |
+| `FakeCloudBackupProvider.kt` | `CloudBackupProvider` | Configurable: éxito / error / FileNotFound por llamada; registra uploads/downloads      |
+
+---
+
+### `BackupResultTest.kt`
+
+- `mapOnSuccess` — `Success(42).map { it * 2 }` retorna `Success(84)`
+- `mapOnFailure` — `Failure(error).map { ... }` retorna el mismo `Failure` sin ejecutar el bloque
+- `getOrElseOnSuccess` — retorna el valor
+- `getOrElseOnFailure` — retorna el default
+
+---
+
+### `CloudProviderTypeTest.kt`
+
+- `fromIdReturnsCorrectType` — `fromId("google_drive") == GOOGLE_DRIVE`,
+  `fromId("dropbox") == DROPBOX`
+- `fromIdReturnsNullForUnknown` — `fromId("unknown") == null`
+
+---
+
+### `BackupMigrationManagerTest.kt`
+
+- `noMigrationWhenSchemasMatch` — `migrate(json, from=1, to=1)` retorna el mismo objeto sin
+  modificar
+- `singleMigrationApplied` — registra migración 1→2 que agrega un campo; verifica que el campo está
+  presente
+- `chainedMigrationsApplied` — registra 1→2 y 2→3; input en schema 1 recibe ambas transformaciones
+  en orden
+
+---
+
+### `BackupRepositoryImplTest.kt`
+
+- `returnsNoProviderSelectedWhenPrefsEmpty` — `FakeBackupPreferences` sin proveedor configurado;
+  cualquier operación retorna `Failure(BackupError.NoProviderSelected)`
+
+---
+
+### `SyncBackupUseCaseTest.kt`
+
+Usa `runTest` + `UnconfinedTestDispatcher`.
+
+- `returnsAlreadyInProgressWhenMutexLocked` — adquiere el mutex antes de invocar;
+  resultado es `Success(SyncResult.AlreadyInProgress)`, no se llama a `serialize()`
+- `skipsUploadWhenHashUnchanged` — `FakeBackupPreferences` tiene hash almacenado igual al que
+  retorna `FakeBackupDataSource.serialize()`; resultado es `Success(SyncResult.SkippedNoChanges)`,
+  `FakeCloudBackupProvider.upload()` **no** fue llamado
+- `uploadsAndPersistsHashWhenContentChanged` — contenido nuevo (hash diferente al guardado);
+  `FakeCloudBackupProvider.upload()` fue llamado; nuevo hash guardado en `FakeBackupPreferences`
+
+---
+
+### `RestoreBackupUseCaseTest.kt`
+
+- `returnsIncompatibleVersionForFutureSchema` — `FakeCloudBackupProvider` retorna metadata con
+  `schemaVersion = 99`; resultado es `Failure(BackupError.IncompatibleVersion(99))`;
+  `FakeBackupDataSource.deserializeAndImport` **no** fue llamado
+- `callsDeserializeWhenSchemaCompatible` — `schemaVersion == BackupMigrationManager.currentSchema`;
+  `FakeBackupDataSource.deserializeAndImport` **sí** fue llamado
+
+---
+
+### `CheckBackupStatusUseCaseTest.kt`
+
+- `returnsNullWhenNoRemoteFile` — `FakeCloudBackupProvider` retorna `FileNotFound`;
+  resultado es `Success(null)`
+- `isCompatibleTrueWhenSchemaMatches` — `remoteSchema == currentSchema`; `isCompatible == true`
+- `isCompatibleFalseWhenRemoteIsNewer` — `remoteSchema > currentSchema`; `isCompatible == false`
+
+---
+
+### `DisconnectBackupUseCaseTest.kt`
+
+- `clearsBackupEnabledAndCallsCancelAll` — tras invoke: `FakeBackupPreferences.getBackupEnabled()`
+  retorna `false`; se verifica que `BackupScheduler.cancelAll()` fue llamado (usando una
+  `FakeBackupScheduler` simple que registra la llamada)
+
+---
+
+### Compile + run check
+
+```
+./gradlew :backup:test
+```
+
+Debe pasar sin errores antes de continuar con FASE 2.
+
+---
+
 ## FASE 2 — Dev Playground
 
 ### New files under `feature/dev/backup/`
@@ -380,18 +513,20 @@ initially; real translations in a follow-up.
 
 ## Execution order
 
-1. Fase 1 steps 0→9 (compile `:backup` after step 9, then `:compose`)
-2. Fase 2 dev playground (compile + smoke test in emulator)
-3. Fase 3 production UI + onboarding changes
-4. Fase 4 strings
-5. `./gradlew :backup:compileDebugKotlin :compose:compileDebugKotlin` must pass after each phase
+1. Fase 1 steps 0→9 — compile: `./gradlew :backup:compileDebugKotlin :compose:compileDebugKotlin`
+2. Fase 1.5 unit tests — run: `./gradlew :backup:test`
+3. Fase 2 dev playground — compile + smoke test in emulator
+4. Fase 3 production UI + onboarding changes
+5. Fase 4 strings
+6. Both compile commands must pass after each phase
 
 ---
 
 ## Verification
 
 1. `./gradlew :backup:compileDebugKotlin :compose:compileDebugKotlin` — no errors after each phase
-2. Fase 2: smoke-test both providers (Google Drive + Dropbox) from dev playground in emulator
-3. Fase 3: verify onboarding step count is 11 when flag=true, 10 when flag=false
-4. Fase 3: verify Settings backup section hidden when flag=false
-5. Fase 4: verify no missing string resource errors at build time
+2. `./gradlew :backup:test` — all unit tests pass after Fase 1.5
+3. Fase 2: smoke-test both providers (Google Drive + Dropbox) from dev playground in emulator
+4. Fase 3: verify onboarding step count is 11 when flag=true, 10 when flag=false
+5. Fase 3: verify Settings backup section hidden when flag=false
+6. Fase 4: verify no missing string resource errors at build time
