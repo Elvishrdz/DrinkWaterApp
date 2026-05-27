@@ -1,6 +1,5 @@
 package com.eahm.drinkwaterapp.backup.di
 
-import com.eahm.drinkwaterapp.backup.BackupProviderRegistry
 import com.eahm.drinkwaterapp.backup.BackupRepository
 import com.eahm.drinkwaterapp.backup.BackupRepositoryImpl
 import com.eahm.drinkwaterapp.backup.CheckBackupStatusUseCase
@@ -17,7 +16,8 @@ import org.koin.dsl.module
 val backupCoreModule = module {
     single { Mutex() }
 
-    singleOf(::BackupProviderRegistry)
+    // BackupProviderRegistry is registered by the host module (BackupModule in :compose)
+    // using explicit typed get() because both params are CloudBackupProvider.
 
     singleOf(::ConnectBackupUseCase)
     singleOf(::SyncBackupUseCase)

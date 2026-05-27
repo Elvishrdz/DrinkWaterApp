@@ -66,6 +66,7 @@ import com.eahm.drinkwaterapp.feature.dev.alarmintervals.AlarmIntervalsRoot
 import com.eahm.drinkwaterapp.feature.dev.alarms.AlarmsRoot
 import com.eahm.drinkwaterapp.feature.dev.alarmsv2.AlarmsV2Root
 import com.eahm.drinkwaterapp.feature.dev.analytics.AnalyticsRoot
+import com.eahm.drinkwaterapp.feature.dev.backup.BackupDevRoot
 import com.eahm.drinkwaterapp.feature.dev.billing.BillingDevRoot
 import com.eahm.drinkwaterapp.feature.dev.celebrations.CelebrationsRoot
 import com.eahm.drinkwaterapp.feature.dev.consent.ConsentDevRoot
@@ -117,6 +118,7 @@ enum class DevDestination(
     WATER_ANIMATION("Water Anim", DwIcons.Wave),
     HISTORY_INJECT("History", DwIcons.History),
     HISTORY_V2("History V2", DwIcons.History),
+    CLOUD_BACKUP("Backup", DwIcons.Star),
 }
 
 
@@ -207,6 +209,10 @@ internal fun DevRoot(onBackClicked: () -> Unit) {
             )
 
             DevDestination.HISTORY_V2 -> HistoryV2Root()
+
+            DevDestination.CLOUD_BACKUP -> BackupDevRoot(
+                onBackClicked = onBackClicked,
+            )
         }
     }
 

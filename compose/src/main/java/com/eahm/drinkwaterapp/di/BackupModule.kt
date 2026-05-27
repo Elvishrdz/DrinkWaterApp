@@ -3,6 +3,7 @@ package com.eahm.drinkwaterapp.di
 import androidx.work.WorkManager
 import com.eahm.drinkwaterapp.backup.BackupDataSource
 import com.eahm.drinkwaterapp.backup.BackupPreferences
+import com.eahm.drinkwaterapp.backup.BackupProviderRegistry
 import com.eahm.drinkwaterapp.backup.BackupScheduler
 import com.eahm.drinkwaterapp.backup.CloudBackupWorker
 import com.eahm.drinkwaterapp.backup.DropboxBackupProvider
@@ -47,6 +48,14 @@ internal val backupModule = module {
     // Provider implementations — explicit factories to inject qualified Json
     single { GoogleDriveBackupProvider(get(), get(backupJsonQualifier)) }
     single { DropboxBackupProvider(get(backupJsonQualifier)) }
+
+    // Registry — explicit to avoid Koin ambiguity (two CloudBackupProvider params)
+    single {
+        BackupProviderRegistry(
+            get<GoogleDriveBackupProvider>(),
+            get<DropboxBackupProvider>()
+        )
+    }
 
     // Bridge implementations
     single { BackupSerializer(get(), get(), get(backupJsonQualifier)) } bind BackupDataSource::class
