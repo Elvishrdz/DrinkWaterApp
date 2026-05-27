@@ -29,6 +29,11 @@ interface TrackingService
             DevMenu,
         }
 
+        // using \ to use the native field App Version String from mixpanel
+        // https://docs.mixpanel.com/docs/data-structure/property-reference/default-properties
+        @Suppress("CanConvertToMultiDollarString")
+        const val SUPER_PROP_APP_VERSION = "\$app_version_string"
+
         const val EVENT_TRACKING_OPTED_OUT = "tracking_opted_out"
     }
 }

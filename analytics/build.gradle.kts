@@ -17,6 +17,10 @@ val mixpanelTokenProd: String = System.getenv("MIXPANEL_TOKEN")
 android {
     namespace = "com.eahm.drinkwaterapp.analytics"
 
+    defaultConfig {
+        buildConfigField("String", "APP_VERSION", "\"${libs.versions.androidVersionName.get()}\"")
+    }
+
     buildTypes {
         release {
             buildConfigField("String", "MIXPANEL_TOKEN", "\"$mixpanelTokenProd\"")

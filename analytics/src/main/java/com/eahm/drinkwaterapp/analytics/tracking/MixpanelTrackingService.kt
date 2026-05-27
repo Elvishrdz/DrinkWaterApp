@@ -10,6 +10,17 @@ import com.eahm.drinkwaterapp.analytics.tracking.TrackingHistory.Companion.EVENT
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingHistory.Companion.EVENT_HISTORY_EDIT_AMOUNT_TAPPED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingHistory.Companion.EVENT_HISTORY_EDIT_TIME_TAPPED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingHistory.Companion.EVENT_HISTORY_FILTER_CHANGED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingNavigation.Companion.EVENT_SCREEN_VIEWED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingNotification.Companion.EVENT_NOTIFICATION_DRINK_TAPPED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingNotification.Companion.EVENT_NOTIFICATION_OPENED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingNotification.Companion.EVENT_NOTIFICATION_SKIP_TAPPED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_ABANDONED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_COMPLETED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_STARTED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_TIME
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingService.Companion.EVENT_TRACKING_OPTED_OUT
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingService.Companion.OptOutSource
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingService.Companion.SUPER_PROP_APP_VERSION
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingSettings.Companion.EVENT_SETTINGS_DAILY_GOAL_CHANGED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingSettings.Companion.EVENT_SETTINGS_END_TIME_CHANGED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingSettings.Companion.EVENT_SETTINGS_FEATURE_REQUEST_TAPPED
@@ -27,16 +38,6 @@ import com.eahm.drinkwaterapp.analytics.tracking.TrackingSettings.Companion.EVEN
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingStats.Companion.EVENT_STATS_BAR_TAPPED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingStats.Companion.EVENT_STATS_PERIOD_SELECTED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingStats.Companion.EVENT_STATS_PERSONAL_BEST_TAPPED
-import com.eahm.drinkwaterapp.analytics.tracking.TrackingNavigation.Companion.EVENT_SCREEN_VIEWED
-import com.eahm.drinkwaterapp.analytics.tracking.TrackingNotification.Companion.EVENT_NOTIFICATION_DRINK_TAPPED
-import com.eahm.drinkwaterapp.analytics.tracking.TrackingNotification.Companion.EVENT_NOTIFICATION_OPENED
-import com.eahm.drinkwaterapp.analytics.tracking.TrackingNotification.Companion.EVENT_NOTIFICATION_SKIP_TAPPED
-import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_ABANDONED
-import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_COMPLETED
-import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_STARTED
-import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_TIME
-import com.eahm.drinkwaterapp.analytics.tracking.TrackingService.Companion.EVENT_TRACKING_OPTED_OUT
-import com.eahm.drinkwaterapp.analytics.tracking.TrackingService.Companion.OptOutSource
 import com.mixpanel.android.mpmetrics.MixpanelAPI
 import org.json.JSONObject
 
@@ -69,6 +70,12 @@ internal class MixpanelTrackingService(
     ).apply {
         flushBatchSize = 70
         setServerURL("https://api-eu.mixpanel.com")
+
+        // Attach app version to every event so dashboards can be filtered by release.
+        // Set app version name so Mixpanel recognizes it as the canonical version field.
+        registerSuperPropertiesOnce(JSONObject().apply {
+            put(SUPER_PROP_APP_VERSION, BuildConfig.APP_VERSION)
+        })
     }
 
     override fun startTracking() {
