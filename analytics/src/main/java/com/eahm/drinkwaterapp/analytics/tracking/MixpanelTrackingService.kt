@@ -6,6 +6,10 @@ import com.eahm.drinkwaterapp.analytics.BuildConfig
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingDrink.Companion.EVENT_DRINK_RECORDED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingDrink.Companion.EVENT_PRESET_BOTTOM_SHEET_OPENED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingDrink.Companion.EVENT_PRESET_CREATED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingHistory.Companion.EVENT_HISTORY_DELETE_TAPPED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingHistory.Companion.EVENT_HISTORY_EDIT_AMOUNT_TAPPED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingHistory.Companion.EVENT_HISTORY_EDIT_TIME_TAPPED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingHistory.Companion.EVENT_HISTORY_FILTER_CHANGED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingNavigation.Companion.EVENT_SCREEN_VIEWED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_ABANDONED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_COMPLETED
@@ -131,5 +135,21 @@ internal class MixpanelTrackingService(
         sendEvent(EVENT_SCREEN_VIEWED, JSONObject().apply {
             put("screen", screen)
         })
+    }
+
+    override fun trackHistoryEditAmountTapped() {
+        sendEvent(EVENT_HISTORY_EDIT_AMOUNT_TAPPED)
+    }
+
+    override fun trackHistoryEditTimeTapped() {
+        sendEvent(EVENT_HISTORY_EDIT_TIME_TAPPED)
+    }
+
+    override fun trackHistoryDeleteTapped() {
+        sendEvent(EVENT_HISTORY_DELETE_TAPPED)
+    }
+
+    override fun trackHistoryFilterChanged() {
+        sendEvent(EVENT_HISTORY_FILTER_CHANGED)
     }
 }

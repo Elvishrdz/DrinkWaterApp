@@ -52,6 +52,7 @@ import com.eahm.drinkwaterapp.core.domain.mock.localDateTimeMock
 import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.feature.history.ui.RecordAmountBottomSheet
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
 import com.eahm.drinkwaterapp.ui.historylist.DateTimePickerButton
 import com.eahm.drinkwaterapp.ui.historylist.HistoryTimeline
 import com.eahm.drinkwaterapp.ui.historylist.HistoryUI
@@ -61,6 +62,7 @@ import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.datetime.LocalDateTime
+import org.koin.compose.koinInject
 import kotlin.random.Random
 
 private const val INTERSTITIAL_PROBABILITY = 0.5f
@@ -121,6 +123,8 @@ private fun Content(
     onDateChanged: (LocalDateTime) -> Unit,
     onGoToToday: () -> Unit,
 ) {
+    val trackingService = koinInject<TrackingService>()
+
     // Hoisted here — survives date changes, item deletions, and group structural shifts.
     // The AdView is created and loadAd fired once per screen visit regardless of how many
     // times the list below recomposes or the banner moves between inside-group / between-group.
@@ -212,7 +216,10 @@ private fun Content(
                 }
                 DateTimePickerButton(
                     selectedDateTime = date,
-                    onDateTimeSelected = onDateChanged,
+                    onDateTimeSelected = { dt ->
+                        trackingService.trackHistoryFilterChanged()
+                        onDateChanged(dt)
+                    },
                     label = stringResource(R.string.history_select_date_label),
                 )
             }
@@ -241,9 +248,18 @@ private fun Content(
                 historyRecords = historyRecords,
                 is24Hour = is24Hour,
                 unitPreference = unitPreference,
-                onDelete = { onDelete(it.toEntity()) },
-                onEditAmount = { item -> onRequestEdit(item) { editAmountTarget = item } },
-                onEditTime = { item -> onRequestEdit(item) { editTimeTarget = item } },
+                onDelete = {
+                    trackingService.trackHistoryDeleteTapped()
+                    onDelete(it.toEntity())
+                },
+                onEditAmount = { item ->
+                    trackingService.trackHistoryEditAmountTapped()
+                    onRequestEdit(item) { editAmountTarget = item }
+                },
+                onEditTime = { item ->
+                    trackingService.trackHistoryEditTimeTapped()
+                    onRequestEdit(item) { editTimeTarget = item }
+                },
                 secondItemContent = if (!isAdFree) {
                     { InlineBannerAd(state = bannerAdState) }
                 } else null,

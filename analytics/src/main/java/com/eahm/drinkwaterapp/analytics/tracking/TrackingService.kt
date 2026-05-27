@@ -3,7 +3,8 @@ package com.eahm.drinkwaterapp.analytics.tracking
 interface TrackingService
     : TrackingOnboarding,
     TrackingDrink,
-    TrackingNavigation {
+    TrackingNavigation,
+    TrackingHistory {
 
     fun startTracking()
 
