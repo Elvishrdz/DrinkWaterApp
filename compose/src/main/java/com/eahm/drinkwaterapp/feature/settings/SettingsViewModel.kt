@@ -15,9 +15,12 @@ import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingService.Companion.OptOutSource
 import com.eahm.drinkwaterapp.backup.BackupPreferences
 import com.eahm.drinkwaterapp.backup.BackupRepository
+import com.eahm.drinkwaterapp.backup.BackupResult
 import com.eahm.drinkwaterapp.backup.BackupScheduler
 import com.eahm.drinkwaterapp.backup.BackupSyncState
 import com.eahm.drinkwaterapp.backup.CloudProviderType
+import com.eahm.drinkwaterapp.backup.DropboxBackupProvider
+import com.eahm.drinkwaterapp.backup.GoogleDriveBackupProvider
 import com.eahm.drinkwaterapp.core.billing.PurchaseManager
 import com.eahm.drinkwaterapp.core.config.AppInfoService
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
@@ -63,6 +66,8 @@ internal class SettingsViewModel(
     private val backupRepository: BackupRepository,
     private val backupPreferences: BackupPreferences,
     private val backupScheduler: BackupScheduler,
+    private val googleDriveProvider: GoogleDriveBackupProvider,
+    private val dropboxProvider: DropboxBackupProvider,
 ) : ViewModel() {
 
     private val dao = database.getDailyGoalDao()
@@ -356,6 +361,48 @@ internal class SettingsViewModel(
     fun onRestorePurchase() {
         purchaseManager.restore()
     }
+
+    // ── Google Drive OAuth ─────────────────────────────────────────────────────
+
+    fun getGoogleSignInIntent(): Intent? =
+        googleDriveProvider.getSignInIntent(application)
+
+    fun onGoogleSignInResult(resultCode: Int, data: android.content.Intent?) {
+        viewModelScope.launch {
+            val result = googleDriveProvider.handleSignInResult(application, resultCode, data)
+            if (result is BackupResult.Success) {
+                backupRepository.connect(application, CloudProviderType.GOOGLE_DRIVE)
+                refreshBackupState()
+            }
+        }
+    }
+
+    // ── Dropbox OAuth ──────────────────────────────────────────────────────────
+
+    private var waitingForDropboxOAuth = false
+
+    fun startDropboxOAuth(context: android.content.Context) {
+        waitingForDropboxOAuth = true
+        dropboxProvider.startOAuth(context)
+    }
+
+    fun onDropboxResume() {
+        if (!waitingForDropboxOAuth) return
+        waitingForDropboxOAuth = false
+        viewModelScope.launch {
+            val result = dropboxProvider.handleSignInResult(
+                application,
+                android.app.Activity.RESULT_OK,
+                null
+            )
+            if (result is BackupResult.Success) {
+                backupRepository.connect(application, CloudProviderType.DROPBOX)
+                refreshBackupState()
+            }
+        }
+    }
+
+    // ── Connect (already authenticated — used for re-connect after disconnect) ─
 
     fun onConnectBackup(providerType: CloudProviderType) {
         viewModelScope.launch {

@@ -11,7 +11,7 @@ Before testing or releasing the cloud backup feature, complete each step below.
 1. Go to [https://www.dropbox.com/developers/apps](https://www.dropbox.com/developers/apps)
 2. Click **Create app**
 3. Select **Scoped access** → **App folder**
-4. Name the app (e.g. `DrinkWaterBackup`)
+4. Name the app (e.g. `DrinkWaterApp`)
 5. Under **Permissions**, enable:
     - `files.content.write`
     - `files.content.read`
@@ -36,18 +36,62 @@ dropbox.app.key=YOUR_DROPBOX_APP_KEY
 3. Navigate to **APIs & Services → Library**
 4. Search for **Google Drive API** and click **Enable**
 
-### 2.2 Create OAuth credentials
+### 2.2 Generate your SHA-1 fingerprints
+
+You need one OAuth client per signing config (debug and release).
+
+#### Debug keystore
+
+The debug keystore is generated automatically by Android Studio at `~/.android/debug.keystore`.
+
+```bash
+keytool -list -v \
+  -keystore ~/.android/debug.keystore \
+  -alias androiddebugkey \
+  -storepass android \
+  -keypass android
+```
+
+Look for the line that starts with `SHA1:` in the output.
+
+#### Production keystore
+
+The project keystore is at `keystore/drink_water_app_keystore.jks`.
+The alias and passwords are read from environment variables (same ones used by CI):
+
+```bash
+keytool -list -v \
+  -keystore keystore/drink_water_app_keystore.jks \
+  -alias "$KEY_ALIAS" \
+  -storepass "$KEYSTORE_PASSWORD" \
+  -keypass "$KEY_PASSWORD"
+```
+
+If you don't have the env vars set locally, pass the values directly:
+
+```bash
+keytool -list -v \
+  -keystore keystore/drink_water_app_keystore.jks \
+  -alias YOUR_ALIAS \
+  -storepass YOUR_STORE_PASSWORD \
+  -keypass YOUR_KEY_PASSWORD
+```
+
+> The keystore file is gitignored. Passwords are stored as CI/CD secrets (`KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`).
+
+### 2.3 Create OAuth credentials
+
+Create **two** OAuth client IDs — one per fingerprint:
 
 1. Go to **APIs & Services → Credentials**
 2. Click **Create Credentials → OAuth client ID**
 3. Select **Android**
 4. Enter the package name: `com.eahm.drinkwaterapp`
-5. Enter the **SHA-1 fingerprint** of your debug keystore:
-   ```bash
-   keytool -list -v -keystore ~/.android/debug.keystore \
-     -alias androiddebugkey -storepass android -keypass android
-   ```
-6. Click **Create** — no file download needed; the client ID is embedded in `google-services.json`
+5. Paste the SHA-1 from the debug keystore → **Create**
+6. Repeat steps 2–5 with the SHA-1 from the production keystore
+7. Both client IDs are automatically embedded in `google-services.json` — no manual changes needed
+
+> You need **both** entries for Google Sign-In to work on debug builds and signed release builds.
 
 ### 2.3 Verify `google-services.json`
 
@@ -143,7 +187,10 @@ buildConfigField("boolean", "FEATURE_CLOUD_BACKUP", "true")
 
 - [ ] `dropbox.app.key` added to `local.properties`
 - [ ] Google Drive API enabled in Google Cloud Console
-- [ ] Android OAuth client created with correct SHA-1
+- [ ] SHA-1 generated for debug keystore (`~/.android/debug.keystore`)
+- [ ] SHA-1 generated for production keystore (`keystore/drink_water_app_keystore.jks`)
+- [ ] Two Android OAuth clients created in GCP (one per SHA-1)
+- [ ] `google-services.json` re-downloaded after adding both clients
 - [ ] `ActivityResultLauncher` wired for Google Sign-In in `SettingsScreen`
 - [ ] `onResume` handler wired for Dropbox in `SettingsScreen`
 - [ ] Smoke-tested in emulator via dev playground (`Dev → Backup`)

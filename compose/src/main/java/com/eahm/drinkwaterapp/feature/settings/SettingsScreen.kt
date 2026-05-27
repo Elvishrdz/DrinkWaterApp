@@ -66,6 +66,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.backup.CloudProviderType
 import com.eahm.drinkwaterapp.core.billing.PurchaseState
@@ -218,6 +220,18 @@ internal fun SettingsScreen(
         showExactAlarmInstructionsDialog = true
     }
 
+    // ── Google Sign-In for Backup ─────────────────────────────────────────────
+    val googleSignInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        viewModel.onGoogleSignInResult(result.resultCode, result.data)
+    }
+
+    // Dropbox result arrives via onResume after the external browser flow
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        viewModel.onDropboxResume()
+    }
+
     SettingsContent(
         state = state,
         onNotificationsToggled = ::handleNotificationToggle,
@@ -259,7 +273,17 @@ internal fun SettingsScreen(
             else showRevokeTrackingDialog = true
         },
         onPrivacyPolicyAndTermsOfUseTap = context::openPrivacyPolicyAndTermsOfUse,
-        onConnectBackupTap = viewModel::onConnectBackup,
+        onConnectBackupTap = { provider ->
+            when (provider) {
+                CloudProviderType.GOOGLE_DRIVE -> {
+                    val intent = viewModel.getGoogleSignInIntent()
+                    if (intent != null) googleSignInLauncher.launch(intent)
+                    else viewModel.onConnectBackup(CloudProviderType.GOOGLE_DRIVE)
+                }
+
+                CloudProviderType.DROPBOX -> viewModel.startDropboxOAuth(context)
+            }
+        },
         onSyncNowTap = viewModel::onSyncNow,
         onDisconnectBackupTap = viewModel::onDisconnectBackup,
         modifier = modifier,

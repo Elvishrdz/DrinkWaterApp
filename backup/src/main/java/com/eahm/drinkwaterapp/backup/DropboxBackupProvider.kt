@@ -51,6 +51,11 @@ class DropboxBackupProvider(
         return Intent().also { it.putExtra("dropbox_oauth", true) }
     }
 
+    /** Launches the Dropbox PKCE OAuth flow. Must be called from an Activity context. */
+    fun startOAuth(context: Context?) {
+        Auth.startOAuth2PKCE(context!!, BuildConfig.DROPBOX_APP_KEY, requestConfig)
+    }
+
     /** Call Auth.startOAuth2PKCE(context, appKey, requestConfig) from the Activity before this. */
     override suspend fun handleSignInResult(
         context: Context?,
