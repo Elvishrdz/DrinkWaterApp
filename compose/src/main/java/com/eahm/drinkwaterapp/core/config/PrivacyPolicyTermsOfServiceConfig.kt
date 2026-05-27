@@ -16,7 +16,7 @@ object PrivacyPolicyTermsOfServiceConfig {
     val effectiveDate = LocalDate(
         year = 2026,
         month = Month.MAY,
-        day = 25,
+        day = 26,
     )
 
     val CURRENT_POLICY_DATE: Long = effectiveDate.toEpochDays() * 24L * 60 * 60 * 1000
