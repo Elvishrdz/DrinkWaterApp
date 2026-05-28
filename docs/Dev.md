@@ -35,6 +35,7 @@ App Release
 
 Priorities Tier 1
 
+- [] archievements, logros y recompensas por completar 
 - [x] Release notes: quitar "material you" del texto
 - [x] Intervalo bottom sheet muestra minutes en ingles para todos los idiomas
 - [] Cambiar gol no actualiza el gráfico inmediatamente
