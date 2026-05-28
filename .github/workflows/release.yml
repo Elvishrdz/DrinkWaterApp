@@ -67,7 +67,7 @@ jobs:
   update-listing:
     name: Update Store Listing
     needs: release
-    if: ${{ github.event.inputs.update_listing == 'true' }}
+    if: ${{ inputs.update_listing == true }}
     uses: ./.github/workflows/listing.yml
     with:
       mode: "all"
