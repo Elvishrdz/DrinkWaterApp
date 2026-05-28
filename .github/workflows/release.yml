@@ -56,6 +56,7 @@ jobs:
           packageName: com.eahm.drinkwaterapp
           releaseFiles: compose/build/outputs/bundle/release/*.aab
           mappingFile: compose/build/outputs/mapping/release/mapping.txt
+          debugSymbols: compose/build/outputs/native-debug-symbols/release/native-debug-symbols.zip
           tracks: ${{ github.event.inputs.track }}
           whatsNewDirectory: release-notes/
           changesNotSentForReview: ${{ github.event.inputs.track == 'production' }}
