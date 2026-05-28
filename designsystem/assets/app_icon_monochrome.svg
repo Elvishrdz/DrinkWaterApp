@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  
+  <defs>
+    <clipPath id="topClip">
+      <path d="M 154 108&#xA;               L 358 108&#xA;               C 358 148, 336 200, 256 256&#xA;               C 176 200, 154 148, 154 108 Z"></path>
+    </clipPath>
+    <clipPath id="bottomClip">
+      <path d="M 256 256&#xA;               C 336 312, 358 364, 358 404&#xA;               L 154 404&#xA;               C 154 364, 176 312, 256 256 Z"></path>
+    </clipPath>
+  </defs>
+
+  
+  <g clip-path="url(#topClip)" fill="#ffffff">
+    <path opacity="0.35" d="M 110 116&#xA;             C 158 150, 210 100, 256 132&#xA;             C 304 164, 354 116, 402 140&#xA;             L 402 100 L 110 100 Z"></path>
+    <path opacity="0.55" d="M 110 164&#xA;             C 158 196, 210 146, 256 176&#xA;             C 304 208, 354 158, 402 184&#xA;             L 402 100 L 110 100 Z"></path>
+    <path opacity="0.85" d="M 110 214&#xA;             C 158 244, 210 196, 256 224&#xA;             C 304 254, 354 208, 402 234&#xA;             L 402 100 L 110 100 Z"></path>
+  </g>
+
+  
+  <g clip-path="url(#bottomClip)" fill="#ffffff">
+    <path opacity="0.85" d="M 110 300&#xA;             C 158 274, 210 322, 256 296&#xA;             C 304 270, 354 314, 402 290&#xA;             L 402 412 L 110 412 Z"></path>
+    <path opacity="0.55" d="M 110 348&#xA;             C 158 322, 210 372, 256 344&#xA;             C 304 318, 354 364, 402 340&#xA;             L 402 412 L 110 412 Z"></path>
+    <path opacity="0.35" d="M 110 396&#xA;             C 158 372, 210 418, 256 392&#xA;             C 304 366, 354 410, 402 386&#xA;             L 402 412 L 110 412 Z"></path>
+  </g>
+
+  
+  <g fill="none" stroke="#ffffff" stroke-width="7" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M 154 108&#xA;             L 358 108&#xA;             C 358 148, 336 200, 256 256&#xA;             C 176 200, 154 148, 154 108 Z"></path>
+    <path d="M 256 256&#xA;             C 336 312, 358 364, 358 404&#xA;             L 154 404&#xA;             C 154 364, 176 312, 256 256 Z"></path>
+  </g>
+</svg>
