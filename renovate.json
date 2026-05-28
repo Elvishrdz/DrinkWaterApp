@@ -75,8 +75,5 @@
   ],
   "gradle": {
     "enabled": true
-  },
-  "registryUrls": [
-    "https://jitpack.io"
-  ]
+  }
 }

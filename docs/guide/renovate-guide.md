@@ -102,14 +102,11 @@ una sola PR.
 | **Firebase & Google Services** | `firebase-crashlytics-gradle`, `google-services`                       | Se actualizan en pares                       |
 | **GitHub Actions**             | `actions/checkout`, `actions/setup-java`, `r0adkll/upload-google-play` | Un solo PR para todos los actions            |
 
-### Registro de JitPack
+### JitPack
 
-```json
-"registryUrls": ["https://jitpack.io"]
-```
-
-Necesario para que Renovate detecte actualizaciones de `com.github.anhaki:PickTime-Compose`,
-que viene del repositorio de JitPack.
+Renovate detecta el registro de JitPack automáticamente leyendo el bloque `allprojects` del
+`build.gradle` raíz, donde ya está declarado `maven { url 'https://jitpack.io' }`. No es
+necesario configurar nada adicional en `renovate.json` para `PickTime-Compose`.
 
 ---
 
@@ -185,6 +182,39 @@ Si se incorpora una nueva librería multi-artefacto, agregar una entrada en `pac
 }
 ```
 
+### Activar actualizaciones de versiones en GitHub Actions
+
+Por defecto, Renovate no puede consultar la API de GitHub para buscar nuevas versiones de los
+actions (`actions/checkout`, `actions/setup-java`, `r0adkll/upload-google-play`) porque agota
+el rate limit anónimo. Para activarlo:
+
+**1. Crear el secret en Mend.io**
+
+- Crear un GitHub PAT clásico en `https://github.com/settings/tokens`
+  con scope `public_repo` (repos públicos) o `repo` (repos privados)
+- Ir a Mend.io → el repositorio → **Settings → Secrets**
+- Agregar un secret con nombre `GITHUB_COM_TOKEN` y el valor del PAT
+
+**2. Agregar `hostRules` en `renovate.json`** (solo después de confirmar que el secret existe)
+
+```json
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "hostRules": [
+    {
+      "matchHost": "api.github.com",
+      "token": "{{ secrets.GITHUB_COM_TOKEN }}"
+    }
+  ],
+  ...
+}
+```
+
+> **Advertencia**: si se agrega el bloque `hostRules` al `renovate.json` antes de crear el
+> secret en Mend.io, Renovate falla con `config-validation` y deja de procesar todas las
+> dependencias del repositorio hasta que se corrija.
+
 ---
 
 ## 8. Solución de problemas
@@ -209,9 +239,60 @@ Si se incorpora una nueva librería multi-artefacto, agregar una entrada en `pac
 3. Investigar la incompatibilidad en el changelog de la librería
 4. Cuando esté resuelta, eliminar la entrada de `ignoreDeps`
 
+**Warning: "Failed to look up github-tags package actions/checkout: no-result"**
+
+Renovate agota el rate limit anónimo de la API de GitHub (60 req/hora) al intentar buscar
+nuevas versiones de los actions. Es un warning **no bloqueante**: Renovate sigue procesando
+las dependencias de Gradle y solo omite las actualizaciones de Actions.
+
+Si se quiere resolver, se puede proporcionar un token de GitHub mediante `hostRules` en
+`renovate.json`. **Importante**: el secret debe existir en Mend.io **antes** de agregar la
+referencia al `renovate.json`, de lo contrario Renovate falla con `config-validation` y deja
+de procesar todo el repositorio.
+
+Orden correcto:
+
+1. Crear un GitHub PAT clásico en `https://github.com/settings/tokens`
+   con scope `public_repo` (o `repo` para repos privados)
+2. Ir a Mend.io → el repositorio → **Settings → Secrets**
+3. Agregar un secret llamado `GITHUB_COM_TOKEN` con el valor del PAT
+4. Recién después, agregar esto en `renovate.json`:
+   ```json
+   "hostRules": [
+     {
+       "matchHost": "api.github.com",
+       "token": "{{ secrets.GITHUB_COM_TOKEN }}"
+     }
+   ]
+   ```
+
+Si se agrega el `hostRules` al `renovate.json` sin haber creado el secret primero, Renovate
+lanza `config-validation` y no procesa ninguna dependencia hasta que se corrija.
+
+**Warning: "Failed to look up pypi package google-api-python-client: no-result"**
+
+Los paquetes de `scripts/requirements.txt` usan restricciones de rango (`>=`) en lugar de
+versiones fijas. Renovate puede manejar este formato, pero a veces el endpoint de PyPI no
+responde desde los servidores de Mend.io. Si el warning persiste después de varios lunes:
+
+1. Verificar que los paquetes existen en PyPI:
+    - [google-api-python-client](https://pypi.org/project/google-api-python-client/)
+    - [google-auth](https://pypi.org/project/google-auth/)
+2. Si confirmas que son transitorios (aparecen y desaparecen), no requieren acción
+3. Si son persistentes, se pueden ignorar explícitamente en `renovate.json`:
+   ```json
+   "ignoreDeps": ["google-api-python-client", "google-auth"]
+   ```
+
+**Warning: "Failed to look up gradle-version package gradle: no-result"**
+
+Renovate no pudo consultar `https://services.gradle.org/versions/all` para verificar nuevas
+versiones del Gradle wrapper. Es un fallo transitorio del servidor de Gradle; no requiere cambios
+en la configuración. Se resuelve solo en el siguiente escaneo.
+
 **Renovate no detecta actualizaciones de JitPack**
 
-- JitPack no siempre expone metadatos de versiones de forma estándar. Si `PickTime-Compose`
-  no recibe PRs, es posible que JitPack no publique los metadatos necesarios. En ese caso,
-  revisarlo manualmente
-  en [https://jitpack.io/#anhaki/PickTime-Compose](https://jitpack.io/#anhaki/PickTime-Compose)
+JitPack no siempre expone metadatos de versiones de forma estándar. Si `PickTime-Compose`
+no recibe PRs, es posible que JitPack no publique los metadatos necesarios. En ese caso,
+revisarlo manualmente
+en [https://jitpack.io/#anhaki/PickTime-Compose](https://jitpack.io/#anhaki/PickTime-Compose)
