@@ -307,6 +307,18 @@
     <string name="settings_interval_sheet_title">Intervalo de recordatorio</string>
     <string name="settings_stepper_custom_hint">O escribe un valor</string>
     <string name="settings_interval_window_hint">Ventana activa: %1$s · Máx: %2$dm</string>
+    <!-- Ajustes — Etiquetas de unidad del intervalo (debajo del valor en el stepper) -->
+    <plurals name="interval_unit_minutes">
+        <item quantity="one">minuto</item>
+        <item quantity="other">minutos</item>
+        <item quantity="many">minutos</item>
+    </plurals>
+    <plurals name="interval_unit_hours">
+        <item quantity="one">hora</item>
+        <item quantity="other">horas</item>
+        <item quantity="many">horas</item>
+    </plurals>
+    <string name="interval_unit_hr">hr</string>
 
     <!-- Ajustes — Sheet de cantidad de notificación -->
     <string name="settings_notif_amount_hint">Cantidad que aparecera en las notificationes para rapidamente registrar que tomaste agua</string>

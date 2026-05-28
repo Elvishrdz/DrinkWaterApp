@@ -328,6 +328,16 @@
     <string name="settings_interval_sheet_title">Erinnerungsintervall</string>
     <string name="settings_stepper_custom_hint">Oder gib einen Wert ein</string>
     <string name="settings_interval_window_hint">Aktives Fenster: %1$s · Max: %2$d Min.</string>
+    <!-- Einstellungen — Einheitenbeschriftungen für das Intervall (unter dem Stepper-Wert) -->
+    <plurals name="interval_unit_minutes">
+        <item quantity="one">Minute</item>
+        <item quantity="other">Minuten</item>
+    </plurals>
+    <plurals name="interval_unit_hours">
+        <item quantity="one">Stunde</item>
+        <item quantity="other">Stunden</item>
+    </plurals>
+    <string name="interval_unit_hr">Std.</string>
 
     <!-- Einstellungen — Benachrichtigungsmenge-Sheet -->
     <string name="settings_notif_amount_hint">Die Menge, die in Benachrichtigungen erscheint, um schnell zu erfassen, dass du Wasser getrunken hast.</string>

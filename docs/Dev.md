@@ -35,6 +35,13 @@ App Release
 
 Priorities Tier 1
 
+- [x] Release notes: quitar "material you" del texto
+- [x] Intervalo bottom sheet muestra minutes en ingles para todos los idiomas
+- [] Cambiar gol no actualiza el gráfico inmediatamente
+- [] En el gráfico siempre sale menos va periodo anterior si seguimos bebiendo. Lo mejor sería
+  mostrar algo más positivo. O cuando hicimos el mismo día la semana pasada. Esto para V2
+- [] Eliminar datos botón: mostrar acción disponible en 5 (counter) para no asustar a la gente que
+  se borran cuando llegue a zero
 - [] agregar ellipsis a bottom menus. cuando el texto es muy largo. y centrar iconos y texto en 1
   sola linea.
 - [] al aceptar una nueva politica de privacidad, y si ya esta aprovado el tracking, no mostrar esta

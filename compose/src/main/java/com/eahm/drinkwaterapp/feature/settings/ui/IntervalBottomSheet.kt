@@ -1,5 +1,6 @@
 package com.eahm.drinkwaterapp.feature.settings.ui
 
+import android.content.Context
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -171,7 +172,7 @@ internal fun IntervalBottomSheet(
                                 modifier = Modifier.clickable { isEditing = true },
                             )
                             Text(
-                                text = formatIntervalUnit(value),
+                                text = context.formatIntervalUnit(value),
                                 fontFamily = PlusJakartaSans,
                                 fontWeight = FontWeight.Normal,
                                 fontSize = 16.sp,
@@ -290,11 +291,10 @@ private fun formatIntervalDisplay(minutes: Int): String = when {
 }
 
 /** Unit label below the large number */
-private fun formatIntervalUnit(minutes: Int): String = when {
-    minutes < 60 -> "minutes"
-    minutes == 60 -> "hour"
-    minutes % 60 == 0 -> "hours"
-    else -> "hr"
+private fun Context.formatIntervalUnit(minutes: Int): String = when {
+    minutes < 60 -> resources.getQuantityString(R.plurals.interval_unit_minutes, minutes)
+    minutes % 60 == 0 -> resources.getQuantityString(R.plurals.interval_unit_hours, minutes / 60)
+    else -> getString(R.string.interval_unit_hr)
 }
 
 /** Human-readable window duration for the hint row */
