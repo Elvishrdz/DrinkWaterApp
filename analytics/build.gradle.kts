@@ -3,6 +3,7 @@ import java.util.Properties
 plugins {
     id("com.android.library")
     id("drinkwater.android.library")
+    id("drinkwater.detekt")
 }
 
 val localProps = Properties().apply {

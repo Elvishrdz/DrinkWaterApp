@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>Indentation:TrackingService.kt$TrackingService$ </ID>
+    <ID>MagicNumber:MixpanelTrackingService.kt$MixpanelTrackingService$70</ID>
+    <ID>NoConsecutiveBlankLines:MixpanelTrackingService.kt$MixpanelTrackingService$ </ID>
+    <ID>SpacingAroundColon:TrackingService.kt$TrackingService$:</ID>
+    <ID>TooManyFunctions:MixpanelTrackingService.kt$MixpanelTrackingService : TrackingService</ID>
+    <ID>Wrapping:MixpanelTrackingService.kt$MixpanelTrackingService$(</ID>
+    <ID>Wrapping:MixpanelTrackingService.kt$MixpanelTrackingService$("test_event", JSONObject().apply { put("parameter", parameter) })</ID>
+    <ID>Wrapping:MixpanelTrackingService.kt$MixpanelTrackingService$(EVENT_DRINK_RECORDED, JSONObject().apply { put("source", source) put("amount_ml", amountMl) })</ID>
+    <ID>Wrapping:MixpanelTrackingService.kt$MixpanelTrackingService$(EVENT_PRESET_BOTTOM_SHEET_OPENED, JSONObject().apply { put("preset_count", presetCount) })</ID>
+    <ID>Wrapping:MixpanelTrackingService.kt$MixpanelTrackingService$(EVENT_PRESET_CREATED, JSONObject().apply { put("amount_ml", amountMl) put("total_presets", totalPresets) })</ID>
+    <ID>Wrapping:MixpanelTrackingService.kt$MixpanelTrackingService$(EVENT_SCREEN_VIEWED, JSONObject().apply { put("screen", screen) })</ID>
+    <ID>Wrapping:MixpanelTrackingService.kt$MixpanelTrackingService$(EVENT_SETTINGS_DAILY_GOAL_CHANGED, JSONObject().apply { put("goal_ml", goalMl) })</ID>
+    <ID>Wrapping:MixpanelTrackingService.kt$MixpanelTrackingService$(EVENT_SETTINGS_END_TIME_CHANGED, JSONObject().apply { put("hour", hour) put("minute", minute) })</ID>
+    <ID>Wrapping:MixpanelTrackingService.kt$MixpanelTrackingService$(EVENT_SETTINGS_QUICK_DRINK_CHANGED, JSONObject().apply { put("amount_ml", amountMl) })</ID>
+    <ID>Wrapping:MixpanelTrackingService.kt$MixpanelTrackingService$(EVENT_SETTINGS_START_TIME_CHANGED, JSONObject().apply { put("hour", hour) put("minute", minute) })</ID>
+    <ID>Wrapping:MixpanelTrackingService.kt$MixpanelTrackingService$(EVENT_SETTINGS_VOLUME_UNIT_CHANGED, JSONObject().apply { put("unit", unit) })</ID>
+    <ID>Wrapping:MixpanelTrackingService.kt$MixpanelTrackingService$(EVENT_STATS_PERIOD_SELECTED, JSONObject().apply { put("period", period) })</ID>
+    <ID>Wrapping:MixpanelTrackingService.kt$MixpanelTrackingService$(EVENT_TRACKING_OPTED_OUT, JSONObject().apply { put("source", source.name) })</ID>
+  </CurrentIssues>
+</SmellBaseline>

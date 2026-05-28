@@ -4,6 +4,7 @@ plugins {
     id("com.android.library")
     id("drinkwater.android.library")
     id("drinkwater.android.compose")
+    id("drinkwater.detekt")
 }
 
 android {

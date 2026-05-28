@@ -9,6 +9,7 @@ dependencies {
     compileOnly(libs.kotlin.gradle.plugin)
     compileOnly(libs.compose.compiler.gradle.plugin)
     compileOnly(libs.room.gradle.plugin)
+    compileOnly(libs.detekt.gradle.plugin)
 }
 
 gradlePlugin {
@@ -36,6 +37,10 @@ gradlePlugin {
         register("androidLibrary") {
             id = "drinkwater.android.library"
             implementationClass = "AndroidLibraryConventionPlugin"
+        }
+        register("detekt") {
+            id = "drinkwater.detekt"
+            implementationClass = "DetektConventionPlugin"
         }
     }
 }

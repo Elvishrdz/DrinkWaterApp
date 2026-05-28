@@ -27,6 +27,7 @@ sqlite = "2.6.2"
 cardview = "1.0.0"
 coreSplashscreen = "1.0.1"
 agp = "9.1.1"
+detekt = "1.23.8"
 desugarJdkLibs = "2.1.5"
 coreKtx = "1.18.0"
 junit = "4.13.2"
@@ -56,6 +57,8 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "roomRuntime" }
 
 build-gradle-kotlin = { module = "com.android.tools.build:gradle-kotlin", version.ref = "gradleKotlin" }
+detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
+detekt-gradle-plugin = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 compose-compiler-gradle-plugin = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "composeCompilerGradlePlugin" }
 firebase-crashlytics-gradle = { module = "com.google.firebase:firebase-crashlytics-gradle", version.ref = "firebaseCrashlyticsGradle" }
 google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
@@ -102,6 +105,7 @@ compose-material3-adaptive-layout = { group = "androidx.compose.material3.adapti
 compose-material3-adaptive-navigation = { group = "androidx.compose.material3.adaptive", name = "adaptive-navigation" }
 
 [plugins]
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 androidx-room = { id = "androidx.room", version.ref = "room" }
 android-library = { id = "com.android.library", version.ref = "agp" }

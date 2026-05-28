@@ -21,6 +21,7 @@ GRADLEW       := ./gradlew
         clear-debug clear-staging clear-qa clear-release \
         uninstall-debug uninstall-staging uninstall-qa uninstall-release \
         logcat logcat-debug screenshot devices \
+        detekt detekt-fix detekt-baseline install-hooks \
         new-feature update-listing deploy
 
 # ─────────────────────────────────────────────
@@ -76,6 +77,12 @@ help:
 	@echo "    logcat-debug      Show logcat filtered by app tag"
 	@echo "    screenshot        Capture screenshot from device"
 	@echo "    devices           List connected ADB devices"
+	@echo ""
+	@echo "  CODE QUALITY"
+	@echo "    detekt            Run Detekt static analysis on all modules"
+	@echo "    detekt-fix        Run Detekt with auto-correct (formatting fixes)"
+	@echo "    detekt-baseline   Regenerate the Detekt baseline file"
+	@echo "    install-hooks     Install git pre-commit hook (run once after clone)"
 	@echo ""
 	@echo "  SCRIPTS"
 	@echo "    new-feature       Start a new dev feature branch"
@@ -205,6 +212,22 @@ devices:
 # ─────────────────────────────────────────────
 # Scripts
 # ─────────────────────────────────────────────
+
+# ─────────────────────────────────────────────
+# Code Quality
+# ─────────────────────────────────────────────
+
+detekt:
+	$(GRADLEW) detekt
+
+detekt-fix:
+	$(GRADLEW) detekt --auto-correct
+
+detekt-baseline:
+	$(GRADLEW) detektBaseline
+
+install-hooks:
+	@bash scripts/git/install_git_hooks.sh
 
 new-feature:
 	@bash scripts/new_dev_feature.sh

@@ -6,6 +6,7 @@ plugins {
     id("drinkwater.android.buildconfig")
     id("drinkwater.android.compose")
     id("drinkwater.android.room")
+    id("drinkwater.detekt")
 
     id("org.jetbrains.kotlin.plugin.serialization") version "2.3.20"
     id("com.google.gms.google-services")

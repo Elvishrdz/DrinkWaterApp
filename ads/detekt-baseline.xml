@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ArgumentListWrapping:NativeAdView.kt$(modifier = modifier .background(containerColor, shape) .padding(padding))</ID>
+    <ID>FinalNewline:AdManagerBannerAd.kt$com.eahm.drinkwaterapp.ads.util.AdManagerBannerAd.kt</ID>
+    <ID>MagicNumber:AdMobBanner.kt$10</ID>
+    <ID>MagicNumber:DrinkWaterBannerAd.kt$360</ID>
+    <ID>MagicNumber:InlineBannerAd.kt$360</ID>
+    <ID>MagicNumber:NativeAdView.kt$15</ID>
+    <ID>MultiLineIfElse:AdMobBanner.kt$null</ID>
+    <ID>NewLineAtEndOfFile:AdManagerBannerAd.kt$com.eahm.drinkwaterapp.ads.util.AdManagerBannerAd.kt</ID>
+    <ID>NoConsecutiveBlankLines:AdManagerBannerAd.kt$ </ID>
+    <ID>NoConsecutiveBlankLines:AdMobBanner.kt$ </ID>
+    <ID>NoConsecutiveBlankLines:AdMobBanner.kt$InlineInterstitialAdState$ </ID>
+    <ID>UnusedPrivateMember:DrinkWaterBannerAd.kt$@Preview(apiLevel = 33) @Composable private fun DrinkWaterBannerAdPreview()</ID>
+    <ID>UnusedPrivateMember:InlineBannerAd.kt$@Preview(apiLevel = 33) @Composable private fun InlineBannerAdPreview()</ID>
+    <ID>UseCheckOrError:NativeAdView.kt$throw IllegalStateException("NativeAdView null")</ID>
+    <ID>Wrapping:NativeAdView.kt$(</ID>
+  </CurrentIssues>
+</SmellBaseline>

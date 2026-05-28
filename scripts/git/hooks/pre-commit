@@ -1,0 +1,52 @@
+#!/bin/bash
+# pre-commit – runs Detekt before every commit.
+# Skip with: SKIP_DETEKT=1 git commit
+
+set -euo pipefail
+
+if [ "${SKIP_DETEKT:-0}" = "1" ]; then
+  echo "[detekt] Skipped (SKIP_DETEKT=1)"
+  exit 0
+fi
+
+# Resolve the repo root regardless of where git calls the hook from.
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+GRADLEW="$REPO_ROOT/gradlew"
+
+if [ ! -x "$GRADLEW" ]; then
+  echo "[detekt] ERROR: gradlew not found or not executable at $GRADLEW"
+  exit 1
+fi
+
+# Check if there are any staged Kotlin files; skip detekt if there are none.
+STAGED_KT=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.kts?$' || true)
+
+if [ -z "$STAGED_KT" ]; then
+  echo "[detekt] No Kotlin files staged – skipping."
+  exit 0
+fi
+
+echo "[detekt] Running static analysis on staged Kotlin files..."
+echo ""
+
+"$GRADLEW" --project-dir "$REPO_ROOT" detekt --daemon --quiet 2>&1
+
+STATUS=$?
+
+if [ $STATUS -ne 0 ]; then
+  echo ""
+  echo "──────────────────────────────────────────────────────"
+  echo "[detekt] Commit blocked: static analysis violations found."
+  echo ""
+  echo "  Fix the issues above, then commit again."
+  echo "  To see the full report: ./gradlew detekt"
+  echo "  To auto-fix formatting: ./gradlew detekt --auto-correct"
+  echo "  To update the baseline: ./gradlew detektBaseline"
+  echo "  To skip (emergency):    SKIP_DETEKT=1 git commit ..."
+  echo "──────────────────────────────────────────────────────"
+  exit 1
+fi
+
+echo ""
+echo "[detekt] All checks passed."
+exit 0
