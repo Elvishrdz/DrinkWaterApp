@@ -34,6 +34,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -222,7 +224,14 @@ private fun Content(
                             },
                         )
                     },
-                    label = { Text(stringResource(destination.labelResId)) },
+                    label = {
+                        Text(
+                            text = stringResource(destination.labelResId),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.Center,
+                        )
+                    },
                     selected = selected,
                     onClick = { onMenuItemClicked(destination) },
                     colors = itemColors,
