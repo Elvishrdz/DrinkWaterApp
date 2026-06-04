@@ -1,6 +1,11 @@
 # The fountain of wishes
 
 - convert to KMP project (to support iOS and Desktop app)
+- schedule future schedule for alarms. example: from a future day in a calendar select a day to
+  configure the alarm for that specific day. This overrides any recurrent alarm configuration for
+  that particular day. Once the day is over OR the last alarm of that day is completed this
+  configuration is disposed. Use case: Im on holiday next week and I dont want reminders those days,
+  OR i just want a midday reminder during my holidays.
 - Fix: Change goal is not updating the stats graph immediately
 - Goal reached: Polish existing celebrations
 - Goal reached: add more celebrations
@@ -80,6 +85,16 @@
   la pantalla de configuracion de notificaciones/reminders
 
 ## Projects
+
+### Appstore
+
+- Publish on app store: complete all store requirements to be legal compliant
+- Setup CD to deploy to appstore
+- Setup CD to deploy listing to appstore
+- setup scripts to locally start workflows to appstore
+- update code based on platform specifics, example: share (to appstore url for ios), rate (to app
+  store url for ios), etc.
+-
 
 ### Restore purchases
 
