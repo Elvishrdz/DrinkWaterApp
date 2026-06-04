@@ -1,5 +1,9 @@
 Development
 
+all changes from this document are not included and organized in ***the-fountain-of-wishes.md***
+do not include more tasks here.
+this document will be removed soon.
+
 urgent fixes
 
 - [x] Fix goal celebration card in phone landscape. with no enough space crashes when trying to drag
@@ -35,7 +39,7 @@ App Release
 
 Priorities Tier 1
 
-- [] archievements, logros y recompensas por completar 
+- [] archievements, logros y recompensas por completar
 - [x] Release notes: quitar "material you" del texto
 - [x] Intervalo bottom sheet muestra minutes en ingles para todos los idiomas
 - [] Cambiar gol no actualiza el gráfico inmediatamente
