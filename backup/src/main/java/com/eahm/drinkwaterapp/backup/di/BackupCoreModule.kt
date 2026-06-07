@@ -5,9 +5,12 @@ import com.eahm.drinkwaterapp.backup.BackupRepositoryImpl
 import com.eahm.drinkwaterapp.backup.CheckBackupStatusUseCase
 import com.eahm.drinkwaterapp.backup.ConnectBackupUseCase
 import com.eahm.drinkwaterapp.backup.DisconnectBackupUseCase
+import com.eahm.drinkwaterapp.backup.MergeEngine
 import com.eahm.drinkwaterapp.backup.MigrateBackupUseCase
+import com.eahm.drinkwaterapp.backup.PurgeTombstonesUseCase
 import com.eahm.drinkwaterapp.backup.RestoreBackupUseCase
 import com.eahm.drinkwaterapp.backup.SyncBackupUseCase
+import com.eahm.drinkwaterapp.backup.TombstonePolicy
 import kotlinx.coroutines.sync.Mutex
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
@@ -27,4 +30,8 @@ val backupCoreModule = module {
     singleOf(::MigrateBackupUseCase)
 
     singleOf(::BackupRepositoryImpl) bind BackupRepository::class
+
+    singleOf(::MergeEngine)
+    single { TombstonePolicy() }
+    singleOf(::PurgeTombstonesUseCase)
 }

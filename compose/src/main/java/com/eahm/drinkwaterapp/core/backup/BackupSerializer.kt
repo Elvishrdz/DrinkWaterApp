@@ -155,6 +155,29 @@ class BackupSerializer(
         }
     }
 
+    override suspend fun findNearExpiryTombstones(warningThreshold: Long, expiryThreshold: Long): Int {
+        val history = database.getHistoryDao().getAll().first()
+        val goals = database.getDailyGoalDao().getAllGoals().first()
+        val historyNear = history.count { record ->
+            record.deletedAt != null && record.deletedAt >= warningThreshold && record.deletedAt < expiryThreshold
+        }
+        val goalsNear = goals.count { goal ->
+            goal.deletedAt != null && goal.deletedAt >= warningThreshold && goal.deletedAt < expiryThreshold
+        }
+        return historyNear + goalsNear
+    }
+
+    override suspend fun purgeExpiredTombstones(expiryThreshold: Long) {
+        val history = database.getHistoryDao().getAll().first()
+        val goals = database.getDailyGoalDao().getAllGoals().first()
+
+        history.filter { it.deletedAt != null && it.deletedAt <= expiryThreshold }
+            .forEach { database.getHistoryDao().delete(it) }
+
+        goals.filter { it.deletedAt != null && it.deletedAt <= expiryThreshold }
+            .forEach { database.getDailyGoalDao().delete(it) }
+    }
+
     @OptIn(kotlin.uuid.ExperimentalUuidApi::class)
     private fun generateId(): String = kotlin.uuid.Uuid.random().toString()
 }

@@ -20,4 +20,7 @@ class FakeBackupDataSource(
         lastImported = data
         return importResult
     }
+
+    override suspend fun findNearExpiryTombstones(warningThreshold: Long, expiryThreshold: Long): Int = 0
+    override suspend fun purgeExpiredTombstones(expiryThreshold: Long) {}
 }
