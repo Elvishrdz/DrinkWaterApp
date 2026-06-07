@@ -3,15 +3,20 @@ package com.eahm.drinkwaterapp.feature.dev.backup
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.eahm.drinkwaterapp.backup.BackupPreferences
 import com.eahm.drinkwaterapp.backup.BackupProviderRegistry
 import com.eahm.drinkwaterapp.backup.BackupRepository
 import com.eahm.drinkwaterapp.backup.CheckBackupStatusUseCase
 import com.eahm.drinkwaterapp.backup.CloudProviderType
 import com.eahm.drinkwaterapp.backup.ConnectBackupUseCase
 import com.eahm.drinkwaterapp.backup.DisconnectBackupUseCase
+import com.eahm.drinkwaterapp.backup.GoalRecord
 import com.eahm.drinkwaterapp.backup.MigrateBackupUseCase
+import com.eahm.drinkwaterapp.backup.PreferencesRecord
 import com.eahm.drinkwaterapp.backup.RestoreBackupUseCase
 import com.eahm.drinkwaterapp.backup.SyncBackupUseCase
+import com.eahm.drinkwaterapp.backup.SyncConflict
+import com.eahm.drinkwaterapp.backup.SyncConflictResolver
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,7 +42,14 @@ internal class BackupDevViewModel(
     private val disconnectUseCase: DisconnectBackupUseCase,
     private val migrateUseCase: MigrateBackupUseCase,
     private val repository: BackupRepository,
+    private val conflictResolver: SyncConflictResolver,
+    private val backupPreferences: BackupPreferences,
 ) : ViewModel() {
+
+    // Accumulated merge stats across all sync calls in this session
+    private val _mergedRecordCount = MutableStateFlow(0)
+    private val _tombstonesApplied = MutableStateFlow(0)
+    private val _autoResolvedConflicts = MutableStateFlow(0)
 
     private val _events = Channel<BackupDevEvent>(Channel.BUFFERED)
     val events: Flow<BackupDevEvent> = _events.receiveAsFlow()
@@ -49,6 +61,12 @@ internal class BackupDevViewModel(
         repository.syncState,
     ) { log, syncState ->
         BackupDevState(syncState = syncState, log = log)
+    }.combine(_mergedRecordCount) { state, merged ->
+        state.copy(mergedRecordCount = merged)
+    }.combine(_tombstonesApplied) { state, tombstones ->
+        state.copy(tombstonesApplied = tombstones)
+    }.combine(_autoResolvedConflicts) { state, autoResolved ->
+        state.copy(autoResolvedConflicts = autoResolved)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
@@ -77,6 +95,9 @@ internal class BackupDevViewModel(
                 CloudProviderType.GOOGLE_DRIVE,
             )
 
+            BackupDevAction.SimulateGoalConflict -> simulateGoalConflict()
+            BackupDevAction.SimulatePrefsConflict -> simulatePrefsConflict()
+            BackupDevAction.SimulateTombstoneWarning -> simulateTombstoneWarning()
             BackupDevAction.ClearLog -> _log.value = emptyList()
         }
     }
@@ -115,6 +136,36 @@ internal class BackupDevViewModel(
         log("Migrate ${from.displayName} → ${to.displayName}…")
         val result = migrateUseCase(application, registry.get(from), registry.get(to))
         log("Migrate → $result")
+    }
+
+    private fun simulateGoalConflict() = viewModelScope.launch {
+        log("[SIM] Injecting GoalConflict into SyncConflictResolver…")
+        val todayEpochDay = Clock.System.now()
+            .toLocalDateTime(TimeZone.currentSystemDefault())
+            .date.toEpochDays().toInt()
+        val conflict = SyncConflict.GoalConflict(
+            effectiveDate = todayEpochDay,
+            localGoal = GoalRecord(id = "local-sim", effectiveDate = todayEpochDay, goalMl = 2000f),
+            remoteGoal = GoalRecord(id = "remote-sim", effectiveDate = todayEpochDay, goalMl = 2500f),
+        )
+        val useRemote = conflictResolver.awaitResolution(conflict)
+        log("[SIM] GoalConflict resolved → useRemote=$useRemote")
+    }
+
+    private fun simulatePrefsConflict() = viewModelScope.launch {
+        log("[SIM] Injecting PreferencesConflict into SyncConflictResolver…")
+        val conflict = SyncConflict.PreferencesConflict(
+            localPrefs = PreferencesRecord(unitPreference = "ML", timeFormat = "24h", amountPerDrink = 250f),
+            remotePrefs = PreferencesRecord(unitPreference = "OZ", timeFormat = "12h", amountPerDrink = 300f),
+        )
+        val useRemote = conflictResolver.awaitResolution(conflict)
+        log("[SIM] PreferencesConflict resolved → useRemote=$useRemote")
+    }
+
+    private fun simulateTombstoneWarning() = viewModelScope.launch {
+        log("[SIM] Setting tombstone warning pending flag…")
+        backupPreferences.setTombstoneWarningPending(true)
+        log("[SIM] Tombstone warning flag set — open the Today/Drink screen to see the dialog")
     }
 
     private fun log(message: String) {

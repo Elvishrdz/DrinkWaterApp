@@ -120,6 +120,55 @@ internal fun BackupDevScreen(
                     }
                 }
 
+                // Sync simulation section
+                item {
+                    HorizontalDivider()
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(
+                            text = "Sync Simulation",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            OutlinedButton(onClick = { onAction(BackupDevAction.SimulateGoalConflict) }) {
+                                Text("Goal conflict")
+                            }
+                            OutlinedButton(onClick = { onAction(BackupDevAction.SimulatePrefsConflict) }) {
+                                Text("Prefs conflict")
+                            }
+                        }
+                        OutlinedButton(onClick = { onAction(BackupDevAction.SimulateTombstoneWarning) }) {
+                            Text("Tombstone warning")
+                        }
+                    }
+                }
+
+                // Merge stats
+                item {
+                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Text(
+                            text = "Merge Stats (this session)",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        Text(
+                            text = "Records merged: ${state.mergedRecordCount}",
+                            style = MaterialTheme.typography.bodySmall,
+                            fontFamily = FontFamily.Monospace,
+                        )
+                        Text(
+                            text = "Tombstones applied: ${state.tombstonesApplied}",
+                            style = MaterialTheme.typography.bodySmall,
+                            fontFamily = FontFamily.Monospace,
+                        )
+                        Text(
+                            text = "Auto-resolved conflicts: ${state.autoResolvedConflicts}",
+                            style = MaterialTheme.typography.bodySmall,
+                            fontFamily = FontFamily.Monospace,
+                        )
+                    }
+                }
+
                 // Log header
                 item {
                     HorizontalDivider()

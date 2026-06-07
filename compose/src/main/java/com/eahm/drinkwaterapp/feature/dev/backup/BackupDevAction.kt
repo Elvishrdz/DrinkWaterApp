@@ -19,6 +19,11 @@ sealed interface BackupDevAction {
     data object MigrateGoogleToDropbox : BackupDevAction
     data object MigrateDropboxToGoogle : BackupDevAction
 
+    // Sync simulation (dev-only)
+    data object SimulateGoalConflict : BackupDevAction
+    data object SimulatePrefsConflict : BackupDevAction
+    data object SimulateTombstoneWarning : BackupDevAction
+
     // Log
     data object ClearLog : BackupDevAction
 }

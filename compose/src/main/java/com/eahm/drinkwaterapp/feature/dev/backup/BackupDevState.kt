@@ -5,4 +5,10 @@ import com.eahm.drinkwaterapp.backup.BackupSyncState
 data class BackupDevState(
     val syncState: BackupSyncState = BackupSyncState.Idle,
     val log: List<String> = emptyList(),
+    /** Total number of records merged across all sync sessions this run. */
+    val mergedRecordCount: Int = 0,
+    /** Total tombstones applied since app start. */
+    val tombstonesApplied: Int = 0,
+    /** Total auto-resolved conflicts since app start. */
+    val autoResolvedConflicts: Int = 0,
 )
