@@ -9,12 +9,14 @@ import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
 import com.eahm.drinkwaterapp.core.database.entity.DailyGoalEntity
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
+import com.eahm.drinkwaterapp.feature.drink.DateTimeZoneChangedObserver
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -22,36 +24,43 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.Month
-import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
-import kotlinx.datetime.toLocalDateTime
 import java.text.DateFormatSymbols
 import java.util.Locale
 import kotlin.math.abs
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class StatsViewModel(
     database: AppDatabase,
     streakRepository: StreakRepository,
     prefsStorage: PrefsStorage,
+    dateTimeZoneChangedObserver: DateTimeZoneChangedObserver,
 ) : ViewModel() {
 
     private val historyDao = database.getHistoryDao()
     private val goalDao = database.getDailyGoalDao()
 
-    private val today: LocalDate = Clock.System.now()
-        .toLocalDateTime(TimeZone.currentSystemDefault())
-        .date
+    // Reactive today: re-emits at midnight or timezone change so charts and isToday
+    // highlights stay accurate without reopening the app.
+    private val today: StateFlow<LocalDate> = dateTimeZoneChangedObserver.currentDateTime
+        .map { it.date }
+        .distinctUntilChanged()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = dateTimeZoneChangedObserver.currentDateTime.value.date,
+        )
 
     private val _selectedPeriod = MutableStateFlow(StatsPeriod.WEEK)
     private val _chartPage = MutableStateFlow(Int.MAX_VALUE) // clamps to newest page on first load
 
-    private val pages: StateFlow<List<PeriodPage>> = _selectedPeriod
-        .flatMapLatest { period -> loadPagesFlow(period) }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+    private val pages: StateFlow<List<PeriodPage>> =
+        combine(_selectedPeriod, today) { period, todayDate ->
+            Pair(period, todayDate)
+        }.flatMapLatest { (period, todayDate) ->
+            loadPagesFlow(period, todayDate)
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     private val streakData: StateFlow<StreakData> = streakRepository.streakData
         .stateIn(viewModelScope, SharingStarted.Lazily, StreakData())
@@ -181,14 +190,15 @@ internal class StatsViewModel(
 
     // ── Data loading ─────────────────────────────────────────────────────────
 
-    private fun loadPagesFlow(period: StatsPeriod): Flow<List<PeriodPage>> = when (period) {
-        StatsPeriod.WEEK -> loadWeekPages()
-        StatsPeriod.MONTH -> loadMonthPages()
-        StatsPeriod.YEAR -> loadYearPages()
-    }
+    private fun loadPagesFlow(period: StatsPeriod, today: LocalDate): Flow<List<PeriodPage>> =
+        when (period) {
+            StatsPeriod.WEEK -> loadWeekPages(today)
+            StatsPeriod.MONTH -> loadMonthPages(today)
+            StatsPeriod.YEAR -> loadYearPages(today)
+        }
 
     /** Pages from the first goal's week to today, oldest first. Each page = Mon–Sun. */
-    private fun loadWeekPages(): Flow<List<PeriodPage>> {
+    private fun loadWeekPages(today: LocalDate): Flow<List<PeriodPage>> {
         val daysFromMonday = today.dayOfWeek.ordinal  // MONDAY=0 … SUNDAY=6
         val thisMonday = today.minus(daysFromMonday, DateTimeUnit.DAY)
 
@@ -237,7 +247,7 @@ internal class StatsViewModel(
     }
 
     /** Pages from the first goal's month to today, oldest first. Each page = all days of a month. */
-    private fun loadMonthPages(): Flow<List<PeriodPage>> {
+    private fun loadMonthPages(today: LocalDate): Flow<List<PeriodPage>> {
         return combine(
             goalDao.getAllGoals(),
             historyDao.getEarliestRecord()
@@ -289,7 +299,7 @@ internal class StatsViewModel(
     }
 
     /** Pages from the first goal's year to today, oldest first. Each page = 12 months. */
-    private fun loadYearPages(): Flow<List<PeriodPage>> {
+    private fun loadYearPages(today: LocalDate): Flow<List<PeriodPage>> {
         return combine(
             goalDao.getAllGoals(),
             historyDao.getEarliestRecord()
