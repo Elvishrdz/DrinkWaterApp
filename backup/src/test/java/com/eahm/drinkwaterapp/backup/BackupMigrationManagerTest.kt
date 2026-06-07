@@ -9,8 +9,8 @@ import kotlin.test.assertTrue
 class BackupMigrationManagerTest {
 
     @Test
-    fun `currentSchema is 1`() {
-        assertEquals(1, BackupMigrationManager.currentSchema)
+    fun `currentSchema is 2`() {
+        assertEquals(2, BackupMigrationManager.currentSchema)
     }
 
     @Test
