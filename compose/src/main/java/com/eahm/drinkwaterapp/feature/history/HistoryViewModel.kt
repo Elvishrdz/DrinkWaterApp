@@ -10,6 +10,7 @@ import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.domain.extension.toEndOfDayTime
 import com.eahm.drinkwaterapp.core.domain.extension.toStartOfDayTime
+import com.eahm.drinkwaterapp.feature.drink.DateTimeZoneChangedObserver
 import com.eahm.drinkwaterapp.ui.historylist.DayGroup
 import com.eahm.drinkwaterapp.ui.historylist.HourGroup
 import kotlinx.collections.immutable.toImmutableList
@@ -26,24 +27,39 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 
 internal class HistoryViewModel(
     val application: Application,
     val database: AppDatabase,
     val prefsStorage: PrefsStorage,
+    val dateTimeZoneChangedObserver: DateTimeZoneChangedObserver,
 ) : ViewModel() {
 
     private val historyDao = database.getHistoryDao()
     private val goalDao = database.getDailyGoalDao()
 
-    @OptIn(ExperimentalTime::class)
-    private val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    // Tracks the real current date/time; updates at midnight or timezone change.
+    private val currentNow = MutableStateFlow(dateTimeZoneChangedObserver.currentDateTime.value)
 
-    private val historyDate = MutableStateFlow(today)
+    // The date the user is currently viewing. Starts at today; auto-advances only when
+    // the user is already on "today" so browsing past dates is unaffected.
+    private val historyDate = MutableStateFlow(dateTimeZoneChangedObserver.currentDateTime.value)
+
+    init {
+        viewModelScope.launch {
+            dateTimeZoneChangedObserver.currentDateTime.collect { newNow ->
+                val oldDate = currentNow.value.date
+                val newDate = newNow.date
+                if (newDate != oldDate) {
+                    // Only snap the viewed date forward if the user was already on "today".
+                    if (historyDate.value.date == oldDate) {
+                        historyDate.value = newNow
+                    }
+                    currentNow.value = newNow
+                }
+            }
+        }
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val records = historyDate
@@ -83,7 +99,8 @@ internal class HistoryViewModel(
         records,
         goalMl,
         consumedMl,
-    ) { date, records, goal, consumed ->
+        currentNow,
+    ) { date, records, goal, consumed, now ->
         val historyRecords = records
             .sortedBy { it.timestamp }
             .reversed()
@@ -100,17 +117,17 @@ internal class HistoryViewModel(
             .mapNotNull { (dayGroup, items) ->
                 HourGroup(
                     hour = dayGroup.hour,
-                    isCurrentHour = dayGroup.hour == today.hour &&
-                            dayGroup.day == today.day &&
-                            dayGroup.month == today.month.ordinal &&
-                            dayGroup.year == today.year,
+                    isCurrentHour = dayGroup.hour == now.hour &&
+                            dayGroup.day == now.day &&
+                            dayGroup.month == now.month.ordinal &&
+                            dayGroup.year == now.year,
                     items = items,
                 )
             }
             .sortedByDescending { it.hour }
             .toImmutableList()
 
-        val isToday = date.date == today.date
+        val isToday = date.date == now.date
 
         HistoryState.Data(
             date = date,
@@ -150,6 +167,6 @@ internal class HistoryViewModel(
     }
 
     fun goToToday() {
-        historyDate.update { today }
+        historyDate.value = currentNow.value
     }
 }
