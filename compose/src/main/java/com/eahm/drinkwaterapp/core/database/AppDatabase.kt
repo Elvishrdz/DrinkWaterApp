@@ -17,7 +17,7 @@ import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import kotlinx.coroutines.Dispatchers
 
 @Database(
-    version = 2,
+    version = 3,
     entities = [
         HistoryEntity::class,
         DailyGoalEntity::class,
@@ -64,11 +64,25 @@ fun getAndroidRoomDatabaseBuilder(
         )
 }
 
+val MIGRATION_2_3 = object : Migration(2, 3) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        // Add sync tracking columns to HistoryEntity
+        db.execSQL("ALTER TABLE HistoryEntity ADD COLUMN device_id TEXT NOT NULL DEFAULT ''")
+        db.execSQL("ALTER TABLE HistoryEntity ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0")
+        db.execSQL("ALTER TABLE HistoryEntity ADD COLUMN deleted_at INTEGER")
+
+        // Add sync tracking columns to daily_goal
+        db.execSQL("ALTER TABLE daily_goal ADD COLUMN device_id TEXT NOT NULL DEFAULT ''")
+        db.execSQL("ALTER TABLE daily_goal ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0")
+        db.execSQL("ALTER TABLE daily_goal ADD COLUMN deleted_at INTEGER")
+    }
+}
+
 fun getRoomDatabase(
     builder: RoomDatabase.Builder<AppDatabase>
 ): AppDatabase {
     return builder
-        .addMigrations(MIGRATION_1_2)
+        .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
         .setQueryCoroutineContext(Dispatchers.IO)
         .build()
 }

@@ -13,4 +13,7 @@ data class DailyGoalEntity(
     @PrimaryKey val id: String = Uuid.random().toString(),
     @ColumnInfo(name = "effective_date") val effectiveDate: LocalDate,
     @ColumnInfo(name = "goal_ml") val goalMl: Float,
+    @ColumnInfo(name = "device_id") val deviceId: String = "",
+    @ColumnInfo(name = "updated_at") val updatedAt: Long = 0L,
+    @ColumnInfo(name = "deleted_at") val deletedAt: Long? = null,
 )

@@ -19,6 +19,9 @@ data class HistoryEntity(
     @ColumnInfo(name = "status") val status: Status,
     @ColumnInfo(name = "timestamp") val timestamp: LocalDateTime =
         Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+    @ColumnInfo(name = "device_id") val deviceId: String = "",
+    @ColumnInfo(name = "updated_at") val updatedAt: Long = 0L,
+    @ColumnInfo(name = "deleted_at") val deletedAt: Long? = null,
 )
 
 enum class Status {

@@ -15,6 +15,7 @@ import kotlinx.serialization.json.double
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.longOrNull
 import kotlinx.serialization.json.put
 
 class BackupSerializer(
@@ -34,6 +35,9 @@ class BackupSerializer(
                     put("amount", record.amount)
                     put("status", record.status.name)
                     put("timestamp", record.timestamp.toString())
+                    put("device_id", record.deviceId)
+                    put("updated_at", record.updatedAt)
+                    if (record.deletedAt != null) put("deleted_at", record.deletedAt) else put("deleted_at", null as String?)
                 })
             }
         }
@@ -44,6 +48,9 @@ class BackupSerializer(
                     put("id", goal.id)
                     put("effective_date", goal.effectiveDate.toString())
                     put("goal_ml", goal.goalMl)
+                    put("device_id", goal.deviceId)
+                    put("updated_at", goal.updatedAt)
+                    if (goal.deletedAt != null) put("deleted_at", goal.deletedAt) else put("deleted_at", null as String?)
                 })
             }
         }
@@ -86,6 +93,9 @@ class BackupSerializer(
                     timestamp = kotlinx.datetime.LocalDateTime.parse(
                         obj["timestamp"]?.jsonPrimitive?.contentOrNull ?: ""
                     ),
+                    deviceId = obj["device_id"]?.jsonPrimitive?.contentOrNull ?: "",
+                    updatedAt = obj["updated_at"]?.jsonPrimitive?.longOrNull ?: 0L,
+                    deletedAt = obj["deleted_at"]?.jsonPrimitive?.longOrNull,
                 )
             }
             if (historyEntities.isNotEmpty()) {
@@ -102,6 +112,9 @@ class BackupSerializer(
                         obj["effective_date"]?.jsonPrimitive?.contentOrNull ?: ""
                     ),
                     goalMl = obj["goal_ml"]?.jsonPrimitive?.double?.toFloat() ?: 500f,
+                    deviceId = obj["device_id"]?.jsonPrimitive?.contentOrNull ?: "",
+                    updatedAt = obj["updated_at"]?.jsonPrimitive?.longOrNull ?: 0L,
+                    deletedAt = obj["deleted_at"]?.jsonPrimitive?.longOrNull,
                 )
                 database.getDailyGoalDao().insert(goal)
             }

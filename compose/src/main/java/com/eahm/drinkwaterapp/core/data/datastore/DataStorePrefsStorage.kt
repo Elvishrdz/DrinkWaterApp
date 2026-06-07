@@ -11,6 +11,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.eahm.drinkwaterapp.backup.BackupPreferences
+import com.eahm.drinkwaterapp.backup.SeenDevice
 import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
 import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
 import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
@@ -65,12 +66,21 @@ internal class DataStorePrefsStorage(
 
     // Backup keys
     private val backupEnabledKey = booleanPreferencesKey("BACKUP_ENABLED")
+
     private val backupProviderKey = stringPreferencesKey("BACKUP_PROVIDER")
     private val backupLastSyncAtKey = longPreferencesKey("BACKUP_LAST_SYNC_AT")
     private val backupAutoIntervalDaysKey = intPreferencesKey("BACKUP_AUTO_INTERVAL_DAYS")
     private val backupUserDisplayNameKey = stringPreferencesKey("BACKUP_USER_DISPLAY_NAME")
     private val backupContentHashKey = stringPreferencesKey("BACKUP_CONTENT_HASH")
     private val backupLastErrorKey = stringPreferencesKey("BACKUP_LAST_ERROR")
+
+    // Sync / device identity keys
+    private val deviceIdKey = stringPreferencesKey("SYNC_DEVICE_ID")
+    private val syncPendingKey = booleanPreferencesKey("SYNC_PENDING")
+    private val lastRemoteSyncAtKey = longPreferencesKey("SYNC_LAST_REMOTE_SYNC_AT")
+    private val syncOnSaveEnabledKey = booleanPreferencesKey("SYNC_ON_SAVE_ENABLED")
+    private val seenDevicesKey = stringPreferencesKey("SYNC_SEEN_DEVICES")
+    private val tombstoneWarningPendingKey = booleanPreferencesKey("SYNC_TOMBSTONE_WARNING_PENDING")
 
     private val json = Json {
         ignoreUnknownKeys = true
@@ -413,7 +423,61 @@ internal class DataStorePrefsStorage(
             prefs.remove(backupUserDisplayNameKey)
             prefs.remove(backupContentHashKey)
             prefs.remove(backupLastErrorKey)
+            prefs.remove(deviceIdKey)
+            prefs.remove(syncPendingKey)
+            prefs.remove(lastRemoteSyncAtKey)
+            prefs.remove(syncOnSaveEnabledKey)
+            prefs.remove(seenDevicesKey)
+            prefs.remove(tombstoneWarningPendingKey)
         }
+    }
+
+    // --- Sync / device identity prefs implementation ---
+
+    override suspend fun getDeviceId(): String =
+        dataStore.data.map { it[deviceIdKey] ?: "" }.first()
+
+    override suspend fun setDeviceId(id: String) {
+        dataStore.edit { it[deviceIdKey] = id }
+    }
+
+    override suspend fun getSyncPending(): Boolean =
+        dataStore.data.map { it[syncPendingKey] ?: false }.first()
+
+    override suspend fun setSyncPending(pending: Boolean) {
+        dataStore.edit { it[syncPendingKey] = pending }
+    }
+
+    override suspend fun getLastRemoteSyncAt(): Long? =
+        dataStore.data.map { it[lastRemoteSyncAtKey] }.first()
+
+    override suspend fun setLastRemoteSyncAt(millis: Long) {
+        dataStore.edit { it[lastRemoteSyncAtKey] = millis }
+    }
+
+    override suspend fun getSyncOnSaveEnabled(): Boolean =
+        dataStore.data.map { it[syncOnSaveEnabledKey] ?: true }.first()
+
+    override suspend fun setSyncOnSaveEnabled(enabled: Boolean) {
+        dataStore.edit { it[syncOnSaveEnabledKey] = enabled }
+    }
+
+    override suspend fun getSeenDevices(): List<SeenDevice> =
+        dataStore.data.map { prefs ->
+            prefs[seenDevicesKey]?.let { raw ->
+                runCatching { json.decodeFromString<List<SeenDevice>>(raw) }.getOrNull()
+            } ?: emptyList()
+        }.first()
+
+    override suspend fun setSeenDevices(devices: List<SeenDevice>) {
+        dataStore.edit { it[seenDevicesKey] = json.encodeToString(devices) }
+    }
+
+    override suspend fun getTombstoneWarningPending(): Boolean =
+        dataStore.data.map { it[tombstoneWarningPendingKey] ?: false }.first()
+
+    override suspend fun setTombstoneWarningPending(pending: Boolean) {
+        dataStore.edit { it[tombstoneWarningPendingKey] = pending }
     }
 
     override suspend fun clear() {
