@@ -1,5 +1,8 @@
+.claude
+/.claude
+
+# Android Studio
 *.iml
-.gradle
 /local.properties
 /.idea/caches/build_file_checksums.ser
 /.idea/caches/deviceStreaming.xml
@@ -9,12 +12,61 @@
 /.idea/androidTestResultsUserPreferences.xml
 /.idea/deploymentTargetSelector.xml
 /.idea/planningMode.xml
-.DS_Store
 /build
 /captures
 .externalNativeBuild
 app/release/*
-*.apk
-*.aab
 /.idea/shelf/*
-/.claude
+
+### Xcode ###
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+!*.xcworkspace/contents.xcworkspacedata/
+/*.gcno
+**/xcshareddata/WorkspaceSettings.xcsettings
+*.xcuserstate
+*.xcscheme
+*.xcworkspace
+xcuserdata/
+
+# CocoaPods
+Pods/
+
+## iOS App packaging
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Android App packaging
+*.apk
+*.ap_
+*.aab
+
+# macOs
+.DS_Store
+
+# Generated files
+bin/
+gen/
+*.class
+*.dex
+
+# Gradle files
+.gradle
+.gradle/
+build/
+
+# Local configuration file
+local.properties
+
+# More
+.kotlin
+**/build/
+xcuserdata
+!src/**/build/
+.idea
+captures
+.cxx
+!*.xcodeproj/project.xcworkspace/
+!*.xcworkspace/contents.xcworkspacedata
