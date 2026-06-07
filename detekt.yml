@@ -607,6 +607,9 @@ style:
   UnusedPrivateMember:
     active: true
     allowedNames: ''
+    ignoreAnnotated:
+      - 'Preview'
+      - 'PreviewScreenSizes'
   UnusedPrivateProperty:
     active: true
     allowedNames: '_|(ignored|expected).*'
