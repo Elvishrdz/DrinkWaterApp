@@ -13,8 +13,6 @@
     <ID>NoConsecutiveBlankLines:AdManagerBannerAd.kt$ </ID>
     <ID>NoConsecutiveBlankLines:AdMobBanner.kt$ </ID>
     <ID>NoConsecutiveBlankLines:AdMobBanner.kt$InlineInterstitialAdState$ </ID>
-    <ID>UnusedPrivateMember:DrinkWaterBannerAd.kt$@Preview(apiLevel = 33) @Composable private fun DrinkWaterBannerAdPreview()</ID>
-    <ID>UnusedPrivateMember:InlineBannerAd.kt$@Preview(apiLevel = 33) @Composable private fun InlineBannerAdPreview()</ID>
     <ID>UseCheckOrError:NativeAdView.kt$throw IllegalStateException("NativeAdView null")</ID>
     <ID>Wrapping:NativeAdView.kt$(</ID>
   </CurrentIssues>

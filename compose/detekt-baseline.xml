@@ -3,8 +3,6 @@
   <ManuallySuppressedIssues/>
   <CurrentIssues>
     <ID>AnnotationOnSeparateLine:PulsingRippleButton.kt$@Suppress("UNUSED_EXPRESSION") frame</ID>
-    <ID>ArgumentListWrapping:ActiveStatusBadge.kt$(R.string.drink_alarm_status_active)</ID>
-    <ID>ArgumentListWrapping:ActiveStatusBadge.kt$(R.string.drink_alarm_status_resting)</ID>
     <ID>ArgumentListWrapping:CelebrationDecor.kt$( Color(0xFFFFC107), Color(0xFFFF5252), Color(0xFF69F0AE), Color(0xFF40C4FF), Color(0xFFEA80FC), Color(0xFFFFFF00), Color(0xFFFF6D00), )</ID>
     <ID>ArgumentListWrapping:DailyGoalDao.kt$DailyGoalDao$("SELECT * FROM daily_goal WHERE effective_date BETWEEN :startEpoch AND :endEpoch ORDER BY effective_date ASC")</ID>
     <ID>ArgumentListWrapping:DrinkAlarmManagerV2.kt$DrinkAlarmManagerV2.ScheduleResult.Rescheduled$( hour, minute, if (exact) "updated" else "skipped", if (inexact) "updated" else "skipped", )</ID>
@@ -50,7 +48,6 @@
     <ID>CognitiveComplexMethod:DayStrip.kt$@Composable internal fun DayStripRow( days: List&lt;DayItem&gt;, selectedKey: String, canGoPrev: Boolean, canGoNext: Boolean, onSelectDay: (String) -&gt; Unit, onPrevDay: () -&gt; Unit, onNextDay: () -&gt; Unit, )</ID>
     <ID>CognitiveComplexMethod:DraggablePresets.kt$@Composable fun DraggablePresetGrid( presets: List&lt;DrinkSuggestion&gt;, onDrink: (Float) -&gt; Unit, onReorder: (List&lt;DrinkSuggestion&gt;) -&gt; Unit, modifier: Modifier = Modifier, onDelete: (DrinkSuggestion) -&gt; Unit = {}, onDraggingChanged: (Boolean) -&gt; Unit = {}, onDeleteHover: (Boolean) -&gt; Unit = {}, columns: Int = GRID_COLUMNS, unitPreference: UnitPreference = UnitPreference.ML, )</ID>
     <ID>CognitiveComplexMethod:DraggablePresets.kt$@Composable fun DraggableQuickAddRow( presets: List&lt;DrinkSuggestion&gt;, onDrink: (Float) -&gt; Unit, onReorder: (List&lt;DrinkSuggestion&gt;, Boolean) -&gt; Unit, modifier: Modifier = Modifier, trailingContent: @Composable (Modifier) -&gt; Unit = {}, unitPreference: UnitPreference = UnitPreference.ML, )</ID>
-    <ID>CognitiveComplexMethod:DrinkAlarmManagerV2.kt$DrinkAlarmManagerV2$suspend fun onInexactAlarmReceived(source: AlarmSource, hour: Int?, minute: Int?)</ID>
     <ID>CognitiveComplexMethod:DrinkShape.kt$@Composable fun DrinkShape( fillFraction: Float, modifier: Modifier = Modifier, shape: DrinkShape = DrinkShape.Bottle, appearance: DrinkAppearance = DrinkAppearance(), bubbles: BubbleConfig = BubbleConfig(), onFillChanged: ((Float) -&gt; Unit)? = null, )</ID>
     <ID>CognitiveComplexMethod:GoalBottomSheet.kt$@Composable internal fun GoalStepperRow( value: Float, onDecrement: () -&gt; Unit, onIncrement: () -&gt; Unit, onValueSet: (Float) -&gt; Unit, modifier: Modifier = Modifier, unitPreference: UnitPreference = UnitPreference.ML, )</ID>
     <ID>CognitiveComplexMethod:GoalCelebrationCard.kt$@Composable fun GoalCelebrationCard( variant: CelebrationVariant, amountMl: Float, drinkCount: Int, streakDays: Int, onClose: () -&gt; Unit, onShare: (Bitmap) -&gt; Unit, modifier: Modifier = Modifier, showStreakDays: Boolean = true, showShareProgressButton: Boolean = true, unitPreference: UnitPreference = UnitPreference.ML, onBoundsInRoot: ((Rect) -&gt; Unit)? = null, )</ID>
@@ -66,13 +63,12 @@
     <ID>CognitiveComplexMethod:RecordAmountBottomSheet.kt$@Composable private fun RecordAmountSheetContent( value: Int, isAtMin: Boolean, isAtMax: Boolean, onDecrement: () -&gt; Unit, onIncrement: () -&gt; Unit, onValueSet: (Int) -&gt; Unit, onSave: () -&gt; Unit, unitPreference: UnitPreference = UnitPreference.ML, )</ID>
     <ID>CognitiveComplexMethod:RingAnimations.kt$fun Modifier.bounceTap( onClick: () -&gt; Unit, shape: Shape = CircleShape, enabled: Boolean = true, rippleEnabled: Boolean = false, ): Modifier</ID>
     <ID>CognitiveComplexMethod:RingSection.kt$@Composable private fun RotatingInfoPill( remaining: Float, alarmCountdownMs: Long?, alarmIsExact: Boolean, isOutsideActiveHours: Boolean, modifier: Modifier = Modifier, )</ID>
-    <ID>CognitiveComplexMethod:SettingsScreen.kt$@Composable internal fun SettingsContent( state: SettingsState, onNotificationsToggled: (Boolean) -&gt; Unit, onUsernameChanged: (String) -&gt; Unit, onGoalChanged: (Float) -&gt; Unit, onUnitChanged: (WaterUnit, WeightUnit) -&gt; Unit, onIntervalChanged: (Int) -&gt; Unit, onNotificationAmountChanged: (Float) -&gt; Unit, onStartTimeChanged: (TimeSelected) -&gt; Unit, onEndTimeChanged: (TimeSelected) -&gt; Unit, onShareTap: () -&gt; Unit, onRateTap: () -&gt; Unit, onRequestFeatureTap: () -&gt; Unit, onReportProblemTap: () -&gt; Unit, onGoalCelebrationsToggled: (Boolean) -&gt; Unit, onExactAlarmTap: () -&gt; Unit, onClearDataTap: () -&gt; Unit, onRemoveAdsTap: () -&gt; Unit, onTimeFormatChanged: (TimeFormatPreference) -&gt; Unit, onUnitPreferenceChanged: (UnitPreference) -&gt; Unit, onLanguageChanged: (String) -&gt; Unit, onTrackingToggled: (Boolean) -&gt; Unit, onPrivacyPolicyAndTermsOfUseTap: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>CognitiveComplexMethod:SettingsScreen.kt$@Composable internal fun SettingsContent( state: SettingsState, onNotificationsToggled: (Boolean) -&gt; Unit, onUsernameChanged: (String) -&gt; Unit, onGoalChanged: (Float) -&gt; Unit, onUnitChanged: (WaterUnit, WeightUnit) -&gt; Unit, onIntervalChanged: (Int) -&gt; Unit, onNotificationAmountChanged: (Float) -&gt; Unit, onStartTimeChanged: (TimeSelected) -&gt; Unit, onEndTimeChanged: (TimeSelected) -&gt; Unit, onShareTap: () -&gt; Unit, onRateTap: () -&gt; Unit, onRequestFeatureTap: () -&gt; Unit, onReportProblemTap: () -&gt; Unit, onGoalCelebrationsToggled: (Boolean) -&gt; Unit, onExactAlarmTap: () -&gt; Unit, onClearDataTap: () -&gt; Unit, onRemoveAdsTap: () -&gt; Unit, onTimeFormatChanged: (TimeFormatPreference) -&gt; Unit, onUnitPreferenceChanged: (UnitPreference) -&gt; Unit, onLanguageChanged: (String) -&gt; Unit, onTrackingToggled: (Boolean) -&gt; Unit, onPrivacyPolicyAndTermsOfUseTap: () -&gt; Unit, onConnectBackupTap: (CloudProviderType) -&gt; Unit = {}, onSyncNowTap: () -&gt; Unit = {}, onDisconnectBackupTap: () -&gt; Unit = {}, modifier: Modifier = Modifier, )</ID>
     <ID>CognitiveComplexMethod:SettingsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable internal fun SettingsScreen( modifier: Modifier = Modifier, viewModel: SettingsViewModel = koinViewModel(), )</ID>
     <ID>CognitiveComplexMethod:StepNotifs.kt$@Suppress("AssignedValueIsNeverRead") @Composable private fun AmountStepper( unitPreference: UnitPreference, value: Int, isAtMin: Boolean, isAtMax: Boolean, onDecrement: () -&gt; Unit, onIncrement: () -&gt; Unit, onValueSet: (Int) -&gt; Unit, )</ID>
     <ID>CognitiveComplexMethod:StepNotifs.kt$@Suppress("AssignedValueIsNeverRead") @OptIn(ExperimentalMaterial3Api::class) @Composable internal fun stepNotifs( intervalMinutes: Int, notifAmountMl: Float, onAmountChange: (Float) -&gt; Unit, onNext: () -&gt; Unit, onSkip: () -&gt; Unit, onBack: () -&gt; Unit, unitPreference: UnitPreference = UnitPreference.ML, ): OnboardingStep</ID>
     <ID>CognitiveComplexMethod:StepWeight.kt$@Composable private fun WeightInputRow( value: String, unit: WeightUnit, onValueChange: (String) -&gt; Unit, onUnitChange: (WeightUnit) -&gt; Unit, modifier: Modifier = Modifier, )</ID>
     <ID>CognitiveComplexMethod:StreakRepositoryImpl.kt$StreakRepositoryImpl$private fun computeStreaks( today: LocalDate, records: List&lt;HistoryEntity&gt;, goalThreshold: Float, ): ComputedStreaks</ID>
-    <ID>CognitiveComplexMethod:SummaryRow.kt$@Composable internal fun SummaryRow( schedule: DrinkSchedule?, interval: AlarmInterval, nextAlarmSlot: LocalDateTime?, isInActiveHours: Boolean, isInexact: Boolean = false, is24Hour: Boolean = true, )</ID>
     <ID>CognitiveComplexMethod:TodayLogSection.kt$@Composable fun TodayLogSection( items: List&lt;DrinkLogEntry&gt;, onSeeAll: () -&gt; Unit, modifier: Modifier = Modifier, unitPreference: UnitPreference = UnitPreference.ML, )</ID>
     <ID>CognitiveComplexMethod:TrackingDevScreen.kt$@Composable private fun TrackingContent( state: TrackingDevState.Data, onAction: (TrackingDevAction) -&gt; Unit, modifier: Modifier = Modifier, )</ID>
     <ID>CognitiveComplexMethod:WaterRisingAnimation.kt$@Composable internal fun WaterRisingAnimation( playing: Boolean, onAnimationDone: () -&gt; Unit = {}, consumeClicks: Boolean = false, modifier: Modifier = Modifier, config: WaterRisingConfig = WaterRisingConfig(), )</ID>
@@ -110,6 +106,7 @@
     <ID>CyclomaticComplexMethod:AlarmsScreen.kt$@Composable private fun DataContent(state: AlarmsState.Data, onAction: (AlarmsAction) -&gt; Unit)</ID>
     <ID>CyclomaticComplexMethod:AlarmsV2ViewModel.kt$AlarmsV2ViewModel$private fun refreshState()</ID>
     <ID>CyclomaticComplexMethod:AppTimeSelectorDialog.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun AppTimeSelectorDialog( time: TimeSelected? = null, is24HourFormat: Boolean = rememberTimePickerState().is24hour, is24HourResult: Boolean = true, onTimeSelected: (TimeSelected) -&gt; Unit, onDismiss: () -&gt; Unit, canChangeTimeFormat: Boolean = true, message: String? = null, debug: Boolean = false, )</ID>
+    <ID>CyclomaticComplexMethod:BackupSerializer.kt$BackupSerializer$override suspend fun deserializeAndImport(data: JsonObject): BackupResult&lt;Unit&gt;</ID>
     <ID>CyclomaticComplexMethod:ConfettiOverlay.kt$@Composable fun ConfettiOverlay( active: Boolean, modifier: Modifier = Modifier, colors: List&lt;Color&gt; = confettiDefaultColors, pieceCount: Int = 80, fadeMode: ConfettiFadeMode = ConfettiFadeMode.NONE, onFinished: () -&gt; Unit = {}, )</ID>
     <ID>CyclomaticComplexMethod:DevRoot.kt$@Composable internal fun DevRoot(onBackClicked: () -&gt; Unit)</ID>
     <ID>CyclomaticComplexMethod:DraggablePresets.kt$@Composable fun DraggablePresetGrid( presets: List&lt;DrinkSuggestion&gt;, onDrink: (Float) -&gt; Unit, onReorder: (List&lt;DrinkSuggestion&gt;) -&gt; Unit, modifier: Modifier = Modifier, onDelete: (DrinkSuggestion) -&gt; Unit = {}, onDraggingChanged: (Boolean) -&gt; Unit = {}, onDeleteHover: (Boolean) -&gt; Unit = {}, columns: Int = GRID_COLUMNS, unitPreference: UnitPreference = UnitPreference.ML, )</ID>
@@ -123,7 +120,7 @@
     <ID>CyclomaticComplexMethod:NotificationAmountBottomSheet.kt$@Composable private fun NotificationAmountSheetContent( value: Int, isAtMin: Boolean, isAtMax: Boolean, onDecrement: () -&gt; Unit, onIncrement: () -&gt; Unit, onValueSet: (Int) -&gt; Unit, onSave: () -&gt; Unit, unitPreference: UnitPreference = UnitPreference.ML, )</ID>
     <ID>CyclomaticComplexMethod:OnboardingScreen.kt$@Composable internal fun OnboardingScreen( onComplete: () -&gt; Unit, )</ID>
     <ID>CyclomaticComplexMethod:RecordAmountBottomSheet.kt$@Composable private fun RecordAmountSheetContent( value: Int, isAtMin: Boolean, isAtMax: Boolean, onDecrement: () -&gt; Unit, onIncrement: () -&gt; Unit, onValueSet: (Int) -&gt; Unit, onSave: () -&gt; Unit, unitPreference: UnitPreference = UnitPreference.ML, )</ID>
-    <ID>CyclomaticComplexMethod:SettingsScreen.kt$@Composable internal fun SettingsContent( state: SettingsState, onNotificationsToggled: (Boolean) -&gt; Unit, onUsernameChanged: (String) -&gt; Unit, onGoalChanged: (Float) -&gt; Unit, onUnitChanged: (WaterUnit, WeightUnit) -&gt; Unit, onIntervalChanged: (Int) -&gt; Unit, onNotificationAmountChanged: (Float) -&gt; Unit, onStartTimeChanged: (TimeSelected) -&gt; Unit, onEndTimeChanged: (TimeSelected) -&gt; Unit, onShareTap: () -&gt; Unit, onRateTap: () -&gt; Unit, onRequestFeatureTap: () -&gt; Unit, onReportProblemTap: () -&gt; Unit, onGoalCelebrationsToggled: (Boolean) -&gt; Unit, onExactAlarmTap: () -&gt; Unit, onClearDataTap: () -&gt; Unit, onRemoveAdsTap: () -&gt; Unit, onTimeFormatChanged: (TimeFormatPreference) -&gt; Unit, onUnitPreferenceChanged: (UnitPreference) -&gt; Unit, onLanguageChanged: (String) -&gt; Unit, onTrackingToggled: (Boolean) -&gt; Unit, onPrivacyPolicyAndTermsOfUseTap: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
+    <ID>CyclomaticComplexMethod:SettingsScreen.kt$@Composable internal fun SettingsContent( state: SettingsState, onNotificationsToggled: (Boolean) -&gt; Unit, onUsernameChanged: (String) -&gt; Unit, onGoalChanged: (Float) -&gt; Unit, onUnitChanged: (WaterUnit, WeightUnit) -&gt; Unit, onIntervalChanged: (Int) -&gt; Unit, onNotificationAmountChanged: (Float) -&gt; Unit, onStartTimeChanged: (TimeSelected) -&gt; Unit, onEndTimeChanged: (TimeSelected) -&gt; Unit, onShareTap: () -&gt; Unit, onRateTap: () -&gt; Unit, onRequestFeatureTap: () -&gt; Unit, onReportProblemTap: () -&gt; Unit, onGoalCelebrationsToggled: (Boolean) -&gt; Unit, onExactAlarmTap: () -&gt; Unit, onClearDataTap: () -&gt; Unit, onRemoveAdsTap: () -&gt; Unit, onTimeFormatChanged: (TimeFormatPreference) -&gt; Unit, onUnitPreferenceChanged: (UnitPreference) -&gt; Unit, onLanguageChanged: (String) -&gt; Unit, onTrackingToggled: (Boolean) -&gt; Unit, onPrivacyPolicyAndTermsOfUseTap: () -&gt; Unit, onConnectBackupTap: (CloudProviderType) -&gt; Unit = {}, onSyncNowTap: () -&gt; Unit = {}, onDisconnectBackupTap: () -&gt; Unit = {}, modifier: Modifier = Modifier, )</ID>
     <ID>CyclomaticComplexMethod:SettingsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable internal fun SettingsScreen( modifier: Modifier = Modifier, viewModel: SettingsViewModel = koinViewModel(), )</ID>
     <ID>CyclomaticComplexMethod:StatsScreen.kt$@Composable internal fun StatsContent( state: StatsState, calendarState: CalendarState, isAdFree: Boolean = true, onPeriodSelected: (StatsPeriod) -&gt; Unit, onChartPageChanged: (Int) -&gt; Unit, onCalendarPrevious: () -&gt; Unit, onCalendarNext: () -&gt; Unit, onCalendarViewModeToggle: (CalendarViewMode) -&gt; Unit, onBarTapped: () -&gt; Unit = {}, onPersonalBestTapped: () -&gt; Unit = {}, modifier: Modifier = Modifier, )</ID>
     <ID>CyclomaticComplexMethod:StepNotifs.kt$@Suppress("AssignedValueIsNeverRead") @Composable private fun AmountStepper( unitPreference: UnitPreference, value: Int, isAtMin: Boolean, isAtMax: Boolean, onDecrement: () -&gt; Unit, onIncrement: () -&gt; Unit, onValueSet: (Int) -&gt; Unit, )</ID>
@@ -151,12 +148,10 @@
     <ID>FunctionParameterNaming:NotificationService.kt$NotificationService$NOTIFICATION_ID: Int</ID>
     <ID>GlobalCoroutineUsage:BroadcastReceiverGoAsync.kt$GlobalScope.launch(context) { try { block(pendingResult) } finally { pendingResult.finish() } }</ID>
     <ID>ImportOrdering:AlarmReceiver.kt$import android.app.AlarmManager import android.content.BroadcastReceiver import android.content.Context import android.content.Intent import android.os.Build import android.provider.Settings import android.util.Log import androidx.core.app.NotificationManagerCompat import com.eahm.drinkwaterapp.core.data.datastore.initialAmountPerDrink import com.eahm.drinkwaterapp.analytics.tracking.TrackingService import com.eahm.drinkwaterapp.core.data.drinkalarm.DrinkAlarmManagerV2 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmSource import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStatsObserver import com.eahm.drinkwaterapp.core.data.systemnotifications.NotificationService import com.eahm.drinkwaterapp.core.data.systemnotifications.model.Drink import com.eahm.drinkwaterapp.core.data.systemnotifications.model.NotificationRemoved import com.eahm.drinkwaterapp.core.data.systemnotifications.model.SkipDrink import com.eahm.drinkwaterapp.core.data.systemnotifications.notification.DrinkNotification import com.eahm.drinkwaterapp.core.data.systemnotifications.notification.DrinkNotification.EXTRA_CODE import com.eahm.drinkwaterapp.core.data.systemnotifications.notification.DrinkNotification.EXTRA_NOTIFICATION_ID import com.eahm.drinkwaterapp.core.database.AppDatabase import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity import com.eahm.drinkwaterapp.core.database.entity.Status import com.eahm.drinkwaterapp.core.domain.extension.toEndOfDayTime import com.eahm.drinkwaterapp.core.domain.extension.toStartOfDayTime import com.eahm.drinkwaterapp.system.service.goalcelebration.GoalCelebrationOverlay import com.eahm.drinkwaterapp.system.service.goalcelebration.data.CelebrationStyle import com.eahm.drinkwaterapp.system.service.goalcelebration.extension.createIntent import kotlinx.coroutines.Dispatchers import kotlinx.coroutines.flow.first import kotlinx.coroutines.withContext import kotlinx.datetime.TimeZone import kotlinx.datetime.toLocalDateTime import org.koin.core.context.GlobalContext import kotlin.time.Clock import kotlin.time.ExperimentalTime</ID>
-    <ID>ImportOrdering:DataStorePrefsStorage.kt$import androidx.datastore.core.DataStore import androidx.datastore.preferences.core.Preferences import androidx.datastore.preferences.core.booleanPreferencesKey import androidx.datastore.preferences.core.edit import androidx.datastore.preferences.core.floatPreferencesKey import androidx.datastore.preferences.core.intPreferencesKey import androidx.datastore.preferences.core.longPreferencesKey import androidx.datastore.preferences.core.stringPreferencesKey import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference import com.eahm.drinkwaterapp.core.presentation.UnitPreference import kotlinx.coroutines.flow.Flow import kotlinx.coroutines.flow.map import android.icu.util.LocaleData import android.icu.util.ULocale import kotlinx.serialization.json.Json import org.koin.core.module.dsl.singleOf import org.koin.dsl.bind import org.koin.dsl.module</ID>
     <ID>ImportOrdering:ExampleUnitTest.kt$import org.junit.Test import org.junit.Assert.*</ID>
-    <ID>ImportOrdering:FeatureModule.kt$import com.eahm.drinkwaterapp.MainViewModel import com.eahm.drinkwaterapp.feature.consent.ConsentViewModel import com.eahm.drinkwaterapp.feature.dev.DevViewModel import com.eahm.drinkwaterapp.feature.dev.alarmcalculator.AlarmCalculatorViewModel import com.eahm.drinkwaterapp.feature.dev.alarmintervals.AlarmIntervalsViewModel import com.eahm.drinkwaterapp.feature.dev.alarms.AlarmsViewModel import com.eahm.drinkwaterapp.feature.dev.alarmsv2.AlarmsV2ViewModel import com.eahm.drinkwaterapp.feature.dev.analytics.AnalyticsViewModel import com.eahm.drinkwaterapp.feature.dev.celebrations.CelebrationsViewModel import com.eahm.drinkwaterapp.feature.dev.consent.ConsentDevViewModel import com.eahm.drinkwaterapp.feature.dev.dailygoal.DailyGoalDevViewModel import com.eahm.drinkwaterapp.feature.dev.menu.DevMenuViewModel import com.eahm.drinkwaterapp.feature.dev.notifications.NotificationsViewModel import com.eahm.drinkwaterapp.feature.dev.onboarding.OnboardingDevViewModel import com.eahm.drinkwaterapp.feature.dev.streak.StreakDevViewModel import com.eahm.drinkwaterapp.feature.dev.tracking.TrackingDevViewModel import com.eahm.drinkwaterapp.feature.dev.historyinject.HistoryInjectDevViewModel import com.eahm.drinkwaterapp.feature.dev.wateranimation.WaterAnimationDevViewModel import com.eahm.drinkwaterapp.feature.drink.DrinkViewModel import com.eahm.drinkwaterapp.feature.drink.alarm.HomeAlarmViewModel import com.eahm.drinkwaterapp.feature.history.HistoryViewModel import com.eahm.drinkwaterapp.feature.history.v2.HistoryV2ViewModel import com.eahm.drinkwaterapp.feature.onboarding.OnboardingViewModel import com.eahm.drinkwaterapp.feature.settings.SettingsViewModel import com.eahm.drinkwaterapp.feature.stats.CalendarViewModel import com.eahm.drinkwaterapp.feature.stats.StatsViewModel import org.koin.core.module.dsl.viewModelOf import org.koin.dsl.module</ID>
     <ID>ImportOrdering:FirstDrinkDialog.kt$import androidx.compose.foundation.background import androidx.compose.foundation.layout.Column import androidx.compose.foundation.layout.Spacer import androidx.compose.foundation.layout.fillMaxWidth import androidx.compose.foundation.layout.height import androidx.compose.foundation.layout.padding import androidx.compose.foundation.shape.RoundedCornerShape import androidx.compose.material3.BasicAlertDialog import androidx.compose.material3.ExperimentalMaterial3Api import androidx.compose.material3.MaterialTheme import androidx.compose.material3.Text import androidx.compose.runtime.Composable import androidx.compose.ui.Modifier import androidx.compose.ui.draw.clip import androidx.compose.ui.res.stringResource import androidx.compose.ui.text.font.FontWeight import androidx.compose.ui.unit.dp import androidx.compose.ui.unit.sp import com.eahm.drinkwaterapp.R import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton</ID>
     <ID>ImportOrdering:HistoryScreen.kt$import android.text.format.DateFormat import androidx.activity.compose.LocalActivity import androidx.compose.foundation.layout.Arrangement import androidx.compose.foundation.layout.Column import androidx.compose.foundation.layout.Row import androidx.compose.foundation.layout.Spacer import androidx.compose.foundation.layout.fillMaxSize import androidx.compose.foundation.layout.fillMaxWidth import androidx.compose.foundation.layout.height import androidx.compose.foundation.layout.padding import androidx.compose.foundation.rememberScrollState import androidx.compose.foundation.verticalScroll import androidx.compose.material3.MaterialTheme import androidx.compose.material3.Scaffold import androidx.compose.material3.Text import androidx.compose.material3.TextButton import androidx.compose.runtime.Composable import androidx.compose.runtime.LaunchedEffect import androidx.compose.runtime.getValue import androidx.compose.runtime.mutableStateOf import androidx.compose.runtime.remember import androidx.compose.runtime.setValue import androidx.compose.ui.Alignment import androidx.compose.ui.Modifier import androidx.compose.ui.platform.LocalContext import androidx.compose.ui.res.stringResource import androidx.compose.ui.text.font.FontWeight import androidx.compose.ui.text.style.TextAlign import androidx.compose.ui.tooling.preview.Preview import androidx.compose.ui.unit.TextUnit import androidx.compose.ui.unit.TextUnitType import androidx.compose.ui.unit.dp import androidx.compose.ui.unit.sp import com.eahm.drinkwaterapp.R import com.eahm.drinkwaterapp.ads.banner.InlineBannerAd import com.eahm.drinkwaterapp.ads.banner.rememberHistoryScreenLogsBannerAdState import com.eahm.drinkwaterapp.ads.banner.rememberInterstitialState import com.eahm.drinkwaterapp.core.bindings.toEntity import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk300 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500 import com.eahm.drinkwaterapp.core.designsystem.theme.JetBrainsMono import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans import com.eahm.drinkwaterapp.core.domain.extension.formatVolume import com.eahm.drinkwaterapp.core.domain.mock.Mock import com.eahm.drinkwaterapp.core.domain.mock.hourGroupMock import com.eahm.drinkwaterapp.core.domain.mock.localDateTimeMock import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference import com.eahm.drinkwaterapp.core.presentation.UnitPreference import com.eahm.drinkwaterapp.feature.history.ui.RecordAmountBottomSheet import com.eahm.drinkwaterapp.analytics.tracking.TrackingService import com.eahm.drinkwaterapp.ui.historylist.DateTimePickerButton import com.eahm.drinkwaterapp.ui.historylist.HistoryTimeline import com.eahm.drinkwaterapp.ui.historylist.HistoryUI import com.eahm.drinkwaterapp.ui.historylist.HourGroup import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorDialog import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected import kotlinx.collections.immutable.ImmutableList import kotlinx.collections.immutable.toImmutableList import kotlinx.datetime.LocalDateTime import org.koin.compose.koinInject import kotlin.random.Random</ID>
-    <ID>ImportOrdering:SettingsScreen.kt$import android.Manifest import android.app.Activity import android.content.Intent import android.content.pm.PackageManager import android.os.Build import android.provider.Settings import android.text.format.DateFormat import androidx.activity.compose.rememberLauncherForActivityResult import androidx.activity.result.contract.ActivityResultContracts import androidx.compose.foundation.BorderStroke import androidx.compose.foundation.background import androidx.compose.foundation.clickable import androidx.compose.foundation.layout.Arrangement import androidx.compose.foundation.layout.Box import androidx.compose.foundation.layout.Column import androidx.compose.foundation.layout.ColumnScope import androidx.compose.foundation.layout.PaddingValues import androidx.compose.foundation.layout.Row import androidx.compose.foundation.layout.Spacer import androidx.compose.foundation.layout.fillMaxSize import androidx.compose.foundation.layout.fillMaxWidth import androidx.compose.foundation.layout.height import androidx.compose.foundation.layout.padding import androidx.compose.foundation.layout.size import androidx.compose.foundation.lazy.LazyColumn import androidx.compose.foundation.shape.CircleShape import androidx.compose.foundation.shape.RoundedCornerShape import androidx.compose.material3.BasicAlertDialog import androidx.compose.material3.ButtonDefaults import androidx.compose.material3.ExperimentalMaterial3Api import androidx.compose.material3.HorizontalDivider import androidx.compose.material3.Icon import androidx.compose.material3.MaterialTheme import androidx.compose.material3.OutlinedButton import androidx.compose.material3.Scaffold import androidx.compose.material3.Switch import androidx.compose.material3.SwitchDefaults import androidx.compose.material3.Text import androidx.compose.material3.rememberTimePickerState import androidx.compose.runtime.Composable import androidx.compose.runtime.LaunchedEffect import androidx.compose.runtime.collectAsState import androidx.compose.runtime.getValue import androidx.compose.runtime.mutableIntStateOf import androidx.compose.runtime.mutableStateOf import androidx.compose.runtime.remember import androidx.compose.runtime.saveable.rememberSaveable import androidx.compose.runtime.setValue import androidx.compose.ui.Alignment import androidx.compose.ui.Modifier import androidx.compose.ui.draw.clip import androidx.compose.ui.graphics.Brush import androidx.compose.ui.graphics.Color import androidx.compose.ui.graphics.vector.ImageVector import androidx.compose.ui.platform.LocalContext import androidx.compose.ui.res.painterResource import androidx.compose.ui.res.stringResource import androidx.compose.ui.text.font.FontWeight import androidx.compose.ui.text.style.TextAlign import androidx.compose.ui.tooling.preview.Preview import androidx.compose.ui.unit.TextUnit import androidx.compose.ui.unit.TextUnitType import androidx.compose.ui.unit.dp import androidx.compose.ui.unit.sp import androidx.core.content.ContextCompat import androidx.core.net.toUri import com.eahm.drinkwaterapp.R import com.eahm.drinkwaterapp.core.billing.PurchaseState import com.eahm.drinkwaterapp.core.config.FeatureFlags import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton import com.eahm.drinkwaterapp.core.designsystem.component.button.DwSecondaryButton import com.eahm.drinkwaterapp.core.designsystem.component.extension.outlineBorderStyle import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme import com.eahm.drinkwaterapp.core.designsystem.theme.DwDanger import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk100 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk200 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagentaDark import com.eahm.drinkwaterapp.core.designsystem.theme.DwPaper import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintGold import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater import com.eahm.drinkwaterapp.core.designsystem.theme.JetBrainsMono import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans import com.eahm.drinkwaterapp.core.domain.extension.formatVolume import com.eahm.drinkwaterapp.core.domain.extension.sanitizeZeroDecimals import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference import com.eahm.drinkwaterapp.core.presentation.UnitPreference import com.eahm.drinkwaterapp.core.presentation.composable.BuildInfoFooter import com.eahm.drinkwaterapp.feature.settings.extension.openPlayStoreUrl import com.eahm.drinkwaterapp.feature.settings.extension.openPrivacyPolicyAndTermsOfUse import com.eahm.drinkwaterapp.feature.settings.extension.startAppShareIntent import com.eahm.drinkwaterapp.feature.settings.extension.startFeatureRequestIntent import com.eahm.drinkwaterapp.feature.settings.extension.startReportProblemIntent import com.eahm.drinkwaterapp.feature.settings.ui.EditButton import com.eahm.drinkwaterapp.feature.settings.ui.GoalBottomSheet import com.eahm.drinkwaterapp.feature.settings.ui.IntervalBottomSheet import com.eahm.drinkwaterapp.feature.settings.ui.LanguageDialog import com.eahm.drinkwaterapp.feature.settings.ui.NotificationAmountBottomSheet import com.eahm.drinkwaterapp.feature.settings.ui.RemoveAdsBottomSheet import com.eahm.drinkwaterapp.feature.settings.ui.TimeFormatBottomSheet import com.eahm.drinkwaterapp.feature.settings.ui.UnitPreferenceBottomSheet import com.eahm.drinkwaterapp.feature.settings.ui.UnitsBottomSheet import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorDialog import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected import kotlinx.coroutines.delay import com.eahm.drinkwaterapp.analytics.tracking.TrackingService import org.koin.compose.koinInject import org.koin.compose.viewmodel.koinViewModel import java.util.Locale</ID>
+    <ID>ImportOrdering:SettingsScreen.kt$import android.Manifest import android.app.Activity import android.content.Intent import android.content.pm.PackageManager import android.os.Build import android.provider.Settings import android.text.format.DateFormat import androidx.activity.compose.rememberLauncherForActivityResult import androidx.activity.result.contract.ActivityResultContracts import androidx.compose.foundation.BorderStroke import androidx.compose.foundation.background import androidx.compose.foundation.clickable import androidx.compose.foundation.layout.Arrangement import androidx.compose.foundation.layout.Box import androidx.compose.foundation.layout.Column import androidx.compose.foundation.layout.ColumnScope import androidx.compose.foundation.layout.PaddingValues import androidx.compose.foundation.layout.Row import androidx.compose.foundation.layout.Spacer import androidx.compose.foundation.layout.fillMaxSize import androidx.compose.foundation.layout.fillMaxWidth import androidx.compose.foundation.layout.height import androidx.compose.foundation.layout.padding import androidx.compose.foundation.layout.size import androidx.compose.foundation.lazy.LazyColumn import androidx.compose.foundation.shape.CircleShape import androidx.compose.foundation.shape.RoundedCornerShape import androidx.compose.material3.BasicAlertDialog import androidx.compose.material3.ButtonDefaults import androidx.compose.material3.ExperimentalMaterial3Api import androidx.compose.material3.HorizontalDivider import androidx.compose.material3.Icon import androidx.compose.material3.MaterialTheme import androidx.compose.material3.OutlinedButton import androidx.compose.material3.Scaffold import androidx.compose.material3.Switch import androidx.compose.material3.SwitchDefaults import androidx.compose.material3.Text import androidx.compose.material3.rememberTimePickerState import androidx.compose.runtime.Composable import androidx.compose.runtime.LaunchedEffect import androidx.compose.runtime.collectAsState import androidx.compose.runtime.getValue import androidx.compose.runtime.mutableIntStateOf import androidx.compose.runtime.mutableStateOf import androidx.compose.runtime.remember import androidx.compose.runtime.saveable.rememberSaveable import androidx.compose.runtime.setValue import androidx.compose.ui.Alignment import androidx.compose.ui.Modifier import androidx.compose.ui.draw.clip import androidx.compose.ui.graphics.Brush import androidx.compose.ui.graphics.Color import androidx.compose.ui.graphics.vector.ImageVector import androidx.compose.ui.platform.LocalContext import androidx.compose.ui.res.painterResource import androidx.compose.ui.res.stringResource import androidx.compose.ui.text.font.FontWeight import androidx.compose.ui.text.style.TextAlign import androidx.compose.ui.tooling.preview.Preview import androidx.compose.ui.unit.TextUnit import androidx.compose.ui.unit.TextUnitType import androidx.compose.ui.unit.dp import androidx.compose.ui.unit.sp import androidx.core.content.ContextCompat import androidx.core.net.toUri import androidx.lifecycle.Lifecycle import androidx.lifecycle.compose.LifecycleEventEffect import com.eahm.drinkwaterapp.R import com.eahm.drinkwaterapp.backup.CloudProviderType import com.eahm.drinkwaterapp.core.billing.PurchaseState import com.eahm.drinkwaterapp.core.config.FeatureFlags import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton import com.eahm.drinkwaterapp.core.designsystem.component.button.DwSecondaryButton import com.eahm.drinkwaterapp.core.designsystem.component.extension.outlineBorderStyle import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme import com.eahm.drinkwaterapp.core.designsystem.theme.DwDanger import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk100 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk200 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagentaDark import com.eahm.drinkwaterapp.core.designsystem.theme.DwPaper import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintGold import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater import com.eahm.drinkwaterapp.core.designsystem.theme.JetBrainsMono import com.eahm.drinkwaterapp.core.designsystem.theme.Nunito import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans import com.eahm.drinkwaterapp.core.domain.extension.formatVolume import com.eahm.drinkwaterapp.core.domain.extension.sanitizeZeroDecimals import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference import com.eahm.drinkwaterapp.core.presentation.UnitPreference import com.eahm.drinkwaterapp.core.presentation.composable.BuildInfoFooter import com.eahm.drinkwaterapp.feature.settings.backup.BackupSettingsSection import com.eahm.drinkwaterapp.feature.settings.backup.ProviderPickerSheet import com.eahm.drinkwaterapp.feature.settings.extension.openPlayStoreUrl import com.eahm.drinkwaterapp.feature.settings.extension.openPrivacyPolicyAndTermsOfUse import com.eahm.drinkwaterapp.feature.settings.extension.startAppShareIntent import com.eahm.drinkwaterapp.feature.settings.extension.startFeatureRequestIntent import com.eahm.drinkwaterapp.feature.settings.extension.startReportProblemIntent import com.eahm.drinkwaterapp.feature.settings.ui.EditButton import com.eahm.drinkwaterapp.feature.settings.ui.GoalBottomSheet import com.eahm.drinkwaterapp.feature.settings.ui.IntervalBottomSheet import com.eahm.drinkwaterapp.feature.settings.ui.LanguageDialog import com.eahm.drinkwaterapp.feature.settings.ui.NotificationAmountBottomSheet import com.eahm.drinkwaterapp.feature.settings.ui.RemoveAdsBottomSheet import com.eahm.drinkwaterapp.feature.settings.ui.TimeFormatBottomSheet import com.eahm.drinkwaterapp.feature.settings.ui.UnitPreferenceBottomSheet import com.eahm.drinkwaterapp.feature.settings.ui.UnitsBottomSheet import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorDialog import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected import kotlinx.coroutines.delay import com.eahm.drinkwaterapp.analytics.tracking.TrackingService import org.koin.compose.koinInject import org.koin.compose.viewmodel.koinViewModel import java.util.Locale</ID>
     <ID>Indentation:AdaptiveLayout.kt$ </ID>
     <ID>Indentation:AdaptiveScreen.kt$ </ID>
     <ID>Indentation:AlarmReceiver.kt$AlarmReceiver$ </ID>
@@ -189,14 +184,15 @@
     <ID>LargeClass:DwIcons.kt$DwIcons</ID>
     <ID>LongMethod:AlarmReceiver.kt$AlarmReceiver$override fun onReceive(context: Context, intent: Intent)</ID>
     <ID>LongMethod:AlarmsV2ViewModel.kt$AlarmsV2ViewModel$private fun refreshState()</ID>
+    <ID>LongMethod:BackupSerializer.kt$BackupSerializer$override suspend fun deserializeAndImport(data: JsonObject): BackupResult&lt;Unit&gt;</ID>
     <ID>LongMethod:CalendarViewModel.kt$CalendarViewModel$private fun observeCalendarData()</ID>
-    <ID>LongMethod:DrinkAlarmManagerV2.kt$DrinkAlarmManagerV2$suspend fun onInexactAlarmReceived(source: AlarmSource, hour: Int?, minute: Int?)</ID>
     <ID>LongMethod:NotificationService.kt$NotificationService$@OptIn(ExperimentalTime::class) fun showReportNotification( CHANNEL_ID: String, NOTIFICATION_ID: Int, context: Context, title: String?, text: String?, bigText: String? )</ID>
     <ID>LongMethod:StreakRepositoryImpl.kt$StreakRepositoryImpl$private fun computeStreaks( today: LocalDate, records: List&lt;HistoryEntity&gt;, goalThreshold: Float, ): ComputedStreaks</ID>
     <ID>LongMethod:WhatToDoNowDecider.kt$internal fun decideWhatToDoNow( now: LocalDateTime, startTime: LocalDateTime, endTime: LocalDateTime, hasActiveAlarm: Boolean, // we can receive this value even if no active alarm exists // it can be a cached time for a previously existing alarm. alarmAlarmTriggersAt: LocalDateTime?, interval: AlarmInterval = AlarmInterval(0, 0), // TODO: fix tests with this goalMl: Float = 1f, // TODO: fix tests with this ): WhatToDoNow</ID>
+    <ID>LongParameterList:BackupDevViewModel.kt$BackupDevViewModel$( private val application: Application, private val registry: BackupProviderRegistry, private val connectUseCase: ConnectBackupUseCase, private val syncUseCase: SyncBackupUseCase, private val restoreUseCase: RestoreBackupUseCase, private val checkStatusUseCase: CheckBackupStatusUseCase, private val disconnectUseCase: DisconnectBackupUseCase, private val migrateUseCase: MigrateBackupUseCase, private val repository: BackupRepository, )</ID>
     <ID>LongParameterList:DrinkShape.kt$( path: Path, fillY: Float, phase: Float, amplitude: Float, frequency: Float, color: Color, canvasW: Float, canvasH: Float, )</ID>
     <ID>LongParameterList:DrinkViewModel.kt$DrinkViewModel$( val application: Application, val drinkAlarmManagerV2: DrinkAlarmManagerV2, val database: AppDatabase, val prefsStorage: PrefsStorage, val confettiController: ConfettiController, val dateTimeZoneChangedObserver: DateTimeZoneChangedObserver, val drinkStatsObserver: DrinkStatsObserver, val streakRepository: StreakRepository, val trackingService: TrackingService, val activeHoursObserver: ActiveHoursObserver, notificationPermissionObserver: NotificationPermissionObserver, private val purchaseManager: PurchaseManager, )</ID>
-    <ID>LongParameterList:SettingsViewModel.kt$SettingsViewModel$( val application: Application, val database: AppDatabase, val prefsStorage: PrefsStorage, val drinkAlarmManagerV2: DrinkAlarmManagerV2, dateTimeZoneChangedObserver: DateTimeZoneChangedObserver, notificationPermissionObserver: NotificationPermissionObserver, appInfoService: AppInfoService, private val purchaseManager: PurchaseManager, private val trackingService: TrackingService, )</ID>
+    <ID>LongParameterList:SettingsViewModel.kt$SettingsViewModel$( val application: Application, val database: AppDatabase, val prefsStorage: PrefsStorage, val drinkAlarmManagerV2: DrinkAlarmManagerV2, dateTimeZoneChangedObserver: DateTimeZoneChangedObserver, notificationPermissionObserver: NotificationPermissionObserver, appInfoService: AppInfoService, private val purchaseManager: PurchaseManager, private val trackingService: TrackingService, private val backupRepository: BackupRepository, private val backupPreferences: BackupPreferences, private val backupScheduler: BackupScheduler, private val googleDriveProvider: GoogleDriveBackupProvider, private val dropboxProvider: DropboxBackupProvider, )</ID>
     <ID>MagicNumber:ActiveScheduleCard.kt$10</ID>
     <ID>MagicNumber:ActiveScheduleCard.kt$13</ID>
     <ID>MagicNumber:ActiveScheduleCard.kt$14</ID>
@@ -259,6 +255,7 @@
     <ID>MagicNumber:AppTimeSelectorButton.kt$20</ID>
     <ID>MagicNumber:AppTimeSelectorDialog.kt$10</ID>
     <ID>MagicNumber:AppTimeSelectorDialog.kt$20</ID>
+    <ID>MagicNumber:BackupSettingsSection.kt$0.10f</ID>
     <ID>MagicNumber:CalendarViewModel.kt$CalendarViewModel$10</ID>
     <ID>MagicNumber:CalendarViewModel.kt$CalendarViewModel$100</ID>
     <ID>MagicNumber:CalendarViewModel.kt$CalendarViewModel$11</ID>
@@ -519,104 +516,6 @@
     <ID>MagicNumber:DrinkShape.kt$DrinkAppearance$0xFFEAF4F9</ID>
     <ID>MagicNumber:DrinkViewModel.kt$DrinkViewModel$12</ID>
     <ID>MagicNumber:DrinkViewModel.kt$DrinkViewModel$1_000</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$1.26f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$1.2f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$1.791f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$1.79f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$1.8f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$1.94f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$10.3f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$10.5f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$10.61f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$10.96f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$10f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$11.3f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$11.42f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$11.71f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$11f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$12.29f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$12.58f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$12.7f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$12.8f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$12f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$13.04f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$13.39f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$13.42f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$13.5f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$13f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$14.58f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$14.5f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$14f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$15.5f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$15.71f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$15.745f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$15f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$16.29f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$16.51f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$16.5f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$16.6f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$16f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$17.66f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$17.99f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$17f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$18.02f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$18.4f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$18.5f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$18f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$19.07f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$19.43f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$19.99f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$19f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$2.10f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$2.209f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$2.21f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$2.386f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$20.5f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$20f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$21.5f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$21.90f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$21f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$22f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$24f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$25f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$26.5f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$26f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$27f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$28f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$2f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$3.134f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$3.359f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$3.4f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$3.5f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$3.866f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$3f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$4.01f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$4.03f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$4.477f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$4.485f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$4.57f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$4.93f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$4.97f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$4f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$5.523f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$5.5f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$5.6f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$5.745f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$5.98f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$5f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$6.01f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$6.34f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$6.5f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$6f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$7.49f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$7.4f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$7.5f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$7f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$8.5f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$8f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$9.5f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$9.75f</ID>
-    <ID>MagicNumber:DwIcons.kt$DwIcons$9f</ID>
     <ID>MagicNumber:DwPrimaryButton.kt$0xFFB83A95</ID>
     <ID>MagicNumber:DwPrimaryButtonAnimated.kt$300</ID>
     <ID>MagicNumber:EditButton.kt$0.06f</ID>
@@ -675,7 +574,6 @@
     <ID>MagicNumber:HomeAlarmCard.kt$90</ID>
     <ID>MagicNumber:HomeAlarmViewModel.kt$HomeAlarmViewModel$60</ID>
     <ID>MagicNumber:HomeScheduleTimeline.kt$10</ID>
-    <ID>MagicNumber:HomeScheduleTimeline.kt$12</ID>
     <ID>MagicNumber:HomeScheduleTimeline.kt$13</ID>
     <ID>MagicNumber:HomeScheduleTimeline.kt$15</ID>
     <ID>MagicNumber:HomeScheduleTimeline.kt$20</ID>
@@ -762,6 +660,7 @@
     <ID>MagicNumber:OnbShellDefaults.kt$OnbShellDefaults$0xFFB83A95</ID>
     <ID>MagicNumber:OnboardingDevViewModel.kt$OnboardingDevViewModel$5_000</ID>
     <ID>MagicNumber:OnboardingState.kt$10</ID>
+    <ID>MagicNumber:OnboardingState.kt$11</ID>
     <ID>MagicNumber:OnboardingState.kt$3</ID>
     <ID>MagicNumber:OnboardingState.kt$4</ID>
     <ID>MagicNumber:OnboardingState.kt$5</ID>
@@ -864,6 +763,8 @@
     <ID>MagicNumber:StatsViewModel.kt$StatsViewModel$8</ID>
     <ID>MagicNumber:StatsViewModel.kt$StatsViewModel$9</ID>
     <ID>MagicNumber:StatsViewModel.kt$StatsViewModel$999_999_999</ID>
+    <ID>MagicNumber:StepBackup.kt$0xFF0061FF</ID>
+    <ID>MagicNumber:StepBackup.kt$0xFF4285F4</ID>
     <ID>MagicNumber:StepDone.kt$250</ID>
     <ID>MagicNumber:StepDone.kt$60</ID>
     <ID>MagicNumber:StepGoal.kt$1000.0</ID>
@@ -927,6 +828,8 @@
     <ID>MagicNumber:WeeklyBarChart.kt$28</ID>
     <ID>MagicNumber:WeeklyBarChart.kt$31</ID>
     <ID>MagicNumber:WhatToDoNowDecider.kt$60</ID>
+    <ID>MagicNumber:WorkManagerBackupScheduler.kt$WorkManagerBackupScheduler$10</ID>
+    <ID>MagicNumber:WorkManagerBackupScheduler.kt$WorkManagerBackupScheduler$30</ID>
     <ID>MagicNumber:YearCalendarGrid.kt$3</ID>
     <ID>MagicNumber:YearCalendarGrid.kt$4</ID>
     <ID>MatchingDeclarationName:AlarmCalculatorScreen.kt$ScheduleMode</ID>
@@ -982,6 +885,12 @@
     <ID>MultiLineIfElse:DailyGoalDevViewModel.kt$DailyGoalDevViewModel$dao.insert(DailyGoalEntity(effectiveDate = today, goalMl = goalMl))</ID>
     <ID>MultiLineIfElse:DailyGoalDevViewModel.kt$DailyGoalDevViewModel$dao.update(existing.copy(goalMl = goalMl))</ID>
     <ID>MultiLineIfElse:DailyGoalDevViewModel.kt$DailyGoalDevViewModel$dao.update(existing.copy(goalMl = newGoalMl))</ID>
+    <ID>MultiLineIfElse:DataStorePrefsStorage.kt$DataStorePrefsStorage$prefs.remove(backupContentHashKey)</ID>
+    <ID>MultiLineIfElse:DataStorePrefsStorage.kt$DataStorePrefsStorage$prefs.remove(backupLastErrorKey)</ID>
+    <ID>MultiLineIfElse:DataStorePrefsStorage.kt$DataStorePrefsStorage$prefs.remove(backupUserDisplayNameKey)</ID>
+    <ID>MultiLineIfElse:DataStorePrefsStorage.kt$DataStorePrefsStorage$prefs[backupContentHashKey] = hash</ID>
+    <ID>MultiLineIfElse:DataStorePrefsStorage.kt$DataStorePrefsStorage$prefs[backupLastErrorKey] = code</ID>
+    <ID>MultiLineIfElse:DataStorePrefsStorage.kt$DataStorePrefsStorage$prefs[backupUserDisplayNameKey] = name</ID>
     <ID>MultiLineIfElse:DayCircle.kt$return</ID>
     <ID>MultiLineIfElse:DevViewModel.kt$DevViewModel$goalDao.insert(DailyGoalEntity(effectiveDate = todayDate, goalMl = amount))</ID>
     <ID>MultiLineIfElse:DevViewModel.kt$DevViewModel$goalDao.update(existing.copy(goalMl = amount))</ID>
@@ -1031,9 +940,11 @@
     <ID>MultiLineIfElse:RingSection.kt$R.string.drink_alarm_firing_now</ID>
     <ID>MultiLineIfElse:SettingsScreen.kt$R.string.settings_row_reminder_status</ID>
     <ID>MultiLineIfElse:SettingsScreen.kt$R.string.settings_row_reminder_status_approximate</ID>
+    <ID>MultiLineIfElse:SettingsScreen.kt$googleSignInLauncher.launch(intent)</ID>
     <ID>MultiLineIfElse:SettingsScreen.kt$showRevokeTrackingDialog = true</ID>
     <ID>MultiLineIfElse:SettingsScreen.kt$stringResource( R.string.settings_clear_data_cta_countdown, countdown )</ID>
     <ID>MultiLineIfElse:SettingsScreen.kt$stringResource(R.string.settings_clear_data_cta_confirm)</ID>
+    <ID>MultiLineIfElse:SettingsScreen.kt$viewModel.onConnectBackup(CloudProviderType.GOOGLE_DRIVE)</ID>
     <ID>MultiLineIfElse:SettingsScreen.kt$viewModel.onTrackingToggled(true)</ID>
     <ID>MultiLineIfElse:SettingsViewModel.kt$SettingsViewModel$LocaleListCompat.forLanguageTags(tag)</ID>
     <ID>MultiLineIfElse:SettingsViewModel.kt$SettingsViewModel$LocaleListCompat.getEmptyLocaleList()</ID>
@@ -1066,6 +977,7 @@
     <ID>MultiLineIfElse:WaterAnimationDevRoot.kt$MaterialTheme.colorScheme.primary</ID>
     <ID>MultiLineIfElse:WeeklyBarChart.kt$0f</ID>
     <ID>NestedBlockDepth:AlarmsV2ViewModel.kt$AlarmsV2ViewModel$private fun refreshState()</ID>
+    <ID>NestedBlockDepth:BackupSerializer.kt$BackupSerializer$override suspend fun deserializeAndImport(data: JsonObject): BackupResult&lt;Unit&gt;</ID>
     <ID>NestedBlockDepth:WhatToDoNowDecider.kt$internal fun decideWhatToDoNow( now: LocalDateTime, startTime: LocalDateTime, endTime: LocalDateTime, hasActiveAlarm: Boolean, // we can receive this value even if no active alarm exists // it can be a cached time for a previously existing alarm. alarmAlarmTriggersAt: LocalDateTime?, interval: AlarmInterval = AlarmInterval(0, 0), // TODO: fix tests with this goalMl: Float = 1f, // TODO: fix tests with this ): WhatToDoNow</ID>
     <ID>NewLineAtEndOfFile:ActiveStatusBadge.kt$com.eahm.drinkwaterapp.feature.drink.alarm.ActiveStatusBadge.kt</ID>
     <ID>NewLineAtEndOfFile:AdaptiveLayout.kt$com.eahm.drinkwaterapp.feature.dev.ui.AdaptiveLayout.kt</ID>
@@ -1172,6 +1084,7 @@
     <ID>SpacingAroundComma:CelebrationVariant.kt$,</ID>
     <ID>SpacingBetweenPackageAndImports:OnboardingState.kt$ </ID>
     <ID>StringTemplate:ProgressRing.kt$${percentage}</ID>
+    <ID>TooGenericExceptionCaught:BackupSerializer.kt$BackupSerializer$e: Exception</ID>
     <ID>TooGenericExceptionThrown:AlarmSchedulerV3.kt$AlarmSchedulerV3$throw Exception("This should never happen")</ID>
     <ID>TooGenericExceptionThrown:AnalyticsScreen.kt$throw Exception(exceptionMessage)</ID>
     <ID>TooGenericExceptionThrown:ComposeWidget.kt$ComposeWidget$throw RuntimeException("bound mode not supported")</ID>
@@ -1179,7 +1092,7 @@
     <ID>TooGenericExceptionThrown:HistoryMapper.kt$throw Exception("Failed to parse the status with ordinal: $status")</ID>
     <ID>TooGenericExceptionThrown:WhatToDoService.kt$WhatToDoService$throw Exception("WhatShouldIDoNow? Getting the interval was not possible")</ID>
     <ID>TooManyFunctions:AlarmSchedulerV3.kt$AlarmSchedulerV3</ID>
-    <ID>TooManyFunctions:DataStorePrefsStorage.kt$DataStorePrefsStorage : PrefsStorage</ID>
+    <ID>TooManyFunctions:DataStorePrefsStorage.kt$DataStorePrefsStorage : PrefsStorageBackupPreferences</ID>
     <ID>TooManyFunctions:PrefsStorage.kt$PrefsStorage</ID>
     <ID>TooManyFunctions:SettingsScreen.kt$com.eahm.drinkwaterapp.feature.settings.SettingsScreen.kt</ID>
     <ID>TooManyFunctions:SettingsViewModel.kt$SettingsViewModel : ViewModel</ID>
@@ -1193,122 +1106,25 @@
     <ID>UnusedParameter:StatsScreen.kt$onCalendarNext: () -&gt; Unit</ID>
     <ID>UnusedParameter:StatsScreen.kt$onCalendarPrevious: () -&gt; Unit</ID>
     <ID>UnusedParameter:StatsScreen.kt$onCalendarViewModeToggle: (CalendarViewMode) -&gt; Unit</ID>
-    <ID>UnusedPrivateMember:AcceptLegalCheckbox.kt$@Preview(showBackground = true, widthDp = 360) @Composable private fun AcceptLegalCheckboxPreview( @PreviewParameter(CheckedPreviewProvider::class) checked: Boolean, )</ID>
-    <ID>UnusedPrivateMember:ActionsSection.kt$@Preview @Composable private fun ActionsSectionPreview()</ID>
-    <ID>UnusedPrivateMember:ActiveScheduleCard.kt$@Preview @Composable private fun ActiveScheduleCardPreview()</ID>
-    <ID>UnusedPrivateMember:ActiveStatusBadge.kt$@Preview @Composable private fun ActiveStatusBadgePreview()</ID>
-    <ID>UnusedPrivateMember:AddDrinkButton.kt$@Preview @Composable private fun AddDrinkButtonPreview()</ID>
-    <ID>UnusedPrivateMember:AlarmCalculatorScreen.kt$@Preview @Composable private fun AlarmCalculatorScreenPreview()</ID>
-    <ID>UnusedPrivateMember:AlarmCountdown.kt$@Preview(name = "Countdown active", showBackground = true) @Composable private fun AlarmCountdownPreview()</ID>
-    <ID>UnusedPrivateMember:AlarmCountdown.kt$@Preview(name = "Countdown expired", showBackground = true) @Composable private fun AlarmCountdownExpiredPreview()</ID>
-    <ID>UnusedPrivateMember:AlarmIntervalsScreen.kt$@Preview @Composable private fun AlarmIntervalsScreenPreview()</ID>
-    <ID>UnusedPrivateMember:AlarmsScreen.kt$@Preview @Composable private fun ActiveAlarmPreview()</ID>
-    <ID>UnusedPrivateMember:AlarmsScreen.kt$@Preview @Composable private fun NoActiveAlarmPreview()</ID>
-    <ID>UnusedPrivateMember:AnalyticsScreen.kt$@Preview @Composable private fun ContentPreview()</ID>
-    <ID>UnusedPrivateMember:AppTimePickerButton.kt$@Preview @Composable @Suppress("AssignedValueIsNeverRead") private fun AppTimePickerButtonPreview()</ID>
-    <ID>UnusedPrivateMember:AppTimePickerDialog.kt$@Preview @Composable @Suppress("AssignedValueIsNeverRead") private fun AppTimePickerDialogPreview()</ID>
-    <ID>UnusedPrivateMember:AppTimeSelector.kt$@Preview @Composable @Suppress("AssignedValueIsNeverRead") private fun AppTimeSelectorPreview()</ID>
-    <ID>UnusedPrivateMember:AppTimeSelectorButton.kt$@Preview @Composable @Suppress("AssignedValueIsNeverRead") private fun AppTimeSelectorButtonPreview()</ID>
-    <ID>UnusedPrivateMember:AppTimeSelectorDialog.kt$@Preview @Composable @Suppress("AssignedValueIsNeverRead") private fun AppTimeSelectorDialogPreview()</ID>
-    <ID>UnusedPrivateMember:Bubbles.kt$@Preview(widthDp = 300, heightDp = 300) @Composable private fun BubblesPreview()</ID>
-    <ID>UnusedPrivateMember:BuildInfoFooter.kt$@Preview @Composable private fun BuildInfoFooterPreview()</ID>
-    <ID>UnusedPrivateMember:ButtonContent.kt$@Preview(showBackground = true) @Composable private fun ButtonContentPreview()</ID>
-    <ID>UnusedPrivateMember:CelebrationDecor.kt$@Preview( name = "Bubbles Playground", widthDp = 360, heightDp = 800, showBackground = true, ) @Composable private fun PreviewBubblesPlayground()</ID>
-    <ID>UnusedPrivateMember:CelebrationDecor.kt$@Preview(name = "Bubbles (Ocean)", widthDp = 200, heightDp = 200) @Composable private fun PreviewBubbles()</ID>
-    <ID>UnusedPrivateMember:CelebrationDecor.kt$@Preview(name = "Confetti (Carnival)", widthDp = 200, heightDp = 200) @Composable private fun PreviewConfetti()</ID>
-    <ID>UnusedPrivateMember:CelebrationDecor.kt$@Preview(name = "Drips (Rain)", widthDp = 200, heightDp = 200) @Composable private fun PreviewDrips()</ID>
-    <ID>UnusedPrivateMember:CelebrationDecor.kt$@Preview(name = "Rays (Sunset)", widthDp = 200, heightDp = 200) @Composable private fun PreviewRays()</ID>
-    <ID>UnusedPrivateMember:CelebrationDecor.kt$@Preview(name = "Rings (Moonlit)", widthDp = 200, heightDp = 200) @Composable private fun PreviewRings()</ID>
-    <ID>UnusedPrivateMember:CelebrationDecor.kt$@Preview(name = "Sparkles (Starlight)", widthDp = 200, heightDp = 200) @Composable private fun PreviewSparkles()</ID>
-    <ID>UnusedPrivateMember:CelebrationsScreen.kt$@Preview @Composable private fun ContentPreview()</ID>
+    <ID>UnusedParameter:StepBackup.kt$icon: @Composable () -&gt; Unit</ID>
+    <ID>UnusedParameter:StepBackup.kt$tint: Color</ID>
+    <ID>UnusedPrivateMember:BackupSettingsSection.kt$@DwPreview @Composable private fun BackupSettingsSectionPreview_Connected()</ID>
+    <ID>UnusedPrivateMember:BackupSettingsSection.kt$@DwPreview @Composable private fun BackupSettingsSectionPreview_Disconnected()</ID>
     <ID>UnusedPrivateMember:ChoiceCard.kt$@DwPreview @Composable private fun ChoiceCardPreview()</ID>
-    <ID>UnusedPrivateMember:DayStrip.kt$@Preview(showBackground = true) @Composable private fun DayChipDisabledPreview()</ID>
-    <ID>UnusedPrivateMember:DayStrip.kt$@Preview(showBackground = true) @Composable private fun DayChipGoalMetPreview()</ID>
-    <ID>UnusedPrivateMember:DayStrip.kt$@Preview(showBackground = true) @Composable private fun DayChipSelectedPreview()</ID>
-    <ID>UnusedPrivateMember:DayStrip.kt$@Preview(showBackground = true) @Composable private fun DayStripRowPreview()</ID>
-    <ID>UnusedPrivateMember:DeleteButton.kt$@Preview @Composable private fun HoveredPreview()</ID>
-    <ID>UnusedPrivateMember:DeleteButton.kt$@Preview @Composable private fun NormalPreview()</ID>
-    <ID>UnusedPrivateMember:DevMenuRoot.kt$@Preview @Composable private fun DevMenuScreenPreview()</ID>
-    <ID>UnusedPrivateMember:DevRoot.kt$@Preview(showBackground = true) @Composable private fun DrinkScreenPreview()</ID>
-    <ID>UnusedPrivateMember:DrinkButton.kt$@Preview @Composable private fun DrinkButtonPreview()</ID>
-    <ID>UnusedPrivateMember:DrinkLandscape.kt$@Preview(name = "Landscape", widthDp = 900, heightDp = 420) @Composable private fun DrinkLandscapePreview()</ID>
-    <ID>UnusedPrivateMember:DrinkPortrait.kt$@Preview(name = "Portrait") @Composable private fun DrinkPortraitPreview()</ID>
-    <ID>UnusedPrivateMember:DrinkScreen.kt$@Preview(name = "Goal reached") @Composable private fun DrinkScreenGoalReachedPreview()</ID>
-    <ID>UnusedPrivateMember:DrinkScreen.kt$@Preview(name = "Landscape", widthDp = 900, heightDp = 420) @Composable private fun DrinkScreenLandscapePreview()</ID>
-    <ID>UnusedPrivateMember:DrinkScreen.kt$@Preview(name = "Portrait") @Composable private fun DrinkScreenPreview()</ID>
-    <ID>UnusedPrivateMember:DrinkScreen.kt$@Preview(name = "Tablet", widthDp = 1200, heightDp = 800) @Composable private fun DrinkScreenTabletPreview()</ID>
-    <ID>UnusedPrivateMember:DrinkTableTop.kt$@Preview(name = "TableTop", widthDp = 700, heightDp = 700) @Composable private fun DrinkTableTopPreview()</ID>
-    <ID>UnusedPrivateMember:DwIcons.kt$@Preview(name = "DwIcon", showBackground = true, backgroundColor = 0xFFF2F6F9) @Composable private fun DwIconsPreview( @PreviewParameter(DwIconsPreviewProvider::class) item: DwIconSample, )</ID>
     <ID>UnusedPrivateMember:DwPrimaryButton.kt$@DwPreview @Composable private fun DwPrimaryButtonPreview()</ID>
     <ID>UnusedPrivateMember:DwSecondaryButton.kt$@DwPreview @Composable private fun DwSecondaryButtonPreview()</ID>
     <ID>UnusedPrivateMember:DwTertiaryButton.kt$@DwPreview @Composable private fun DwTertiaryButtonPreview()</ID>
-    <ID>UnusedPrivateMember:EmptyState.kt$@Preview(showBackground = true) @Composable private fun EmptyStatePreview()</ID>
-    <ID>UnusedPrivateMember:FeatureCardRow.kt$@Preview(showBackground = true, widthDp = 360) @Composable private fun FeatureCardRowPreview()</ID>
-    <ID>UnusedPrivateMember:GoalCelebrationCard.kt$@Preview(name = "Ocean") @Composable private fun PreviewOcean()</ID>
-    <ID>UnusedPrivateMember:GoalCelebrationCard.kt$@Preview(showBackground = true, name = "Carnival") @Composable private fun PreviewCarnival()</ID>
-    <ID>UnusedPrivateMember:GoalCelebrationCard.kt$@Preview(showBackground = true, name = "Moonlit") @Composable private fun PreviewMoonlit()</ID>
-    <ID>UnusedPrivateMember:GoalCelebrationCard.kt$@Preview(showBackground = true, name = "Rain") @Composable private fun PreviewRain()</ID>
-    <ID>UnusedPrivateMember:GoalCelebrationCard.kt$@Preview(showBackground = true, name = "Starlight") @Composable private fun PreviewStarlight()</ID>
-    <ID>UnusedPrivateMember:GoalCelebrationCard.kt$@Preview(showBackground = true, name = "Sunset") @Composable private fun PreviewSunset()</ID>
-    <ID>UnusedPrivateMember:GoalCelebrationScreen.kt$@Preview @Composable private fun GoalCelebrationScreenPreview()</ID>
-    <ID>UnusedPrivateMember:HistoryButton.kt$@Preview @Composable private fun HistoryButtonPreview()</ID>
-    <ID>UnusedPrivateMember:HistoryDialog.kt$@Preview @Composable private fun HistoryDialogPreview()</ID>
-    <ID>UnusedPrivateMember:HistoryHeader.kt$@Preview(showBackground = true) @Composable private fun HistoryHeaderPreview()</ID>
-    <ID>UnusedPrivateMember:HistoryScreen.kt$@Preview(showBackground = true, backgroundColor = 0xFFF2F6F9) @Composable private fun HistoryScreenPreview()</ID>
-    <ID>UnusedPrivateMember:HistoryV2Root.kt$@Preview(showBackground = true) @Composable private fun HistoryV2ScreenEmptyPreview()</ID>
-    <ID>UnusedPrivateMember:HistoryV2Root.kt$@Preview(showBackground = true) @Composable private fun HistoryV2ScreenPreview()</ID>
-    <ID>UnusedPrivateMember:HomeAlarmCard.kt$@Preview @Composable private fun ActiveInActiveHoursPreview()</ID>
-    <ID>UnusedPrivateMember:HomeAlarmCard.kt$@Preview @Composable private fun ActiveRestingPreview()</ID>
-    <ID>UnusedPrivateMember:HomeAlarmCard.kt$@Preview @Composable private fun NoPermissionPreview()</ID>
-    <ID>UnusedPrivateMember:HomeAlarmCard.kt$@Preview @Composable private fun NotConfiguredPreview()</ID>
-    <ID>UnusedPrivateMember:HomeScheduleTimeline.kt$@Preview @Composable private fun HomeScheduleTimelinePreview()</ID>
-    <ID>UnusedPrivateMember:HomeScreen.kt$@Preview(showBackground = true) @Composable private fun ContentPreview()</ID>
-    <ID>UnusedPrivateMember:HourGroupCard.kt$@Preview(showBackground = true) @Composable private fun HourGroupCardCollapsedPreview()</ID>
-    <ID>UnusedPrivateMember:HourGroupCard.kt$@Preview(showBackground = true) @Composable private fun HourGroupCardExpandedPreview()</ID>
-    <ID>UnusedPrivateMember:HourGroupCard.kt$@Preview(showBackground = true) @Composable private fun HourPillAfternoonPreview()</ID>
-    <ID>UnusedPrivateMember:HourGroupCard.kt$@Preview(showBackground = true) @Composable private fun HourPillMorningPreview()</ID>
-    <ID>UnusedPrivateMember:HourGroupCard.kt$@Preview(showBackground = true) @Composable private fun HourPillNightPreview()</ID>
-    <ID>UnusedPrivateMember:InfoSection.kt$@Preview @Composable private fun InfoSectionEmptyPreview()</ID>
-    <ID>UnusedPrivateMember:InfoSection.kt$@Preview @Composable private fun InfoSectionPreview()</ID>
-    <ID>UnusedPrivateMember:LegalHeaderContent.kt$@Preview(widthDp = 360) @Composable private fun LegalHeaderContentPreview( @PreviewParameter(CenteredPreviewProvider::class) centered: Boolean, )</ID>
-    <ID>UnusedPrivateMember:LegalLandscape.kt$@Preview(name = "Landscape", widthDp = 900, heightDp = 420) @Composable private fun LegalLandscapePreview()</ID>
-    <ID>UnusedPrivateMember:LegalLandscape.kt$@Preview(widthDp = 900, heightDp = 420, fontScale = 1.5f) @Composable private fun BigFontPreview()</ID>
-    <ID>UnusedPrivateMember:LegalPortrait.kt$@Preview(fontScale = 1.5f) @Composable private fun BigFontPreview()</ID>
-    <ID>UnusedPrivateMember:LegalPortrait.kt$@Preview(name = "Portrait") @Composable private fun LegalPortraitPreview()</ID>
-    <ID>UnusedPrivateMember:LegalScreen.kt$@Preview @Composable private fun LegalScreenPreview( @PreviewParameter(LayoutTypesPreviewProvider::class) layoutType: LayoutType, )</ID>
-    <ID>UnusedPrivateMember:LegalScrollableContent.kt$@Preview(showBackground = true, widthDp = 360, heightDp = 500) @Composable private fun LegalScrollableContentPreview()</ID>
-    <ID>UnusedPrivateMember:LegalTableTop.kt$@Preview(name = "TableTop", widthDp = 700, heightDp = 700) @Composable private fun LegalTableTopPreview()</ID>
-    <ID>UnusedPrivateMember:LegalTableTop.kt$@Preview(name = "TableTop", widthDp = 700, heightDp = 700, fontScale = 3f) @Composable private fun BigFontPreview()</ID>
-    <ID>UnusedPrivateMember:MiniCard.kt$@Preview @Composable private fun MiniCardPreview()</ID>
-    <ID>UnusedPrivateMember:MiniStatsCards.kt$@Preview @Composable private fun AllStatsPreview()</ID>
-    <ID>UnusedPrivateMember:MiniStatsCards.kt$@Preview @Composable private fun NoBestStatsPreview()</ID>
-    <ID>UnusedPrivateMember:NoPermissionCard.kt$@Preview @Composable private fun NoPermissionCardPreview()</ID>
-    <ID>UnusedPrivateMember:NotConfiguredCard.kt$@Preview @Composable private fun NotConfiguredCardPreview()</ID>
-    <ID>UnusedPrivateMember:NotificationAmountBottomSheet.kt$@Preview(showBackground = true) @Composable private fun NotificationAmountSheetContentAtMaxPreview()</ID>
-    <ID>UnusedPrivateMember:NotificationAmountBottomSheet.kt$@Preview(showBackground = true) @Composable private fun NotificationAmountSheetContentAtMinPreview()</ID>
-    <ID>UnusedPrivateMember:NotificationAmountBottomSheet.kt$@Preview(showBackground = true) @Composable private fun NotificationAmountSheetContentDefaultPreview()</ID>
     <ID>UnusedPrivateMember:NotificationService.kt$NotificationService$@RequiresPermission(Manifest.permission.VIBRATE) private fun playAudio(context: Context, audioResourceID: Int)</ID>
-    <ID>UnusedPrivateMember:NotificationsScreen.kt$@Preview @Composable private fun ContentPreview()</ID>
-    <ID>UnusedPrivateMember:OnbShell.kt$@Preview @Composable private fun LegalScreenPreview( @PreviewParameter(LayoutTypesPreviewProvider::class) layoutType: LayoutType, )</ID>
-    <ID>UnusedPrivateMember:OnbShellLandscape.kt$@Preview(name = "Landscape", widthDp = 900, heightDp = 420) @Composable private fun OnbShellLandscapePreview()</ID>
     <ID>UnusedPrivateMember:OnbShellPortrait.kt$@DwPreview @Composable private fun BackButtonAndArtPreview()</ID>
     <ID>UnusedPrivateMember:OnbShellPortrait.kt$@DwPreview @Composable private fun NoBackButtonPreview()</ID>
-    <ID>UnusedPrivateMember:OnbShellTableTop.kt$@Preview(name = "TableTop", widthDp = 700, heightDp = 700) @Composable private fun OnbShellTableTopPreview()</ID>
     <ID>UnusedPrivateMember:OnbTimeWheel.kt$@Composable private fun AmPmRow( isPm: Boolean, onAmSelected: () -&gt; Unit, onPmSelected: () -&gt; Unit, modifier: Modifier = Modifier, )</ID>
     <ID>UnusedPrivateMember:OnbTimeWheel.kt$@DwPreview @Composable private fun OnbTimeWheelPreview12h()</ID>
     <ID>UnusedPrivateMember:OnbTimeWheel.kt$@DwPreview @Composable private fun OnbTimeWheelPreview24h()</ID>
-    <ID>UnusedPrivateMember:OnbTopAppBar.kt$@Preview(showBackground = true, backgroundColor = 0xFF1565C0) @Composable private fun OnbTopAppBarNoBackPreview()</ID>
-    <ID>UnusedPrivateMember:OnbTopAppBar.kt$@Preview(showBackground = true, backgroundColor = 0xFF1565C0) @Composable private fun OnbTopAppBarWithBackPreview()</ID>
-    <ID>UnusedPrivateMember:ProgressRing.kt$@Preview @Composable private fun ProgressRingPreview()</ID>
-    <ID>UnusedPrivateMember:QuickAddRow.kt$@Preview @Composable private fun QuickAddRowPreview()</ID>
-    <ID>UnusedPrivateMember:RecordRow.kt$@Preview(showBackground = true) @Composable private fun RecordRowCollapsedPreview()</ID>
-    <ID>UnusedPrivateMember:RecordRow.kt$@Preview(showBackground = true) @Composable private fun RecordRowExpandedPreview()</ID>
     <ID>UnusedPrivateMember:RingSection.kt$@DwPreview @Composable private fun RingSectionPreview()</ID>
     <ID>UnusedPrivateMember:SettingsScreen.kt$@Composable private fun ProfileCard( state: SettingsState, onUsernameChanged: (String) -&gt; Unit, modifier: Modifier = Modifier, )</ID>
-    <ID>UnusedPrivateMember:SettingsScreen.kt$@Preview(showBackground = true, backgroundColor = 0xFFF2F6F9) @Composable private fun SettingsScreenPreview()</ID>
     <ID>UnusedPrivateMember:SplashScreen.kt$@DwPreview @Composable private fun SplashScreenPreview()</ID>
-    <ID>UnusedPrivateMember:StatsScreen.kt$@Preview(showBackground = true) @Composable private fun StatsScreenPreview()</ID>
     <ID>UnusedPrivateMember:StepActivity.kt$@DwPreview @Composable private fun StepActivityPreview()</ID>
+    <ID>UnusedPrivateMember:StepBackup.kt$@DwPreview @Composable private fun StepBackupPreview()</ID>
     <ID>UnusedPrivateMember:StepDone.kt$@DwPreview @Composable private fun StepDoneNoNamePreview()</ID>
     <ID>UnusedPrivateMember:StepDone.kt$@DwPreview @Composable private fun StepDonePreview()</ID>
     <ID>UnusedPrivateMember:StepExactAlarm.kt$@DwPreview @Composable private fun StepExactAlarmGrantedPreview()</ID>
@@ -1318,59 +1134,28 @@
     <ID>UnusedPrivateMember:StepInterval.kt$@DwPreview @Composable private fun StepIntervalCustomPreview()</ID>
     <ID>UnusedPrivateMember:StepInterval.kt$@DwPreview @Composable private fun StepIntervalPreview()</ID>
     <ID>UnusedPrivateMember:StepIntro.kt$@DwPreview @Composable private fun StepIntroPreview()</ID>
-    <ID>UnusedPrivateMember:StepIntro.kt$@Preview(name = "Landscape", widthDp = 900, heightDp = 420) @Composable private fun StepIntroLandscapePreview()</ID>
-    <ID>UnusedPrivateMember:StepIntro.kt$@Preview(name = "Tablet", widthDp = 1200, heightDp = 800) @Composable private fun StepIntroTabletPreview()</ID>
     <ID>UnusedPrivateMember:StepName.kt$@DwPreview @Composable private fun StepNamePreview()</ID>
     <ID>UnusedPrivateMember:StepNotifs.kt$@DwPreview @Composable private fun StepNotifsAmountPreview()</ID>
     <ID>UnusedPrivateMember:StepNotifs.kt$@DwPreview @Composable private fun StepNotifsPermissionPreview()</ID>
-    <ID>UnusedPrivateMember:StepNotifs.kt$@Preview @Composable private fun AmountStepperPreview()</ID>
-    <ID>UnusedPrivateMember:StepNotifs.kt$@Preview @Composable private fun PermissionCardPreview()</ID>
-    <ID>UnusedPrivateMember:StepNotifs.kt$@Preview @Composable private fun PermissionDeniedContentPreview()</ID>
-    <ID>UnusedPrivateMember:StepNotifs.kt$@Preview @Composable private fun StepQuickDrinkPreview()</ID>
-    <ID>UnusedPrivateMember:StepNotifs.kt$@Preview @Composable private fun StepRequestNotificationPermissionPreview()</ID>
     <ID>UnusedPrivateMember:StepOverlay.kt$@DwPreview @Composable private fun StepOverlayGrantedPreview()</ID>
     <ID>UnusedPrivateMember:StepOverlay.kt$@DwPreview @Composable private fun StepOverlayPreview()</ID>
     <ID>UnusedPrivateMember:StepSetGoal.kt$@DwPreview @Composable private fun StepSetGoalPreview()</ID>
-    <ID>UnusedPrivateMember:StepSetGoal.kt$@Preview(name = "Landscape", widthDp = 900, heightDp = 420) @Composable private fun StepSetGoalLandscapePreview()</ID>
-    <ID>UnusedPrivateMember:StepSetGoal.kt$@Preview(name = "Tablet", widthDp = 1200, heightDp = 800) @Composable private fun StepSetGoalTabletPreview()</ID>
     <ID>UnusedPrivateMember:StepSleep.kt$@DwPreview @Composable private fun StepSleepPreview()</ID>
     <ID>UnusedPrivateMember:StepUnits.kt$@DwPreview @Composable private fun StepUnitsAutoLitersPreview()</ID>
     <ID>UnusedPrivateMember:StepUnits.kt$@DwPreview @Composable private fun StepUnitsFlOzPreview()</ID>
     <ID>UnusedPrivateMember:StepUnits.kt$@DwPreview @Composable private fun StepUnitsMlPreview()</ID>
     <ID>UnusedPrivateMember:StepWake.kt$@DwPreview @Composable private fun StepWakePreview()</ID>
-    <ID>UnusedPrivateMember:StepWake.kt$@Preview(name = "Landscape", widthDp = 900, heightDp = 420) @Composable private fun StepWakeLandscapePreview()</ID>
-    <ID>UnusedPrivateMember:StepWake.kt$@Preview(name = "Tablet", widthDp = 1200, heightDp = 800) @Composable private fun StepWakeTabletPreview()</ID>
     <ID>UnusedPrivateMember:StepWeight.kt$@DwPreview @Composable private fun StepWeightPreview()</ID>
-    <ID>UnusedPrivateMember:SummaryCard.kt$@Preview(showBackground = true) @Composable private fun SummaryCardEmptyPreview()</ID>
-    <ID>UnusedPrivateMember:SummaryCard.kt$@Preview(showBackground = true) @Composable private fun SummaryCardGoalMetPreview()</ID>
-    <ID>UnusedPrivateMember:SummaryCard.kt$@Preview(showBackground = true) @Composable private fun SummaryCardPreview()</ID>
-    <ID>UnusedPrivateMember:SummaryCard.kt$@Preview(showBackground = true, backgroundColor = 0xFFF2F6F9) @Composable private fun SummaryCardConsistentPreview()</ID>
-    <ID>UnusedPrivateMember:SummaryCard.kt$@Preview(showBackground = true, backgroundColor = 0xFFF2F6F9) @Composable private fun SummaryCardFirstPeriodPreview()</ID>
-    <ID>UnusedPrivateMember:SummaryCard.kt$@Preview(showBackground = true, backgroundColor = 0xFFF2F6F9) @Composable private fun SummaryCardPreview()</ID>
-    <ID>UnusedPrivateMember:SummaryChip.kt$@Preview @Composable private fun SummaryChipPreview()</ID>
-    <ID>UnusedPrivateMember:SummaryRow.kt$@Preview @Composable private fun SummaryRowPreview()</ID>
-    <ID>UnusedPrivateMember:TodayLogSection.kt$@Preview @Composable private fun TodayLogSectionEmptyPreview()</ID>
-    <ID>UnusedPrivateMember:TodayLogSection.kt$@Preview @Composable private fun TodayLogSectionPreview()</ID>
-    <ID>UnusedPrivateMember:TrackButtons.kt$@Preview(showBackground = true, widthDp = 360) @Composable private fun TrackButtonsPreview( @PreviewParameter(TrackingEnabledPreviewProvider::class) isTrackingEnabled: Boolean, )</ID>
-    <ID>UnusedPrivateMember:TrackHeaderContent.kt$@Preview(widthDp = 360) @Composable private fun TrackHeaderContentPreview( @PreviewParameter(CenteredPreviewProvider::class) centered: Boolean, )</ID>
-    <ID>UnusedPrivateMember:TrackMainContent.kt$@Preview(showBackground = true, widthDp = 360) @Composable private fun TrackMainContentPreview()</ID>
-    <ID>UnusedPrivateMember:TrackingDevScreen.kt$@Preview(showBackground = true) @Composable private fun TrackingContentPreview()</ID>
-    <ID>UnusedPrivateMember:TrackingDevScreen.kt$@Preview(showBackground = true, name = "Updating") @Composable private fun TrackingContentUpdatingPreview()</ID>
-    <ID>UnusedPrivateMember:TrackingRequestLandscape.kt$@Preview(name = "Landscape", widthDp = 900, heightDp = 420) @Composable private fun TrackingRequestLandscapePreview()</ID>
-    <ID>UnusedPrivateMember:TrackingRequestLandscape.kt$@Preview(name = "Landscape", widthDp = 900, heightDp = 420, fontScale = 1.5f) @Composable private fun BigFontPreview()</ID>
-    <ID>UnusedPrivateMember:TrackingRequestPortrait.kt$@Preview(fontScale = 1.5f) @Composable private fun BigFontPreview()</ID>
-    <ID>UnusedPrivateMember:TrackingRequestPortrait.kt$@Preview(name = "Portrait") @Composable private fun TrackingRequestPortraitPreview()</ID>
-    <ID>UnusedPrivateMember:TrackingRequestScreen.kt$@Preview @Composable private fun TrackingRequestScreenPreview( @PreviewParameter(LayoutTypesPreviewProvider::class) layoutType: LayoutType, )</ID>
-    <ID>UnusedPrivateMember:TrackingRequestTableTop.kt$@Preview(name = "TableTop", widthDp = 700, heightDp = 700) @Composable private fun TrackingRequestTableTopPreview()</ID>
-    <ID>UnusedPrivateMember:TrackingRequestTableTop.kt$@Preview(name = "TableTop", widthDp = 700, heightDp = 700, fontScale = 1.5f) @Composable private fun BigFontPreview()</ID>
-    <ID>UnusedPrivateMember:WaterChip.kt$@Preview @Composable private fun WaterChipPreview()</ID>
-    <ID>UnusedPrivateMember:WeeklyBarChart.kt$@Preview(showBackground = true, backgroundColor = 0xFFF2F6F9) @Composable private fun WeeklyBarChartPreview()</ID>
     <ID>UnusedPrivateProperty:AlarmCalculatorViewModel.kt$AlarmCalculatorViewModel$application: Application</ID>
     <ID>UnusedPrivateProperty:AlarmsViewModel.kt$AlarmsViewModel$private val prefsStorage: PrefsStorage</ID>
+    <ID>UnusedPrivateProperty:BackupDevViewModel.kt$BackupDevViewModel$private val disconnectUseCase: DisconnectBackupUseCase</ID>
     <ID>UnusedPrivateProperty:DrinkAlarmCalculator.kt$DrinkAlarmCalculator$x</ID>
     <ID>UnusedPrivateProperty:NotificationService.kt$NotificationService$val APP_NOTIFICATION_SOUND: Int = R.raw.app_notification_sound</ID>
     <ID>UnusedPrivateProperty:StreakRepositoryImpl.kt$StreakRepositoryImpl$i</ID>
     <ID>WildcardImport:ExampleUnitTest.kt$import org.junit.Assert.*</ID>
+    <ID>Wrapping:BackupModule.kt$;</ID>
+    <ID>Wrapping:BackupSerializer.kt$BackupSerializer$(</ID>
+    <ID>Wrapping:BackupSettingsSection.kt$-&gt;</ID>
     <ID>Wrapping:CalendarViewModel.kt$CalendarViewModel$;</ID>
     <ID>Wrapping:ComposeWidget.kt$ComposeWidget$Service(), LifecycleOwner, SavedStateRegistryOwner</ID>
     <ID>Wrapping:DailyGoalDevScreen.kt$;</ID>
