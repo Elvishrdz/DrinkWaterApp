@@ -700,6 +700,37 @@
     <string name="backup_onb_dropbox">Dropbox verbinden</string>
     <string name="backup_onb_skip">Vorerst überspringen</string>
 
+    <!-- Sync-UI — Phase 5 -->
+    <string name="sync_on_save_label">Nach dem Speichern synchronisieren</string>
+    <string name="sync_on_save_desc">Änderungen nach jedem Trinken oder Zielanpassung automatisch hochladen</string>
+    <string name="sync_pending_banner">Synchronisierung ausstehend – wird hochgeladen, sobald eine Verbindung besteht</string>
+    <string name="sync_linked_devices_title">Verknüpfte Geräte</string>
+    <string name="sync_linked_devices_empty">Noch keine anderen Geräte erkannt</string>
+    <string name="sync_device_this_device">Dieses Gerät</string>
+    <string name="sync_device_last_seen">Zuletzt gesehen: %1$s</string>
+
+    <!-- Zielkonflikt -->
+    <string name="sync_goal_conflict_title">Zielkonflikt</string>
+    <string name="sync_goal_conflict_body">Dieses Gerät und ein anderes Gerät haben das Tagesziel für %1$s ungefähr gleichzeitig geändert.</string>
+    <string name="sync_conflict_local_label">Dieses Gerät</string>
+    <string name="sync_conflict_remote_label">Anderes Gerät</string>
+    <string name="sync_conflict_keep_local">Version dieses Geräts behalten</string>
+    <string name="sync_conflict_use_remote">Version des anderen Geräts verwenden</string>
+    <string name="sync_conflict_goal_value">%1$s ml</string>
+
+    <!-- Einstellungskonflikt -->
+    <string name="sync_prefs_conflict_title">Einstellungskonflikt</string>
+    <string name="sync_prefs_conflict_body">Deine Einstellungen wurden auf zwei Geräten kurz nacheinander geändert. Welche möchtest du behalten?</string>
+    <string name="sync_prefs_unit">Einheit: %1$s</string>
+    <string name="sync_prefs_time_format">Zeitformat: %1$s</string>
+    <string name="sync_prefs_amount">Menge pro Trinken: %1$s ml</string>
+
+    <!-- Tombstone-Warnung -->
+    <string name="sync_tombstone_warning_title">Synchronisierung bald erforderlich</string>
+    <string name="sync_tombstone_warning_body">Einige Löschungen laufen in wenigen Tagen ab. Verbinde dich jetzt zur Synchronisierung, damit andere Geräte diese erhalten, bevor sie verloren gehen.</string>
+    <string name="sync_tombstone_warning_sync">Jetzt synchronisieren</string>
+    <string name="sync_tombstone_warning_dismiss">Schließen</string>
+
     <!-- Validierungsfehler -->
     <string name="validation_error_empty">Das Feld darf nicht leer sein</string>
     <string name="validation_error_invalid_number">Gib eine gültige Zahl ein</string>
