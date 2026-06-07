@@ -1,0 +1,24 @@
+# CODEOWNERS — DrinkWaterApp
+# Each line specifies a pattern and the owner(s) responsible for reviewing changes.
+# Owners are automatically added as reviewers when a PR modifies matching files.
+# Reference: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything not matched below
+* @elvishrdz
+
+# Core domain / business logic — senior review required
+/core/       @elvishrdz
+/backup/     @elvishrdz
+/alarm/      @elvishrdz
+
+# Design system — design + dev alignment
+/core/designsystem/ @elvishrdz
+
+# CI/CD — infra changes need explicit sign-off
+/.github/           @elvishrdz
+
+# Build scripts and dependency management
+/build.gradle.kts   @elvishrdz
+/settings.gradle.kts @elvishrdz
+/gradle/            @elvishrdz
+/scripts/           @elvishrdz
