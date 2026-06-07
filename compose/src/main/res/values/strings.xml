@@ -702,6 +702,37 @@
     <string name="backup_onb_dropbox">Connect Dropbox</string>
     <string name="backup_onb_skip">Skip for now</string>
 
+    <!-- Sync UI — Phase 5 -->
+    <string name="sync_on_save_label">Sync on save</string>
+    <string name="sync_on_save_desc">Upload changes automatically after each drink or goal update</string>
+    <string name="sync_pending_banner">Sync pending — will upload when connected</string>
+    <string name="sync_linked_devices_title">Linked devices</string>
+    <string name="sync_linked_devices_empty">No other devices seen yet</string>
+    <string name="sync_device_this_device">This device</string>
+    <string name="sync_device_last_seen">Last seen %1$s</string>
+
+    <!-- Goal conflict sheet -->
+    <string name="sync_goal_conflict_title">Goal conflict</string>
+    <string name="sync_goal_conflict_body">Both this device and another device changed the daily goal for %1$s around the same time.</string>
+    <string name="sync_conflict_local_label">This device</string>
+    <string name="sync_conflict_remote_label">Other device</string>
+    <string name="sync_conflict_keep_local">Keep this device\'s version</string>
+    <string name="sync_conflict_use_remote">Use other device\'s version</string>
+    <string name="sync_conflict_goal_value">%1$s ml</string>
+
+    <!-- Prefs conflict sheet -->
+    <string name="sync_prefs_conflict_title">Settings conflict</string>
+    <string name="sync_prefs_conflict_body">Your preferences were changed on two devices close together. Which settings do you want to keep?</string>
+    <string name="sync_prefs_unit">Unit: %1$s</string>
+    <string name="sync_prefs_time_format">Time format: %1$s</string>
+    <string name="sync_prefs_amount">Amount per drink: %1$s ml</string>
+
+    <!-- Tombstone warning dialog -->
+    <string name="sync_tombstone_warning_title">Sync needed soon</string>
+    <string name="sync_tombstone_warning_body">Some deletions will expire in a few days. Connect to sync now so other devices receive them before they are lost.</string>
+    <string name="sync_tombstone_warning_sync">Sync now</string>
+    <string name="sync_tombstone_warning_dismiss">Dismiss</string>
+
     <!-- Validation errors -->
     <string name="validation_error_empty">Field cannot be empty</string>
     <string name="validation_error_invalid_number">Provide a valid number</string>

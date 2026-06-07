@@ -27,6 +27,8 @@ import com.eahm.drinkwaterapp.feature.drink.ui.DrinkLogEntry
 import com.eahm.drinkwaterapp.system.alarm.AlarmSchedulerV3
 import com.eahm.drinkwaterapp.system.service.goalcelebration.GoalCelebrationOverlay
 import com.eahm.drinkwaterapp.system.service.goalcelebration.data.CelebrationStyle
+import com.eahm.drinkwaterapp.backup.BackupPreferences
+import com.eahm.drinkwaterapp.backup.BackupRepository
 import com.eahm.drinkwaterapp.backup.SyncCoordinator
 import com.eahm.drinkwaterapp.system.service.goalcelebration.extension.createIntent
 import kotlinx.coroutines.Dispatchers
@@ -62,6 +64,8 @@ internal class DrinkViewModel(
     notificationPermissionObserver: NotificationPermissionObserver,
     private val purchaseManager: PurchaseManager,
     private val syncCoordinator: SyncCoordinator,
+    private val backupPreferences: BackupPreferences,
+    private val backupRepository: BackupRepository,
 ) : ViewModel() {
 
     private val dao = database.getHistoryDao()
@@ -77,6 +81,14 @@ internal class DrinkViewModel(
             drinkStatsObserver.goalReachedEvent.collect {
                 confettiController.showConfetti()
                 displayGoalReachedOverlay()
+            }
+        }
+
+        // Load tombstone warning flag — only shown when backup is enabled
+        viewModelScope.launch {
+            val hasProvider = backupPreferences.getBackupProvider() != null
+            if (hasProvider) {
+                _tombstoneWarningPending.value = backupPreferences.getTombstoneWarningPending()
             }
         }
     }
@@ -166,6 +178,7 @@ internal class DrinkViewModel(
 
     private val _firstDrinkDialogVisible = MutableStateFlow(false)
     private val _animationPending = MutableStateFlow(false)
+    private val _tombstoneWarningPending = MutableStateFlow(false)
 
     // Polls the alarm scheduler every second so the countdown is always fresh,
     // even after the alarm fires and reschedules to a new slot.
@@ -230,6 +243,9 @@ internal class DrinkViewModel(
     }.combine(_animationPending) { drinkState, pending ->
         if (drinkState is DrinkState.Data) drinkState.copy(drinkAnimationPending = pending)
         else drinkState
+    }.combine(_tombstoneWarningPending) { drinkState, pending ->
+        if (drinkState is DrinkState.Data) drinkState.copy(tombstoneWarningPending = pending)
+        else drinkState
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
@@ -291,6 +307,21 @@ internal class DrinkViewModel(
 
     fun onFirstDrinkDialogDismissed() {
         _firstDrinkDialogVisible.value = false
+    }
+
+    fun onTombstoneWarningSyncNow() {
+        _tombstoneWarningPending.value = false
+        viewModelScope.launch {
+            backupPreferences.setTombstoneWarningPending(false)
+            backupRepository.sync(application)
+        }
+    }
+
+    fun onTombstoneWarningDismiss() {
+        _tombstoneWarningPending.value = false
+        viewModelScope.launch {
+            backupPreferences.setTombstoneWarningPending(false)
+        }
     }
 
     fun onAnimationDone() {

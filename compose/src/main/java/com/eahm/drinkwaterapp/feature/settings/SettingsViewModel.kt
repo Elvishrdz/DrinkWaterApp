@@ -22,6 +22,7 @@ import com.eahm.drinkwaterapp.backup.BackupSyncState
 import com.eahm.drinkwaterapp.backup.CloudProviderType
 import com.eahm.drinkwaterapp.backup.DropboxBackupProvider
 import com.eahm.drinkwaterapp.backup.GoogleDriveBackupProvider
+import com.eahm.drinkwaterapp.backup.SyncConflictResolver
 import com.eahm.drinkwaterapp.core.billing.PurchaseManager
 import com.eahm.drinkwaterapp.core.config.AppInfoService
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
@@ -70,6 +71,7 @@ internal class SettingsViewModel(
     private val googleDriveProvider: GoogleDriveBackupProvider,
     private val dropboxProvider: DropboxBackupProvider,
     private val syncCoordinator: SyncCoordinator,
+    private val syncConflictResolver: SyncConflictResolver,
 ) : ViewModel() {
 
     private val dao = database.getDailyGoalDao()
@@ -84,11 +86,17 @@ internal class SettingsViewModel(
         val providerId = backupPreferences.getBackupProvider()
         val providerType = providerId?.let { CloudProviderType.fromId(it) }
         val lastSyncAt = backupPreferences.getBackupLastSyncAt()
+        val syncOnSave = backupPreferences.getSyncOnSaveEnabled()
+        val seenDevices = backupPreferences.getSeenDevices()
+        val syncPending = backupPreferences.getSyncPending()
         _backupUiState.update {
             it.copy(
                 isConnected = providerType != null,
                 providerType = providerType,
                 lastSyncAt = lastSyncAt,
+                syncOnSaveEnabled = syncOnSave,
+                seenDevices = seenDevices,
+                syncPending = syncPending,
             )
         }
     }
@@ -198,6 +206,9 @@ internal class SettingsViewModel(
                     isSyncing = syncState is BackupSyncState.InProgress,
                 )
             )
+        }
+        .combine(syncConflictResolver.pendingConflict) { state, conflict ->
+            state.copy(backupUiState = state.backupUiState.copy(pendingConflict = conflict))
         }
         .stateIn(
             scope = viewModelScope,
@@ -426,6 +437,17 @@ internal class SettingsViewModel(
             backupRepository.sync(application)
             refreshBackupState()
         }
+    }
+
+    fun onSyncOnSaveToggled(enabled: Boolean) {
+        viewModelScope.launch {
+            backupPreferences.setSyncOnSaveEnabled(enabled)
+            _backupUiState.update { it.copy(syncOnSaveEnabled = enabled) }
+        }
+    }
+
+    fun onResolveConflict(useRemote: Boolean) {
+        syncConflictResolver.resolve(useRemote)
     }
 
     private suspend fun setGoalFromToday(goalMl: Float) {

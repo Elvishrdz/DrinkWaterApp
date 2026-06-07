@@ -26,6 +26,11 @@ internal sealed interface DrinkState {
         val isOutsideActiveHours: Boolean = false,
         val showFirstDrinkDialog: Boolean = false,
         val drinkAnimationPending: Boolean = false,
+        /**
+         * True when tombstone records are nearing expiry and a sync hasn't been done.
+         * Triggers [TombstoneSyncWarningDialog] on the drink screen.
+         */
+        val tombstoneWarningPending: Boolean = false,
     ) : DrinkState
 }
 

@@ -286,6 +286,8 @@ internal fun SettingsScreen(
         },
         onSyncNowTap = viewModel::onSyncNow,
         onDisconnectBackupTap = viewModel::onDisconnectBackup,
+        onSyncOnSaveToggled = viewModel::onSyncOnSaveToggled,
+        onResolveConflict = viewModel::onResolveConflict,
         modifier = modifier,
     )
 
@@ -447,6 +449,8 @@ internal fun SettingsContent(
     onConnectBackupTap: (CloudProviderType) -> Unit = {},
     onSyncNowTap: () -> Unit = {},
     onDisconnectBackupTap: () -> Unit = {},
+    onSyncOnSaveToggled: (Boolean) -> Unit = {},
+    onResolveConflict: (useRemote: Boolean) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -550,6 +554,8 @@ internal fun SettingsContent(
                         onConnectTap = { showProviderPickerSheet = true },
                         onSyncNowTap = onSyncNowTap,
                         onDisconnectTap = { showDisconnectBackupDialog = true },
+                        onSyncOnSaveToggled = onSyncOnSaveToggled,
+                        onResolveConflict = onResolveConflict,
                     )
                 }
             }

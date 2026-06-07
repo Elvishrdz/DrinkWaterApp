@@ -14,6 +14,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,6 +30,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.backup.CloudProviderType
+import com.eahm.drinkwaterapp.backup.SeenDevice
+import com.eahm.drinkwaterapp.backup.SyncConflict
 import com.eahm.drinkwaterapp.core.designsystem.component.extension.outlineBorderStyle
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
@@ -35,6 +39,8 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk100
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.JetBrainsMono
@@ -43,14 +49,27 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 internal fun BackupSettingsSection(
     state: BackupUiState,
     onConnectTap: () -> Unit,
     onSyncNowTap: () -> Unit,
     onDisconnectTap: () -> Unit,
+    onSyncOnSaveToggled: (Boolean) -> Unit = {},
+    onResolveConflict: (useRemote: Boolean) -> Unit = {},
 ) {
-    BackupSection(title = stringResource(R.string.backup_section_title)) {
+    // Conflict resolution sheet
+    state.pendingConflict?.let { conflict ->
+        SyncConflictSheet(
+            conflict = conflict,
+            onKeepLocal = { onResolveConflict(false) },
+            onUseRemote = { onResolveConflict(true) },
+        )
+    }
+
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        BackupSection(title = stringResource(R.string.backup_section_title)) {
         BackupRow(
             icon = DwIcons.ShieldCheck,
             iconBg = DwTintWater,
@@ -105,6 +124,34 @@ internal fun BackupSettingsSection(
             }
         }
     }
+
+    if (state.isConnected) {
+        // Sync-on-save toggle
+        BackupSection(title = "") {
+            BackupRow(
+                icon = DwIcons.Repeat,
+                iconBg = DwTintMagenta,
+                iconTint = DwMagenta,
+                label = stringResource(R.string.sync_on_save_label),
+            ) {
+                Switch(
+                    checked = state.syncOnSaveEnabled,
+                    onCheckedChange = onSyncOnSaveToggled,
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = DwMagenta,
+                        checkedTrackColor = DwTintMagenta,
+                    ),
+                )
+            }
+        }
+
+        // Pending banner
+        SyncPendingBanner(visible = state.syncPending)
+
+        // Linked devices
+        LinkedDevicesSection(devices = state.seenDevices)
+    }
+    } // closes outer Column
 }
 
 @Composable

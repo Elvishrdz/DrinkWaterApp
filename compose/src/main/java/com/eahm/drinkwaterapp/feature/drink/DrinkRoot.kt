@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.eahm.drinkwaterapp.feature.drink.ui.FirstDrinkDialog
+import com.eahm.drinkwaterapp.feature.drink.ui.TombstoneSyncWarningDialog
 import com.eahm.drinkwaterapp.feature.drink.ui.WaterRisingAnimation
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -34,6 +35,13 @@ internal fun DrinkRoot(
 
                 if (data.showFirstDrinkDialog) {
                     FirstDrinkDialog(onDismiss = viewModel::onFirstDrinkDialogDismissed)
+                }
+
+                if (data.tombstoneWarningPending) {
+                    TombstoneSyncWarningDialog(
+                        onSyncNow = viewModel::onTombstoneWarningSyncNow,
+                        onDismiss = viewModel::onTombstoneWarningDismiss,
+                    )
                 }
 
                 WaterRisingAnimation(
