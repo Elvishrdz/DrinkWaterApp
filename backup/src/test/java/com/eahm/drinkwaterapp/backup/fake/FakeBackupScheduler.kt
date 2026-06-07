@@ -20,4 +20,7 @@ class FakeBackupScheduler : BackupScheduler {
     override fun cancelAll() {
         cancelAllCalled = true
     }
+
+    override fun triggerOnChangeSync() {}
+    override fun triggerForegroundSync() {}
 }

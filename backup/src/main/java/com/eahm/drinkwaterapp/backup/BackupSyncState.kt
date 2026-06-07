@@ -6,4 +6,5 @@ sealed interface BackupSyncState {
     data object UpToDate : BackupSyncState
     data class Success(val syncedAt: Long) : BackupSyncState
     data class Error(val error: BackupError) : BackupSyncState
+    data class ConflictDetected(val conflicts: List<SyncConflict>) : BackupSyncState
 }

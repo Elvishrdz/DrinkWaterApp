@@ -14,4 +14,5 @@ sealed interface BackupError {
     data object FileNotFound : BackupError
     data object SameProviderMigration : BackupError
     data class Unknown(val cause: Throwable? = null) : BackupError
+    data object MergeCorrupted : BackupError
 }

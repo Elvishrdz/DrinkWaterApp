@@ -16,4 +16,22 @@ interface BackupDataSource {
      * Physically deletes all history and goal records where deleted_at <= [expiryThreshold].
      */
     suspend fun purgeExpiredTombstones(expiryThreshold: Long)
+
+    /**
+     * Reads the current local database and returns an in-memory [BackupData] snapshot.
+     * [deviceId] is stamped on any records that are missing a device identifier.
+     */
+    suspend fun readLocalData(deviceId: String): BackupData
+
+    /**
+     * Parses a remote backup [JsonObject] (already schema-migrated) into [BackupData].
+     * Returns null if the JSON structure is unreadable.
+     */
+    suspend fun parseRemoteData(raw: JsonObject): BackupData?
+
+    /**
+     * Replaces all local history and goal records with the provided [BackupData].
+     * Preferences are also applied. This is the merge-import path.
+     */
+    suspend fun writeBackupData(data: BackupData): BackupResult<Unit>
 }

@@ -1,7 +1,9 @@
 package com.eahm.drinkwaterapp.backup.fake
 
+import com.eahm.drinkwaterapp.backup.BackupData
 import com.eahm.drinkwaterapp.backup.BackupDataSource
 import com.eahm.drinkwaterapp.backup.BackupResult
+import com.eahm.drinkwaterapp.backup.PreferencesRecord
 import kotlinx.serialization.json.JsonObject
 
 class FakeBackupDataSource(
@@ -23,4 +25,15 @@ class FakeBackupDataSource(
 
     override suspend fun findNearExpiryTombstones(warningThreshold: Long, expiryThreshold: Long): Int = 0
     override suspend fun purgeExpiredTombstones(expiryThreshold: Long) {}
+
+    override suspend fun readLocalData(deviceId: String): BackupData =
+        BackupData(
+            history = emptyList(),
+            dailyGoals = emptyList(),
+            preferences = PreferencesRecord("ML", "SYSTEM", 250f),
+        )
+
+    override suspend fun parseRemoteData(raw: JsonObject): BackupData? = null
+
+    override suspend fun writeBackupData(data: BackupData): BackupResult<Unit> = BackupResult.Success(Unit)
 }

@@ -4,6 +4,8 @@ import com.eahm.drinkwaterapp.backup.fake.FakeBackupDataSource
 import com.eahm.drinkwaterapp.backup.fake.FakeBackupPreferences
 import com.eahm.drinkwaterapp.backup.fake.FakeCloudBackupProvider
 import kotlinx.coroutines.sync.Mutex
+import com.eahm.drinkwaterapp.backup.MergeEngine
+import com.eahm.drinkwaterapp.backup.SyncConflictResolver
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -17,7 +19,9 @@ class SyncBackupUseCaseTest {
         dataSource: FakeBackupDataSource = FakeBackupDataSource(),
         prefs: FakeBackupPreferences = FakeBackupPreferences(),
         mutex: Mutex = Mutex(),
-    ) = SyncBackupUseCase(mutex, dataSource, prefs)
+        mergeEngine: MergeEngine = MergeEngine(),
+        conflictResolver: SyncConflictResolver = SyncConflictResolver(),
+    ) = SyncBackupUseCase(mutex, dataSource, prefs, mergeEngine, conflictResolver)
 
     @Test
     fun `upload succeeds when content hash is new`() = runTest {

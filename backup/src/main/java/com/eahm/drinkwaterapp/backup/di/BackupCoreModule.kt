@@ -12,6 +12,7 @@ import com.eahm.drinkwaterapp.backup.MigrateBackupUseCase
 import com.eahm.drinkwaterapp.backup.PurgeTombstonesUseCase
 import com.eahm.drinkwaterapp.backup.RestoreBackupUseCase
 import com.eahm.drinkwaterapp.backup.SyncBackupUseCase
+import com.eahm.drinkwaterapp.backup.SyncConflictResolver
 import com.eahm.drinkwaterapp.backup.TombstonePolicy
 import kotlinx.coroutines.sync.Mutex
 import org.koin.android.ext.koin.androidContext
@@ -34,6 +35,7 @@ val backupCoreModule = module {
 
     singleOf(::BackupRepositoryImpl) bind BackupRepository::class
 
+    singleOf(::SyncConflictResolver)
     singleOf(::MergeEngine)
     single { TombstonePolicy() }
     singleOf(::PurgeTombstonesUseCase)

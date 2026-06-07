@@ -6,6 +6,10 @@ import com.eahm.drinkwaterapp.backup.BackupResult
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import kotlinx.coroutines.flow.first
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonArray
@@ -18,6 +22,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.longOrNull
 import kotlinx.serialization.json.put
 
+@OptIn(kotlin.time.ExperimentalTime::class)
 class BackupSerializer(
     private val database: AppDatabase,
     private val prefs: PrefsStorage,
@@ -176,6 +181,164 @@ class BackupSerializer(
 
         goals.filter { it.deletedAt != null && it.deletedAt <= expiryThreshold }
             .forEach { database.getDailyGoalDao().delete(it) }
+    }
+
+    override suspend fun readLocalData(deviceId: String): com.eahm.drinkwaterapp.backup.BackupData {
+        val historyRecords = database.getHistoryDao().getAll().first()
+        val dailyGoals = database.getDailyGoalDao().getAllGoals().first()
+
+        val history = historyRecords.map { entity ->
+            com.eahm.drinkwaterapp.backup.HistoryRecord(
+                id = entity.id,
+                amount = entity.amount,
+                status = entity.status.name,
+                timestamp = entity.timestamp
+                    .toInstant(TimeZone.currentSystemDefault())
+                    .toEpochMilliseconds(),
+                deviceId = entity.deviceId.ifEmpty { deviceId },
+                updatedAt = if (entity.updatedAt == 0L) entity.timestamp
+                    .toInstant(TimeZone.currentSystemDefault())
+                    .toEpochMilliseconds() else entity.updatedAt,
+                deletedAt = entity.deletedAt,
+            )
+        }
+
+        val goals = dailyGoals.map { entity ->
+            com.eahm.drinkwaterapp.backup.GoalRecord(
+                id = entity.id,
+                effectiveDate = entity.effectiveDate.toEpochDays().toInt(),
+                goalMl = entity.goalMl,
+                deviceId = entity.deviceId.ifEmpty { deviceId },
+                updatedAt = entity.updatedAt,
+                deletedAt = entity.deletedAt,
+            )
+        }
+
+        val unitPref = prefs.getUnitPreference().first().name
+        val timeFormat = prefs.getTimeFormatPreference().first().name
+        val amountPerDrink = prefs.getAmountPerDrink().first()
+
+        val prefsRecord = com.eahm.drinkwaterapp.backup.PreferencesRecord(
+            unitPreference = unitPref,
+            timeFormat = timeFormat,
+            amountPerDrink = amountPerDrink,
+            deviceId = deviceId,
+            updatedAt = 0L,
+        )
+
+        return com.eahm.drinkwaterapp.backup.BackupData(history, goals, prefsRecord)
+    }
+
+    override suspend fun parseRemoteData(raw: JsonObject): com.eahm.drinkwaterapp.backup.BackupData? {
+        return try {
+            val dataBlock = raw["data"]?.jsonObject ?: return null
+
+            val history = dataBlock["history"]?.jsonArray?.mapNotNull { element ->
+                val obj = element.jsonObject
+                val timestampStr = obj["timestamp"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null
+                val timestamp = runCatching {
+                    kotlinx.datetime.LocalDateTime.parse(timestampStr)
+                        .toInstant(TimeZone.currentSystemDefault())
+                        .toEpochMilliseconds()
+                }.getOrNull() ?: 0L
+
+                com.eahm.drinkwaterapp.backup.HistoryRecord(
+                    id = obj["id"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null,
+                    amount = obj["amount"]?.jsonPrimitive?.double?.toFloat() ?: 0f,
+                    status = obj["status"]?.jsonPrimitive?.contentOrNull ?: "IN_APP",
+                    timestamp = timestamp,
+                    deviceId = obj["device_id"]?.jsonPrimitive?.contentOrNull ?: "",
+                    updatedAt = obj["updated_at"]?.jsonPrimitive?.longOrNull ?: 0L,
+                    deletedAt = obj["deleted_at"]?.jsonPrimitive?.longOrNull,
+                )
+            } ?: emptyList()
+
+            val goals = dataBlock["daily_goals"]?.jsonArray?.mapNotNull { element ->
+                val obj = element.jsonObject
+                val dateStr = obj["effective_date"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null
+                val epochDays = runCatching {
+                    kotlinx.datetime.LocalDate.parse(dateStr).toEpochDays().toInt()
+                }.getOrNull() ?: return@mapNotNull null
+
+                com.eahm.drinkwaterapp.backup.GoalRecord(
+                    id = obj["id"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null,
+                    effectiveDate = epochDays,
+                    goalMl = obj["goal_ml"]?.jsonPrimitive?.double?.toFloat() ?: 500f,
+                    deviceId = obj["device_id"]?.jsonPrimitive?.contentOrNull ?: "",
+                    updatedAt = obj["updated_at"]?.jsonPrimitive?.longOrNull ?: 0L,
+                    deletedAt = obj["deleted_at"]?.jsonPrimitive?.longOrNull,
+                )
+            } ?: emptyList()
+
+            val prefsObj = dataBlock["preferences"]?.jsonObject
+            val prefsRecord = com.eahm.drinkwaterapp.backup.PreferencesRecord(
+                unitPreference = prefsObj?.get("unit_preference")?.jsonPrimitive?.contentOrNull ?: "ML",
+                timeFormat = prefsObj?.get("time_format_preference")?.jsonPrimitive?.contentOrNull ?: "SYSTEM",
+                amountPerDrink = prefsObj?.get("amount_per_drink")?.jsonPrimitive?.double?.toFloat() ?: 250f,
+                deviceId = prefsObj?.get("device_id")?.jsonPrimitive?.contentOrNull ?: "",
+                updatedAt = prefsObj?.get("updated_at")?.jsonPrimitive?.longOrNull ?: 0L,
+            )
+
+            com.eahm.drinkwaterapp.backup.BackupData(history, goals, prefsRecord)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    override suspend fun writeBackupData(data: com.eahm.drinkwaterapp.backup.BackupData): com.eahm.drinkwaterapp.backup.BackupResult<Unit> {
+        return try {
+            database.getHistoryDao().deleteAll()
+            database.getDailyGoalDao().deleteAll()
+
+            val historyEntities = data.history.map { record ->
+                val localDateTime = Instant.fromEpochMilliseconds(record.timestamp)
+                    .toLocalDateTime(TimeZone.currentSystemDefault())
+                com.eahm.drinkwaterapp.core.database.entity.HistoryEntity(
+                    id = record.id,
+                    amount = record.amount,
+                    status = runCatching {
+                        com.eahm.drinkwaterapp.core.database.entity.Status.valueOf(record.status)
+                    }.getOrElse { com.eahm.drinkwaterapp.core.database.entity.Status.IN_APP },
+                    timestamp = localDateTime,
+                    deviceId = record.deviceId,
+                    updatedAt = record.updatedAt,
+                    deletedAt = record.deletedAt,
+                )
+            }
+            if (historyEntities.isNotEmpty()) {
+                database.getHistoryDao().insertAll(*historyEntities.toTypedArray())
+            }
+
+            data.dailyGoals.forEach { record ->
+                val localDate = kotlinx.datetime.LocalDate.fromEpochDays(record.effectiveDate)
+                val goal = com.eahm.drinkwaterapp.core.database.entity.DailyGoalEntity(
+                    id = record.id,
+                    effectiveDate = localDate,
+                    goalMl = record.goalMl,
+                    deviceId = record.deviceId,
+                    updatedAt = record.updatedAt,
+                    deletedAt = record.deletedAt,
+                )
+                database.getDailyGoalDao().insert(goal)
+            }
+
+            val prefsRecord = data.preferences
+            runCatching {
+                com.eahm.drinkwaterapp.core.presentation.UnitPreference.valueOf(prefsRecord.unitPreference)
+            }.getOrNull()?.let { prefs.setUnitPreference(it) }
+
+            runCatching {
+                com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference.valueOf(prefsRecord.timeFormat)
+            }.getOrNull()?.let { prefs.setTimeFormatPreference(it) }
+
+            prefs.setAmountPerDrink(prefsRecord.amountPerDrink)
+
+            com.eahm.drinkwaterapp.backup.BackupResult.Success(Unit)
+        } catch (e: Exception) {
+            com.eahm.drinkwaterapp.backup.BackupResult.Failure(
+                com.eahm.drinkwaterapp.backup.BackupError.MigrationFailed(e)
+            )
+        }
     }
 
     @OptIn(kotlin.uuid.ExperimentalUuidApi::class)

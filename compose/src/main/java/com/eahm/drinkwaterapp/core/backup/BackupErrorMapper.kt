@@ -43,5 +43,8 @@ object BackupErrorMapper {
 
         is BackupError.Unknown ->
             UiText.DynamicString("Unknown error")
+
+        is BackupError.MergeCorrupted ->
+            UiText.DynamicString("Merge failed: remote backup data is corrupted")
     }
 }

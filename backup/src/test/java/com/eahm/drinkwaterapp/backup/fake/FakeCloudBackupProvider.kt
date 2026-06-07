@@ -2,13 +2,13 @@ package com.eahm.drinkwaterapp.backup.fake
 
 import android.content.Context
 import android.content.Intent
+import com.eahm.drinkwaterapp.backup.BackupError
 import com.eahm.drinkwaterapp.backup.BackupFile
 import com.eahm.drinkwaterapp.backup.BackupMetadata
 import com.eahm.drinkwaterapp.backup.BackupResult
 import com.eahm.drinkwaterapp.backup.CloudBackupProvider
 import com.eahm.drinkwaterapp.backup.CloudProviderType
 import com.eahm.drinkwaterapp.backup.CloudUser
-import kotlinx.serialization.json.buildJsonObject
 
 class FakeCloudBackupProvider(
     override val providerType: CloudProviderType = CloudProviderType.GOOGLE_DRIVE,
@@ -16,17 +16,7 @@ class FakeCloudBackupProvider(
         CloudUser("Test User", providerType = CloudProviderType.GOOGLE_DRIVE)
     ),
     private val uploadResult: BackupResult<Unit> = BackupResult.Success(Unit),
-    private val downloadResult: BackupResult<BackupFile> = BackupResult.Success(
-        BackupFile(
-            metadata = BackupMetadata(
-                schemaVersion = 1,
-                appVersion = "1.0",
-                createdAt = 0L,
-                deviceId = "test-device",
-            ),
-            rawData = buildJsonObject {},
-        )
-    ),
+    private val downloadResult: BackupResult<BackupFile> = BackupResult.Failure(BackupError.FileNotFound),
     private val metadataResult: BackupResult<BackupMetadata?> = BackupResult.Success(null),
 ) : CloudBackupProvider {
 
