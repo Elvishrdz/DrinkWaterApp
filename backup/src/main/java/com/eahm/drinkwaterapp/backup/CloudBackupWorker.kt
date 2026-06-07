@@ -39,6 +39,8 @@ class CloudBackupWorker(
     companion object {
         const val WORK_NAME_PERIODIC = "BACKUP_SYNC_WORK_PERIODIC"
         const val WORK_NAME_MANUAL = "BACKUP_SYNC_WORK_MANUAL"
+        const val WORK_NAME_ON_CHANGE = "cloud_backup_sync_on_change"
+        const val WORK_NAME_FOREGROUND = "cloud_backup_sync_foreground"
         private const val MAX_RETRIES = 3
     }
 }

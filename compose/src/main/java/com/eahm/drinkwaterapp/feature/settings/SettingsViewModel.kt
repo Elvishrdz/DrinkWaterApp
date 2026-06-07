@@ -15,6 +15,7 @@ import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingService.Companion.OptOutSource
 import com.eahm.drinkwaterapp.backup.BackupPreferences
 import com.eahm.drinkwaterapp.backup.BackupRepository
+import com.eahm.drinkwaterapp.backup.SyncCoordinator
 import com.eahm.drinkwaterapp.backup.BackupResult
 import com.eahm.drinkwaterapp.backup.BackupScheduler
 import com.eahm.drinkwaterapp.backup.BackupSyncState
@@ -68,6 +69,7 @@ internal class SettingsViewModel(
     private val backupScheduler: BackupScheduler,
     private val googleDriveProvider: GoogleDriveBackupProvider,
     private val dropboxProvider: DropboxBackupProvider,
+    private val syncCoordinator: SyncCoordinator,
 ) : ViewModel() {
 
     private val dao = database.getDailyGoalDao()
@@ -432,6 +434,7 @@ internal class SettingsViewModel(
         val existing = dao.getGoalOnDate(epochDay).first()
         if (existing != null) dao.update(existing.copy(goalMl = goalMl))
         else dao.insert(DailyGoalEntity(effectiveDate = current, goalMl = goalMl))
+        syncCoordinator.onDataChanged()
     }
 
     /**

@@ -53,8 +53,42 @@ class WorkManagerBackupScheduler(
         )
     }
 
+    override fun triggerOnChangeSync() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val request = OneTimeWorkRequestBuilder<CloudBackupWorker>()
+            .setConstraints(constraints)
+            .build()
+
+        workManager.enqueueUniqueWork(
+            CloudBackupWorker.WORK_NAME_ON_CHANGE,
+            ExistingWorkPolicy.KEEP,
+            request,
+        )
+    }
+
+    override fun triggerForegroundSync() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val request = OneTimeWorkRequestBuilder<CloudBackupWorker>()
+            .setConstraints(constraints)
+            .build()
+
+        workManager.enqueueUniqueWork(
+            CloudBackupWorker.WORK_NAME_FOREGROUND,
+            ExistingWorkPolicy.KEEP,
+            request,
+        )
+    }
+
     override fun cancelAll() {
         workManager.cancelUniqueWork(CloudBackupWorker.WORK_NAME_PERIODIC)
         workManager.cancelUniqueWork(CloudBackupWorker.WORK_NAME_MANUAL)
+        workManager.cancelUniqueWork(CloudBackupWorker.WORK_NAME_ON_CHANGE)
+        workManager.cancelUniqueWork(CloudBackupWorker.WORK_NAME_FOREGROUND)
     }
 }

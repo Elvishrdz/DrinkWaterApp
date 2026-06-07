@@ -27,6 +27,7 @@ import com.eahm.drinkwaterapp.feature.drink.ui.DrinkLogEntry
 import com.eahm.drinkwaterapp.system.alarm.AlarmSchedulerV3
 import com.eahm.drinkwaterapp.system.service.goalcelebration.GoalCelebrationOverlay
 import com.eahm.drinkwaterapp.system.service.goalcelebration.data.CelebrationStyle
+import com.eahm.drinkwaterapp.backup.SyncCoordinator
 import com.eahm.drinkwaterapp.system.service.goalcelebration.extension.createIntent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -60,6 +61,7 @@ internal class DrinkViewModel(
     val activeHoursObserver: ActiveHoursObserver,
     notificationPermissionObserver: NotificationPermissionObserver,
     private val purchaseManager: PurchaseManager,
+    private val syncCoordinator: SyncCoordinator,
 ) : ViewModel() {
 
     private val dao = database.getHistoryDao()
@@ -267,6 +269,7 @@ internal class DrinkViewModel(
                 )
 
                 dao.insertAll(record)
+                syncCoordinator.onDataChanged()
 
                 drinkAlarmManagerV2.restoreAlarm(source = "drink-button")
             }
