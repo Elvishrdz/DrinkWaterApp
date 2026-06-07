@@ -29,6 +29,61 @@ object AlarmSchedulerV3 {
 
     // region Schedule
 
+    /**
+     * Schedules an exact alarm at a specific [targetCalendar] time.
+     * Use this when the next active day is more than 24 h away (e.g. skipping inactive days).
+     */
+    fun scheduleExactAlarmAt(
+        context: Context,
+        alarmId: Int,
+        targetCalendar: Calendar,
+    ) {
+        val canScheduleExactAlarms = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            context.getSystemService(AlarmManager::class.java).canScheduleExactAlarms()
+        } else {
+            true
+        }
+        if (!canScheduleExactAlarms) throw Exception("This should never happen")
+
+        val delayMs = (targetCalendar.timeInMillis - System.currentTimeMillis()).coerceAtLeast(0L)
+        val triggerAtMs = SystemClock.elapsedRealtime() + delayMs
+        val hour = targetCalendar.get(Calendar.HOUR_OF_DAY)
+        val minute = targetCalendar.get(Calendar.MINUTE)
+        val pendingIntent = exactPendingIntent(context, alarmId, hour, minute, update = true)
+            ?: return
+
+        context.getSystemService(AlarmManager::class.java)
+            .setExactAndAllowWhileIdle(
+                AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                triggerAtMs,
+                pendingIntent,
+            )
+
+        saveToStorage(context, alarmId, prefix = "exact", hour, minute, triggerAtMs)
+    }
+
+    /**
+     * Schedules an inexact alarm at a specific [targetCalendar] time.
+     * Use this when the next active day is more than 24 h away (e.g. skipping inactive days).
+     */
+    fun scheduleInexactAlarmAt(context: Context, alarmId: Int, targetCalendar: Calendar) {
+        val delayMs = (targetCalendar.timeInMillis - System.currentTimeMillis()).coerceAtLeast(0L)
+        val triggerAtMs = SystemClock.elapsedRealtime() + delayMs
+        val hour = targetCalendar.get(Calendar.HOUR_OF_DAY)
+        val minute = targetCalendar.get(Calendar.MINUTE)
+        val pendingIntent = inexactPendingIntent(context, alarmId, hour, minute, update = true)
+            ?: return
+
+        context.getSystemService(AlarmManager::class.java)
+            .setAndAllowWhileIdle(
+                AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                triggerAtMs,
+                pendingIntent,
+            )
+
+        saveToStorage(context, alarmId, prefix = "inexact", hour, minute, triggerAtMs)
+    }
+
     fun scheduleExactAlarm(context: Context, alarmId: Int, hour: Int, minute: Int) {
         val canScheduleExactAlarms = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             context.getSystemService(AlarmManager::class.java).canScheduleExactAlarms()

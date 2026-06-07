@@ -47,6 +47,9 @@
     <!-- Generic — labels -->
     <string name="label_today">Today</string>
     <string name="dev_title">Dev</string>
+    <string name="reminders_title">Reminders</string>
+    <string name="reminders_section_active_days">Active days</string>
+    <string name="reminders_enable_all_days">Enable all days</string>
     <string name="label_daily_goal">Daily goal</string>
     <string name="label_start_time">Start time</string>
     <string name="label_end_time">End time</string>
@@ -398,6 +401,7 @@
     <string name="drink_alarm_not_configured_body">Configure your active hours in Settings to get reminders.</string>
     <string name="drink_alarm_status_active">Active hours</string>
     <string name="drink_alarm_status_resting">Resting</string>
+    <string name="drink_alarm_status_no_alarms_today">No alarms today</string>
     <string name="drink_alarm_summary_drinks">Drinks</string>
     <string name="drink_alarm_summary_every">Every</string>
     <string name="drink_alarm_summary_every_approx">Approx. every</string>

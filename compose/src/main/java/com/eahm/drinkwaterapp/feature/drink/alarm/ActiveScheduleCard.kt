@@ -33,6 +33,7 @@ import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import kotlinx.datetime.LocalDateTime
 
+@Suppress("CognitiveComplexMethod")
 @Composable
 internal fun ActiveScheduleCard(
     state: HomeAlarmState.Active,
@@ -70,11 +71,16 @@ internal fun ActiveScheduleCard(
                 fontSize = 16.sp,
                 color = MaterialTheme.colorScheme.onSurface,
             )
-            ActiveStatusBadge(isActive = state.isInActiveHours)
+            val badgeStatus = when {
+                !state.isTodayActive -> AlarmDayStatus.NO_ALARMS_TODAY
+                state.isInActiveHours -> AlarmDayStatus.ACTIVE
+                else -> AlarmDayStatus.RESTING
+            }
+            ActiveStatusBadge(status = badgeStatus)
         }
 
         AnimatedVisibility(
-            visible = state.isInActiveHours && state.schedule != null,
+            visible = state.isTodayActive && state.isInActiveHours && state.schedule != null,
             enter = fadeIn() + expandVertically(),
             exit = fadeOut() + shrinkVertically(),
         ) {
@@ -90,14 +96,27 @@ internal fun ActiveScheduleCard(
             }
         }
 
-        SummaryRow(
-            schedule = state.schedule,
-            interval = state.interval,
-            nextAlarmSlot = state.nextAlarmSlot,
-            isInActiveHours = state.isInActiveHours,
-            isInexact = state.isInexact,
-            is24Hour = is24Hour,
-        )
+        if (!state.isTodayActive && state.nextActiveDayLabel != null) {
+            val timeLabel = state.startTime.formatTime(is24Hour)
+            SummaryRow(
+                schedule = null,
+                interval = state.interval,
+                nextAlarmSlot = null,
+                isInActiveHours = false,
+                isInexact = state.isInexact,
+                is24Hour = is24Hour,
+                nextOnDayLabel = "${state.nextActiveDayLabel} $timeLabel",
+            )
+        } else {
+            SummaryRow(
+                schedule = state.schedule,
+                interval = state.interval,
+                nextAlarmSlot = state.nextAlarmSlot,
+                isInActiveHours = state.isInActiveHours,
+                isInexact = state.isInexact,
+                is24Hour = is24Hour,
+            )
+        }
     }
 }
 

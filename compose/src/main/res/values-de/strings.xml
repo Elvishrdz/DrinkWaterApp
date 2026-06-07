@@ -46,6 +46,9 @@
     <!-- Allgemein — Beschriftungen -->
     <string name="label_today">Heute</string>
     <string name="dev_title">Dev</string>
+    <string name="reminders_title">Erinnerungen</string>
+    <string name="reminders_section_active_days">Aktive Tage</string>
+    <string name="reminders_enable_all_days">Alle Tage aktivieren</string>
     <string name="label_daily_goal">Tagesziel</string>
     <string name="label_start_time">Startzeit</string>
     <string name="label_end_time">Endzeit</string>
@@ -397,6 +400,7 @@
     <string name="drink_alarm_not_configured_body">Konfiguriere deine aktiven Stunden in den Einstellungen, um Erinnerungen zu erhalten.</string>
     <string name="drink_alarm_status_active">Aktive Stunden</string>
     <string name="drink_alarm_status_resting">Ruhezeit</string>
+    <string name="drink_alarm_status_no_alarms_today">Heute keine Erinnerungen</string>
     <string name="drink_alarm_summary_drinks">Getränke</string>
     <string name="drink_alarm_summary_every">Alle</string>
     <string name="drink_alarm_summary_every_approx">Ca. alle</string>

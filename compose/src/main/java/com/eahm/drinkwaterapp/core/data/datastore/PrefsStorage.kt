@@ -59,5 +59,9 @@ interface PrefsStorage {
     fun getWaterAnimationEnabled(): Flow<Boolean>
     suspend fun setWaterAnimationEnabled(enabled: Boolean)
 
+    /** Returns the set of active days-of-week as ISO values (1=Mon … 7=Sun). Defaults to all 7. */
+    fun getActiveDays(): Flow<Set<Int>>
+    suspend fun setActiveDays(days: Set<Int>)
+
     suspend fun clear()
 }

@@ -26,6 +26,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.LocalDateTime
+import java.time.DayOfWeek
+import java.time.format.TextStyle
+import java.util.Locale
 
 internal class HomeAlarmViewModel(
     private val application: Application,
@@ -59,7 +62,15 @@ internal class HomeAlarmViewModel(
         prefsStorage.getInterval(),
         prefsStorage.getStartTime(),
         prefsStorage.getEndTime(),
-    ) { interval, start, end -> Triple(interval, start, end) }
+        prefsStorage.getActiveDays(),
+    ) { interval, start, end, activeDays -> AlarmPrefs(interval, start, end, activeDays) }
+
+    private data class AlarmPrefs(
+        val interval: com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime,
+        val start: com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime,
+        val end: com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime,
+        val activeDays: Set<Int>,
+    )
 
     val state = combine(
         notificationPermissionObserver.hasPermission,
@@ -69,10 +80,9 @@ internal class HomeAlarmViewModel(
     ) { hasPermission, now, prefs, _ ->
         if (!hasPermission) return@combine HomeAlarmState.NoPermission
 
-        val (intervalPref, startTimePref, endTimePref) = prefs
-        val startTime = startTimePref.toLocalDateTime()
-        val endTime = endTimePref.toLocalDateTime()
-        val alarmInterval = AlarmInterval(intervalPref.hour, intervalPref.minute)
+        val startTime = prefs.start.toLocalDateTime()
+        val endTime = prefs.end.toLocalDateTime()
+        val alarmInterval = AlarmInterval(prefs.interval.hour, prefs.interval.minute)
 
         val isExactActive =
             AlarmSchedulerV3.isExactAlarmActive(application, DrinkAlarmManagerV2.EXACT_ALARM_ID)
@@ -84,7 +94,29 @@ internal class HomeAlarmViewModel(
             .getGoalForDate(now.date.toEpochDays())
             .firstOrNull()?.goalMl ?: DEFAULT_GOAL_ML
 
-        val schedule = buildSchedule(startTime, endTime, goalMl, alarmInterval)
+        // Check whether today is an active day; ISO ordinal: Mon=0 → 1, …, Sun=6 → 7
+        val todayIsoDay = now.dayOfWeek.ordinal + 1
+        val isTodayActive = todayIsoDay in prefs.activeDays
+
+        // Find the next active day label when today is inactive
+        @Suppress("MagicNumber")
+        val nextActiveDayLabel: String? = if (isTodayActive) {
+            null
+        } else {
+            var daysAhead = 1
+            for (offset in 1..6) {
+                val candidate = ((todayIsoDay - 1 + offset) % 7) + 1
+                if (candidate in prefs.activeDays) {
+                    daysAhead = offset
+                    break
+                }
+            }
+            val nextIsoDay = ((todayIsoDay - 1 + daysAhead) % 7) + 1
+            DayOfWeek.of(nextIsoDay).getDisplayName(TextStyle.FULL, Locale.getDefault())
+        }
+
+        val schedule =
+            if (isTodayActive) buildSchedule(startTime, endTime, goalMl, alarmInterval) else null
         val nextAlarmSlot = runCatching {
             getNextAlarmSlot(now, startTime, endTime, goalMl, alarmInterval)
         }.getOrNull()
@@ -95,9 +127,11 @@ internal class HomeAlarmViewModel(
             interval = alarmInterval,
             schedule = schedule,
             nextAlarmSlot = nextAlarmSlot,
-            isInActiveHours = computeIsInActiveHours(now, startTime, endTime),
+            isInActiveHours = isTodayActive && computeIsInActiveHours(now, startTime, endTime),
             now = now,
             isInexact = isInexactActive && !isExactActive,
+            isTodayActive = isTodayActive,
+            nextActiveDayLabel = nextActiveDayLabel,
         )
     }.combine(prefsStorage.getTimeFormatPreference()) { alarmState, timeFormat ->
         if (alarmState is HomeAlarmState.Active) alarmState.copy(timeFormatPreference = timeFormat)

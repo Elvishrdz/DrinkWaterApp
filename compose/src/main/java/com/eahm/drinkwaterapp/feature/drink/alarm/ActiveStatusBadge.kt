@@ -27,11 +27,32 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
 
 @Composable
 internal fun ActiveStatusBadge(isActive: Boolean) {
-    val bgColor = if (isActive) DwSuccess.copy(alpha = 0.12f) else DwInk200
-    val fgColor = if (isActive) DwSuccess else DwInk400
-    val label =
-        if (isActive) stringResource(R.string.drink_alarm_status_active) else stringResource(R.string.drink_alarm_status_resting)
-    val icon = if (isActive) DwIcons.Sun else DwIcons.Moon
+    val status = if (isActive) AlarmDayStatus.ACTIVE else AlarmDayStatus.RESTING
+    ActiveStatusBadge(status)
+}
+
+@Composable
+internal fun ActiveStatusBadge(status: AlarmDayStatus) {
+    val bgColor = when (status) {
+        AlarmDayStatus.ACTIVE -> DwSuccess.copy(alpha = 0.12f)
+        AlarmDayStatus.RESTING -> DwInk200
+        AlarmDayStatus.NO_ALARMS_TODAY -> DwInk200
+    }
+    val fgColor = when (status) {
+        AlarmDayStatus.ACTIVE -> DwSuccess
+        AlarmDayStatus.RESTING -> DwInk400
+        AlarmDayStatus.NO_ALARMS_TODAY -> DwInk400
+    }
+    val label = when (status) {
+        AlarmDayStatus.ACTIVE -> stringResource(R.string.drink_alarm_status_active)
+        AlarmDayStatus.RESTING -> stringResource(R.string.drink_alarm_status_resting)
+        AlarmDayStatus.NO_ALARMS_TODAY -> stringResource(R.string.drink_alarm_status_no_alarms_today)
+    }
+    val icon = when (status) {
+        AlarmDayStatus.ACTIVE -> DwIcons.Sun
+        AlarmDayStatus.RESTING -> DwIcons.Moon
+        AlarmDayStatus.NO_ALARMS_TODAY -> DwIcons.Bell
+    }
 
     Row(
         modifier = Modifier
@@ -64,3 +85,5 @@ private fun ActiveStatusBadgePreview() {
         ActiveStatusBadge(true)
     }
 }
+
+internal enum class AlarmDayStatus { ACTIVE, RESTING, NO_ALARMS_TODAY }

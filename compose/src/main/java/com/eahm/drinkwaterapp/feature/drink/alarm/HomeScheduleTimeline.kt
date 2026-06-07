@@ -161,21 +161,6 @@ internal fun HomeScheduleTimeline(
     }
 }
 
-private fun LocalDateTime.formatTime(is24Hour: Boolean): String {
-    val mm = minute.toString().padStart(2, '0')
-    return if (is24Hour) {
-        "${hour.toString().padStart(2, '0')}:$mm"
-    } else {
-        val h12 = when {
-            hour == 0 -> 12
-            hour > 12 -> hour - 12
-            else -> hour
-        }
-        val period = if (hour < 12) "AM" else "PM"
-        "$h12:$mm $period"
-    }
-}
-
 @Preview
 @Composable
 private fun HomeScheduleTimelinePreview() {

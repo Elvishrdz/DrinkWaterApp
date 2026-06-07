@@ -46,6 +46,9 @@
     <!-- Generic — etiquetas -->
     <string name="label_today">Hoy</string>
     <string name="dev_title">Dev</string>
+    <string name="reminders_title">Recordatorios</string>
+    <string name="reminders_section_active_days">Días activos</string>
+    <string name="reminders_enable_all_days">Activar todos los días</string>
     <string name="label_daily_goal">Meta diaria</string>
     <string name="label_start_time">Hora de inicio</string>
     <string name="label_end_time">Hora de fin</string>
@@ -397,6 +400,7 @@
     <string name="drink_alarm_not_configured_body">Configura tu ventana activa en Ajustes para recibir recordatorios.</string>
     <string name="drink_alarm_status_active">Horas activas</string>
     <string name="drink_alarm_status_resting">En descanso</string>
+    <string name="drink_alarm_status_no_alarms_today">Sin alarmas hoy</string>
     <string name="drink_alarm_summary_drinks">Bebidas</string>
     <string name="drink_alarm_summary_every">Cada</string>
     <string name="drink_alarm_summary_every_approx">Aprox. cada</string>

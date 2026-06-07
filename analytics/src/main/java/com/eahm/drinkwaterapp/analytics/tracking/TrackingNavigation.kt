@@ -16,6 +16,7 @@ interface TrackingNavigation {
         const val SCREEN_TODAY = "today"
         const val SCREEN_HISTORY = "history"
         const val SCREEN_STATS = "stats"
+        const val SCREEN_REMINDERS = "reminders"
         const val SCREEN_SETTINGS = "settings"
     }
 }

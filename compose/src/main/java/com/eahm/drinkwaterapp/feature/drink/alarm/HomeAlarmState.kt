@@ -27,5 +27,7 @@ internal sealed interface HomeAlarmState {
         val timeFormatPreference: TimeFormatPreference = TimeFormatPreference.SYSTEM,
         /** True when the app is using inexact (battery-friendly) alarms instead of exact alarms. */
         val isInexact: Boolean = false,
+        val isTodayActive: Boolean = true,
+        val nextActiveDayLabel: String? = null,
     ) : HomeAlarmState
 }

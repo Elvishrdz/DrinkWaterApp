@@ -1,3 +1,5 @@
+@file:Suppress("MagicNumber")
+
 package com.eahm.drinkwaterapp.core.designsystem.icon
 
 import androidx.compose.foundation.layout.Column
@@ -1024,6 +1026,51 @@ object DwIcons {
     }
 
     /**
+     * Filled alarm clock — solid circle body with bell feet.
+     * Used as the selected state icon for the Reminders nav tab.
+     */
+    val AlarmFilled: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "DwAlarmFilled",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).apply {
+            // Filled clock body (EvenOdd punches out the clock hands as negative space)
+            path(
+                fill = SolidColor(Color.Black),
+                pathFillType = PathFillType.EvenOdd,
+            ) {
+                // Outer filled circle (r=9, centre 12,12)
+                moveTo(12f, 3f)
+                arcTo(9f, 9f, 0f, false, true, 21f, 12f)
+                arcTo(9f, 9f, 0f, false, true, 12f, 21f)
+                arcTo(9f, 9f, 0f, false, true, 3f, 12f)
+                arcTo(9f, 9f, 0f, false, true, 12f, 3f)
+                close()
+                // Hand cutout: thin polygon tracing 12→center→~3 o'clock (1 px wide)
+                moveTo(11.5f, 7f)
+                lineTo(12.5f, 7f)
+                lineTo(12.5f, 11.73f)
+                lineTo(16.45f, 13.5f)
+                lineTo(16.0f, 14.43f)
+                lineTo(11.5f, 12.27f)
+                close()
+            }
+            // Bell feet — diagonal lines at upper-left and upper-right
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+            ) {
+                moveTo(5.6f, 5.6f); lineTo(3.5f, 3.5f)
+                moveTo(18.4f, 5.6f); lineTo(20.5f, 3.5f)
+            }
+        }.build()
+    }
+
+    /**
      * Repeat / loop arrows — two arcs with arrowheads forming a closed oval cycle.
      * Used for the Reminder Interval setting.
      */
@@ -1178,6 +1225,60 @@ object DwIcons {
                 lineTo(18f, 10f)
                 moveTo(16f, 4f)
                 lineTo(20f, 8f)
+            }
+        }.build()
+    }
+
+    /**
+     * Circle outline containing the digit "7" and a small checkmark at the bottom-right.
+     * Used for the "enable all 7 days" action in the Reminders screen.
+     */
+    val SevenDaysCheck: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "DwSevenDaysCheck",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f,
+        ).apply {
+            // Outer circle
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 1.8f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round,
+            ) {
+                // Circle: centre (12, 12) radius 10
+                moveTo(22f, 12f)
+                arcTo(10f, 10f, 0f, false, true, 12f, 22f)
+                arcTo(10f, 10f, 0f, false, true, 2f, 12f)
+                arcTo(10f, 10f, 0f, false, true, 12f, 2f)
+                arcTo(10f, 10f, 0f, false, true, 22f, 12f)
+                close()
+            }
+            // Digit "7" — top bar then diagonal stroke, shifted left to leave room for the check
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 1.8f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round,
+            ) {
+                // Horizontal top bar of "7"
+                moveTo(8.5f, 8f)
+                lineTo(13.5f, 8f)
+                // Diagonal down-left stroke of "7"
+                lineTo(10f, 16f)
+            }
+            // Small checkmark at bottom-right inside the circle
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 1.6f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round,
+            ) {
+                moveTo(13.5f, 15f)
+                lineTo(15f, 17f)
+                lineTo(17.5f, 13.5f)
             }
         }.build()
     }

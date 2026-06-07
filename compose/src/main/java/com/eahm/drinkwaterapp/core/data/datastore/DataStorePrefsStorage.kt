@@ -1,5 +1,7 @@
 package com.eahm.drinkwaterapp.core.data.datastore
 
+import android.icu.util.LocaleData
+import android.icu.util.ULocale
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -14,8 +16,6 @@ import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import android.icu.util.LocaleData
-import android.icu.util.ULocale
 import kotlinx.serialization.json.Json
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
@@ -43,7 +43,8 @@ private class DataStorePrefsStorage(
     )
 
     private val privacyPolicyAcceptedAtKey = longPreferencesKey("PRIVACY_POLICY_ACCEPTED_AT")
-    private val privacyPolicyVersionAcceptedKey = longPreferencesKey("PRIVACY_POLICY_VERSION_ACCEPTED")
+    private val privacyPolicyVersionAcceptedKey =
+        longPreferencesKey("PRIVACY_POLICY_VERSION_ACCEPTED")
     private val trackingConsentDecidedKey = booleanPreferencesKey("TRACKING_CONSENT_DECIDED")
     private val onboardingCompletedKey = booleanPreferencesKey("ONBOARDING_COMPLETED")
     private val usernameKey = stringPreferencesKey("USERNAME")
@@ -58,6 +59,7 @@ private class DataStorePrefsStorage(
     private val unitPreferenceKey = stringPreferencesKey("UNIT_PREFERENCE")
     private val firstDrinkDialogSeenKey = booleanPreferencesKey("FIRST_DRINK_DIALOG_SEEN")
     private val waterAnimationEnabledKey = booleanPreferencesKey("WATER_ANIMATION_ENABLED")
+    private val activeDaysKey = stringPreferencesKey("ACTIVE_DAYS")
 
     private val json = Json {
         ignoreUnknownKeys = true
@@ -314,6 +316,20 @@ private class DataStorePrefsStorage(
     override suspend fun setWaterAnimationEnabled(enabled: Boolean) {
         dataStore.updateData { prefs ->
             prefs.toMutablePreferences().also { it[waterAnimationEnabledKey] = enabled }
+        }
+    }
+
+    @Suppress("MagicNumber")
+    override fun getActiveDays(): Flow<Set<Int>> =
+        dataStore.data.map { prefs ->
+            prefs[activeDaysKey]
+                ?.let { runCatching { json.decodeFromString<Set<Int>>(it) }.getOrNull() }
+                ?: setOf(1, 2, 3, 4, 5, 6, 7)
+        }
+
+    override suspend fun setActiveDays(days: Set<Int>) {
+        dataStore.updateData { prefs ->
+            prefs.toMutablePreferences().also { it[activeDaysKey] = Json.encodeToString(days) }
         }
     }
 

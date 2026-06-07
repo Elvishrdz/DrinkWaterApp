@@ -17,6 +17,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import kotlinx.datetime.LocalDateTime
 
+@Suppress("CognitiveComplexMethod")
 @Composable
 internal fun SummaryRow(
     schedule: DrinkSchedule?,
@@ -25,6 +26,7 @@ internal fun SummaryRow(
     isInActiveHours: Boolean,
     isInexact: Boolean = false,
     is24Hour: Boolean = true,
+    nextOnDayLabel: String? = null,
 ) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         AnimatedVisibility(
@@ -57,21 +59,35 @@ internal fun SummaryRow(
             }
         }
 
-        nextAlarmSlot?.let { next ->
-            val label = when {
-                !isInActiveHours -> stringResource(R.string.drink_alarm_summary_starts)
-                isInexact -> stringResource(R.string.drink_alarm_summary_next_approx)
-                else -> stringResource(R.string.drink_alarm_summary_next)
+        if (nextOnDayLabel != null) {
+            // Today is an inactive day. show the next active day instead of a time chip.
+            val nextOnDayTextResId = if (isInexact) {
+                R.string.drink_alarm_summary_next_approx
+            } else {
+                R.string.drink_alarm_summary_next
             }
+
             SummaryChip(
-                label = label,
-                value = next.formatTime(is24Hour),
+                label = stringResource(nextOnDayTextResId),
+                value = nextOnDayLabel,
             )
+        } else {
+            nextAlarmSlot?.let { next ->
+                val label = when {
+                    !isInActiveHours -> stringResource(R.string.drink_alarm_summary_starts)
+                    isInexact -> stringResource(R.string.drink_alarm_summary_next_approx)
+                    else -> stringResource(R.string.drink_alarm_summary_next)
+                }
+                SummaryChip(
+                    label = label,
+                    value = next.formatTime(is24Hour),
+                )
+            }
         }
     }
 }
 
-private fun LocalDateTime.formatTime(is24Hour: Boolean): String {
+internal fun LocalDateTime.formatTime(is24Hour: Boolean): String {
     val mm = minute.toString().padStart(2, '0')
     return if (is24Hour) {
         "${hour.toString().padStart(2, '0')}:$mm"

@@ -13,6 +13,7 @@ enum class HomeDestination(
     TODAY(R.string.label_today, DwIcons.Drop, DwIcons.DropFilled),
     HISTORY(R.string.history_title, DwIcons.History, DwIcons.HistoryFilled),
     STATS(R.string.stats_title, DwIcons.BarChart, DwIcons.BarChartFilled),
+    REMINDERS(R.string.reminders_title, DwIcons.Alarm, DwIcons.AlarmFilled),
     SETTINGS(R.string.settings_title, DwIcons.Settings, DwIcons.SettingsFilled),
     DEV(R.string.dev_title, DwIcons.Ruler, DwIcons.Ruler),
 }

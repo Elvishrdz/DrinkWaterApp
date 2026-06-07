@@ -97,3 +97,25 @@ private fun ActiveRestingPreview() {
         )
     }
 }
+
+@Suppress("MagicNumber")
+@Preview
+@Composable
+private fun TodayInactivePreview() {
+    DrinkWaterAppTheme {
+        ActiveScheduleCard(
+            state = HomeAlarmState.Active(
+                startTime = LocalDateTime(2026, 5, 10, 7, 0),
+                endTime = LocalDateTime(2026, 5, 10, 20, 0),
+                interval = AlarmInterval(1, 30),
+                schedule = null,
+                nextAlarmSlot = null,
+                isInActiveHours = false,
+                now = LocalDateTime(2026, 5, 10, 14, 0),
+                isTodayActive = false,
+                nextActiveDayLabel = "Monday",
+            ),
+            modifier = Modifier.padding(20.dp),
+        )
+    }
+}

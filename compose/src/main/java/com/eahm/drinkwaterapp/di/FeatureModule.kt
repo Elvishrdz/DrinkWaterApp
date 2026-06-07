@@ -11,18 +11,19 @@ import com.eahm.drinkwaterapp.feature.dev.analytics.AnalyticsViewModel
 import com.eahm.drinkwaterapp.feature.dev.celebrations.CelebrationsViewModel
 import com.eahm.drinkwaterapp.feature.dev.consent.ConsentDevViewModel
 import com.eahm.drinkwaterapp.feature.dev.dailygoal.DailyGoalDevViewModel
+import com.eahm.drinkwaterapp.feature.dev.historyinject.HistoryInjectDevViewModel
 import com.eahm.drinkwaterapp.feature.dev.menu.DevMenuViewModel
 import com.eahm.drinkwaterapp.feature.dev.notifications.NotificationsViewModel
 import com.eahm.drinkwaterapp.feature.dev.onboarding.OnboardingDevViewModel
 import com.eahm.drinkwaterapp.feature.dev.streak.StreakDevViewModel
 import com.eahm.drinkwaterapp.feature.dev.tracking.TrackingDevViewModel
-import com.eahm.drinkwaterapp.feature.dev.historyinject.HistoryInjectDevViewModel
 import com.eahm.drinkwaterapp.feature.dev.wateranimation.WaterAnimationDevViewModel
 import com.eahm.drinkwaterapp.feature.drink.DrinkViewModel
 import com.eahm.drinkwaterapp.feature.drink.alarm.HomeAlarmViewModel
 import com.eahm.drinkwaterapp.feature.history.HistoryViewModel
 import com.eahm.drinkwaterapp.feature.history.v2.HistoryV2ViewModel
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingViewModel
+import com.eahm.drinkwaterapp.feature.reminders.RemindersViewModel
 import com.eahm.drinkwaterapp.feature.settings.SettingsViewModel
 import com.eahm.drinkwaterapp.feature.stats.CalendarViewModel
 import com.eahm.drinkwaterapp.feature.stats.StatsViewModel
@@ -40,6 +41,7 @@ internal val featureModule = module {
     viewModelOf(::CalendarViewModel)
     viewModelOf(::HistoryViewModel)
     viewModelOf(::HistoryV2ViewModel)
+    viewModelOf(::RemindersViewModel)
     viewModelOf(::SettingsViewModel)
 
     // development modules

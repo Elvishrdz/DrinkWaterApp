@@ -55,6 +55,7 @@ import com.eahm.drinkwaterapp.core.presentation.layouttype.toNavigationSuite
 import com.eahm.drinkwaterapp.feature.dev.DevRoot
 import com.eahm.drinkwaterapp.feature.drink.DrinkRoot
 import com.eahm.drinkwaterapp.feature.history.HistoryRoot
+import com.eahm.drinkwaterapp.feature.reminders.RemindersScreen
 import com.eahm.drinkwaterapp.feature.settings.SettingsScreen
 import com.eahm.drinkwaterapp.feature.stats.StatsScreen
 import com.eahm.drinkwaterapp.ui.confetti.ConfettiFadeMode
@@ -78,6 +79,7 @@ internal fun HomeScreen() {
             HomeDestination.TODAY -> TrackingNavigation.SCREEN_TODAY
             HomeDestination.HISTORY -> TrackingNavigation.SCREEN_HISTORY
             HomeDestination.STATS -> TrackingNavigation.SCREEN_STATS
+            HomeDestination.REMINDERS -> TrackingNavigation.SCREEN_REMINDERS
             HomeDestination.SETTINGS -> TrackingNavigation.SCREEN_SETTINGS
             HomeDestination.DEV -> return@LaunchedEffect
         }
@@ -127,6 +129,7 @@ internal fun HomeScreen() {
 
             HomeDestination.HISTORY -> HistoryRoot()
             HomeDestination.STATS -> StatsScreen()
+            HomeDestination.REMINDERS -> RemindersScreen()
             HomeDestination.SETTINGS -> SettingsScreen()
             HomeDestination.DEV -> DevRoot { currentDestination = HomeDestination.TODAY }
         }
