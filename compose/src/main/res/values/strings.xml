@@ -688,6 +688,9 @@
     <string name="backup_migration_body">Transferring your data to the new provider.</string>
     <string name="backup_migration_success">Migration complete</string>
     <string name="backup_migration_error">Migration failed</string>
+    <string name="backup_error_not_signed_in">You\'re not signed in. Reconnect your account to resume backups.</string>
+    <string name="backup_error_unknown">Something went wrong with the backup. Please try again.</string>
+    <string name="backup_error_dismiss">Dismiss</string>
 
     <!-- Backup — Change provider sheet -->
     <string name="backup_change_title">Change backup provider</string>

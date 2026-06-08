@@ -39,6 +39,7 @@ dependencies {
     implementation(libs.koin.androidx.workmanager)
 
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
     testImplementation(kotlin("test"))
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
 }

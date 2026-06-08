@@ -1,6 +1,7 @@
 package com.eahm.drinkwaterapp.feature.settings.backup
 
 import androidx.compose.runtime.Immutable
+import com.eahm.drinkwaterapp.backup.BackupError
 import com.eahm.drinkwaterapp.backup.CloudProviderType
 import com.eahm.drinkwaterapp.backup.SeenDevice
 import com.eahm.drinkwaterapp.backup.SyncConflict
@@ -19,4 +20,17 @@ data class BackupUiState(
     val seenDevices: List<SeenDevice> = emptyList(),
     // Non-null when the sync engine is waiting for user conflict resolution.
     val pendingConflict: SyncConflict? = null,
+    val error: BackupUIError? = null,
 )
+
+enum class BackupUIError {
+    NOT_SIGNED_IN,
+    UNKNOWN,
+}
+
+internal fun BackupError.toUI(): BackupUIError {
+    return when {
+        this is BackupError.NotSignedIn -> BackupUIError.NOT_SIGNED_IN
+        else -> BackupUIError.UNKNOWN
+    }
+}

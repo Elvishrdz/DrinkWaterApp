@@ -40,6 +40,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintMagenta
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
+import com.eahm.drinkwaterapp.core.designsystem.theme.DwWarning
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.JetBrainsMono
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
@@ -47,7 +48,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-@Suppress("CognitiveComplexMethod")
+@Suppress("CyclomaticComplexMethod", "CognitiveComplexMethod")
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 internal fun BackupSettingsSection(
@@ -68,6 +69,16 @@ internal fun BackupSettingsSection(
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         BackupSection(title = stringResource(R.string.backup_section_title)) {
+            state.error?.let { error ->
+                val errorMessage = when (error) {
+                    BackupUIError.NOT_SIGNED_IN -> stringResource(R.string.backup_error_not_signed_in)
+                    BackupUIError.UNKNOWN -> stringResource(R.string.backup_error_unknown)
+                }
+
+                BackupErrorRow(errorMessage = errorMessage)
+                HorizontalDivider(color = DwInk100)
+            }
+
             BackupRow(
                 icon = DwIcons.ShieldCheck,
                 iconBg = DwTintWater,
@@ -152,6 +163,38 @@ internal fun BackupSettingsSection(
 
             LinkedDevicesSection(devices = state.seenDevices)
         }
+    }
+}
+
+@Composable
+private fun BackupErrorRow(errorMessage: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Box(
+            modifier = Modifier
+                .size(28.dp)
+                .clip(RoundedCornerShape(4.dp))
+                .background(DwWarning.copy(alpha = 0.15f)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = DwIcons.Warning,
+                contentDescription = null,
+                tint = DwWarning,
+                modifier = Modifier.size(18.dp),
+            )
+        }
+        Text(
+            text = errorMessage,
+            style = MaterialTheme.typography.bodySmall,
+            color = DwInk500,
+            modifier = Modifier.weight(1f),
+        )
     }
 }
 

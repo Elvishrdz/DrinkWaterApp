@@ -1,11 +1,13 @@
 package com.eahm.drinkwaterapp.backup
 
+import android.app.Application
 import android.content.Context
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class BackupRepositoryImpl(
+    private val application: Application,
     private val registry: BackupProviderRegistry,
     private val prefs: BackupPreferences,
     private val connectUseCase: ConnectBackupUseCase,
@@ -40,7 +42,7 @@ class BackupRepositoryImpl(
         }
     }
 
-    override suspend fun sync(context: Context?): BackupResult<SyncResult> {
+    override suspend fun sync(): BackupResult<SyncResult> {
         if (_syncState.value is BackupSyncState.InProgress) {
             return BackupResult.Success(SyncResult.AlreadyInProgress)
         }
@@ -50,10 +52,13 @@ class BackupRepositoryImpl(
             _syncState.value = BackupSyncState.Error(provider.error)
             return provider
         }
-        return syncUseCase(context, (provider as BackupResult.Success).value).also { result ->
+        return syncUseCase(
+            context = application,
+            provider = (provider as BackupResult.Success).value,
+        ).also { result ->
             _syncState.value = when (result) {
-                is BackupResult.Success -> BackupSyncState.Success(System.currentTimeMillis())
-                is BackupResult.Failure -> BackupSyncState.Error(result.error)
+                is BackupResult.Success -> BackupSyncState.Success(syncedAt = System.currentTimeMillis())
+                is BackupResult.Failure -> BackupSyncState.Error(error = result.error)
             }
         }
     }

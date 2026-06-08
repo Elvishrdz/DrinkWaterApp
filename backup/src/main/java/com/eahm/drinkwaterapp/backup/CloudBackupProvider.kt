@@ -3,6 +3,7 @@ package com.eahm.drinkwaterapp.backup
 import android.content.Context
 import android.content.Intent
 
+// TODO: remove the context parameter and get it internally in the implementation to avoid passing null
 interface CloudBackupProvider {
     val providerType: CloudProviderType
 

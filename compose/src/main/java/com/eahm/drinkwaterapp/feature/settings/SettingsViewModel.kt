@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.AlarmManager
 import android.app.Application
 import android.content.Intent
+import android.content.IntentSender
 import android.os.Build
 import android.provider.Settings
 import androidx.appcompat.app.AppCompatDelegate
@@ -15,7 +16,6 @@ import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingService.Companion.OptOutSource
 import com.eahm.drinkwaterapp.backup.BackupPreferences
 import com.eahm.drinkwaterapp.backup.BackupRepository
-import com.eahm.drinkwaterapp.backup.SyncCoordinator
 import com.eahm.drinkwaterapp.backup.BackupResult
 import com.eahm.drinkwaterapp.backup.BackupScheduler
 import com.eahm.drinkwaterapp.backup.BackupSyncState
@@ -23,6 +23,7 @@ import com.eahm.drinkwaterapp.backup.CloudProviderType
 import com.eahm.drinkwaterapp.backup.DropboxBackupProvider
 import com.eahm.drinkwaterapp.backup.GoogleDriveBackupProvider
 import com.eahm.drinkwaterapp.backup.SyncConflictResolver
+import com.eahm.drinkwaterapp.backup.SyncCoordinator
 import com.eahm.drinkwaterapp.core.billing.PurchaseManager
 import com.eahm.drinkwaterapp.core.config.AppInfoService
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
@@ -36,6 +37,7 @@ import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.feature.drink.DateTimeZoneChangedObserver
 import com.eahm.drinkwaterapp.feature.settings.backup.BackupUiState
+import com.eahm.drinkwaterapp.feature.settings.backup.toUI
 import com.eahm.drinkwaterapp.feature.settings.data.ActiveTimes
 import com.eahm.drinkwaterapp.ui.inputfield.validateText
 import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
@@ -204,6 +206,7 @@ internal class SettingsViewModel(
             state.copy(
                 backupUiState = state.backupUiState.copy(
                     isSyncing = syncState is BackupSyncState.InProgress,
+                    error = (syncState as? BackupSyncState.Error)?.error?.toUI(),
                 )
             )
         }
@@ -377,12 +380,17 @@ internal class SettingsViewModel(
 
     // ── Google Drive OAuth ─────────────────────────────────────────────────────
 
-    fun getGoogleSignInIntent(): Intent? =
-        googleDriveProvider.getSignInIntent(application)
+    suspend fun getGoogleAuthorizationIntentSender(): IntentSender? =
+        googleDriveProvider.getAuthorizationIntentSender(application)
 
-    fun onGoogleSignInResult(resultCode: Int, data: android.content.Intent?) {
+    fun onGoogleSignInResult(data: Intent?) {
         viewModelScope.launch {
-            val result = googleDriveProvider.handleSignInResult(application, resultCode, data)
+            val result = googleDriveProvider.handleSignInResult(
+                context = application,
+                resultCode = Activity.RESULT_OK,
+                data = data,
+            )
+
             if (result is BackupResult.Success) {
                 backupRepository.connect(application, CloudProviderType.GOOGLE_DRIVE)
                 refreshBackupState()
@@ -434,7 +442,7 @@ internal class SettingsViewModel(
 
     fun onSyncNow() {
         viewModelScope.launch {
-            backupRepository.sync(application)
+            backupRepository.sync()
             refreshBackupState()
         }
     }

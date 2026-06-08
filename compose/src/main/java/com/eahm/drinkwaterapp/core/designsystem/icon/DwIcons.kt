@@ -1283,6 +1283,42 @@ object DwIcons {
         }.build()
     }
 
+    val Warning: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "DwWarning",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).apply {
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 1.8f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round,
+            ) {
+                moveTo(12f, 3f)
+                lineTo(2.27f, 20f)
+                horizontalLineTo(21.73f)
+                close()
+            }
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+            ) {
+                moveTo(12f, 10f); lineTo(12f, 14f)
+            }
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+            ) {
+                moveTo(12f, 17f); lineTo(12.01f, 17f)
+            }
+        }.build()
+    }
+
     val BarChartFilled: ImageVector by lazy {
         ImageVector.Builder(
             name = "DwBarChartFilled",

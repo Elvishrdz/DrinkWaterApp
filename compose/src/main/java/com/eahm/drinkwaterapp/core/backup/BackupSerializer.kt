@@ -2,7 +2,10 @@ package com.eahm.drinkwaterapp.core.backup
 
 import com.eahm.drinkwaterapp.backup.BackupDataSource
 import com.eahm.drinkwaterapp.backup.BackupError
+import com.eahm.drinkwaterapp.backup.BackupMigrationManager
+import com.eahm.drinkwaterapp.backup.BackupPreferences
 import com.eahm.drinkwaterapp.backup.BackupResult
+import com.eahm.drinkwaterapp.core.config.AppInfoService
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import kotlinx.coroutines.flow.first
@@ -26,9 +29,12 @@ import kotlinx.serialization.json.put
 class BackupSerializer(
     private val database: AppDatabase,
     private val prefs: PrefsStorage,
+    private val backupPreferences: BackupPreferences,
+    private val appInfo: AppInfoService,
     private val json: Json,
 ) : BackupDataSource {
 
+    @Suppress("LongMethod")
     override suspend fun serialize(): String {
         val historyRecords = database.getHistoryDao().getAll().first()
         val dailyGoals = database.getDailyGoalDao().getAllGoals().first()
@@ -42,7 +48,14 @@ class BackupSerializer(
                     put("timestamp", record.timestamp.toString())
                     put("device_id", record.deviceId)
                     put("updated_at", record.updatedAt)
-                    if (record.deletedAt != null) put("deleted_at", record.deletedAt) else put("deleted_at", null as String?)
+                    if (record.deletedAt != null) {
+                        put(
+                            "deleted_at",
+                            record.deletedAt
+                        )
+                    } else {
+                        put("deleted_at", null as String?)
+                    }
                 })
             }
         }
@@ -55,7 +68,14 @@ class BackupSerializer(
                     put("goal_ml", goal.goalMl)
                     put("device_id", goal.deviceId)
                     put("updated_at", goal.updatedAt)
-                    if (goal.deletedAt != null) put("deleted_at", goal.deletedAt) else put("deleted_at", null as String?)
+                    if (goal.deletedAt != null) {
+                        put(
+                            "deleted_at",
+                            goal.deletedAt
+                        )
+                    } else {
+                        put("deleted_at", null as String?)
+                    }
                 })
             }
         }
@@ -70,10 +90,22 @@ class BackupSerializer(
             put("best_drink_streak", prefs.getBestDrinkStreak().first())
         }
 
-        val root = buildJsonObject {
+        val dataJson = buildJsonObject {
             put("history", historyJson)
             put("daily_goals", goalsJson)
             put("preferences", prefsJson)
+        }
+
+        val metadataJson = buildJsonObject {
+            put("schema_version", BackupMigrationManager.currentSchema)
+            put("app_version", appInfo.versionName)
+            put("created_at", System.currentTimeMillis())
+            put("device_id", backupPreferences.getDeviceId())
+        }
+
+        val root = buildJsonObject {
+            put("metadata", metadataJson)
+            put("data", dataJson)
         }
 
         return json.encodeToString(JsonObject.serializer(), root)
@@ -85,8 +117,11 @@ class BackupSerializer(
             database.getHistoryDao().deleteAll()
             database.getDailyGoalDao().deleteAll()
 
+            // Records live under the "data" envelope; fall back to root for legacy flat files.
+            val dataBlock = data["data"]?.jsonObject ?: data
+
             // Re-insert history
-            val historyArray = data["history"]?.jsonArray ?: return BackupResult.Success(Unit)
+            val historyArray = dataBlock["history"]?.jsonArray ?: return BackupResult.Success(Unit)
             val historyEntities = historyArray.map { element ->
                 val obj = element.jsonObject
                 com.eahm.drinkwaterapp.core.database.entity.HistoryEntity(
@@ -108,7 +143,7 @@ class BackupSerializer(
             }
 
             // Re-insert daily goals
-            val goalsArray = data["daily_goals"]?.jsonArray ?: emptyList()
+            val goalsArray = dataBlock["daily_goals"]?.jsonArray ?: emptyList()
             goalsArray.forEach { element ->
                 val obj = element.jsonObject
                 val goal = com.eahm.drinkwaterapp.core.database.entity.DailyGoalEntity(
@@ -125,7 +160,7 @@ class BackupSerializer(
             }
 
             // Restore preferences
-            val prefsObj = data["preferences"]?.jsonObject
+            val prefsObj = dataBlock["preferences"]?.jsonObject
             if (prefsObj != null) {
                 prefsObj["username"]?.jsonPrimitive?.contentOrNull
                     ?.let { prefs.setUsername(it) }
@@ -160,7 +195,10 @@ class BackupSerializer(
         }
     }
 
-    override suspend fun findNearExpiryTombstones(warningThreshold: Long, expiryThreshold: Long): Int {
+    override suspend fun findNearExpiryTombstones(
+        warningThreshold: Long,
+        expiryThreshold: Long
+    ): Int {
         val history = database.getHistoryDao().getAll().first()
         val goals = database.getDailyGoalDao().getAllGoals().first()
         val historyNear = history.count { record ->
@@ -235,7 +273,8 @@ class BackupSerializer(
 
             val history = dataBlock["history"]?.jsonArray?.mapNotNull { element ->
                 val obj = element.jsonObject
-                val timestampStr = obj["timestamp"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null
+                val timestampStr =
+                    obj["timestamp"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null
                 val timestamp = runCatching {
                     kotlinx.datetime.LocalDateTime.parse(timestampStr)
                         .toInstant(TimeZone.currentSystemDefault())
@@ -255,7 +294,8 @@ class BackupSerializer(
 
             val goals = dataBlock["daily_goals"]?.jsonArray?.mapNotNull { element ->
                 val obj = element.jsonObject
-                val dateStr = obj["effective_date"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null
+                val dateStr =
+                    obj["effective_date"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null
                 val epochDays = runCatching {
                     kotlinx.datetime.LocalDate.parse(dateStr).toEpochDays().toInt()
                 }.getOrNull() ?: return@mapNotNull null
@@ -272,9 +312,12 @@ class BackupSerializer(
 
             val prefsObj = dataBlock["preferences"]?.jsonObject
             val prefsRecord = com.eahm.drinkwaterapp.backup.PreferencesRecord(
-                unitPreference = prefsObj?.get("unit_preference")?.jsonPrimitive?.contentOrNull ?: "ML",
-                timeFormat = prefsObj?.get("time_format_preference")?.jsonPrimitive?.contentOrNull ?: "SYSTEM",
-                amountPerDrink = prefsObj?.get("amount_per_drink")?.jsonPrimitive?.double?.toFloat() ?: 250f,
+                unitPreference = prefsObj?.get("unit_preference")?.jsonPrimitive?.contentOrNull
+                    ?: "ML",
+                timeFormat = prefsObj?.get("time_format_preference")?.jsonPrimitive?.contentOrNull
+                    ?: "SYSTEM",
+                amountPerDrink = prefsObj?.get("amount_per_drink")?.jsonPrimitive?.double?.toFloat()
+                    ?: 250f,
                 deviceId = prefsObj?.get("device_id")?.jsonPrimitive?.contentOrNull ?: "",
                 updatedAt = prefsObj?.get("updated_at")?.jsonPrimitive?.longOrNull ?: 0L,
             )

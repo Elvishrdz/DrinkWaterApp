@@ -58,7 +58,9 @@ internal val backupModule = module {
     }
 
     // Bridge implementations
-    single { BackupSerializer(get(), get(), get(backupJsonQualifier)) } bind BackupDataSource::class
+    single {
+        BackupSerializer(get(), get(), get(), get(), get(backupJsonQualifier))
+    } bind BackupDataSource::class
     singleOf(::WorkManagerBackupScheduler) bind BackupScheduler::class
 
     // BackupPreferences bridge — reuse the DataStorePrefsStorage single

@@ -7,6 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingDrink
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
+import com.eahm.drinkwaterapp.backup.BackupPreferences
+import com.eahm.drinkwaterapp.backup.BackupRepository
+import com.eahm.drinkwaterapp.backup.SyncCoordinator
 import com.eahm.drinkwaterapp.core.billing.PurchaseManager
 import com.eahm.drinkwaterapp.core.data.confetti.ConfettiController
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
@@ -27,9 +30,6 @@ import com.eahm.drinkwaterapp.feature.drink.ui.DrinkLogEntry
 import com.eahm.drinkwaterapp.system.alarm.AlarmSchedulerV3
 import com.eahm.drinkwaterapp.system.service.goalcelebration.GoalCelebrationOverlay
 import com.eahm.drinkwaterapp.system.service.goalcelebration.data.CelebrationStyle
-import com.eahm.drinkwaterapp.backup.BackupPreferences
-import com.eahm.drinkwaterapp.backup.BackupRepository
-import com.eahm.drinkwaterapp.backup.SyncCoordinator
 import com.eahm.drinkwaterapp.system.service.goalcelebration.extension.createIntent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -313,7 +313,7 @@ internal class DrinkViewModel(
         _tombstoneWarningPending.value = false
         viewModelScope.launch {
             backupPreferences.setTombstoneWarningPending(false)
-            backupRepository.sync(application)
+            backupRepository.sync()
         }
     }
 

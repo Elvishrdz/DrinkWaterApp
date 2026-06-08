@@ -688,6 +688,9 @@
     <string name="backup_migration_body">Transfiriendo tus datos al nuevo proveedor.</string>
     <string name="backup_migration_success">Migración completada</string>
     <string name="backup_migration_error">Error en la migración</string>
+    <string name="backup_error_not_signed_in">No has iniciado sesión. Vuelve a conectar tu cuenta para reanudar las copias de seguridad.</string>
+    <string name="backup_error_unknown">Algo salió mal con la copia de seguridad. Por favor, inténtalo de nuevo.</string>
+    <string name="backup_error_dismiss">Cerrar</string>
 
     <!-- Copia de seguridad — Hoja de cambio de proveedor -->
     <string name="backup_change_title">Cambiar proveedor de copia</string>

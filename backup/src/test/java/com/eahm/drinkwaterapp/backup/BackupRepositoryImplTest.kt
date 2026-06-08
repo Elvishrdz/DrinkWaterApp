@@ -4,6 +4,7 @@ import com.eahm.drinkwaterapp.backup.fake.FakeBackupDataSource
 import com.eahm.drinkwaterapp.backup.fake.FakeBackupPreferences
 import com.eahm.drinkwaterapp.backup.fake.FakeBackupScheduler
 import com.eahm.drinkwaterapp.backup.fake.FakeCloudBackupProvider
+import io.mockk.mockk
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -21,7 +22,8 @@ class BackupRepositoryImplTest {
         val registry = BackupProviderRegistry(googleProvider, dropboxProvider)
         val scheduler = FakeBackupScheduler()
         val mutex = Mutex()
-        val syncUseCase = SyncBackupUseCase(mutex, dataSource, prefs, MergeEngine(), SyncConflictResolver())
+        val syncUseCase =
+            SyncBackupUseCase(mutex, dataSource, prefs, MergeEngine(), SyncConflictResolver())
         val restoreUseCase = RestoreBackupUseCase(dataSource)
         val checkStatusUseCase = CheckBackupStatusUseCase()
         val disconnectUseCase = DisconnectBackupUseCase(registry, prefs, scheduler)
@@ -29,6 +31,7 @@ class BackupRepositoryImplTest {
         val connectUseCase = ConnectBackupUseCase(registry, prefs, syncUseCase)
 
         return BackupRepositoryImpl(
+            application = mockk(relaxed = true),
             registry = registry,
             prefs = prefs,
             connectUseCase = connectUseCase,
@@ -49,7 +52,7 @@ class BackupRepositoryImplTest {
     @Test
     fun `sync returns Failure(NoProviderSelected) when no provider in prefs`() = runTest {
         val repo = buildRepository(prefs = FakeBackupPreferences())
-        val result = repo.sync(null)
+        val result = repo.sync()
         assertTrue(result is BackupResult.Failure)
         assertEquals(BackupError.NoProviderSelected, result.error)
     }
@@ -60,7 +63,7 @@ class BackupRepositoryImplTest {
             backupProvider = CloudProviderType.GOOGLE_DRIVE.id
         }
         val repo = buildRepository(prefs = prefs)
-        val result = repo.sync(null)
+        val result = repo.sync()
         assertTrue(result is BackupResult.Success)
     }
 
@@ -77,7 +80,7 @@ class BackupRepositoryImplTest {
         val stateFlow = field.get(repo) as kotlinx.coroutines.flow.MutableStateFlow<BackupSyncState>
         stateFlow.value = BackupSyncState.InProgress
 
-        val result = repo.sync(null)
+        val result = repo.sync()
         assertTrue(result is BackupResult.Success)
         assertEquals(SyncResult.AlreadyInProgress, result.value)
     }
@@ -88,7 +91,7 @@ class BackupRepositoryImplTest {
             backupProvider = CloudProviderType.GOOGLE_DRIVE.id
         }
         val repo = buildRepository(prefs = prefs)
-        repo.sync(null)
+        repo.sync()
         assertTrue(repo.syncState.value is BackupSyncState.Success)
     }
 
@@ -102,7 +105,7 @@ class BackupRepositoryImplTest {
             uploadResult = BackupResult.Failure(BackupError.NetworkUnavailable),
         )
         val repo = buildRepository(prefs = prefs, googleProvider = failingProvider)
-        repo.sync(null)
+        repo.sync()
         assertTrue(repo.syncState.value is BackupSyncState.Error)
     }
 

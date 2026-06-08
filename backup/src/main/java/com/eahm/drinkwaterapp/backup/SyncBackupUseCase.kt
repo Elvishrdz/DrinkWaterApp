@@ -71,6 +71,7 @@ class SyncBackupUseCase(
                 mergedData = when (conflict) {
                     is SyncConflict.GoalConflict ->
                         mergeEngine.resolveGoalConflict(mergedData, conflict, useRemote)
+
                     is SyncConflict.PreferencesConflict ->
                         mergeEngine.resolvePrefsConflict(mergedData, conflict, useRemote)
                 }
@@ -127,6 +128,7 @@ class SyncBackupUseCase(
         }
 
         val uploadResult = provider.upload(context, serialized)
+
         return if (uploadResult is BackupResult.Success) {
             val now = System.currentTimeMillis()
             prefs.setBackupContentHash(newHash)

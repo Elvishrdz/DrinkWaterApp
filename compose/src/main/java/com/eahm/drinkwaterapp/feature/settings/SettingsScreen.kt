@@ -8,6 +8,7 @@ import android.os.Build
 import android.provider.Settings
 import android.text.format.DateFormat
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -46,6 +47,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -117,6 +119,7 @@ import com.eahm.drinkwaterapp.feature.settings.ui.UnitsBottomSheet
 import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorDialog
 import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import java.util.Locale
@@ -134,6 +137,7 @@ internal fun SettingsScreen(
     val viewModel = koinViewModel<SettingsViewModel>()
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     val trackingService = koinInject<TrackingService>()
 
     var showClearDataDialog by rememberSaveable { mutableStateOf(false) }
@@ -223,9 +227,9 @@ internal fun SettingsScreen(
 
     // ── Google Sign-In for Backup ─────────────────────────────────────────────
     val googleSignInLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult(),
+        contract = ActivityResultContracts.StartIntentSenderForResult(),
     ) { result ->
-        viewModel.onGoogleSignInResult(result.resultCode, result.data)
+        viewModel.onGoogleSignInResult(result.data)
     }
 
     // Dropbox result arrives via onResume after the external browser flow
@@ -277,9 +281,14 @@ internal fun SettingsScreen(
         onConnectBackup = { provider ->
             when (provider) {
                 CloudProviderType.GOOGLE_DRIVE -> {
-                    val intent = viewModel.getGoogleSignInIntent()
-                    if (intent != null) googleSignInLauncher.launch(intent)
-                    else viewModel.onConnectBackup(CloudProviderType.GOOGLE_DRIVE)
+                    coroutineScope.launch {
+                        val sender = viewModel.getGoogleAuthorizationIntentSender()
+                        if (sender != null) {
+                            googleSignInLauncher.launch(IntentSenderRequest.Builder(sender).build())
+                        } else {
+                            viewModel.onConnectBackup(CloudProviderType.GOOGLE_DRIVE)
+                        }
+                    }
                 }
 
                 CloudProviderType.DROPBOX -> viewModel.startDropboxOAuth(context)

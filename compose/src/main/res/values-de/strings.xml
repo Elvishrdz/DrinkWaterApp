@@ -686,6 +686,9 @@
     <string name="backup_migration_body">Deine Daten werden zum neuen Anbieter übertragen.</string>
     <string name="backup_migration_success">Migration abgeschlossen</string>
     <string name="backup_migration_error">Migration fehlgeschlagen</string>
+    <string name="backup_error_not_signed_in">Du bist nicht angemeldet. Verbinde dein Konto erneut, um Backups fortzusetzen.</string>
+    <string name="backup_error_unknown">Beim Backup ist etwas schiefgelaufen. Bitte versuche es erneut.</string>
+    <string name="backup_error_dismiss">Schließen</string>
 
     <!-- Backup — Anbieter wechseln Blatt -->
     <string name="backup_change_title">Backup-Anbieter wechseln</string>
