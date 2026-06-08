@@ -153,6 +153,38 @@ else
 fi
 
 # -----------------------------------------------------------------------------
+section "IDE Tools (format-on-save & Detekt plugin)"
+# -----------------------------------------------------------------------------
+
+# Format-on-save: check workspace.xml for FormatOnSaveOptions component
+WORKSPACE="$ROOT/.idea/workspace.xml"
+if [[ -f "$WORKSPACE" ]] && grep -q "FormatOnSaveOptions" "$WORKSPACE" 2>/dev/null; then
+    ok "Format-on-save enabled (Reformat code + Optimize imports on ⌘S)"
+else
+    warn "Format-on-save not configured"
+    info "Run: bash scripts/ide/install-format-on-save.sh"
+fi
+
+# Detekt IntelliJ plugin: check user plugins directory (macOS only)
+if [[ "$(uname)" == "Darwin" ]]; then
+    AS_SUPPORT_DIR="$HOME/Library/Application Support/Google"
+    DETEKT_FOUND=false
+    while IFS= read -r dir; do
+        if [[ -d "$dir/plugins/detekt-intellij-plugin" ]]; then
+            DETEKT_FOUND=true
+            break
+        fi
+    done < <(ls -dt "$AS_SUPPORT_DIR"/AndroidStudio* 2>/dev/null)
+
+    if $DETEKT_FOUND; then
+        ok "Detekt IntelliJ plugin installed (inline violation highlighting)"
+    else
+        warn "Detekt IntelliJ plugin not found"
+        info "Run: bash scripts/ide/install-detekt-plugin.sh"
+    fi
+fi
+
+# -----------------------------------------------------------------------------
 section "Scripts"
 # -----------------------------------------------------------------------------
 
