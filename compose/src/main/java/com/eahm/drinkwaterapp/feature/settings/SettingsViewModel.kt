@@ -15,6 +15,7 @@ import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingService.Companion.OptOutSource
 import com.eahm.drinkwaterapp.backup.BackupPreferences
+import com.eahm.drinkwaterapp.backup.BackupRecoveryResolver
 import com.eahm.drinkwaterapp.backup.BackupRepository
 import com.eahm.drinkwaterapp.backup.BackupResult
 import com.eahm.drinkwaterapp.backup.BackupScheduler
@@ -56,6 +57,7 @@ import kotlinx.coroutines.launch
 import kotlin.time.ExperimentalTime
 import com.revenuecat.purchases.Package as RcPackage
 
+@Suppress("LongParameterList")
 @OptIn(ExperimentalTime::class)
 internal class SettingsViewModel(
     val application: Application,
@@ -74,6 +76,7 @@ internal class SettingsViewModel(
     private val dropboxProvider: DropboxBackupProvider,
     private val syncCoordinator: SyncCoordinator,
     private val syncConflictResolver: SyncConflictResolver,
+    private val backupRecoveryResolver: BackupRecoveryResolver,
 ) : ViewModel() {
 
     private val dao = database.getDailyGoalDao()
@@ -212,6 +215,9 @@ internal class SettingsViewModel(
         }
         .combine(syncConflictResolver.pendingConflict) { state, conflict ->
             state.copy(backupUiState = state.backupUiState.copy(pendingConflict = conflict))
+        }
+        .combine(backupRecoveryResolver.pendingCorruption) { state, corruption ->
+            state.copy(backupUiState = state.backupUiState.copy(pendingCorruption = corruption))
         }
         .stateIn(
             scope = viewModelScope,
@@ -456,6 +462,14 @@ internal class SettingsViewModel(
 
     fun onResolveConflict(useRemote: Boolean) {
         syncConflictResolver.resolve(useRemote)
+    }
+
+    fun onResolveCorruption(overwrite: Boolean) {
+        backupRecoveryResolver.resolve(overwrite)
+
+        if (overwrite) {
+            viewModelScope.launch { refreshBackupState() }
+        }
     }
 
     private suspend fun setGoalFromToday(goalMl: Float) {

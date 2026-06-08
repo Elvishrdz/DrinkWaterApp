@@ -1,5 +1,6 @@
 package com.eahm.drinkwaterapp.backup.di
 
+import com.eahm.drinkwaterapp.backup.BackupRecoveryResolver
 import com.eahm.drinkwaterapp.backup.BackupRepository
 import com.eahm.drinkwaterapp.backup.BackupRepositoryImpl
 import com.eahm.drinkwaterapp.backup.CheckBackupStatusUseCase
@@ -36,6 +37,7 @@ val backupCoreModule = module {
     singleOf(::BackupRepositoryImpl) bind BackupRepository::class
 
     singleOf(::SyncConflictResolver)
+    singleOf(::BackupRecoveryResolver)
     singleOf(::MergeEngine)
     single { TombstonePolicy() }
     single { PurgeTombstonesUseCase(get(), get(), get()) }

@@ -667,6 +667,14 @@
     <string name="backup_disconnect_body">Tus datos permanecerán en la nube, pero la sincronización automática se desactivará hasta que te vuelvas a conectar.</string>
     <string name="backup_disconnect_confirm">Desconectar</string>
 
+    <!-- Backup — Corrupted remote backup recovery -->
+    <string name="backup_corrupted_title">No se puede leer la copia de seguridad</string>
+    <string name="backup_corrupted_body_unreadable">No se pudo leer tu copia de seguridad en la nube. Es posible que se haya creado con una versión anterior de la app o que se haya modificado fuera de ella.</string>
+    <string name="backup_corrupted_body_unrecognized">Tu copia de seguridad en la nube tiene un formato no reconocido. Es posible que se haya creado con una versión anterior de la app o que se haya modificado fuera de ella.</string>
+    <string name="backup_corrupted_irreversible_warning">Sobrescribir reemplaza la copia de seguridad en la nube con los datos de este dispositivo. Esta acción no se puede deshacer: la copia actual no se podrá recuperar.</string>
+    <string name="backup_corrupted_overwrite">Sobrescribir con este dispositivo</string>
+    <string name="backup_corrupted_leave">Dejar la copia sin cambios</string>
+
     <!-- Copia de seguridad — Diálogo de conflicto de datos -->
     <string name="backup_conflict_title">Conflicto de datos</string>
     <string name="backup_conflict_body">Tienes datos locales y una copia en la nube. ¿Cuál quieres conservar?</string>

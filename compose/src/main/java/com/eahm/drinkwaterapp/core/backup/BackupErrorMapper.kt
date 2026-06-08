@@ -46,5 +46,8 @@ object BackupErrorMapper {
 
         is BackupError.MergeCorrupted ->
             UiText.DynamicString("Merge failed: remote backup data is corrupted")
+
+        is BackupError.RemoteCorrupted ->
+            UiText.DynamicString("Cloud backup is corrupted or unreadable")
     }
 }

@@ -135,14 +135,30 @@ class DropboxBackupProvider(
         val outputStream = ByteArrayOutputStream()
         client.files().downloadBuilder(BACKUP_PATH).download(outputStream)
         val rawString = outputStream.toString(Charsets.UTF_8.name())
-        val rawJson = json.parseToJsonElement(rawString).jsonObject
-        val metadata =
-            json.decodeFromJsonElement(BackupMetadata.serializer(), rawJson["metadata"]!!)
+
+        val rawJson = runCatching {
+            json.parseToJsonElement(rawString).jsonObject
+        }.getOrNull()
+            ?: return BackupResult.Failure(BackupError.RemoteCorrupted)
+
+        val metadataElement = rawJson["metadata"]
+            ?: return BackupResult.Failure(BackupError.RemoteCorrupted)
+
+        val metadata = runCatching {
+            json.decodeFromJsonElement(
+                deserializer = BackupMetadata.serializer(),
+                element = metadataElement,
+            )
+        }.getOrNull()
+            ?: return BackupResult.Failure(BackupError.RemoteCorrupted)
+
         BackupResult.Success(BackupFile(metadata = metadata, rawData = rawJson))
+
     }.getOrElse { e ->
         if (e.message?.contains("not_found", ignoreCase = true) == true)
             BackupResult.Failure(BackupError.FileNotFound)
-        else BackupResult.Failure(BackupError.DownloadFailed(e))
+        else
+            BackupResult.Failure(BackupError.DownloadFailed(e))
     }
 
     override suspend fun getRemoteMetadata(context: Context?): BackupResult<BackupMetadata?> =

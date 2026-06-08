@@ -15,4 +15,5 @@ sealed interface BackupError {
     data object SameProviderMigration : BackupError
     data class Unknown(val cause: Throwable? = null) : BackupError
     data object MergeCorrupted : BackupError
+    data object RemoteCorrupted : BackupError
 }

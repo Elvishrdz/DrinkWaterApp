@@ -665,6 +665,14 @@
     <string name="backup_disconnect_body">Deine Daten bleiben in der Cloud, aber die automatische Synchronisierung wird deaktiviert, bis du dich erneut verbindest.</string>
     <string name="backup_disconnect_confirm">Trennen</string>
 
+    <!-- Backup — Corrupted remote backup recovery -->
+    <string name="backup_corrupted_title">Backup kann nicht gelesen werden</string>
+    <string name="backup_corrupted_body_unreadable">Dein Cloud-Backup konnte nicht gelesen werden. Es wurde möglicherweise mit einer älteren Version der App erstellt oder außerhalb der App geändert.</string>
+    <string name="backup_corrupted_body_unrecognized">Dein Cloud-Backup hat ein unbekanntes Format. Es wurde möglicherweise mit einer älteren Version der App erstellt oder außerhalb der App geändert.</string>
+    <string name="backup_corrupted_irreversible_warning">Beim Überschreiben wird das Cloud-Backup durch die Daten dieses Geräts ersetzt. Dies kann nicht rückgängig gemacht werden — das aktuelle Backup kann nicht wiederhergestellt werden.</string>
+    <string name="backup_corrupted_overwrite">Mit diesem Gerät überschreiben</string>
+    <string name="backup_corrupted_leave">Backup unverändert lassen</string>
+
     <!-- Backup — Datenkonflikts-Dialog -->
     <string name="backup_conflict_title">Datenkonflikt</string>
     <string name="backup_conflict_body">Du hast lokale Daten und ein Cloud-Backup. Welches möchtest du behalten?</string>

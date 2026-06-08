@@ -667,6 +667,14 @@
     <string name="backup_disconnect_body">Your data will remain on the cloud, but auto-sync will be disabled until you reconnect.</string>
     <string name="backup_disconnect_confirm">Disconnect</string>
 
+    <!-- Backup — Corrupted remote backup recovery -->
+    <string name="backup_corrupted_title">Backup can\'t be read</string>
+    <string name="backup_corrupted_body_unreadable">Your cloud backup couldn\'t be read. It may have been created by an older version of the app or changed outside the app.</string>
+    <string name="backup_corrupted_body_unrecognized">Your cloud backup is in an unrecognized format. It may have been created by an older version of the app or changed outside the app.</string>
+    <string name="backup_corrupted_irreversible_warning">Overwriting replaces the cloud backup with this device\'s data. This can\'t be undone — the current backup can\'t be recovered.</string>
+    <string name="backup_corrupted_overwrite">Overwrite with this device</string>
+    <string name="backup_corrupted_leave">Leave backup unchanged</string>
+
     <!-- Backup — Restore conflict dialog -->
     <string name="backup_conflict_title">Data conflict</string>
     <string name="backup_conflict_body">You have local data and a cloud backup. Which one do you want to keep?</string>

@@ -10,6 +10,7 @@ class SyncBackupUseCase(
     private val prefs: BackupPreferences,
     private val mergeEngine: MergeEngine,
     private val conflictResolver: SyncConflictResolver,
+    private val recoveryResolver: BackupRecoveryResolver,
 ) {
 
     suspend operator fun invoke(
@@ -29,6 +30,18 @@ class SyncBackupUseCase(
                 downloadResult.error is BackupError.FileNotFound
             ) {
                 return uploadLocal(context, provider, deviceId)
+            }
+
+            // Remote file exists but doesn't match our spec → ask the user what to do.
+            if (downloadResult is BackupResult.Failure &&
+                downloadResult.error is BackupError.RemoteCorrupted
+            ) {
+                return handleCorruptedRemote(
+                    context = context,
+                    provider = provider,
+                    deviceId = deviceId,
+                    reason = CorruptedBackup.Reason.UNREADABLE,
+                )
             }
 
             // Any other download error → propagate
@@ -54,9 +67,15 @@ class SyncBackupUseCase(
                 remoteFile.rawData
             }
 
-            // Step 3: Parse remote into BackupData
+            // Step 3: Parse remote into BackupData. A null here means the file was
+            // readable but its structure is unrecognizable → user recovery decision.
             val remoteData = dataSource.parseRemoteData(migratedRaw)
-                ?: return BackupResult.Failure(BackupError.MergeCorrupted)
+                ?: return handleCorruptedRemote(
+                    context = context,
+                    provider = provider,
+                    deviceId = deviceId,
+                    reason = CorruptedBackup.Reason.UNRECOGNIZED_STRUCTURE,
+                )
 
             // Step 4: Read local data
             val localData = dataSource.readLocalData(deviceId)
@@ -114,16 +133,38 @@ class SyncBackupUseCase(
         }
     }
 
+    /**
+     * Remote backup is unusable. Ask the user (suspends) whether to overwrite it with
+     * this device's data. If they decline, the remote file is left exactly as-is.
+     * Overwriting is irreversible — the previous remote contents cannot be recovered.
+     */
+    private suspend fun handleCorruptedRemote(
+        context: Context?,
+        provider: CloudBackupProvider,
+        deviceId: String,
+        reason: CorruptedBackup.Reason,
+    ): BackupResult<SyncResult> {
+        prefs.setBackupLastError(BackupError.RemoteCorrupted.javaClass.simpleName)
+        val overwrite = recoveryResolver.awaitDecision(CorruptedBackup(reason))
+        return if (overwrite) {
+            uploadLocal(context, provider, deviceId, force = true)
+        } else {
+            // User declined — do nothing to the backup.
+            BackupResult.Success(SyncResult.SkippedNoChanges)
+        }
+    }
+
     private suspend fun uploadLocal(
         context: Context?,
         provider: CloudBackupProvider,
         deviceId: String,
+        force: Boolean = false,
     ): BackupResult<SyncResult> {
         val serialized = dataSource.serialize()
         val newHash = sha256(serialized)
         val storedHash = prefs.getBackupContentHash()
 
-        if (newHash == storedHash) {
+        if (!force && newHash == storedHash) {
             return BackupResult.Success(SyncResult.SkippedNoChanges)
         }
 

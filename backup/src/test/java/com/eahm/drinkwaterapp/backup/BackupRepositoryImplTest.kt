@@ -22,8 +22,14 @@ class BackupRepositoryImplTest {
         val registry = BackupProviderRegistry(googleProvider, dropboxProvider)
         val scheduler = FakeBackupScheduler()
         val mutex = Mutex()
-        val syncUseCase =
-            SyncBackupUseCase(mutex, dataSource, prefs, MergeEngine(), SyncConflictResolver())
+        val syncUseCase = SyncBackupUseCase(
+            mutex = mutex,
+            dataSource = dataSource,
+            prefs = prefs,
+            mergeEngine = MergeEngine(),
+            conflictResolver = SyncConflictResolver(),
+            recoveryResolver = BackupRecoveryResolver(),
+        )
         val restoreUseCase = RestoreBackupUseCase(dataSource)
         val checkStatusUseCase = CheckBackupStatusUseCase()
         val disconnectUseCase = DisconnectBackupUseCase(registry, prefs, scheduler)

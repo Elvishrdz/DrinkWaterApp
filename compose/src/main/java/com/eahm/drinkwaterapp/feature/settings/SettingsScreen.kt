@@ -298,6 +298,7 @@ internal fun SettingsScreen(
         onDisconnectBackupTap = viewModel::onDisconnectBackup,
         onSyncOnSaveToggled = viewModel::onSyncOnSaveToggled,
         onResolveConflict = viewModel::onResolveConflict,
+        onResolveCorruption = viewModel::onResolveCorruption,
         modifier = modifier,
     )
 
@@ -462,6 +463,7 @@ internal fun SettingsContent(
     onDisconnectBackupTap: () -> Unit = {},
     onSyncOnSaveToggled: (Boolean) -> Unit = {},
     onResolveConflict: (useRemote: Boolean) -> Unit = {},
+    onResolveCorruption: (overwrite: Boolean) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -568,6 +570,7 @@ internal fun SettingsContent(
                         onDisconnect = { showDisconnectBackupDialog = true },
                         onSyncOnSaveToggled = onSyncOnSaveToggled,
                         onResolveConflict = onResolveConflict,
+                        onResolveCorruption = onResolveCorruption,
                     )
 
                     if (showProviderPickerSheet) {

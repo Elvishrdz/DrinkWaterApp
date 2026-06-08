@@ -3,6 +3,7 @@ package com.eahm.drinkwaterapp.feature.settings.backup
 import androidx.compose.runtime.Immutable
 import com.eahm.drinkwaterapp.backup.BackupError
 import com.eahm.drinkwaterapp.backup.CloudProviderType
+import com.eahm.drinkwaterapp.backup.CorruptedBackup
 import com.eahm.drinkwaterapp.backup.SeenDevice
 import com.eahm.drinkwaterapp.backup.SyncConflict
 
@@ -20,6 +21,8 @@ data class BackupUiState(
     val seenDevices: List<SeenDevice> = emptyList(),
     // Non-null when the sync engine is waiting for user conflict resolution.
     val pendingConflict: SyncConflict? = null,
+    // Non-null when the remote backup is corrupted and awaiting a user recovery decision.
+    val pendingCorruption: CorruptedBackup? = null,
     val error: BackupUIError? = null,
 )
 

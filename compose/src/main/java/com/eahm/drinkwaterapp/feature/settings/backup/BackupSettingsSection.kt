@@ -58,12 +58,21 @@ internal fun BackupSettingsSection(
     onSyncNow: () -> Unit,
     onSyncOnSaveToggled: (Boolean) -> Unit = {},
     onResolveConflict: (useRemote: Boolean) -> Unit = {},
+    onResolveCorruption: (overwrite: Boolean) -> Unit = {},
 ) {
     state.pendingConflict?.let { conflict ->
         SyncConflictSheet(
             conflict = conflict,
             onKeepLocal = { onResolveConflict(false) },
             onUseRemote = { onResolveConflict(true) },
+        )
+    }
+
+    state.pendingCorruption?.let { corruption ->
+        CorruptedBackupDialog(
+            corruption = corruption,
+            onOverwrite = { onResolveCorruption(true) },
+            onLeave = { onResolveCorruption(false) },
         )
     }
 

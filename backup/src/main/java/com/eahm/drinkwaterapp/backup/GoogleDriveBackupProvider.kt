@@ -243,12 +243,21 @@ class GoogleDriveBackupProvider(
             return BackupResult.Failure(BackupError.DownloadFailed())
         }
 
-        // TODO: metadata is not in the json raw. was this stored the first time?
-        val rawJson = json.parseToJsonElement(string = response.bodyAsText()).jsonObject
-        val metadata = json.decodeFromJsonElement(
-            deserializer = BackupMetadata.serializer(),
-            element = rawJson["metadata"]!!,
-        )
+        val rawJson = runCatching {
+            json.parseToJsonElement(response.bodyAsText()).jsonObject
+        }.getOrNull()
+            ?: return BackupResult.Failure(BackupError.RemoteCorrupted)
+
+        val metadataElement = rawJson["metadata"]
+            ?: return BackupResult.Failure(BackupError.RemoteCorrupted)
+
+        val metadata = runCatching {
+            json.decodeFromJsonElement(
+                deserializer = BackupMetadata.serializer(),
+                element = metadataElement,
+            )
+        }.getOrNull()
+            ?: return BackupResult.Failure(BackupError.RemoteCorrupted)
 
         BackupResult.Success(BackupFile(metadata = metadata, rawData = rawJson))
 
