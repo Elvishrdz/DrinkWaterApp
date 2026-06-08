@@ -387,18 +387,17 @@ internal class SettingsViewModel(
     // ── Google Drive OAuth ─────────────────────────────────────────────────────
 
     suspend fun getGoogleAuthorizationIntentSender(): IntentSender? =
-        googleDriveProvider.getAuthorizationIntentSender(application)
+        googleDriveProvider.getAuthorizationIntentSender()
 
     fun onGoogleSignInResult(data: Intent?) {
         viewModelScope.launch {
             val result = googleDriveProvider.handleSignInResult(
-                context = application,
                 resultCode = Activity.RESULT_OK,
                 data = data,
             )
 
             if (result is BackupResult.Success) {
-                backupRepository.connect(application, CloudProviderType.GOOGLE_DRIVE)
+                backupRepository.connect(CloudProviderType.GOOGLE_DRIVE)
                 refreshBackupState()
             }
         }
@@ -408,9 +407,9 @@ internal class SettingsViewModel(
 
     private var waitingForDropboxOAuth = false
 
-    fun startDropboxOAuth(context: android.content.Context) {
+    fun startDropboxOAuth() {
         waitingForDropboxOAuth = true
-        dropboxProvider.startOAuth(context)
+        dropboxProvider.startOAuth()
     }
 
     fun onDropboxResume() {
@@ -418,12 +417,11 @@ internal class SettingsViewModel(
         waitingForDropboxOAuth = false
         viewModelScope.launch {
             val result = dropboxProvider.handleSignInResult(
-                application,
-                android.app.Activity.RESULT_OK,
-                null
+                resultCode = Activity.RESULT_OK,
+                data = null
             )
             if (result is BackupResult.Success) {
-                backupRepository.connect(application, CloudProviderType.DROPBOX)
+                backupRepository.connect(CloudProviderType.DROPBOX)
                 refreshBackupState()
             }
         }
@@ -433,14 +431,14 @@ internal class SettingsViewModel(
 
     fun onConnectBackup(providerType: CloudProviderType) {
         viewModelScope.launch {
-            backupRepository.connect(application, providerType)
+            backupRepository.connect(providerType)
             refreshBackupState()
         }
     }
 
     fun onDisconnectBackup() {
         viewModelScope.launch {
-            backupRepository.disconnect(application)
+            backupRepository.disconnect()
             backupScheduler.cancelAll()
             refreshBackupState()
         }

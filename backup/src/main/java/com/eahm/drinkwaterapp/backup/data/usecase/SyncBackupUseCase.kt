@@ -1,6 +1,5 @@
 package com.eahm.drinkwaterapp.backup.data.usecase
 
-import android.content.Context
 import com.eahm.drinkwaterapp.backup.data.BackupMigrationManager
 import com.eahm.drinkwaterapp.backup.data.BackupRecoveryResolver
 import com.eahm.drinkwaterapp.backup.data.MergeEngine
@@ -27,7 +26,6 @@ class SyncBackupUseCase(
 ) {
 
     suspend operator fun invoke(
-        context: Context?,
         provider: CloudBackupProvider,
     ): BackupResult<SyncResult> {
         if (!mutex.tryLock()) return BackupResult.Success(SyncResult.AlreadyInProgress)
@@ -36,13 +34,13 @@ class SyncBackupUseCase(
             val deviceId = prefs.getDeviceId()
 
             // Step 1: Try to download the remote file
-            val downloadResult = provider.download(context)
+            val downloadResult = provider.download()
 
             // First sync: no remote file yet — just upload local data
             if (downloadResult is BackupResult.Failure &&
                 downloadResult.error is BackupError.FileNotFound
             ) {
-                return uploadLocal(context, provider, deviceId)
+                return uploadLocal(provider, deviceId)
             }
 
             // Remote file exists but doesn't match our spec → ask the user what to do.
@@ -50,7 +48,6 @@ class SyncBackupUseCase(
                 downloadResult.error is BackupError.RemoteCorrupted
             ) {
                 return handleCorruptedRemote(
-                    context = context,
                     provider = provider,
                     deviceId = deviceId,
                     reason = CorruptedBackup.Reason.UNREADABLE,
@@ -84,7 +81,6 @@ class SyncBackupUseCase(
             // readable but its structure is unrecognizable → user recovery decision.
             val remoteData = dataSource.parseRemoteData(migratedRaw)
                 ?: return handleCorruptedRemote(
-                    context = context,
                     provider = provider,
                     deviceId = deviceId,
                     reason = CorruptedBackup.Reason.UNRECOGNIZED_STRUCTURE,
@@ -126,7 +122,7 @@ class SyncBackupUseCase(
             }
 
             // Step 10: Upload
-            val uploadResult = provider.upload(context, serialized)
+            val uploadResult = provider.upload(serialized)
             if (uploadResult is BackupResult.Failure) {
                 prefs.setBackupLastError(uploadResult.error.javaClass.simpleName)
                 return uploadResult
@@ -152,7 +148,6 @@ class SyncBackupUseCase(
      * Overwriting is irreversible — the previous remote contents cannot be recovered.
      */
     private suspend fun handleCorruptedRemote(
-        context: Context?,
         provider: CloudBackupProvider,
         deviceId: String,
         reason: CorruptedBackup.Reason,
@@ -160,7 +155,7 @@ class SyncBackupUseCase(
         prefs.setBackupLastError(BackupError.RemoteCorrupted.javaClass.simpleName)
         val overwrite = recoveryResolver.awaitDecision(CorruptedBackup(reason))
         return if (overwrite) {
-            uploadLocal(context, provider, deviceId, force = true)
+            uploadLocal(provider, deviceId, force = true)
         } else {
             // User declined — do nothing to the backup.
             BackupResult.Success(SyncResult.SkippedNoChanges)
@@ -168,7 +163,6 @@ class SyncBackupUseCase(
     }
 
     private suspend fun uploadLocal(
-        context: Context?,
         provider: CloudBackupProvider,
         deviceId: String,
         force: Boolean = false,
@@ -181,7 +175,7 @@ class SyncBackupUseCase(
             return BackupResult.Success(SyncResult.SkippedNoChanges)
         }
 
-        val uploadResult = provider.upload(context, serialized)
+        val uploadResult = provider.upload(serialized)
 
         return if (uploadResult is BackupResult.Success) {
             val now = System.currentTimeMillis()

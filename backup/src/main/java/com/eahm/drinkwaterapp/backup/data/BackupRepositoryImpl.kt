@@ -1,7 +1,5 @@
 package com.eahm.drinkwaterapp.backup.data
 
-import android.app.Application
-import android.content.Context
 import com.eahm.drinkwaterapp.backup.data.usecase.CheckBackupStatusUseCase
 import com.eahm.drinkwaterapp.backup.data.usecase.ConnectBackupUseCase
 import com.eahm.drinkwaterapp.backup.data.usecase.DisconnectBackupUseCase
@@ -25,7 +23,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 
 class BackupRepositoryImpl(
-    private val application: Application,
     private val registry: BackupProviderRegistry,
     private val prefs: BackupPreferences,
     private val connectUseCase: ConnectBackupUseCase,
@@ -48,11 +45,10 @@ class BackupRepositoryImpl(
     }
 
     override suspend fun connect(
-        context: Context?,
         providerType: CloudProviderType,
     ): BackupResult<CloudUser> = withContext(Dispatchers.IO) {
         _syncState.value = BackupSyncState.InProgress
-        connectUseCase(context, providerType).also { result ->
+        connectUseCase(providerType).also { result ->
             _syncState.value = when (result) {
                 is BackupResult.Success -> BackupSyncState.Success(System.currentTimeMillis())
                 is BackupResult.Failure -> BackupSyncState.Error(result.error)
@@ -71,7 +67,6 @@ class BackupRepositoryImpl(
             return@withContext provider
         }
         syncUseCase(
-            context = application,
             provider = (provider as BackupResult.Success).value,
         ).also { result ->
             _syncState.value = when (result) {
@@ -81,31 +76,29 @@ class BackupRepositoryImpl(
         }
     }
 
-    override suspend fun restore(context: Context?): BackupResult<Unit> =
+    override suspend fun restore(): BackupResult<Unit> =
         withContext(Dispatchers.IO) {
             val provider = resolveProvider()
             if (provider is BackupResult.Failure) return@withContext provider
-            restoreUseCase(context, (provider as BackupResult.Success).value)
+            restoreUseCase((provider as BackupResult.Success).value)
         }
 
-    override suspend fun checkRemoteStatus(
-        context: Context?,
-    ): BackupResult<RemoteBackupStatus?> = withContext(Dispatchers.IO) {
-        val provider = resolveProvider()
-        if (provider is BackupResult.Failure) return@withContext provider
-        checkStatusUseCase(context, (provider as BackupResult.Success).value)
-    }
+    override suspend fun checkRemoteStatus(): BackupResult<RemoteBackupStatus?> =
+        withContext(Dispatchers.IO) {
+            val provider = resolveProvider()
+            if (provider is BackupResult.Failure) return@withContext provider
+            checkStatusUseCase((provider as BackupResult.Success).value)
+        }
 
-    override suspend fun disconnect(context: Context?): BackupResult<Unit> =
-        withContext(Dispatchers.IO) { disconnectUseCase(context) }
+    override suspend fun disconnect(): BackupResult<Unit> =
+        withContext(Dispatchers.IO) { disconnectUseCase() }
 
     override suspend fun migrateProvider(
-        context: Context?,
         from: CloudProviderType,
         to: CloudProviderType,
     ): BackupResult<Unit> = withContext(Dispatchers.IO) {
         val fromProvider = registry.get(from)
         val toProvider = registry.get(to)
-        migrateUseCase(context, fromProvider, toProvider)
+        migrateUseCase(fromProvider, toProvider)
     }
 }

@@ -46,8 +46,8 @@ internal val backupModule = module {
     single { WorkManager.getInstance(get()) }
 
     // Provider implementations — explicit factories to inject qualified Json
-    single { GoogleDriveBackupProvider(get(), get(backupJsonQualifier)) }
-    single { DropboxBackupProvider(get(backupJsonQualifier)) }
+    single { GoogleDriveBackupProvider(get(), get(), get(backupJsonQualifier)) }
+    single { DropboxBackupProvider(get(), get(backupJsonQualifier)) }
 
     // Registry — explicit to avoid Koin ambiguity (two CloudBackupProvider params)
     single {

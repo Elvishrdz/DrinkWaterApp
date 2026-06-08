@@ -1,6 +1,5 @@
 package com.eahm.drinkwaterapp.backup.data.usecase
 
-import android.content.Context
 import com.eahm.drinkwaterapp.backup.data.BackupMigrationManager
 import com.eahm.drinkwaterapp.backup.domain.BackupDataSource
 import com.eahm.drinkwaterapp.backup.domain.CloudBackupProvider
@@ -11,10 +10,9 @@ class RestoreBackupUseCase(
     private val dataSource: BackupDataSource,
 ) {
     suspend operator fun invoke(
-        context: Context?,
         provider: CloudBackupProvider,
     ): BackupResult<Unit> {
-        val downloadResult = provider.download(context)
+        val downloadResult = provider.download()
         val backupFile = when (downloadResult) {
             is BackupResult.Success -> downloadResult.value
             is BackupResult.Failure -> return downloadResult

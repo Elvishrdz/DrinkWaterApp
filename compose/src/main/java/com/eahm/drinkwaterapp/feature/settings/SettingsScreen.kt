@@ -291,7 +291,7 @@ internal fun SettingsScreen(
                     }
                 }
 
-                CloudProviderType.DROPBOX -> viewModel.startDropboxOAuth(context)
+                CloudProviderType.DROPBOX -> viewModel.startDropboxOAuth()
             }
         },
         onSyncNow = viewModel::onSyncNow,

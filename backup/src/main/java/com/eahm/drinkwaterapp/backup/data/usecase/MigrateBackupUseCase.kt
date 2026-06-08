@@ -1,6 +1,5 @@
 package com.eahm.drinkwaterapp.backup.data.usecase
 
-import android.content.Context
 import com.eahm.drinkwaterapp.backup.domain.BackupPreferences
 import com.eahm.drinkwaterapp.backup.domain.CloudBackupProvider
 import com.eahm.drinkwaterapp.backup.domain.model.BackupError
@@ -12,7 +11,6 @@ class MigrateBackupUseCase(
     private val prefs: BackupPreferences,
 ) {
     suspend operator fun invoke(
-        context: Context?,
         from: CloudBackupProvider,
         to: CloudBackupProvider,
     ): BackupResult<Unit> {
@@ -20,12 +18,12 @@ class MigrateBackupUseCase(
 
         if (!mutex.tryLock()) return BackupResult.Failure(BackupError.Unknown(null))
         return try {
-            val backupFile = when (val dl = from.download(context)) {
+            val backupFile = when (val dl = from.download()) {
                 is BackupResult.Success -> dl.value
                 is BackupResult.Failure -> return dl
             }
 
-            val uploadResult = to.upload(context, backupFile.rawData.toString())
+            val uploadResult = to.upload(backupFile.rawData.toString())
             if (uploadResult is BackupResult.Failure) return uploadResult
 
             // Persist new provider

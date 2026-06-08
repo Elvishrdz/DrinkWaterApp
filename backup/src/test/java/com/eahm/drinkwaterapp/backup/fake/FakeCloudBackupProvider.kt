@@ -1,6 +1,5 @@
 package com.eahm.drinkwaterapp.backup.fake
 
-import android.content.Context
 import android.content.Intent
 import com.eahm.drinkwaterapp.backup.domain.CloudBackupProvider
 import com.eahm.drinkwaterapp.backup.domain.model.BackupError
@@ -25,41 +24,40 @@ class FakeCloudBackupProvider(
     var signOutCalled = false
     var lastUploadedData: String? = null
 
-    override fun getSignInIntent(context: Context?): Intent? = null
+    override fun getSignInIntent(): Intent? = null
 
     override suspend fun handleSignInResult(
-        context: Context?,
         resultCode: Int,
         data: Intent?,
     ): BackupResult<CloudUser> = signInResult
 
-    override suspend fun silentSignIn(context: Context?): BackupResult<CloudUser> = signInResult
+    override suspend fun silentSignIn(): BackupResult<CloudUser> = signInResult
 
-    override suspend fun signOut(context: Context?): BackupResult<Unit> {
+    override suspend fun signOut(): BackupResult<Unit> {
         signOutCalled = true
         return BackupResult.Success(Unit)
     }
 
-    override suspend fun isSignedIn(context: Context?): Boolean =
+    override suspend fun isSignedIn(): Boolean =
         signInResult is BackupResult.Success
 
-    override suspend fun getCurrentUser(context: Context?): CloudUser? =
+    override suspend fun getCurrentUser(): CloudUser? =
         (signInResult as? BackupResult.Success)?.value
 
-    override suspend fun upload(context: Context?, data: String): BackupResult<Unit> {
+    override suspend fun upload(data: String): BackupResult<Unit> {
         uploadCallCount++
         lastUploadedData = data
         return uploadResult
     }
 
-    override suspend fun download(context: Context?): BackupResult<BackupFile> {
+    override suspend fun download(): BackupResult<BackupFile> {
         downloadCallCount++
         return downloadResult
     }
 
-    override suspend fun getRemoteMetadata(context: Context?): BackupResult<BackupMetadata?> =
+    override suspend fun getRemoteMetadata(): BackupResult<BackupMetadata?> =
         metadataResult
 
-    override suspend fun deleteRemoteFile(context: Context?): BackupResult<Unit> =
+    override suspend fun deleteRemoteFile(): BackupResult<Unit> =
         BackupResult.Success(Unit)
 }

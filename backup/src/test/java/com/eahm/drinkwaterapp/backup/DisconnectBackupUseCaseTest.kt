@@ -29,7 +29,7 @@ class DisconnectBackupUseCaseTest {
         }
         val useCase = DisconnectBackupUseCase(buildRegistry(provider), prefs, FakeBackupScheduler())
 
-        useCase(null)
+        useCase()
 
         assertTrue(provider.signOutCalled)
     }
@@ -42,7 +42,7 @@ class DisconnectBackupUseCaseTest {
         }
         val useCase = DisconnectBackupUseCase(buildRegistry(), prefs, FakeBackupScheduler())
 
-        useCase(null)
+        useCase()
 
         assertTrue(prefs.clearCalled)
     }
@@ -52,7 +52,7 @@ class DisconnectBackupUseCaseTest {
         val scheduler = FakeBackupScheduler()
         val useCase = DisconnectBackupUseCase(buildRegistry(), FakeBackupPreferences(), scheduler)
 
-        useCase(null)
+        useCase()
 
         assertTrue(scheduler.cancelAllCalled)
     }
@@ -62,7 +62,7 @@ class DisconnectBackupUseCaseTest {
         val prefs = FakeBackupPreferences() // backupProvider = null
         val useCase = DisconnectBackupUseCase(buildRegistry(), prefs, FakeBackupScheduler())
 
-        val result = useCase(null)
+        val result = useCase()
 
         assertTrue(result is BackupResult.Success)
     }

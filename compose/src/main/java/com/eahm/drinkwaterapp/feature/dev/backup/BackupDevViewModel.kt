@@ -1,6 +1,5 @@
 package com.eahm.drinkwaterapp.feature.dev.backup
 
-import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.backup.data.BackupProviderRegistry
@@ -31,9 +30,9 @@ import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
+@Suppress("LongParameterList")
 @OptIn(ExperimentalTime::class)
 internal class BackupDevViewModel(
-    private val application: Application,
     private val registry: BackupProviderRegistry,
     private val connectUseCase: ConnectBackupUseCase,
     private val syncUseCase: SyncBackupUseCase,
@@ -104,37 +103,37 @@ internal class BackupDevViewModel(
 
     private fun connectProvider(type: CloudProviderType) = viewModelScope.launch {
         log("Connect ${type.displayName}…")
-        val result = connectUseCase(application, type)
+        val result = connectUseCase(type)
         log("${type.displayName} connect → $result")
     }
 
     private fun syncProvider(type: CloudProviderType) = viewModelScope.launch {
         log("Sync ${type.displayName}…")
-        val result = syncUseCase(application, registry.get(type))
+        val result = syncUseCase(registry.get(type))
         log("${type.displayName} sync → $result")
     }
 
     private fun restoreProvider(type: CloudProviderType) = viewModelScope.launch {
         log("Restore ${type.displayName}…")
-        val result = restoreUseCase(application, registry.get(type))
+        val result = restoreUseCase(registry.get(type))
         log("${type.displayName} restore → $result")
     }
 
     private fun checkStatus(type: CloudProviderType) = viewModelScope.launch {
         log("Check status ${type.displayName}…")
-        val result = checkStatusUseCase(application, registry.get(type))
+        val result = checkStatusUseCase(registry.get(type))
         log("${type.displayName} status → $result")
     }
 
     private fun disconnectProvider(type: CloudProviderType) = viewModelScope.launch {
         log("Disconnect ${type.displayName}…")
-        registry.get(type).signOut(application)
+        registry.get(type).signOut()
         log("${type.displayName} signed out")
     }
 
     private fun migrate(from: CloudProviderType, to: CloudProviderType) = viewModelScope.launch {
         log("Migrate ${from.displayName} → ${to.displayName}…")
-        val result = migrateUseCase(application, registry.get(from), registry.get(to))
+        val result = migrateUseCase(registry.get(from), registry.get(to))
         log("Migrate → $result")
     }
 

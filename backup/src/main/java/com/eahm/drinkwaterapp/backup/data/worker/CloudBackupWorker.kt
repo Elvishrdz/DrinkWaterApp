@@ -22,7 +22,7 @@ class CloudBackupWorker(
 
     override suspend fun doWork(): Result {
         return when (val result =
-            syncUseCase(applicationContext, resolveProvider() ?: return Result.failure())) {
+            syncUseCase(resolveProvider() ?: return Result.failure())) {
             is BackupResult.Success -> Result.success()
             is BackupResult.Failure -> {
                 val error = result.error

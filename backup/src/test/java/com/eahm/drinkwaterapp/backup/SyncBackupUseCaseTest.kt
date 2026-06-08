@@ -43,7 +43,7 @@ class SyncBackupUseCaseTest {
         val provider = FakeCloudBackupProvider()
         val useCase = buildUseCase(dataSource, prefs)
 
-        val result = useCase(null, provider)
+        val result = useCase(provider)
 
         assertTrue(result is BackupResult.Success)
         assertEquals(SyncResult.Uploaded, result.value)
@@ -60,7 +60,7 @@ class SyncBackupUseCaseTest {
         val provider = FakeCloudBackupProvider()
         val useCase = buildUseCase(dataSource, prefs)
 
-        val result = useCase(null, provider)
+        val result = useCase(provider)
 
         assertTrue(result is BackupResult.Success)
         assertEquals(SyncResult.SkippedNoChanges, result.value)
@@ -71,7 +71,7 @@ class SyncBackupUseCaseTest {
     fun `returns AlreadyInProgress when mutex is locked`() = runTest {
         val mutex = Mutex(locked = true)
         val useCase = buildUseCase(mutex = mutex)
-        val result = useCase(null, FakeCloudBackupProvider())
+        val result = useCase(FakeCloudBackupProvider())
         assertTrue(result is BackupResult.Success)
         assertEquals(SyncResult.AlreadyInProgress, result.value)
     }
@@ -80,7 +80,7 @@ class SyncBackupUseCaseTest {
     fun `persists hash and timestamp on successful upload`() = runTest {
         val prefs = FakeBackupPreferences()
         val useCase = buildUseCase(prefs = prefs)
-        useCase(null, FakeCloudBackupProvider())
+        useCase(FakeCloudBackupProvider())
         assertNotNull(prefs.backupContentHash)
         assertNotNull(prefs.backupLastSyncAt)
         assertNull(prefs.backupLastError)
@@ -93,7 +93,7 @@ class SyncBackupUseCaseTest {
             uploadResult = BackupResult.Failure(BackupError.UploadFailed()),
         )
         val useCase = buildUseCase(prefs = prefs)
-        val result = useCase(null, provider)
+        val result = useCase(provider)
         assertTrue(result is BackupResult.Failure)
         assertNotNull(prefs.backupLastError)
     }

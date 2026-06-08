@@ -20,7 +20,6 @@ import com.eahm.drinkwaterapp.backup.fake.FakeBackupDataSource
 import com.eahm.drinkwaterapp.backup.fake.FakeBackupPreferences
 import com.eahm.drinkwaterapp.backup.fake.FakeBackupScheduler
 import com.eahm.drinkwaterapp.backup.fake.FakeCloudBackupProvider
-import io.mockk.mockk
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -53,7 +52,6 @@ class BackupRepositoryImplTest {
         val connectUseCase = ConnectBackupUseCase(registry, prefs, syncUseCase)
 
         return BackupRepositoryImpl(
-            application = mockk(relaxed = true),
             registry = registry,
             prefs = prefs,
             connectUseCase = connectUseCase,
@@ -134,7 +132,7 @@ class BackupRepositoryImplTest {
     @Test
     fun `checkRemoteStatus returns Failure when no provider selected`() = runTest {
         val repo = buildRepository(prefs = FakeBackupPreferences())
-        val result = repo.checkRemoteStatus(null)
+        val result = repo.checkRemoteStatus()
         assertTrue(result is BackupResult.Failure)
         assertEquals(BackupError.NoProviderSelected, result.error)
     }

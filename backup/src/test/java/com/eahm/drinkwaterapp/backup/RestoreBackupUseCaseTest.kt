@@ -36,7 +36,7 @@ class RestoreBackupUseCaseTest {
                 )
             )
         )
-        val result = buildUseCase().invoke(null, provider)
+        val result = buildUseCase().invoke(provider)
         assertTrue(result is BackupResult.Success)
     }
 
@@ -51,7 +51,7 @@ class RestoreBackupUseCaseTest {
                 )
             )
         )
-        val result = buildUseCase().invoke(null, provider)
+        val result = buildUseCase().invoke(provider)
         assertTrue(result is BackupResult.Failure)
         val error = result.error
         assertTrue(error is BackupError.IncompatibleVersion)
@@ -63,7 +63,7 @@ class RestoreBackupUseCaseTest {
         val provider = FakeCloudBackupProvider(
             downloadResult = BackupResult.Failure(BackupError.DownloadFailed()),
         )
-        val result = buildUseCase().invoke(null, provider)
+        val result = buildUseCase().invoke(provider)
         assertTrue(result is BackupResult.Failure)
         assertTrue(result.error is BackupError.DownloadFailed)
     }
@@ -80,7 +80,7 @@ class RestoreBackupUseCaseTest {
                 )
             )
         )
-        buildUseCase(dataSource).invoke(null, provider)
+        buildUseCase(dataSource).invoke(provider)
         assertEquals(rawData, dataSource.lastImported)
     }
 
@@ -97,7 +97,7 @@ class RestoreBackupUseCaseTest {
                 )
             )
         )
-        val result = buildUseCase(dataSource).invoke(null, provider)
+        val result = buildUseCase(dataSource).invoke(provider)
         assertTrue(result is BackupResult.Failure)
         assertTrue(result.error is BackupError.MigrationFailed)
     }

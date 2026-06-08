@@ -28,7 +28,7 @@ class CheckBackupStatusUseCaseTest {
         val provider = FakeCloudBackupProvider(
             metadataResult = BackupResult.Success(null),
         )
-        val result = useCase(null, provider)
+        val result = useCase(provider)
         assertTrue(result is BackupResult.Success)
         assertNull(result.value)
     }
@@ -38,7 +38,7 @@ class CheckBackupStatusUseCaseTest {
         val provider = FakeCloudBackupProvider(
             metadataResult = BackupResult.Success(metadata(BackupMigrationManager.currentSchema)),
         )
-        val result = useCase(null, provider)
+        val result = useCase(provider)
         assertTrue(result is BackupResult.Success)
         val status = result.value!!
         assertTrue(status.isCompatible)
@@ -52,7 +52,7 @@ class CheckBackupStatusUseCaseTest {
             val provider = FakeCloudBackupProvider(
                 metadataResult = BackupResult.Success(metadata(futureSchema)),
             )
-            val result = useCase(null, provider)
+            val result = useCase(provider)
             assertTrue(result is BackupResult.Success)
             val status = result.value!!
             assertTrue(!status.isCompatible)
@@ -63,7 +63,7 @@ class CheckBackupStatusUseCaseTest {
         val provider = FakeCloudBackupProvider(
             metadataResult = BackupResult.Failure(BackupError.NetworkUnavailable),
         )
-        val result = useCase(null, provider)
+        val result = useCase(provider)
         assertTrue(result is BackupResult.Failure)
         assertEquals(BackupError.NetworkUnavailable, result.error)
     }
