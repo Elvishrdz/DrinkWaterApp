@@ -23,8 +23,10 @@ SKIP="↩️ "
 FAIL="❌"
 INFO="ℹ️ "
 
-PLUGIN_ID="detekt-intellij-plugin"
-PLUGIN_MARKETPLACE_ID="10802"
+# Numeric plugin ID from JetBrains Marketplace (plugins.jetbrains.com/plugin/10761-detekt)
+PLUGIN_NUMERIC_ID="10761"
+# Folder name the zip extracts to (as shipped by JetBrains)
+PLUGIN_DIR_NAME="Detekt IntelliJ Plugin"
 
 # -----------------------------------------------------------------------------
 # macOS guard
@@ -48,7 +50,7 @@ if [[ ! -d "$AS_SUPPORT_DIR" ]]; then
   exit 1
 fi
 
-# Pick the newest AndroidStudio* directory (non-Preview, then Preview as fallback)
+# Pick the newest non-Preview AndroidStudio* directory, then Preview as fallback
 PLUGINS_DIR=""
 while IFS= read -r dir; do
   if [[ -d "$dir/plugins" ]]; then
@@ -57,7 +59,6 @@ while IFS= read -r dir; do
   fi
 done < <(ls -dt "$AS_SUPPORT_DIR"/AndroidStudio[0-9]* 2>/dev/null)
 
-# Fallback: include Preview builds
 if [[ -z "$PLUGINS_DIR" ]]; then
   while IFS= read -r dir; do
     if [[ -d "$dir/plugins" ]]; then
@@ -79,69 +80,72 @@ echo "       $PLUGINS_DIR"
 # -----------------------------------------------------------------------------
 # Idempotency check — already installed?
 # -----------------------------------------------------------------------------
-PLUGIN_DIR="$PLUGINS_DIR/$PLUGIN_ID"
-if [[ -d "$PLUGIN_DIR" ]]; then
+PLUGIN_INSTALL_DIR="$PLUGINS_DIR/$PLUGIN_DIR_NAME"
+if [[ -d "$PLUGIN_INSTALL_DIR" ]]; then
   echo "  $SKIP Detekt plugin already installed at:"
-  echo "       $PLUGIN_DIR"
+  echo "       $PLUGIN_INSTALL_DIR"
   echo "       To reinstall, run: bash scripts/ide/uninstall-detekt-plugin.sh"
   exit 0
 fi
 
 # -----------------------------------------------------------------------------
-# Get Android Studio build number for Marketplace API compatibility check
-# -----------------------------------------------------------------------------
-AS_APP=$(mdfind "kMDItemCFBundleIdentifier == 'com.google.android.studio'" 2>/dev/null | head -1)
-BUILD_NUMBER=""
-
-if [[ -n "$AS_APP" && -f "$AS_APP/Contents/Resources/product-info.json" ]]; then
-  BUILD_NUMBER=$(python3 -c "
-import json, sys
-with open('$AS_APP/Contents/Resources/product-info.json') as f:
-    d = json.load(f)
-print(d.get('buildNumber', ''))
-" 2>/dev/null || true)
-fi
-
-# -----------------------------------------------------------------------------
-# Resolve download URL via JetBrains Marketplace API
+# Resolve the latest stable release via JetBrains Marketplace JSON API
+# The pluginManager download endpoint requires a matching build number, which
+# varies per IDE version. Using the /api/plugins/{id}/updates endpoint instead
+# gives us a direct file URL that always works.
 # -----------------------------------------------------------------------------
 echo ""
-echo "  Resolving plugin download URL from JetBrains Marketplace..."
+echo "  Resolving latest stable release from JetBrains Marketplace..."
 
-if [[ -n "$BUILD_NUMBER" ]]; then
-  DOWNLOAD_URL="https://plugins.jetbrains.com/pluginManager?action=download&id=${PLUGIN_ID}&build=AI-${BUILD_NUMBER}"
-  echo "  $INFO Build number: $BUILD_NUMBER"
-else
-  # Fallback: latest stable, no build pin
-  DOWNLOAD_URL="https://plugins.jetbrains.com/pluginManager?action=download&id=${PLUGIN_ID}"
-  echo "  $INFO Build number not found — downloading latest stable release"
+DOWNLOAD_URL=$(python3 - <<PYEOF
+import urllib.request, json, sys
+
+url = "https://plugins.jetbrains.com/api/plugins/${PLUGIN_NUMERIC_ID}/updates?size=1"
+try:
+    with urllib.request.urlopen(url, timeout=15) as r:
+        updates = json.load(r)
+except Exception as e:
+    print(f"ERROR: {e}", file=sys.stderr)
+    sys.exit(1)
+
+if not updates:
+    print("ERROR: no updates returned", file=sys.stderr)
+    sys.exit(1)
+
+file_path = updates[0].get("file", "")
+if not file_path:
+    print("ERROR: no file path in update", file=sys.stderr)
+    sys.exit(1)
+
+print(f"https://plugins.jetbrains.com/files/{file_path}")
+PYEOF
+)
+
+if [[ -z "$DOWNLOAD_URL" ]]; then
+  echo "  $FAIL Could not resolve download URL from JetBrains Marketplace."
+  echo "     Install manually: Android Studio → Settings → Plugins → search 'Detekt'"
+  exit 1
 fi
+
+echo "  $INFO Download URL: $DOWNLOAD_URL"
 
 # -----------------------------------------------------------------------------
 # Download plugin zip to a temp directory
 # -----------------------------------------------------------------------------
 TMP_DIR=$(mktemp -d)
-ZIP_PATH="$TMP_DIR/${PLUGIN_ID}.zip"
+ZIP_NAME=$(basename "$DOWNLOAD_URL")
+ZIP_PATH="$TMP_DIR/$ZIP_NAME"
 
-echo "  Downloading..."
+echo "  Downloading $ZIP_NAME..."
 if ! curl --silent --show-error --location --output "$ZIP_PATH" "$DOWNLOAD_URL"; then
   echo "  $FAIL Download failed. Check your internet connection and try again."
   rm -rf "$TMP_DIR"
   exit 1
 fi
 
-# Verify the download looks like a zip
-if ! python3 -c "
-import zipfile, sys
-try:
-    zipfile.ZipFile('$ZIP_PATH')
-except Exception as e:
-    print(f'Not a valid zip: {e}')
-    sys.exit(1)
-" 2>/dev/null; then
+# Verify the download is a valid zip
+if ! python3 -c "import zipfile; zipfile.ZipFile('$ZIP_PATH')" 2>/dev/null; then
   echo "  $FAIL Downloaded file is not a valid zip archive."
-  echo "     The Marketplace may have returned an error page."
-  echo "     Install manually: Android Studio → Settings → Plugins → search 'Detekt'"
   rm -rf "$TMP_DIR"
   exit 1
 fi
@@ -153,13 +157,12 @@ echo "  Installing..."
 unzip -q "$ZIP_PATH" -d "$PLUGINS_DIR"
 rm -rf "$TMP_DIR"
 
-# Verify extraction created the expected directory
-if [[ ! -d "$PLUGIN_DIR" ]]; then
-  # The zip might extract to a different folder name — find what was created
-  echo "  $PASS Plugin extracted (folder name may differ from expected)."
-else
+if [[ -d "$PLUGIN_INSTALL_DIR" ]]; then
   echo "  $PASS Detekt plugin installed at:"
-  echo "       $PLUGIN_DIR"
+  echo "       $PLUGIN_INSTALL_DIR"
+else
+  # Zip may extract to a slightly different folder name — still succeeded
+  echo "  $PASS Detekt plugin extracted into $PLUGINS_DIR"
 fi
 
 echo ""

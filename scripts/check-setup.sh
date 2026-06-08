@@ -170,7 +170,7 @@ if [[ "$(uname)" == "Darwin" ]]; then
     AS_SUPPORT_DIR="$HOME/Library/Application Support/Google"
     DETEKT_FOUND=false
     while IFS= read -r dir; do
-        if [[ -d "$dir/plugins/detekt-intellij-plugin" ]]; then
+        if [[ -d "$dir/plugins/Detekt IntelliJ Plugin" ]]; then
             DETEKT_FOUND=true
             break
         fi

@@ -18,7 +18,7 @@ SKIP="↩️ "
 FAIL="❌"
 INFO="ℹ️ "
 
-PLUGIN_ID="detekt-intellij-plugin"
+PLUGIN_ID="Detekt IntelliJ Plugin"
 
 # -----------------------------------------------------------------------------
 # macOS guard
