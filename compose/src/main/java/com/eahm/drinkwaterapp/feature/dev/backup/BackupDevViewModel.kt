@@ -12,6 +12,7 @@ import com.eahm.drinkwaterapp.backup.data.usecase.RestoreBackupUseCase
 import com.eahm.drinkwaterapp.backup.data.usecase.SyncBackupUseCase
 import com.eahm.drinkwaterapp.backup.domain.BackupPreferences
 import com.eahm.drinkwaterapp.backup.domain.BackupRepository
+import com.eahm.drinkwaterapp.backup.domain.model.BackupResult
 import com.eahm.drinkwaterapp.backup.domain.model.CloudProviderType
 import com.eahm.drinkwaterapp.backup.domain.model.GoalRecord
 import com.eahm.drinkwaterapp.backup.domain.model.PreferencesRecord
@@ -79,11 +80,13 @@ internal class BackupDevViewModel(
             BackupDevAction.RestoreGoogle -> restoreProvider(CloudProviderType.GOOGLE_DRIVE)
             BackupDevAction.CheckStatusGoogle -> checkStatus(CloudProviderType.GOOGLE_DRIVE)
             BackupDevAction.DisconnectGoogle -> disconnectProvider(CloudProviderType.GOOGLE_DRIVE)
+            BackupDevAction.DeleteFileGoogle -> deleteRemoteFile(CloudProviderType.GOOGLE_DRIVE)
             BackupDevAction.ConnectDropbox -> connectProvider(CloudProviderType.DROPBOX)
             BackupDevAction.SyncDropbox -> syncProvider(CloudProviderType.DROPBOX)
             BackupDevAction.RestoreDropbox -> restoreProvider(CloudProviderType.DROPBOX)
             BackupDevAction.CheckStatusDropbox -> checkStatus(CloudProviderType.DROPBOX)
             BackupDevAction.DisconnectDropbox -> disconnectProvider(CloudProviderType.DROPBOX)
+            BackupDevAction.DeleteFileDropbox -> deleteRemoteFile(CloudProviderType.DROPBOX)
             BackupDevAction.MigrateGoogleToDropbox -> migrate(
                 CloudProviderType.GOOGLE_DRIVE,
                 CloudProviderType.DROPBOX,
@@ -129,6 +132,26 @@ internal class BackupDevViewModel(
         log("Disconnect ${type.displayName}…")
         registry.get(type).signOut()
         log("${type.displayName} signed out")
+    }
+
+    /**
+     * Deletes the backup file from the cloud provider and resets local sync bookkeeping
+     * so the next sync behaves like a first-ever upload — i.e. as if the backup never
+     * existed (fresh install).
+     */
+    private fun deleteRemoteFile(type: CloudProviderType) = viewModelScope.launch {
+        log("Delete remote file ${type.displayName}…")
+        when (val result = registry.get(type).deleteRemoteFile()) {
+            is BackupResult.Success -> {
+                backupPreferences.setBackupContentHash(null)
+                backupPreferences.setSeenDevices(emptyList())
+                backupPreferences.setSyncPending(false)
+                log("${type.displayName} remote file deleted — local sync state reset")
+            }
+
+            is BackupResult.Failure ->
+                log("${type.displayName} delete failed → ${result.error}")
+        }
     }
 
     private fun migrate(from: CloudProviderType, to: CloudProviderType) = viewModelScope.launch {

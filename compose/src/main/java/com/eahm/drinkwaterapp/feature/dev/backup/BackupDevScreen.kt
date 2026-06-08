@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -86,6 +87,7 @@ internal fun BackupDevScreen(
                         onRestore = { onAction(BackupDevAction.RestoreGoogle) },
                         onCheckStatus = { onAction(BackupDevAction.CheckStatusGoogle) },
                         onDisconnect = { onAction(BackupDevAction.DisconnectGoogle) },
+                        onDeleteFile = { onAction(BackupDevAction.DeleteFileGoogle) },
                     )
                 }
 
@@ -98,6 +100,7 @@ internal fun BackupDevScreen(
                         onRestore = { onAction(BackupDevAction.RestoreDropbox) },
                         onCheckStatus = { onAction(BackupDevAction.CheckStatusDropbox) },
                         onDisconnect = { onAction(BackupDevAction.DisconnectDropbox) },
+                        onDeleteFile = { onAction(BackupDevAction.DeleteFileDropbox) },
                     )
                 }
 
@@ -209,6 +212,7 @@ private fun DevProviderSection(
     onRestore: () -> Unit,
     onCheckStatus: () -> Unit,
     onDisconnect: () -> Unit,
+    onDeleteFile: () -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(
@@ -228,6 +232,14 @@ private fun DevProviderSection(
         ) {
             OutlinedButton(onClick = onCheckStatus) { Text("Status") }
             OutlinedButton(onClick = onDisconnect) { Text("Disconnect") }
+        }
+        OutlinedButton(
+            onClick = onDeleteFile,
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = MaterialTheme.colorScheme.error,
+            ),
+        ) {
+            Text("Delete file (fresh install)")
         }
     }
 }
