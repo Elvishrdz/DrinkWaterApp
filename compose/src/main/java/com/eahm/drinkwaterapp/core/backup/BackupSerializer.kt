@@ -1,5 +1,6 @@
 package com.eahm.drinkwaterapp.core.backup
 
+import com.eahm.drinkwaterapp.backup.BackupData
 import com.eahm.drinkwaterapp.backup.BackupDataSource
 import com.eahm.drinkwaterapp.backup.BackupError
 import com.eahm.drinkwaterapp.backup.BackupMigrationManager
@@ -221,7 +222,7 @@ class BackupSerializer(
             .forEach { database.getDailyGoalDao().delete(it) }
     }
 
-    override suspend fun readLocalData(deviceId: String): com.eahm.drinkwaterapp.backup.BackupData {
+    override suspend fun readLocalData(deviceId: String): BackupData {
         val historyRecords = database.getHistoryDao().getAll().first()
         val dailyGoals = database.getDailyGoalDao().getAllGoals().first()
 
@@ -264,10 +265,11 @@ class BackupSerializer(
             updatedAt = 0L,
         )
 
-        return com.eahm.drinkwaterapp.backup.BackupData(history, goals, prefsRecord)
+        return BackupData(history, goals, prefsRecord)
     }
 
-    override suspend fun parseRemoteData(raw: JsonObject): com.eahm.drinkwaterapp.backup.BackupData? {
+    @Suppress("CyclomaticComplexMethod")
+    override suspend fun parseRemoteData(raw: JsonObject): BackupData? {
         return try {
             val dataBlock = raw["data"]?.jsonObject ?: return null
 
@@ -322,13 +324,13 @@ class BackupSerializer(
                 updatedAt = prefsObj?.get("updated_at")?.jsonPrimitive?.longOrNull ?: 0L,
             )
 
-            com.eahm.drinkwaterapp.backup.BackupData(history, goals, prefsRecord)
+            BackupData(history, goals, prefsRecord)
         } catch (e: Exception) {
             null
         }
     }
 
-    override suspend fun writeBackupData(data: com.eahm.drinkwaterapp.backup.BackupData): com.eahm.drinkwaterapp.backup.BackupResult<Unit> {
+    override suspend fun writeBackupData(data: BackupData): BackupResult<Unit> {
         return try {
             database.getHistoryDao().deleteAll()
             database.getDailyGoalDao().deleteAll()
