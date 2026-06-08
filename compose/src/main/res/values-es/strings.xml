@@ -675,6 +675,13 @@
     <string name="backup_corrupted_overwrite">Sobrescribir con este dispositivo</string>
     <string name="backup_corrupted_leave">Dejar la copia sin cambios</string>
 
+    <!-- Backup — First-connection choice when a remote backup already exists -->
+    <string name="backup_initial_sync_title">Copia de seguridad existente</string>
+    <string name="backup_initial_sync_body">Esta cuenta ya tiene una copia de seguridad. Elige si restaurarla en este dispositivo o reemplazarla con los datos de este dispositivo. Esta acción no se puede deshacer.</string>
+    <string name="backup_initial_sync_body_dated">Esta cuenta ya tiene una copia de seguridad del %1$s. Elige si restaurarla en este dispositivo o reemplazarla con los datos de este dispositivo. Esta acción no se puede deshacer.</string>
+    <string name="backup_initial_sync_use_remote">Usar copia remota (reemplazar este dispositivo)</string>
+    <string name="backup_initial_sync_upload_local">Subir este dispositivo (reemplazar copia)</string>
+
     <!-- Copia de seguridad — Diálogo de conflicto de datos -->
     <string name="backup_conflict_title">Conflicto de datos</string>
     <string name="backup_conflict_body">Tienes datos locales y una copia en la nube. ¿Cuál quieres conservar?</string>

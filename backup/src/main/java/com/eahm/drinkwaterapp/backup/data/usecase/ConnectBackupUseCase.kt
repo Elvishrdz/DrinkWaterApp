@@ -9,7 +9,7 @@ import com.eahm.drinkwaterapp.backup.domain.model.CloudUser
 class ConnectBackupUseCase(
     private val registry: BackupProviderRegistry,
     private val prefs: BackupPreferences,
-    private val syncUseCase: SyncBackupUseCase,
+    private val initialConnectionSyncUseCase: InitialConnectionSyncUseCase,
 ) {
     suspend operator fun invoke(
         providerType: CloudProviderType,
@@ -34,8 +34,9 @@ class ConnectBackupUseCase(
         prefs.setBackupProvider(providerType.id)
         prefs.setBackupUserDisplayName(user.displayName)
 
-        // First sync
-        syncUseCase(provider)
+        // First sync: if a remote backup already exists, the user decides the direction;
+        // otherwise this performs the normal automatic upload.
+        initialConnectionSyncUseCase(provider)
 
         return BackupResult.Success(user)
     }

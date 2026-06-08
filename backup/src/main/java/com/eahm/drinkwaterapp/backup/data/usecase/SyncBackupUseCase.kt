@@ -147,6 +147,21 @@ class SyncBackupUseCase(
      * this device's data. If they decline, the remote file is left exactly as-is.
      * Overwriting is irreversible — the previous remote contents cannot be recovered.
      */
+    /**
+     * Force-uploads local data, replacing the remote backup regardless of its contents.
+     * Used by the first-connection flow when the user chooses to keep this device's data.
+     */
+    suspend fun overwriteRemoteWithLocal(
+        provider: CloudBackupProvider,
+    ): BackupResult<SyncResult> {
+        if (!mutex.tryLock()) return BackupResult.Success(SyncResult.AlreadyInProgress)
+        return try {
+            uploadLocal(provider, prefs.getDeviceId(), force = true)
+        } finally {
+            mutex.unlock()
+        }
+    }
+
     private suspend fun handleCorruptedRemote(
         provider: CloudBackupProvider,
         deviceId: String,

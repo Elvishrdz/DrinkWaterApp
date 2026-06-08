@@ -73,6 +73,7 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
 import com.eahm.drinkwaterapp.backup.domain.model.CloudProviderType
+import com.eahm.drinkwaterapp.backup.domain.model.InitialSyncDecision
 import com.eahm.drinkwaterapp.core.billing.PurchaseState
 import com.eahm.drinkwaterapp.core.config.FeatureFlags
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
@@ -299,6 +300,8 @@ internal fun SettingsScreen(
         onSyncOnSaveToggled = viewModel::onSyncOnSaveToggled,
         onResolveConflict = viewModel::onResolveConflict,
         onResolveCorruption = viewModel::onResolveCorruption,
+        onResolveInitialSync = viewModel::onResolveInitialSync,
+        onDismissInitialSync = viewModel::onDismissInitialSync,
         modifier = modifier,
     )
 
@@ -464,6 +467,8 @@ internal fun SettingsContent(
     onSyncOnSaveToggled: (Boolean) -> Unit = {},
     onResolveConflict: (useRemote: Boolean) -> Unit = {},
     onResolveCorruption: (overwrite: Boolean) -> Unit = {},
+    onResolveInitialSync: (InitialSyncDecision) -> Unit = {},
+    onDismissInitialSync: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -571,6 +576,8 @@ internal fun SettingsContent(
                         onSyncOnSaveToggled = onSyncOnSaveToggled,
                         onResolveConflict = onResolveConflict,
                         onResolveCorruption = onResolveCorruption,
+                        onResolveInitialSync = onResolveInitialSync,
+                        onDismissInitialSync = onDismissInitialSync,
                     )
 
                     if (showProviderPickerSheet) {

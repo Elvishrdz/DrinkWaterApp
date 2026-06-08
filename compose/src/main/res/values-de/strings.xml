@@ -673,6 +673,13 @@
     <string name="backup_corrupted_overwrite">Mit diesem Gerät überschreiben</string>
     <string name="backup_corrupted_leave">Backup unverändert lassen</string>
 
+    <!-- Backup — First-connection choice when a remote backup already exists -->
+    <string name="backup_initial_sync_title">Vorhandenes Backup gefunden</string>
+    <string name="backup_initial_sync_body">Dieses Konto hat bereits ein Backup. Wähle, ob du es auf dieses Gerät wiederherstellen oder durch die Daten dieses Geräts ersetzen möchtest. Dies kann nicht rückgängig gemacht werden.</string>
+    <string name="backup_initial_sync_body_dated">Dieses Konto hat bereits ein Backup vom %1$s. Wähle, ob du es auf dieses Gerät wiederherstellen oder durch die Daten dieses Geräts ersetzen möchtest. Dies kann nicht rückgängig gemacht werden.</string>
+    <string name="backup_initial_sync_use_remote">Remote-Backup verwenden (dieses Gerät ersetzen)</string>
+    <string name="backup_initial_sync_upload_local">Dieses Gerät hochladen (Backup ersetzen)</string>
+
     <!-- Backup — Datenkonflikts-Dialog -->
     <string name="backup_conflict_title">Datenkonflikt</string>
     <string name="backup_conflict_body">Du hast lokale Daten und ein Cloud-Backup. Welches möchtest du behalten?</string>

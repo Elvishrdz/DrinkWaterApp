@@ -3,11 +3,13 @@ package com.eahm.drinkwaterapp.backup
 import com.eahm.drinkwaterapp.backup.data.BackupProviderRegistry
 import com.eahm.drinkwaterapp.backup.data.BackupRecoveryResolver
 import com.eahm.drinkwaterapp.backup.data.BackupRepositoryImpl
+import com.eahm.drinkwaterapp.backup.data.InitialSyncResolver
 import com.eahm.drinkwaterapp.backup.data.MergeEngine
 import com.eahm.drinkwaterapp.backup.data.SyncConflictResolver
 import com.eahm.drinkwaterapp.backup.data.usecase.CheckBackupStatusUseCase
 import com.eahm.drinkwaterapp.backup.data.usecase.ConnectBackupUseCase
 import com.eahm.drinkwaterapp.backup.data.usecase.DisconnectBackupUseCase
+import com.eahm.drinkwaterapp.backup.data.usecase.InitialConnectionSyncUseCase
 import com.eahm.drinkwaterapp.backup.data.usecase.MigrateBackupUseCase
 import com.eahm.drinkwaterapp.backup.data.usecase.RestoreBackupUseCase
 import com.eahm.drinkwaterapp.backup.data.usecase.SyncBackupUseCase
@@ -49,7 +51,12 @@ class BackupRepositoryImplTest {
         val checkStatusUseCase = CheckBackupStatusUseCase()
         val disconnectUseCase = DisconnectBackupUseCase(registry, prefs, scheduler)
         val migrateUseCase = MigrateBackupUseCase(mutex, prefs)
-        val connectUseCase = ConnectBackupUseCase(registry, prefs, syncUseCase)
+        val initialConnectionSyncUseCase = InitialConnectionSyncUseCase(
+            syncUseCase = syncUseCase,
+            restoreUseCase = restoreUseCase,
+            resolver = InitialSyncResolver(),
+        )
+        val connectUseCase = ConnectBackupUseCase(registry, prefs, initialConnectionSyncUseCase)
 
         return BackupRepositoryImpl(
             registry = registry,

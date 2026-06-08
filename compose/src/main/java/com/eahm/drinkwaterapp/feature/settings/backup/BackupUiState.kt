@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import com.eahm.drinkwaterapp.backup.domain.model.BackupError
 import com.eahm.drinkwaterapp.backup.domain.model.CloudProviderType
 import com.eahm.drinkwaterapp.backup.domain.model.CorruptedBackup
+import com.eahm.drinkwaterapp.backup.domain.model.ExistingRemoteBackup
 import com.eahm.drinkwaterapp.backup.domain.model.SeenDevice
 import com.eahm.drinkwaterapp.backup.domain.model.SyncConflict
 
@@ -23,6 +24,9 @@ data class BackupUiState(
     val pendingConflict: SyncConflict? = null,
     // Non-null when the remote backup is corrupted and awaiting a user recovery decision.
     val pendingCorruption: CorruptedBackup? = null,
+    // Non-null on first connection when a remote backup already exists and the user must
+    // choose whether to keep the remote data or replace it with this device's data.
+    val pendingInitialSync: ExistingRemoteBackup? = null,
     val error: BackupUIError? = null,
 )
 

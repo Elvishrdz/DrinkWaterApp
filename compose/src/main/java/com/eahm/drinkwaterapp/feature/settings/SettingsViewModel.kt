@@ -15,6 +15,7 @@ import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingService.Companion.OptOutSource
 import com.eahm.drinkwaterapp.backup.data.BackupRecoveryResolver
+import com.eahm.drinkwaterapp.backup.data.InitialSyncResolver
 import com.eahm.drinkwaterapp.backup.data.SyncConflictResolver
 import com.eahm.drinkwaterapp.backup.data.SyncCoordinator
 import com.eahm.drinkwaterapp.backup.data.provider.DropboxBackupProvider
@@ -25,6 +26,7 @@ import com.eahm.drinkwaterapp.backup.domain.BackupScheduler
 import com.eahm.drinkwaterapp.backup.domain.BackupSyncState
 import com.eahm.drinkwaterapp.backup.domain.model.BackupResult
 import com.eahm.drinkwaterapp.backup.domain.model.CloudProviderType
+import com.eahm.drinkwaterapp.backup.domain.model.InitialSyncDecision
 import com.eahm.drinkwaterapp.core.billing.PurchaseManager
 import com.eahm.drinkwaterapp.core.config.AppInfoService
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
@@ -77,6 +79,7 @@ internal class SettingsViewModel(
     private val syncCoordinator: SyncCoordinator,
     private val syncConflictResolver: SyncConflictResolver,
     private val backupRecoveryResolver: BackupRecoveryResolver,
+    private val initialSyncResolver: InitialSyncResolver,
 ) : ViewModel() {
 
     private val dao = database.getDailyGoalDao()
@@ -218,6 +221,9 @@ internal class SettingsViewModel(
         }
         .combine(backupRecoveryResolver.pendingCorruption) { state, corruption ->
             state.copy(backupUiState = state.backupUiState.copy(pendingCorruption = corruption))
+        }
+        .combine(initialSyncResolver.pending) { state, initialSync ->
+            state.copy(backupUiState = state.backupUiState.copy(pendingInitialSync = initialSync))
         }
         .stateIn(
             scope = viewModelScope,
@@ -468,6 +474,15 @@ internal class SettingsViewModel(
         if (overwrite) {
             viewModelScope.launch { refreshBackupState() }
         }
+    }
+
+    fun onResolveInitialSync(decision: InitialSyncDecision) {
+        initialSyncResolver.resolve(decision)
+        viewModelScope.launch { refreshBackupState() }
+    }
+
+    fun onDismissInitialSync() {
+        initialSyncResolver.cancelPending()
     }
 
     private suspend fun setGoalFromToday(goalMl: Float) {

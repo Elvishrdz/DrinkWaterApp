@@ -2,6 +2,7 @@ package com.eahm.drinkwaterapp.backup.di
 
 import com.eahm.drinkwaterapp.backup.data.BackupRecoveryResolver
 import com.eahm.drinkwaterapp.backup.data.BackupRepositoryImpl
+import com.eahm.drinkwaterapp.backup.data.InitialSyncResolver
 import com.eahm.drinkwaterapp.backup.data.MergeEngine
 import com.eahm.drinkwaterapp.backup.data.SyncConflictResolver
 import com.eahm.drinkwaterapp.backup.data.SyncCoordinator
@@ -9,6 +10,7 @@ import com.eahm.drinkwaterapp.backup.data.observer.ConnectivityObserver
 import com.eahm.drinkwaterapp.backup.data.usecase.CheckBackupStatusUseCase
 import com.eahm.drinkwaterapp.backup.data.usecase.ConnectBackupUseCase
 import com.eahm.drinkwaterapp.backup.data.usecase.DisconnectBackupUseCase
+import com.eahm.drinkwaterapp.backup.data.usecase.InitialConnectionSyncUseCase
 import com.eahm.drinkwaterapp.backup.data.usecase.MigrateBackupUseCase
 import com.eahm.drinkwaterapp.backup.data.usecase.PurgeTombstonesUseCase
 import com.eahm.drinkwaterapp.backup.data.usecase.RestoreBackupUseCase
@@ -28,6 +30,7 @@ val backupCoreModule = module {
     // using explicit typed get() because both params are CloudBackupProvider.
 
     singleOf(::ConnectBackupUseCase)
+    singleOf(::InitialConnectionSyncUseCase)
     singleOf(::SyncBackupUseCase)
     singleOf(::RestoreBackupUseCase)
     singleOf(::CheckBackupStatusUseCase)
@@ -38,6 +41,7 @@ val backupCoreModule = module {
 
     singleOf(::SyncConflictResolver)
     singleOf(::BackupRecoveryResolver)
+    singleOf(::InitialSyncResolver)
     singleOf(::MergeEngine)
     single { TombstonePolicy() }
     single { PurgeTombstonesUseCase(get(), get(), get()) }

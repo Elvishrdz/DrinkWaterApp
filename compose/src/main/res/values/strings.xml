@@ -675,6 +675,13 @@
     <string name="backup_corrupted_overwrite">Overwrite with this device</string>
     <string name="backup_corrupted_leave">Leave backup unchanged</string>
 
+    <!-- Backup — First-connection choice when a remote backup already exists -->
+    <string name="backup_initial_sync_title">Existing backup found</string>
+    <string name="backup_initial_sync_body">This account already has a backup. Choose whether to restore it to this device or replace it with this device\'s data. This can\'t be undone.</string>
+    <string name="backup_initial_sync_body_dated">This account already has a backup from %1$s. Choose whether to restore it to this device or replace it with this device\'s data. This can\'t be undone.</string>
+    <string name="backup_initial_sync_use_remote">Use remote backup (replace this device)</string>
+    <string name="backup_initial_sync_upload_local">Upload this device (replace backup)</string>
+
     <!-- Backup — Restore conflict dialog -->
     <string name="backup_conflict_title">Data conflict</string>
     <string name="backup_conflict_body">You have local data and a cloud backup. Which one do you want to keep?</string>
