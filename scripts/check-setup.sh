@@ -165,22 +165,38 @@ else
     info "Run: bash scripts/ide/install-format-on-save.sh"
 fi
 
-# Detekt IntelliJ plugin: check user plugins directory (macOS only)
-if [[ "$(uname)" == "Darwin" ]]; then
+# Detekt IntelliJ plugin: check user plugins directory (macOS + Windows via Git Bash/WSL)
+OS="$(uname)"
+DETEKT_FOUND=false
+DETEKT_INSTALL_CMD=""
+
+if [[ "$OS" == "Darwin" ]]; then
     AS_SUPPORT_DIR="$HOME/Library/Application Support/Google"
-    DETEKT_FOUND=false
+    DETEKT_INSTALL_CMD="bash scripts/ide/install-detekt-plugin.sh"
     while IFS= read -r dir; do
         if [[ -d "$dir/plugins/Detekt IntelliJ Plugin" ]]; then
             DETEKT_FOUND=true
             break
         fi
     done < <(ls -dt "$AS_SUPPORT_DIR"/AndroidStudio* 2>/dev/null)
+elif [[ "$OS" == MINGW* || "$OS" == CYGWIN* || "$OS" == MSYS* ]]; then
+    # Git Bash / WSL on Windows — APPDATA is set by Git Bash
+    AS_SUPPORT_DIR="${APPDATA}/Google"
+    DETEKT_INSTALL_CMD="powershell -ExecutionPolicy Bypass -File scripts\\ide\\install-detekt-plugin-windows.ps1"
+    while IFS= read -r dir; do
+        if [[ -d "$dir/plugins/Detekt IntelliJ Plugin" ]]; then
+            DETEKT_FOUND=true
+            break
+        fi
+    done < <(ls -dt "$AS_SUPPORT_DIR"/AndroidStudio* 2>/dev/null)
+fi
 
+if [[ -n "$DETEKT_INSTALL_CMD" ]]; then
     if $DETEKT_FOUND; then
         ok "Detekt IntelliJ plugin installed (inline violation highlighting)"
     else
         warn "Detekt IntelliJ plugin not found"
-        info "Run: bash scripts/ide/install-detekt-plugin.sh"
+        info "Run: $DETEKT_INSTALL_CMD"
     fi
 fi
 
