@@ -9,10 +9,12 @@ import com.google.android.gms.auth.api.identity.AuthorizationResult
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.common.api.Scope
 import io.ktor.client.HttpClient
+import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
+import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
@@ -208,14 +210,21 @@ class GoogleDriveBackupProvider(
             "$DRIVE_BASE/upload/drive/v3/files/$existingId?uploadType=multipart"
         }
 
-        val response = httpClient.post(url) {
+        val requestBlock: HttpRequestBuilder.() -> Unit = {
             header(HttpHeaders.Authorization, "Bearer $token")
             contentType(ContentType.parse("multipart/related; boundary=$boundary"))
             setBody(multipartBody)
         }
 
-        if (response.status.isSuccess()) BackupResult.Success(Unit)
-        else {
+        val response = if (existingId == null) {
+            httpClient.post(url, requestBlock)
+        } else {
+            httpClient.patch(url, requestBlock)
+        }
+
+        if (response.status.isSuccess()) {
+            BackupResult.Success(Unit)
+        } else {
             Log.e(TAG, "upload failed: ${response.status} -> ${response.bodyAsText()}")
             BackupResult.Failure(BackupError.UploadFailed())
         }
