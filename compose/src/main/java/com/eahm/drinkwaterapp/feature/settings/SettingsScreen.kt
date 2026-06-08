@@ -69,6 +69,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import com.eahm.drinkwaterapp.R
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
 import com.eahm.drinkwaterapp.backup.CloudProviderType
 import com.eahm.drinkwaterapp.core.billing.PurchaseState
 import com.eahm.drinkwaterapp.core.config.FeatureFlags
@@ -116,7 +117,6 @@ import com.eahm.drinkwaterapp.feature.settings.ui.UnitsBottomSheet
 import com.eahm.drinkwaterapp.ui.timeselector.AppTimeSelectorDialog
 import com.eahm.drinkwaterapp.ui.timeselector.TimeSelected
 import kotlinx.coroutines.delay
-import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import java.util.Locale
@@ -125,12 +125,13 @@ private val gradientMagentaHero = Brush.verticalGradient(
     colors = listOf(Color(0xFFB83A95), DwMagentaDark)
 )
 
+@Suppress("CyclomaticComplexMethod", "CognitiveComplexMethod")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun SettingsScreen(
     modifier: Modifier = Modifier,
-    viewModel: SettingsViewModel = koinViewModel(),
 ) {
+    val viewModel = koinViewModel<SettingsViewModel>()
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
     val trackingService = koinInject<TrackingService>()
@@ -273,7 +274,7 @@ internal fun SettingsScreen(
             else showRevokeTrackingDialog = true
         },
         onPrivacyPolicyAndTermsOfUseTap = context::openPrivacyPolicyAndTermsOfUse,
-        onConnectBackupTap = { provider ->
+        onConnectBackup = { provider ->
             when (provider) {
                 CloudProviderType.GOOGLE_DRIVE -> {
                     val intent = viewModel.getGoogleSignInIntent()
@@ -284,7 +285,7 @@ internal fun SettingsScreen(
                 CloudProviderType.DROPBOX -> viewModel.startDropboxOAuth(context)
             }
         },
-        onSyncNowTap = viewModel::onSyncNow,
+        onSyncNow = viewModel::onSyncNow,
         onDisconnectBackupTap = viewModel::onDisconnectBackup,
         onSyncOnSaveToggled = viewModel::onSyncOnSaveToggled,
         onResolveConflict = viewModel::onResolveConflict,
@@ -422,6 +423,7 @@ internal fun SettingsScreen(
 
 // ── Content composable ────────────────────────────────────────────────────────
 
+@Suppress("CyclomaticComplexMethod", "CognitiveComplexMethod")
 @Composable
 internal fun SettingsContent(
     state: SettingsState,
@@ -446,8 +448,8 @@ internal fun SettingsContent(
     onLanguageChanged: (String) -> Unit,
     onTrackingToggled: (Boolean) -> Unit,
     onPrivacyPolicyAndTermsOfUseTap: () -> Unit,
-    onConnectBackupTap: (CloudProviderType) -> Unit = {},
-    onSyncNowTap: () -> Unit = {},
+    onConnectBackup: (CloudProviderType) -> Unit = {},
+    onSyncNow: () -> Unit = {},
     onDisconnectBackupTap: () -> Unit = {},
     onSyncOnSaveToggled: (Boolean) -> Unit = {},
     onResolveConflict: (useRemote: Boolean) -> Unit = {},
@@ -476,8 +478,6 @@ internal fun SettingsContent(
     var showTimeFormatSheet by rememberSaveable { mutableStateOf(false) }
     var showUnitSheet by rememberSaveable { mutableStateOf(false) }
     var showLanguageDialog by rememberSaveable { mutableStateOf(false) }
-    var showProviderPickerSheet by rememberSaveable { mutableStateOf(false) }
-    var showDisconnectBackupDialog by rememberSaveable { mutableStateOf(false) }
 
     Scaffold { innerPadding ->
         LazyColumn(
@@ -549,14 +549,37 @@ internal fun SettingsContent(
 
             if (FeatureFlags.cloudBackupEnabled) {
                 item {
+                    var showProviderPickerSheet by rememberSaveable { mutableStateOf(false) }
+                    var showDisconnectBackupDialog by rememberSaveable { mutableStateOf(false) }
+
                     BackupSettingsSection(
                         state = state.backupUiState,
-                        onConnectTap = { showProviderPickerSheet = true },
-                        onSyncNowTap = onSyncNowTap,
-                        onDisconnectTap = { showDisconnectBackupDialog = true },
+                        onConnect = { showProviderPickerSheet = true },
+                        onSyncNow = onSyncNow,
+                        onDisconnect = { showDisconnectBackupDialog = true },
                         onSyncOnSaveToggled = onSyncOnSaveToggled,
                         onResolveConflict = onResolveConflict,
                     )
+
+                    if (showProviderPickerSheet) {
+                        ProviderPickerSheet(
+                            onProviderSelected = { provider ->
+                                showProviderPickerSheet = false
+                                onConnectBackup(provider)
+                            },
+                            onDismiss = { showProviderPickerSheet = false },
+                        )
+                    }
+
+                    if (showDisconnectBackupDialog) {
+                        DisconnectBackupDialog(
+                            onDismiss = { showDisconnectBackupDialog = false },
+                            onConfirm = {
+                                showDisconnectBackupDialog = false
+                                onDisconnectBackupTap()
+                            },
+                        )
+                    }
                 }
             }
 
@@ -889,28 +912,6 @@ internal fun SettingsContent(
             current = state.currentLocaleTag,
             onLanguageSelected = onLanguageChanged,
             onDismiss = { showLanguageDialog = false },
-        )
-    }
-
-    // ── Backup provider picker sheet ──────────────────────────────────────────
-    if (showProviderPickerSheet) {
-        ProviderPickerSheet(
-            onProviderSelected = { provider ->
-                showProviderPickerSheet = false
-                onConnectBackupTap(provider)
-            },
-            onDismiss = { showProviderPickerSheet = false },
-        )
-    }
-
-    // ── Backup disconnect dialog ──────────────────────────────────────────────
-    if (showDisconnectBackupDialog) {
-        DisconnectBackupDialog(
-            onDismiss = { showDisconnectBackupDialog = false },
-            onConfirm = {
-                showDisconnectBackupDialog = false
-                onDisconnectBackupTap()
-            },
         )
     }
 }

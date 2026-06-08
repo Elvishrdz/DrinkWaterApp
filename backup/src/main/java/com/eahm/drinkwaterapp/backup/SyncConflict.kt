@@ -1,6 +1,7 @@
 package com.eahm.drinkwaterapp.backup
 
 sealed interface SyncConflict {
+
     data class GoalConflict(
         val effectiveDate: Int,
         val localGoal: GoalRecord,

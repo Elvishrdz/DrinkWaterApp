@@ -30,8 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.backup.CloudProviderType
-import com.eahm.drinkwaterapp.backup.SeenDevice
-import com.eahm.drinkwaterapp.backup.SyncConflict
 import com.eahm.drinkwaterapp.core.designsystem.component.extension.outlineBorderStyle
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
@@ -49,17 +47,17 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+@Suppress("CognitiveComplexMethod")
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 internal fun BackupSettingsSection(
     state: BackupUiState,
-    onConnectTap: () -> Unit,
-    onSyncNowTap: () -> Unit,
-    onDisconnectTap: () -> Unit,
+    onConnect: () -> Unit,
+    onDisconnect: () -> Unit,
+    onSyncNow: () -> Unit,
     onSyncOnSaveToggled: (Boolean) -> Unit = {},
     onResolveConflict: (useRemote: Boolean) -> Unit = {},
 ) {
-    // Conflict resolution sheet
     state.pendingConflict?.let { conflict ->
         SyncConflictSheet(
             conflict = conflict,
@@ -70,88 +68,91 @@ internal fun BackupSettingsSection(
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         BackupSection(title = stringResource(R.string.backup_section_title)) {
-        BackupRow(
-            icon = DwIcons.ShieldCheck,
-            iconBg = DwTintWater,
-            iconTint = DwWater,
-            label = stringResource(R.string.backup_row_provider),
-            onClick = if (state.isConnected) null else onConnectTap,
-        ) {
-            val statusText = when {
-                state.isSyncing -> stringResource(R.string.backup_status_syncing)
-                state.isConnected -> state.providerType?.displayName
-                    ?: stringResource(R.string.backup_status_not_connected)
+            BackupRow(
+                icon = DwIcons.ShieldCheck,
+                iconBg = DwTintWater,
+                iconTint = DwWater,
+                label = stringResource(R.string.backup_row_provider),
+                onClick = if (state.isConnected) null else onConnect,
+            ) {
+                val statusText = when {
+                    state.isSyncing -> stringResource(R.string.backup_status_syncing)
+                    state.isConnected -> state.providerType?.displayName
+                        ?: stringResource(R.string.backup_status_not_connected)
 
-                else -> stringResource(R.string.backup_status_not_connected)
+                    else -> stringResource(R.string.backup_status_not_connected)
+                }
+                BackupValueTrailing(value = statusText, showChevron = !state.isConnected)
             }
-            BackupValueTrailing(value = statusText, showChevron = !state.isConnected)
+
+            if (state.isConnected) {
+                HorizontalDivider(color = DwInk100)
+                BackupRow(
+                    icon = DwIcons.Repeat,
+                    iconBg = DwTintWater,
+                    iconTint = DwWater,
+                    label = stringResource(R.string.backup_row_sync_now),
+                    onClick = if (state.isSyncing) null else onSyncNow,
+                ) {
+                    BackupChevronTrailing()
+                }
+
+                HorizontalDivider(color = DwInk100)
+                BackupRow(
+                    icon = DwIcons.Clock,
+                    iconBg = DwTintWater,
+                    iconTint = DwWater,
+                    label = stringResource(R.string.backup_row_last_sync),
+                ) {
+                    val syncText = state.lastSyncAt
+                        ?.let {
+                            SimpleDateFormat(
+                                "MMM d, HH:mm",
+                                Locale.getDefault()
+                            ).format(Date(it))
+                        }
+                        ?: stringResource(R.string.backup_last_sync_never)
+                    BackupValueTrailing(value = syncText, showChevron = false)
+                }
+
+                HorizontalDivider(color = DwInk100)
+                BackupRow(
+                    icon = DwIcons.Close,
+                    iconBg = DwInk100,
+                    iconTint = DwInk500,
+                    label = stringResource(R.string.backup_row_disconnect),
+                    onClick = onDisconnect,
+                ) {
+                    BackupChevronTrailing()
+                }
+            }
         }
 
         if (state.isConnected) {
-            HorizontalDivider(color = DwInk100)
-            BackupRow(
-                icon = DwIcons.Repeat,
-                iconBg = DwTintWater,
-                iconTint = DwWater,
-                label = stringResource(R.string.backup_row_sync_now),
-                onClick = if (state.isSyncing) null else onSyncNowTap,
-            ) {
-                BackupChevronTrailing()
+            // TODO: rename this to: Force sync. force to sync in specified places while using the app.
+            BackupSection(title = "") {
+                BackupRow(
+                    icon = DwIcons.Repeat,
+                    iconBg = DwTintMagenta,
+                    iconTint = DwMagenta,
+                    label = stringResource(R.string.sync_on_save_label),
+                ) {
+                    Switch(
+                        checked = state.syncOnSaveEnabled,
+                        onCheckedChange = onSyncOnSaveToggled,
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = DwMagenta,
+                            checkedTrackColor = DwTintMagenta,
+                        ),
+                    )
+                }
             }
 
-            HorizontalDivider(color = DwInk100)
-            BackupRow(
-                icon = DwIcons.Clock,
-                iconBg = DwTintWater,
-                iconTint = DwWater,
-                label = stringResource(R.string.backup_row_last_sync),
-            ) {
-                val syncText = state.lastSyncAt
-                    ?.let { SimpleDateFormat("MMM d, HH:mm", Locale.getDefault()).format(Date(it)) }
-                    ?: stringResource(R.string.backup_last_sync_never)
-                BackupValueTrailing(value = syncText, showChevron = false)
-            }
+            SyncPendingBanner(visible = state.syncPending)
 
-            HorizontalDivider(color = DwInk100)
-            BackupRow(
-                icon = DwIcons.Close,
-                iconBg = DwInk100,
-                iconTint = DwInk500,
-                label = stringResource(R.string.backup_row_disconnect),
-                onClick = onDisconnectTap,
-            ) {
-                BackupChevronTrailing()
-            }
+            LinkedDevicesSection(devices = state.seenDevices)
         }
     }
-
-    if (state.isConnected) {
-        // Sync-on-save toggle
-        BackupSection(title = "") {
-            BackupRow(
-                icon = DwIcons.Repeat,
-                iconBg = DwTintMagenta,
-                iconTint = DwMagenta,
-                label = stringResource(R.string.sync_on_save_label),
-            ) {
-                Switch(
-                    checked = state.syncOnSaveEnabled,
-                    onCheckedChange = onSyncOnSaveToggled,
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = DwMagenta,
-                        checkedTrackColor = DwTintMagenta,
-                    ),
-                )
-            }
-        }
-
-        // Pending banner
-        SyncPendingBanner(visible = state.syncPending)
-
-        // Linked devices
-        LinkedDevicesSection(devices = state.seenDevices)
-    }
-    } // closes outer Column
 }
 
 @Composable
@@ -236,13 +237,13 @@ private fun BackupValueTrailing(value: String, showChevron: Boolean = true) {
             fontFamily = PlusJakartaSans,
             fontWeight = FontWeight.Normal,
             fontSize = 13.sp,
-            color = DwInk500,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         if (showChevron) {
             Icon(
                 imageVector = DwIcons.ChevronRight,
                 contentDescription = null,
-                tint = DwInk400,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(16.dp),
             )
         }
@@ -261,7 +262,7 @@ private fun BackupChevronTrailing() {
 
 @DwPreview
 @Composable
-private fun BackupSettingsSectionPreview_Disconnected() {
+private fun DisconnectedPreview() {
     DrinkWaterAppTheme {
         BackupSettingsSection(
             state = BackupUiState(
@@ -270,16 +271,16 @@ private fun BackupSettingsSectionPreview_Disconnected() {
                 lastSyncAt = null,
                 isSyncing = false,
             ),
-            onConnectTap = {},
-            onSyncNowTap = {},
-            onDisconnectTap = {},
+            onConnect = {},
+            onDisconnect = {},
+            onSyncNow = {},
         )
     }
 }
 
 @DwPreview
 @Composable
-private fun BackupSettingsSectionPreview_Connected() {
+private fun ConnectedPreview() {
     DrinkWaterAppTheme {
         BackupSettingsSection(
             state = BackupUiState(
@@ -288,9 +289,9 @@ private fun BackupSettingsSectionPreview_Connected() {
                 lastSyncAt = System.currentTimeMillis(),
                 isSyncing = false,
             ),
-            onConnectTap = {},
-            onSyncNowTap = {},
-            onDisconnectTap = {},
+            onConnect = {},
+            onDisconnect = {},
+            onSyncNow = {},
         )
     }
 }

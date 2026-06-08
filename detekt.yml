@@ -97,6 +97,7 @@ complexity:
     ignoreAnnotated:
       - 'Composable'
       - 'Preview'
+      - 'DwPreview'
   LongParameterList:
     active: true
     functionThreshold: 8
@@ -388,6 +389,7 @@ naming:
     ignoreAnnotated:
       - 'Composable'
       - 'Preview'
+      - 'DwPreview'
   FunctionParameterNaming:
     active: true
     parameterPattern: '[a-z][a-zA-Z0-9]*'
@@ -610,6 +612,7 @@ style:
     ignoreAnnotated:
       - 'Preview'
       - 'PreviewScreenSizes'
+      - 'DwPreview'
   UnusedPrivateProperty:
     active: true
     allowedNames: '_|(ignored|expected).*'

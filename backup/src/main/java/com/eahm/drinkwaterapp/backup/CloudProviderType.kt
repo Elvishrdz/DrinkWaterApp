@@ -1,6 +1,9 @@
 package com.eahm.drinkwaterapp.backup
 
-enum class CloudProviderType(val id: String, val displayName: String) {
+enum class CloudProviderType(
+    val id: String,
+    val displayName: String,
+) {
     GOOGLE_DRIVE("google_drive", "Google Drive"),
     DROPBOX("dropbox", "Dropbox");
 
