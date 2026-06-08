@@ -1,14 +1,14 @@
 package com.eahm.drinkwaterapp.di
 
 import androidx.work.WorkManager
-import com.eahm.drinkwaterapp.backup.BackupDataSource
-import com.eahm.drinkwaterapp.backup.BackupPreferences
-import com.eahm.drinkwaterapp.backup.BackupProviderRegistry
-import com.eahm.drinkwaterapp.backup.BackupScheduler
-import com.eahm.drinkwaterapp.backup.CloudBackupWorker
-import com.eahm.drinkwaterapp.backup.DropboxBackupProvider
-import com.eahm.drinkwaterapp.backup.GoogleDriveBackupProvider
+import com.eahm.drinkwaterapp.backup.data.BackupProviderRegistry
+import com.eahm.drinkwaterapp.backup.data.provider.DropboxBackupProvider
+import com.eahm.drinkwaterapp.backup.data.provider.GoogleDriveBackupProvider
+import com.eahm.drinkwaterapp.backup.data.worker.CloudBackupWorker
 import com.eahm.drinkwaterapp.backup.di.backupCoreModule
+import com.eahm.drinkwaterapp.backup.domain.BackupDataSource
+import com.eahm.drinkwaterapp.backup.domain.BackupPreferences
+import com.eahm.drinkwaterapp.backup.domain.BackupScheduler
 import com.eahm.drinkwaterapp.core.backup.BackupSerializer
 import com.eahm.drinkwaterapp.core.backup.WorkManagerBackupScheduler
 import com.eahm.drinkwaterapp.core.data.datastore.DataStorePrefsStorage

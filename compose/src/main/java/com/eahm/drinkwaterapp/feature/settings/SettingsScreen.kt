@@ -72,7 +72,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
-import com.eahm.drinkwaterapp.backup.CloudProviderType
+import com.eahm.drinkwaterapp.backup.domain.model.CloudProviderType
 import com.eahm.drinkwaterapp.core.billing.PurchaseState
 import com.eahm.drinkwaterapp.core.config.FeatureFlags
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton

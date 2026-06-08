@@ -1,6 +1,6 @@
 package com.eahm.drinkwaterapp.core.backup
 
-import com.eahm.drinkwaterapp.backup.BackupError
+import com.eahm.drinkwaterapp.backup.domain.model.BackupError
 import com.eahm.drinkwaterapp.core.presentation.UiText
 
 object BackupErrorMapper {

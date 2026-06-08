@@ -7,9 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingDrink
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
-import com.eahm.drinkwaterapp.backup.BackupPreferences
-import com.eahm.drinkwaterapp.backup.BackupRepository
-import com.eahm.drinkwaterapp.backup.SyncCoordinator
+import com.eahm.drinkwaterapp.backup.data.SyncCoordinator
+import com.eahm.drinkwaterapp.backup.domain.BackupPreferences
+import com.eahm.drinkwaterapp.backup.domain.BackupRepository
 import com.eahm.drinkwaterapp.core.billing.PurchaseManager
 import com.eahm.drinkwaterapp.core.data.confetti.ConfettiController
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage

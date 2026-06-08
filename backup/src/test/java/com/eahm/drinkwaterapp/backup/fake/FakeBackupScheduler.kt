@@ -1,6 +1,6 @@
 package com.eahm.drinkwaterapp.backup.fake
 
-import com.eahm.drinkwaterapp.backup.BackupScheduler
+import com.eahm.drinkwaterapp.backup.domain.BackupScheduler
 
 class FakeBackupScheduler : BackupScheduler {
     var scheduleAutoSyncCalled = false

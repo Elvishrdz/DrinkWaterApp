@@ -1,5 +1,11 @@
 package com.eahm.drinkwaterapp.backup
 
+import com.eahm.drinkwaterapp.backup.data.MergeEngine
+import com.eahm.drinkwaterapp.backup.domain.model.BackupData
+import com.eahm.drinkwaterapp.backup.domain.model.GoalRecord
+import com.eahm.drinkwaterapp.backup.domain.model.HistoryRecord
+import com.eahm.drinkwaterapp.backup.domain.model.PreferencesRecord
+import com.eahm.drinkwaterapp.backup.domain.model.SyncConflict
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -22,8 +28,10 @@ class MergeEngineTest {
         deviceId: String = localDeviceId,
         updatedAt: Long = now,
         deletedAt: Long? = null,
-    ) = HistoryRecord(id = id, amount = amount, status = "IN_APP", timestamp = now,
-        deviceId = deviceId, updatedAt = updatedAt, deletedAt = deletedAt)
+    ) = HistoryRecord(
+        id = id, amount = amount, status = "IN_APP", timestamp = now,
+        deviceId = deviceId, updatedAt = updatedAt, deletedAt = deletedAt
+    )
 
     private fun goalRecord(
         date: Int,
@@ -31,8 +39,10 @@ class MergeEngineTest {
         deviceId: String = localDeviceId,
         updatedAt: Long = now,
         deletedAt: Long? = null,
-    ) = GoalRecord(id = "goal-$date", effectiveDate = date, goalMl = goalMl,
-        deviceId = deviceId, updatedAt = updatedAt, deletedAt = deletedAt)
+    ) = GoalRecord(
+        id = "goal-$date", effectiveDate = date, goalMl = goalMl,
+        deviceId = deviceId, updatedAt = updatedAt, deletedAt = deletedAt
+    )
 
     // ---- History tests ----
 
@@ -43,7 +53,10 @@ class MergeEngineTest {
             dailyGoals = emptyList(), preferences = emptyPrefs()
         )
         val remote = BackupData(
-            history = listOf(historyRecord("b", deviceId = remoteDeviceId), historyRecord("c", deviceId = remoteDeviceId)),
+            history = listOf(
+                historyRecord("b", deviceId = remoteDeviceId),
+                historyRecord("c", deviceId = remoteDeviceId)
+            ),
             dailyGoals = emptyList(), preferences = emptyPrefs()
         )
         val result = engine.merge(local, remote, localDeviceId)
@@ -60,7 +73,14 @@ class MergeEngineTest {
             dailyGoals = emptyList(), preferences = emptyPrefs()
         )
         val remote = BackupData(
-            history = listOf(historyRecord("a", amount = 200f, deviceId = remoteDeviceId, updatedAt = now)),
+            history = listOf(
+                historyRecord(
+                    "a",
+                    amount = 200f,
+                    deviceId = remoteDeviceId,
+                    updatedAt = now
+                )
+            ),
             dailyGoals = emptyList(), preferences = emptyPrefs()
         )
         val result = engine.merge(local, remote, localDeviceId)
@@ -76,7 +96,14 @@ class MergeEngineTest {
             dailyGoals = emptyList(), preferences = emptyPrefs()
         )
         val remote = BackupData(
-            history = listOf(historyRecord("a", deviceId = remoteDeviceId, updatedAt = now, deletedAt = now)),
+            history = listOf(
+                historyRecord(
+                    "a",
+                    deviceId = remoteDeviceId,
+                    updatedAt = now,
+                    deletedAt = now
+                )
+            ),
             dailyGoals = emptyList(), preferences = emptyPrefs()
         )
         val result = engine.merge(local, remote, localDeviceId)
@@ -92,7 +119,14 @@ class MergeEngineTest {
             dailyGoals = emptyList(), preferences = emptyPrefs()
         )
         val remote = BackupData(
-            history = listOf(historyRecord("a", deviceId = remoteDeviceId, updatedAt = now - 10_000, deletedAt = now - 10_000)),
+            history = listOf(
+                historyRecord(
+                    "a",
+                    deviceId = remoteDeviceId,
+                    updatedAt = now - 10_000,
+                    deletedAt = now - 10_000
+                )
+            ),
             dailyGoals = emptyList(), preferences = emptyPrefs()
         )
         val result = engine.merge(local, remote, localDeviceId)
@@ -105,7 +139,8 @@ class MergeEngineTest {
 
     @Test
     fun `goal only on remote side is added`() {
-        val local = BackupData(history = emptyList(), dailyGoals = emptyList(), preferences = emptyPrefs())
+        val local =
+            BackupData(history = emptyList(), dailyGoals = emptyList(), preferences = emptyPrefs())
         val remote = BackupData(
             history = emptyList(),
             dailyGoals = listOf(goalRecord(date = 1000, goalMl = 2000f, deviceId = remoteDeviceId)),
@@ -125,7 +160,14 @@ class MergeEngineTest {
         )
         val remote = BackupData(
             history = emptyList(),
-            dailyGoals = listOf(goalRecord(date = 1000, goalMl = 2500f, deviceId = remoteDeviceId, updatedAt = now - 30_000)),
+            dailyGoals = listOf(
+                goalRecord(
+                    date = 1000,
+                    goalMl = 2500f,
+                    deviceId = remoteDeviceId,
+                    updatedAt = now - 30_000
+                )
+            ),
             preferences = emptyPrefs()
         )
         val result = engine.merge(local, remote, localDeviceId)
@@ -143,7 +185,14 @@ class MergeEngineTest {
         )
         val remote = BackupData(
             history = emptyList(),
-            dailyGoals = listOf(goalRecord(date = 1000, goalMl = 2500f, deviceId = remoteDeviceId, updatedAt = now)),
+            dailyGoals = listOf(
+                goalRecord(
+                    date = 1000,
+                    goalMl = 2500f,
+                    deviceId = remoteDeviceId,
+                    updatedAt = now
+                )
+            ),
             preferences = emptyPrefs()
         )
         val result = engine.merge(local, remote, localDeviceId)
@@ -158,8 +207,10 @@ class MergeEngineTest {
     fun `preferences conflict within 5 minutes is flagged`() {
         val localPrefs = PreferencesRecord("ML", "SYSTEM", 250f, updatedAt = now)
         val remotePrefs = PreferencesRecord("FL_OZ", "12H", 8f, updatedAt = now - 120_000)
-        val local = BackupData(history = emptyList(), dailyGoals = emptyList(), preferences = localPrefs)
-        val remote = BackupData(history = emptyList(), dailyGoals = emptyList(), preferences = remotePrefs)
+        val local =
+            BackupData(history = emptyList(), dailyGoals = emptyList(), preferences = localPrefs)
+        val remote =
+            BackupData(history = emptyList(), dailyGoals = emptyList(), preferences = remotePrefs)
         // local is newer, so we keep local — no conflict emitted (remote.updatedAt < local.updatedAt)
         val result = engine.merge(local, remote, localDeviceId)
         // local wins (updatedAt >= remote), conflict only emitted when remote wins
@@ -171,8 +222,10 @@ class MergeEngineTest {
     fun `preferences remote newer within 5 minutes triggers conflict`() {
         val localPrefs = PreferencesRecord("ML", "SYSTEM", 250f, updatedAt = now - 120_000)
         val remotePrefs = PreferencesRecord("FL_OZ", "12H", 8f, updatedAt = now)
-        val local = BackupData(history = emptyList(), dailyGoals = emptyList(), preferences = localPrefs)
-        val remote = BackupData(history = emptyList(), dailyGoals = emptyList(), preferences = remotePrefs)
+        val local =
+            BackupData(history = emptyList(), dailyGoals = emptyList(), preferences = localPrefs)
+        val remote =
+            BackupData(history = emptyList(), dailyGoals = emptyList(), preferences = remotePrefs)
         val result = engine.merge(local, remote, localDeviceId)
         assertEquals(1, result.conflicts.filterIsInstance<SyncConflict.PreferencesConflict>().size)
         // Merged prefs is remote (remote is newer)
@@ -183,8 +236,10 @@ class MergeEngineTest {
     fun `preferences remote newer outside 5 minutes is silent auto-resolve`() {
         val localPrefs = PreferencesRecord("ML", "SYSTEM", 250f, updatedAt = now - 600_000)
         val remotePrefs = PreferencesRecord("FL_OZ", "12H", 8f, updatedAt = now)
-        val local = BackupData(history = emptyList(), dailyGoals = emptyList(), preferences = localPrefs)
-        val remote = BackupData(history = emptyList(), dailyGoals = emptyList(), preferences = remotePrefs)
+        val local =
+            BackupData(history = emptyList(), dailyGoals = emptyList(), preferences = localPrefs)
+        val remote =
+            BackupData(history = emptyList(), dailyGoals = emptyList(), preferences = remotePrefs)
         val result = engine.merge(local, remote, localDeviceId)
         assertTrue(result.conflicts.isEmpty())
         assertEquals(1, result.autoResolvedConflicts)

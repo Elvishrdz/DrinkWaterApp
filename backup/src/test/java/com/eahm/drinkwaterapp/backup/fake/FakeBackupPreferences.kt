@@ -1,7 +1,7 @@
 package com.eahm.drinkwaterapp.backup.fake
 
-import com.eahm.drinkwaterapp.backup.BackupPreferences
-import com.eahm.drinkwaterapp.backup.SeenDevice
+import com.eahm.drinkwaterapp.backup.domain.BackupPreferences
+import com.eahm.drinkwaterapp.backup.domain.model.SeenDevice
 
 class FakeBackupPreferences : BackupPreferences {
     var backupEnabled: Boolean = false
@@ -73,20 +73,32 @@ class FakeBackupPreferences : BackupPreferences {
     var tombstoneWarningPending: Boolean = false
 
     override suspend fun getDeviceId() = deviceId
-    override suspend fun setDeviceId(id: String) { deviceId = id }
+    override suspend fun setDeviceId(id: String) {
+        deviceId = id
+    }
 
     override suspend fun getSyncPending() = syncPending
-    override suspend fun setSyncPending(pending: Boolean) { syncPending = pending }
+    override suspend fun setSyncPending(pending: Boolean) {
+        syncPending = pending
+    }
 
     override suspend fun getLastRemoteSyncAt() = lastRemoteSyncAt
-    override suspend fun setLastRemoteSyncAt(millis: Long) { lastRemoteSyncAt = millis }
+    override suspend fun setLastRemoteSyncAt(millis: Long) {
+        lastRemoteSyncAt = millis
+    }
 
     override suspend fun getSyncOnSaveEnabled() = syncOnSaveEnabled
-    override suspend fun setSyncOnSaveEnabled(enabled: Boolean) { syncOnSaveEnabled = enabled }
+    override suspend fun setSyncOnSaveEnabled(enabled: Boolean) {
+        syncOnSaveEnabled = enabled
+    }
 
     override suspend fun getSeenDevices() = seenDevices
-    override suspend fun setSeenDevices(devices: List<SeenDevice>) { seenDevices = devices }
+    override suspend fun setSeenDevices(devices: List<SeenDevice>) {
+        seenDevices = devices
+    }
 
     override suspend fun getTombstoneWarningPending() = tombstoneWarningPending
-    override suspend fun setTombstoneWarningPending(pending: Boolean) { tombstoneWarningPending = pending }
+    override suspend fun setTombstoneWarningPending(pending: Boolean) {
+        tombstoneWarningPending = pending
+    }
 }

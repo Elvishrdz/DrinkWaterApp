@@ -26,9 +26,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.R
-import com.eahm.drinkwaterapp.backup.GoalRecord
-import com.eahm.drinkwaterapp.backup.PreferencesRecord
-import com.eahm.drinkwaterapp.backup.SyncConflict
+import com.eahm.drinkwaterapp.backup.domain.model.GoalRecord
+import com.eahm.drinkwaterapp.backup.domain.model.PreferencesRecord
+import com.eahm.drinkwaterapp.backup.domain.model.SyncConflict
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk100
@@ -118,12 +118,18 @@ private fun GoalConflictContent(conflict: SyncConflict.GoalConflict) {
     ) {
         ConflictOptionCard(
             label = stringResource(R.string.sync_conflict_local_label),
-            value = stringResource(R.string.sync_conflict_goal_value, conflict.localGoal.goalMl.toInt()),
+            value = stringResource(
+                R.string.sync_conflict_goal_value,
+                conflict.localGoal.goalMl.toInt()
+            ),
             modifier = Modifier.weight(1f),
         )
         ConflictOptionCard(
             label = stringResource(R.string.sync_conflict_remote_label),
-            value = stringResource(R.string.sync_conflict_goal_value, conflict.remoteGoal.goalMl.toInt()),
+            value = stringResource(
+                R.string.sync_conflict_goal_value,
+                conflict.remoteGoal.goalMl.toInt()
+            ),
             modifier = Modifier.weight(1f),
         )
     }
@@ -218,8 +224,16 @@ private fun SyncConflictSheetPreview_Prefs() {
     DrinkWaterAppTheme {
         SyncConflictSheet(
             conflict = SyncConflict.PreferencesConflict(
-                localPrefs = PreferencesRecord(unitPreference = "ML", timeFormat = "24h", amountPerDrink = 250f),
-                remotePrefs = PreferencesRecord(unitPreference = "OZ", timeFormat = "12h", amountPerDrink = 300f),
+                localPrefs = PreferencesRecord(
+                    unitPreference = "ML",
+                    timeFormat = "24h",
+                    amountPerDrink = 250f
+                ),
+                remotePrefs = PreferencesRecord(
+                    unitPreference = "OZ",
+                    timeFormat = "12h",
+                    amountPerDrink = 300f
+                ),
             ),
             onKeepLocal = {},
             onUseRemote = {},

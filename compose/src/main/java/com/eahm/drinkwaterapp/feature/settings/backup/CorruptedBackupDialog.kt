@@ -18,7 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.R
-import com.eahm.drinkwaterapp.backup.CorruptedBackup
+import com.eahm.drinkwaterapp.backup.domain.model.CorruptedBackup
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwSecondaryButton
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview

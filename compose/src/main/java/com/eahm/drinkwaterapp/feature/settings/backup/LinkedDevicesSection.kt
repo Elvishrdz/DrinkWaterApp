@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.R
-import com.eahm.drinkwaterapp.backup.SeenDevice
+import com.eahm.drinkwaterapp.backup.domain.model.SeenDevice
 import com.eahm.drinkwaterapp.core.designsystem.component.extension.outlineBorderStyle
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview

@@ -2,13 +2,13 @@ package com.eahm.drinkwaterapp.backup.fake
 
 import android.content.Context
 import android.content.Intent
-import com.eahm.drinkwaterapp.backup.BackupError
-import com.eahm.drinkwaterapp.backup.BackupFile
-import com.eahm.drinkwaterapp.backup.BackupMetadata
-import com.eahm.drinkwaterapp.backup.BackupResult
-import com.eahm.drinkwaterapp.backup.CloudBackupProvider
-import com.eahm.drinkwaterapp.backup.CloudProviderType
-import com.eahm.drinkwaterapp.backup.CloudUser
+import com.eahm.drinkwaterapp.backup.domain.CloudBackupProvider
+import com.eahm.drinkwaterapp.backup.domain.model.BackupError
+import com.eahm.drinkwaterapp.backup.domain.model.BackupFile
+import com.eahm.drinkwaterapp.backup.domain.model.BackupMetadata
+import com.eahm.drinkwaterapp.backup.domain.model.BackupResult
+import com.eahm.drinkwaterapp.backup.domain.model.CloudProviderType
+import com.eahm.drinkwaterapp.backup.domain.model.CloudUser
 
 class FakeCloudBackupProvider(
     override val providerType: CloudProviderType = CloudProviderType.GOOGLE_DRIVE,

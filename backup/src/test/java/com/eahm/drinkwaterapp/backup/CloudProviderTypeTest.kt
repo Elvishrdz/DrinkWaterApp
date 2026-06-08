@@ -1,5 +1,6 @@
 package com.eahm.drinkwaterapp.backup
 
+import com.eahm.drinkwaterapp.backup.domain.model.CloudProviderType
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull

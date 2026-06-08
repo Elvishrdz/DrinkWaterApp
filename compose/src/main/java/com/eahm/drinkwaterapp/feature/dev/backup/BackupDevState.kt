@@ -1,6 +1,6 @@
 package com.eahm.drinkwaterapp.feature.dev.backup
 
-import com.eahm.drinkwaterapp.backup.BackupSyncState
+import com.eahm.drinkwaterapp.backup.domain.BackupSyncState
 
 data class BackupDevState(
     val syncState: BackupSyncState = BackupSyncState.Idle,

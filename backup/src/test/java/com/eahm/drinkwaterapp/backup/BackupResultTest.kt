@@ -1,5 +1,9 @@
 package com.eahm.drinkwaterapp.backup
 
+import com.eahm.drinkwaterapp.backup.domain.model.BackupError
+import com.eahm.drinkwaterapp.backup.domain.model.BackupResult
+import com.eahm.drinkwaterapp.backup.domain.model.onFailure
+import com.eahm.drinkwaterapp.backup.domain.model.onSuccess
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse

@@ -10,8 +10,8 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.eahm.drinkwaterapp.backup.BackupPreferences
-import com.eahm.drinkwaterapp.backup.SeenDevice
+import com.eahm.drinkwaterapp.backup.domain.BackupPreferences
+import com.eahm.drinkwaterapp.backup.domain.model.SeenDevice
 import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
 import com.eahm.drinkwaterapp.core.data.datastore.data.DrinkSuggestion
 import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference

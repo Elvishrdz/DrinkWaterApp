@@ -1,11 +1,11 @@
 package com.eahm.drinkwaterapp.feature.settings.backup
 
 import androidx.compose.runtime.Immutable
-import com.eahm.drinkwaterapp.backup.BackupError
-import com.eahm.drinkwaterapp.backup.CloudProviderType
-import com.eahm.drinkwaterapp.backup.CorruptedBackup
-import com.eahm.drinkwaterapp.backup.SeenDevice
-import com.eahm.drinkwaterapp.backup.SyncConflict
+import com.eahm.drinkwaterapp.backup.domain.model.BackupError
+import com.eahm.drinkwaterapp.backup.domain.model.CloudProviderType
+import com.eahm.drinkwaterapp.backup.domain.model.CorruptedBackup
+import com.eahm.drinkwaterapp.backup.domain.model.SeenDevice
+import com.eahm.drinkwaterapp.backup.domain.model.SyncConflict
 
 @Immutable
 data class BackupUiState(

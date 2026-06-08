@@ -1,11 +1,14 @@
 package com.eahm.drinkwaterapp.core.backup
 
-import com.eahm.drinkwaterapp.backup.BackupData
-import com.eahm.drinkwaterapp.backup.BackupDataSource
-import com.eahm.drinkwaterapp.backup.BackupError
-import com.eahm.drinkwaterapp.backup.BackupMigrationManager
-import com.eahm.drinkwaterapp.backup.BackupPreferences
-import com.eahm.drinkwaterapp.backup.BackupResult
+import com.eahm.drinkwaterapp.backup.data.BackupMigrationManager
+import com.eahm.drinkwaterapp.backup.domain.BackupDataSource
+import com.eahm.drinkwaterapp.backup.domain.BackupPreferences
+import com.eahm.drinkwaterapp.backup.domain.model.BackupData
+import com.eahm.drinkwaterapp.backup.domain.model.BackupError
+import com.eahm.drinkwaterapp.backup.domain.model.BackupResult
+import com.eahm.drinkwaterapp.backup.domain.model.GoalRecord
+import com.eahm.drinkwaterapp.backup.domain.model.HistoryRecord
+import com.eahm.drinkwaterapp.backup.domain.model.PreferencesRecord
 import com.eahm.drinkwaterapp.core.config.AppInfoService
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.database.AppDatabase
@@ -227,7 +230,7 @@ class BackupSerializer(
         val dailyGoals = database.getDailyGoalDao().getAllGoals().first()
 
         val history = historyRecords.map { entity ->
-            com.eahm.drinkwaterapp.backup.HistoryRecord(
+            HistoryRecord(
                 id = entity.id,
                 amount = entity.amount,
                 status = entity.status.name,
@@ -243,7 +246,7 @@ class BackupSerializer(
         }
 
         val goals = dailyGoals.map { entity ->
-            com.eahm.drinkwaterapp.backup.GoalRecord(
+            GoalRecord(
                 id = entity.id,
                 effectiveDate = entity.effectiveDate.toEpochDays().toInt(),
                 goalMl = entity.goalMl,
@@ -257,7 +260,7 @@ class BackupSerializer(
         val timeFormat = prefs.getTimeFormatPreference().first().name
         val amountPerDrink = prefs.getAmountPerDrink().first()
 
-        val prefsRecord = com.eahm.drinkwaterapp.backup.PreferencesRecord(
+        val prefsRecord = PreferencesRecord(
             unitPreference = unitPref,
             timeFormat = timeFormat,
             amountPerDrink = amountPerDrink,
@@ -283,7 +286,7 @@ class BackupSerializer(
                         .toEpochMilliseconds()
                 }.getOrNull() ?: 0L
 
-                com.eahm.drinkwaterapp.backup.HistoryRecord(
+                HistoryRecord(
                     id = obj["id"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null,
                     amount = obj["amount"]?.jsonPrimitive?.double?.toFloat() ?: 0f,
                     status = obj["status"]?.jsonPrimitive?.contentOrNull ?: "IN_APP",
@@ -302,7 +305,7 @@ class BackupSerializer(
                     kotlinx.datetime.LocalDate.parse(dateStr).toEpochDays().toInt()
                 }.getOrNull() ?: return@mapNotNull null
 
-                com.eahm.drinkwaterapp.backup.GoalRecord(
+                GoalRecord(
                     id = obj["id"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null,
                     effectiveDate = epochDays,
                     goalMl = obj["goal_ml"]?.jsonPrimitive?.double?.toFloat() ?: 500f,
@@ -313,7 +316,7 @@ class BackupSerializer(
             } ?: emptyList()
 
             val prefsObj = dataBlock["preferences"]?.jsonObject
-            val prefsRecord = com.eahm.drinkwaterapp.backup.PreferencesRecord(
+            val prefsRecord = PreferencesRecord(
                 unitPreference = prefsObj?.get("unit_preference")?.jsonPrimitive?.contentOrNull
                     ?: "ML",
                 timeFormat = prefsObj?.get("time_format_preference")?.jsonPrimitive?.contentOrNull
@@ -378,10 +381,10 @@ class BackupSerializer(
 
             prefs.setAmountPerDrink(prefsRecord.amountPerDrink)
 
-            com.eahm.drinkwaterapp.backup.BackupResult.Success(Unit)
+            BackupResult.Success(Unit)
         } catch (e: Exception) {
-            com.eahm.drinkwaterapp.backup.BackupResult.Failure(
-                com.eahm.drinkwaterapp.backup.BackupError.MigrationFailed(e)
+            BackupResult.Failure(
+                BackupError.MigrationFailed(e)
             )
         }
     }

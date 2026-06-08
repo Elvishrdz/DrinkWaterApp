@@ -20,7 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.R
-import com.eahm.drinkwaterapp.backup.CloudProviderType
+import com.eahm.drinkwaterapp.backup.domain.model.CloudProviderType
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwSecondaryButton
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme

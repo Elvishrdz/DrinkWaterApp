@@ -8,8 +8,8 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.eahm.drinkwaterapp.backup.BackupScheduler
-import com.eahm.drinkwaterapp.backup.CloudBackupWorker
+import com.eahm.drinkwaterapp.backup.data.worker.CloudBackupWorker
+import com.eahm.drinkwaterapp.backup.domain.BackupScheduler
 import java.util.concurrent.TimeUnit
 
 class WorkManagerBackupScheduler(

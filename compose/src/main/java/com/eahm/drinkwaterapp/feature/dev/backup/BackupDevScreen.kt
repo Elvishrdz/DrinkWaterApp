@@ -26,7 +26,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.eahm.drinkwaterapp.backup.BackupSyncState
+import com.eahm.drinkwaterapp.backup.domain.BackupSyncState
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 
 @Composable
