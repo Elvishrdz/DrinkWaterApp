@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
 import android.util.Log
+import com.google.android.gms.auth.GoogleAuthUtil
 import com.google.android.gms.auth.api.identity.AuthorizationRequest
 import com.google.android.gms.auth.api.identity.AuthorizationResult
 import com.google.android.gms.auth.api.identity.Identity
@@ -17,9 +18,11 @@ import io.ktor.client.request.parameter
 import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -36,7 +39,6 @@ private const val PROFILE_SCOPE = "https://www.googleapis.com/auth/userinfo.prof
 private const val BACKUP_FILE_NAME = "drinkwater_backup.json"
 private const val DRIVE_BASE = "https://www.googleapis.com"
 private const val USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo"
-private const val REVOKE_URL = "https://oauth2.googleapis.com/revoke"
 
 /**
  * Google Drive backup using the Google Identity Services **Authorization** API
@@ -149,14 +151,13 @@ class GoogleDriveBackupProvider(
         BackupResult.Success(user)
     }.getOrElse { e -> BackupResult.Failure(BackupError.Unknown(e)) }
 
-    override suspend fun signOut(context: Context?): BackupResult<Unit> = runCatching {
-        // Best-effort revoke so a later reconnect re-prompts for consent.
-        val token = getAccessToken(context)
-        if (token != null) {
-            runCatching { httpClient.post(REVOKE_URL) { parameter("token", token) } }
-        }
-        BackupResult.Success(Unit)
-    }.getOrElse { e -> BackupResult.Failure(BackupError.Unknown(e)) }
+    override suspend fun signOut(context: Context?): BackupResult<Unit> {
+        // Local unlink only. We intentionally do NOT revoke the access token: revoking
+        // kills it server-side while Play Services keeps serving the cached copy, so the
+        // next silent authorize() would hand back a dead token and Drive returns 401.
+        // Disconnecting the provider in prefs (DisconnectBackupUseCase) is enough.
+        return BackupResult.Success(Unit)
+    }
 
     override suspend fun isSignedIn(context: Context?): Boolean =
         runCatching { getAccessToken(context) != null }.getOrDefault(false)
@@ -166,13 +167,41 @@ class GoogleDriveBackupProvider(
         return runCatching { fetchUser(token) }.getOrNull()
     }
 
-    private suspend fun findBackupFileId(token: String): String? {
-        val response = httpClient.get("$DRIVE_BASE/drive/v3/files") {
-            header(HttpHeaders.Authorization, "Bearer $token")
-            parameter("spaces", "appDataFolder")
-            parameter("fields", "files(id,name)")
-            parameter("q", "name='$BACKUP_FILE_NAME'")
-        }
+    /**
+     * Runs an authorized Drive [request]. On a 401 (token revoked/stale in the Play
+     * Services cache), clears the cached token and retries once with a fresh one.
+     * Returns null only when no token can be obtained (user not signed in).
+     */
+    private suspend fun authorizedCall(
+        context: Context?,
+        request: suspend (token: String) -> HttpResponse,
+    ): HttpResponse? {
+        val token = getAccessToken(context) ?: return null
+        val response = request(token)
+        if (response.status != HttpStatusCode.Unauthorized) return response
+
+        Log.w(TAG, "Drive returned 401. clearing cached token and retrying once")
+        clearCachedToken(context, token)
+        val refreshed = getAccessToken(context) ?: return response
+        return request(refreshed)
+    }
+
+    /** Invalidates a stale token in the GMS token store so the next authorize() re-mints it. */
+    private fun clearCachedToken(context: Context?, token: String) {
+        val ctx = context ?: return
+        runCatching { GoogleAuthUtil.clearToken(ctx, token) }
+            .onFailure { Log.w(TAG, "clearToken failed: ${it.message}") }
+    }
+
+    private suspend fun findBackupFileId(context: Context?): String? {
+        val response = authorizedCall(context) { token ->
+            httpClient.get("$DRIVE_BASE/drive/v3/files") {
+                header(HttpHeaders.Authorization, "Bearer $token")
+                parameter("spaces", "appDataFolder")
+                parameter("fields", "files(id,name)")
+                parameter("q", "name='$BACKUP_FILE_NAME'")
+            }
+        } ?: return null
         if (!response.status.isSuccess()) {
             Log.e(TAG, "findBackupFileId failed: ${response.status} -> ${response.bodyAsText()}")
             return null
@@ -184,10 +213,11 @@ class GoogleDriveBackupProvider(
     }
 
     override suspend fun upload(context: Context?, data: String): BackupResult<Unit> = runCatching {
-        val token = getAccessToken(context)
-            ?: return BackupResult.Failure(BackupError.NotSignedIn)
+        if (getAccessToken(context) == null) {
+            return BackupResult.Failure(BackupError.NotSignedIn)
+        }
 
-        val existingId = findBackupFileId(token)
+        val existingId = findBackupFileId(context)
 
         val metaPart = if (existingId == null) {
             """{"name":"$BACKUP_FILE_NAME","parents":["appDataFolder"]}"""
@@ -204,23 +234,27 @@ class GoogleDriveBackupProvider(
                 "$data\r\n" +
                 "--$boundary--"
 
+        // Create → POST /files;
+        // update → PATCH /files/{id}.
         val url = if (existingId == null) {
             "$DRIVE_BASE/upload/drive/v3/files?uploadType=multipart"
         } else {
             "$DRIVE_BASE/upload/drive/v3/files/$existingId?uploadType=multipart"
         }
 
-        val requestBlock: HttpRequestBuilder.() -> Unit = {
-            header(HttpHeaders.Authorization, "Bearer $token")
-            contentType(ContentType.parse("multipart/related; boundary=$boundary"))
-            setBody(multipartBody)
+        val response = authorizedCall(context) { token ->
+            val requestBlock: HttpRequestBuilder.() -> Unit = {
+                header(HttpHeaders.Authorization, "Bearer $token")
+                contentType(ContentType.parse("multipart/related; boundary=$boundary"))
+                setBody(multipartBody)
+            }
+            if (existingId == null) {
+                httpClient.post(url, requestBlock)
+            } else {
+                httpClient.patch(url, requestBlock)
+            }
         }
-
-        val response = if (existingId == null) {
-            httpClient.post(url, requestBlock)
-        } else {
-            httpClient.patch(url, requestBlock)
-        }
+            ?: return BackupResult.Failure(BackupError.NotSignedIn)
 
         if (response.status.isSuccess()) {
             BackupResult.Success(Unit)
@@ -237,16 +271,20 @@ class GoogleDriveBackupProvider(
     }
 
     override suspend fun download(context: Context?): BackupResult<BackupFile> = runCatching {
-        val token = getAccessToken(context)
-            ?: return BackupResult.Failure(BackupError.NotSignedIn)
+        if (getAccessToken(context) == null) {
+            return BackupResult.Failure(BackupError.NotSignedIn)
+        }
 
-        val fileId = findBackupFileId(token)
+        val fileId = findBackupFileId(context)
             ?: return BackupResult.Failure(BackupError.FileNotFound)
 
-        val response = httpClient.get("$DRIVE_BASE/drive/v3/files/$fileId") {
-            header(HttpHeaders.Authorization, "Bearer $token")
-            parameter("alt", "media")
+        val response = authorizedCall(context) { token ->
+            httpClient.get("$DRIVE_BASE/drive/v3/files/$fileId") {
+                header(HttpHeaders.Authorization, "Bearer $token")
+                parameter("alt", "media")
+            }
         }
+            ?: return BackupResult.Failure(BackupError.NotSignedIn)
 
         if (!response.status.isSuccess()) {
             return BackupResult.Failure(BackupError.DownloadFailed())
@@ -274,9 +312,13 @@ class GoogleDriveBackupProvider(
 
     override suspend fun getRemoteMetadata(context: Context?): BackupResult<BackupMetadata?> =
         runCatching {
-            val token = getAccessToken(context)
-                ?: return BackupResult.Failure(BackupError.NotSignedIn)
-            val fileId = findBackupFileId(token) ?: return BackupResult.Success(null)
+            if (getAccessToken(context) == null) {
+                return BackupResult.Failure(BackupError.NotSignedIn)
+            }
+
+            findBackupFileId(context)
+                ?: return BackupResult.Success(null)
+
             when (val result = download(context)) {
                 is BackupResult.Success -> BackupResult.Success(result.value.metadata)
                 is BackupResult.Failure -> result
@@ -284,13 +326,25 @@ class GoogleDriveBackupProvider(
         }.getOrElse { e -> BackupResult.Failure(BackupError.Unknown(e)) }
 
     override suspend fun deleteRemoteFile(context: Context?): BackupResult<Unit> = runCatching {
-        val token = getAccessToken(context)
-            ?: return BackupResult.Failure(BackupError.NotSignedIn)
-        val fileId = findBackupFileId(token) ?: return BackupResult.Success(Unit)
-        val response = httpClient.delete("$DRIVE_BASE/drive/v3/files/$fileId") {
-            header(HttpHeaders.Authorization, "Bearer $token")
+        if (getAccessToken(context) == null) {
+            return BackupResult.Failure(BackupError.NotSignedIn)
         }
-        if (response.status.isSuccess()) BackupResult.Success(Unit)
-        else BackupResult.Failure(BackupError.Unknown())
+
+        val fileId = findBackupFileId(context)
+            ?: return BackupResult.Success(Unit)
+
+        val response = authorizedCall(context) { token ->
+            httpClient.delete("$DRIVE_BASE/drive/v3/files/$fileId") {
+                header(HttpHeaders.Authorization, "Bearer $token")
+            }
+        }
+            ?: return BackupResult.Failure(BackupError.NotSignedIn)
+
+        if (response.status.isSuccess()) {
+            BackupResult.Success(Unit)
+        } else {
+            BackupResult.Failure(BackupError.Unknown())
+        }
+
     }.getOrElse { e -> BackupResult.Failure(BackupError.Unknown(e)) }
 }
