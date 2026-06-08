@@ -1,6 +1,7 @@
 package com.eahm.drinkwaterapp.backup.data.usecase
 
 import com.eahm.drinkwaterapp.backup.data.InitialSyncResolver
+import com.eahm.drinkwaterapp.backup.domain.BackupPreferences
 import com.eahm.drinkwaterapp.backup.domain.CloudBackupProvider
 import com.eahm.drinkwaterapp.backup.domain.model.BackupResult
 import com.eahm.drinkwaterapp.backup.domain.model.ExistingRemoteBackup
@@ -25,29 +26,40 @@ class InitialConnectionSyncUseCase(
     private val syncUseCase: SyncBackupUseCase,
     private val restoreUseCase: RestoreBackupUseCase,
     private val resolver: InitialSyncResolver,
+    private val prefs: BackupPreferences,
 ) {
     suspend operator fun invoke(provider: CloudBackupProvider): BackupResult<SyncResult> {
         val remoteMetadata = when (val status = provider.getRemoteMetadata()) {
             is BackupResult.Success -> status.value
             // Couldn't determine remote state (e.g. network) → defer to normal sync,
-            // which has its own error handling.
+            // which has its own error handling. Leave the pending flag untouched.
             is BackupResult.Failure -> return syncUseCase(provider)
         }
 
-        // No remote file → keep the existing automatic behavior.
-        if (remoteMetadata == null) return syncUseCase(provider)
+        // No remote file → nothing to decide; keep the existing automatic behavior.
+        if (remoteMetadata == null) {
+            prefs.setInitialSyncPending(false)
+            return syncUseCase(provider)
+        }
 
-        // Remote file exists → the user decides what to do.
+        // Remote file exists → a first-time decision is required before any merge.
+        prefs.setInitialSyncPending(true)
+
         return when (resolver.awaitDecision(ExistingRemoteBackup(remoteMetadata))) {
             InitialSyncDecision.USE_REMOTE -> when (val restore = restoreUseCase(provider)) {
                 is BackupResult.Failure -> BackupResult.Failure(restore.error)
                 // Local now matches remote; run a normal sync to settle hashes/timestamps.
-                is BackupResult.Success -> syncUseCase(provider)
+                is BackupResult.Success -> {
+                    prefs.setInitialSyncPending(false)
+                    syncUseCase(provider)
+                }
             }
 
             InitialSyncDecision.UPLOAD_LOCAL -> syncUseCase.overwriteRemoteWithLocal(provider)
+                .also { if (it is BackupResult.Success) prefs.setInitialSyncPending(false) }
 
-            // Dismissed — leave both sides untouched for now.
+            // Dismissed — leave both sides untouched; the flag stays pending so the next
+            // interactive "Sync now" asks again.
             null -> BackupResult.Success(SyncResult.SkippedNoChanges)
         }
     }

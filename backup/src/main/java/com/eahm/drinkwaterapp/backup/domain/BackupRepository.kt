@@ -12,7 +12,15 @@ interface BackupRepository {
     val syncState: StateFlow<BackupSyncState>
 
     suspend fun connect(providerType: CloudProviderType): BackupResult<CloudUser>
-    suspend fun sync(): BackupResult<SyncResult>
+
+    /**
+     * Synchronizes with the remote backup.
+     *
+     * @param allowInitialDecision when the provider has an unresolved first-connection
+     * backup, set true (interactive "Sync now") to re-prompt the user for the initial
+     * direction; false (automatic/background sync) skips until the user has decided.
+     */
+    suspend fun sync(allowInitialDecision: Boolean = false): BackupResult<SyncResult>
     suspend fun restore(): BackupResult<Unit>
     suspend fun checkRemoteStatus(): BackupResult<RemoteBackupStatus?>
     suspend fun disconnect(): BackupResult<Unit>

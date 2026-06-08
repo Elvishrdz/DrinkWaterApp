@@ -44,4 +44,12 @@ interface BackupPreferences {
 
     suspend fun getTombstoneWarningPending(): Boolean
     suspend fun setTombstoneWarningPending(pending: Boolean)
+
+    /**
+     * True when the provider has a remote backup that the user has not yet decided how to
+     * reconcile on first connection. While true, interactive "Sync now" re-prompts the
+     * initial-sync choice and automatic syncs are skipped.
+     */
+    suspend fun getInitialSyncPending(): Boolean
+    suspend fun setInitialSyncPending(pending: Boolean)
 }

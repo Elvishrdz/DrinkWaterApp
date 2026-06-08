@@ -452,7 +452,7 @@ internal class SettingsViewModel(
 
     fun onSyncNow() {
         viewModelScope.launch {
-            backupRepository.sync()
+            backupRepository.sync(allowInitialDecision = true)
             refreshBackupState()
         }
     }

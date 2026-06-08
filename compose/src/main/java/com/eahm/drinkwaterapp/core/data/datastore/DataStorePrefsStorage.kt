@@ -81,6 +81,7 @@ internal class DataStorePrefsStorage(
     private val syncOnSaveEnabledKey = booleanPreferencesKey("SYNC_ON_SAVE_ENABLED")
     private val seenDevicesKey = stringPreferencesKey("SYNC_SEEN_DEVICES")
     private val tombstoneWarningPendingKey = booleanPreferencesKey("SYNC_TOMBSTONE_WARNING_PENDING")
+    private val initialSyncPendingKey = booleanPreferencesKey("BACKUP_INITIAL_SYNC_PENDING")
 
     private val json = Json {
         ignoreUnknownKeys = true
@@ -429,6 +430,7 @@ internal class DataStorePrefsStorage(
             prefs.remove(syncOnSaveEnabledKey)
             prefs.remove(seenDevicesKey)
             prefs.remove(tombstoneWarningPendingKey)
+            prefs.remove(initialSyncPendingKey)
         }
     }
 
@@ -478,6 +480,13 @@ internal class DataStorePrefsStorage(
 
     override suspend fun setTombstoneWarningPending(pending: Boolean) {
         dataStore.edit { it[tombstoneWarningPendingKey] = pending }
+    }
+
+    override suspend fun getInitialSyncPending(): Boolean =
+        dataStore.data.map { it[initialSyncPendingKey] ?: false }.first()
+
+    override suspend fun setInitialSyncPending(pending: Boolean) {
+        dataStore.edit { it[initialSyncPendingKey] = pending }
     }
 
     override suspend fun clear() {

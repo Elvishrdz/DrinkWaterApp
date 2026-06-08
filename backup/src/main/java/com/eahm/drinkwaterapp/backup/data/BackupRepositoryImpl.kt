@@ -3,6 +3,7 @@ package com.eahm.drinkwaterapp.backup.data
 import com.eahm.drinkwaterapp.backup.data.usecase.CheckBackupStatusUseCase
 import com.eahm.drinkwaterapp.backup.data.usecase.ConnectBackupUseCase
 import com.eahm.drinkwaterapp.backup.data.usecase.DisconnectBackupUseCase
+import com.eahm.drinkwaterapp.backup.data.usecase.InitialConnectionSyncUseCase
 import com.eahm.drinkwaterapp.backup.data.usecase.MigrateBackupUseCase
 import com.eahm.drinkwaterapp.backup.data.usecase.RestoreBackupUseCase
 import com.eahm.drinkwaterapp.backup.data.usecase.SyncBackupUseCase
@@ -27,6 +28,7 @@ class BackupRepositoryImpl(
     private val prefs: BackupPreferences,
     private val connectUseCase: ConnectBackupUseCase,
     private val syncUseCase: SyncBackupUseCase,
+    private val initialConnectionSyncUseCase: InitialConnectionSyncUseCase,
     private val restoreUseCase: RestoreBackupUseCase,
     private val checkStatusUseCase: CheckBackupStatusUseCase,
     private val disconnectUseCase: DisconnectBackupUseCase,
@@ -56,7 +58,9 @@ class BackupRepositoryImpl(
         }
     }
 
-    override suspend fun sync(): BackupResult<SyncResult> = withContext(Dispatchers.IO) {
+    override suspend fun sync(
+        allowInitialDecision: Boolean,
+    ): BackupResult<SyncResult> = withContext(Dispatchers.IO) {
         if (_syncState.value is BackupSyncState.InProgress) {
             return@withContext BackupResult.Success(SyncResult.AlreadyInProgress)
         }
@@ -66,9 +70,17 @@ class BackupRepositoryImpl(
             _syncState.value = BackupSyncState.Error(provider.error)
             return@withContext provider
         }
-        syncUseCase(
-            provider = (provider as BackupResult.Success).value,
-        ).also { result ->
+        val cloudProvider = (provider as BackupResult.Success).value
+
+        // First connection still undecided: interactive "Sync now" re-prompts the choice.
+        // Otherwise normal sync runs — and SyncBackupUseCase itself skips while a decision
+        // is still pending, so automatic/background syncs never merge prematurely.
+        val syncCall = if (allowInitialDecision && prefs.getInitialSyncPending()) {
+            initialConnectionSyncUseCase(cloudProvider)
+        } else {
+            syncUseCase(cloudProvider)
+        }
+        syncCall.also { result ->
             _syncState.value = when (result) {
                 is BackupResult.Success -> BackupSyncState.Success(syncedAt = System.currentTimeMillis())
                 is BackupResult.Failure -> BackupSyncState.Error(error = result.error)

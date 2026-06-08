@@ -101,4 +101,10 @@ class FakeBackupPreferences : BackupPreferences {
     override suspend fun setTombstoneWarningPending(pending: Boolean) {
         tombstoneWarningPending = pending
     }
+
+    var initialSyncPending: Boolean = false
+    override suspend fun getInitialSyncPending() = initialSyncPending
+    override suspend fun setInitialSyncPending(pending: Boolean) {
+        initialSyncPending = pending
+    }
 }

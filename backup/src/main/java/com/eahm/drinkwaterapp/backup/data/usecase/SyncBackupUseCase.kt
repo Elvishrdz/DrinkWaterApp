@@ -28,6 +28,11 @@ class SyncBackupUseCase(
     suspend operator fun invoke(
         provider: CloudBackupProvider,
     ): BackupResult<SyncResult> {
+        // Never merge automatically while the user still owes a first-connection decision.
+        // The interactive flow (InitialConnectionSyncUseCase) clears this before syncing.
+        if (prefs.getInitialSyncPending()) {
+            return BackupResult.Success(SyncResult.SkippedNoChanges)
+        }
         if (!mutex.tryLock()) return BackupResult.Success(SyncResult.AlreadyInProgress)
 
         return try {
