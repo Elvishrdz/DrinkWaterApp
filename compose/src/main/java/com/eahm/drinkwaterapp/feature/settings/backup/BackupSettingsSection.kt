@@ -82,6 +82,7 @@ internal fun BackupSettingsSection(
     state.pendingInitialSync?.let { remote ->
         InitialSyncDialog(
             remote = remote,
+            onMerge = { onResolveInitialSync(InitialSyncDecision.MERGE) },
             onUseRemote = { onResolveInitialSync(InitialSyncDecision.USE_REMOTE) },
             onUploadLocal = { onResolveInitialSync(InitialSyncDecision.UPLOAD_LOCAL) },
             onDismiss = onDismissInitialSync,

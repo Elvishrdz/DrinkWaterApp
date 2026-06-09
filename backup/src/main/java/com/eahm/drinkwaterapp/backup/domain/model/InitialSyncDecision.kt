@@ -6,6 +6,13 @@ package com.eahm.drinkwaterapp.backup.domain.model
  * the (destructive) direction instead of an automatic merge.
  */
 enum class InitialSyncDecision {
+    /**
+     * Merge local and remote data using the normal sync logic, resolving any conflicts.
+     * Non-destructive: nothing is written locally or remotely until every conflict is
+     * resolved, so abandoning the process leaves both sides untouched.
+     */
+    MERGE,
+
     /** Download the remote backup and overwrite this device's local data. */
     USE_REMOTE,
 

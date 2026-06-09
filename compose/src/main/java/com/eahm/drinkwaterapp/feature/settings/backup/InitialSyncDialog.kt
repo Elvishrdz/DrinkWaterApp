@@ -31,8 +31,9 @@ import java.util.Date
 import java.util.Locale
 
 /**
- * Shown on first connection when the provider already has a backup. The user chooses the
- * direction of the first reconciliation, since it is destructive:
+ * Shown on first connection when the provider already has a backup. The user chooses how
+ * to reconcile:
+ *  - "Merge" → combine local + remote with the normal sync logic (non-destructive).
  *  - "Use remote backup" → download remote and overwrite this device's data.
  *  - "Upload this device" → overwrite the remote backup with this device's data.
  * Dismissing leaves both sides untouched; the user stays connected and can sync later.
@@ -41,6 +42,7 @@ import java.util.Locale
 @Composable
 internal fun InitialSyncDialog(
     remote: ExistingRemoteBackup,
+    onMerge: () -> Unit,
     onUseRemote: () -> Unit,
     onUploadLocal: () -> Unit,
     onDismiss: () -> Unit,
@@ -77,11 +79,16 @@ internal fun InitialSyncDialog(
             )
 
             DwPrimaryButton(
-                text = stringResource(R.string.backup_initial_sync_use_remote),
-                onClick = onUseRemote,
+                text = stringResource(R.string.backup_initial_sync_merge),
+                onClick = onMerge,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 14.dp),
+            )
+            DwSecondaryButton(
+                text = stringResource(R.string.backup_initial_sync_use_remote),
+                onClick = onUseRemote,
+                modifier = Modifier.fillMaxWidth(),
             )
             DwSecondaryButton(
                 text = stringResource(R.string.backup_initial_sync_upload_local),
@@ -105,6 +112,7 @@ private fun InitialSyncDialogPreview() {
                     deviceId = "pixel-8",
                 ),
             ),
+            onMerge = {},
             onUseRemote = {},
             onUploadLocal = {},
             onDismiss = {},

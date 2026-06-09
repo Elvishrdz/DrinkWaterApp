@@ -79,6 +79,14 @@ class InitialConnectionSyncUseCase(
         prefs.setInitialSyncPending(true)
 
         return when (resolver.awaitDecision(ExistingRemoteBackup(backupFile.metadata))) {
+            // Normal merge + conflict resolution. Clearing the flag first lets the guarded
+            // SyncBackupUseCase run; it only writes/uploads after all conflicts are resolved,
+            // so abandoning mid-way leaves local and remote untouched.
+            InitialSyncDecision.MERGE -> {
+                prefs.setInitialSyncPending(false)
+                syncUseCase(provider)
+            }
+
             InitialSyncDecision.USE_REMOTE -> when (val restore = restoreUseCase(provider)) {
                 is BackupResult.Failure -> BackupResult.Failure(restore.error)
                 is BackupResult.Success -> {

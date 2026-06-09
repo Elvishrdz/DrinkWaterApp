@@ -679,6 +679,7 @@
     <string name="backup_initial_sync_title">Existing backup found</string>
     <string name="backup_initial_sync_body">This account already has a backup. Choose whether to restore it to this device or replace it with this device\'s data. This can\'t be undone.</string>
     <string name="backup_initial_sync_body_dated">This account already has a backup from %1$s. Choose whether to restore it to this device or replace it with this device\'s data. This can\'t be undone.</string>
+    <string name="backup_initial_sync_merge">Merge local and cloud data</string>
     <string name="backup_initial_sync_use_remote">Use remote backup (replace this device)</string>
     <string name="backup_initial_sync_upload_local">Upload this device (replace backup)</string>
 
