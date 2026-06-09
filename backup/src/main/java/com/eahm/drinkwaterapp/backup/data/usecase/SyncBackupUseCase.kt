@@ -23,6 +23,7 @@ class SyncBackupUseCase(
     private val mergeEngine: MergeEngine,
     private val conflictResolver: SyncConflictResolver,
     private val recoveryResolver: BackupRecoveryResolver,
+    private val purgeTombstonesUseCase: PurgeTombstonesUseCase,
 ) {
 
     suspend operator fun invoke(
@@ -36,6 +37,10 @@ class SyncBackupUseCase(
         if (!mutex.tryLock()) return BackupResult.Success(SyncResult.AlreadyInProgress)
 
         return try {
+            // Physically remove tombstones older than the retention window before syncing,
+            // so deletions propagate once and don't linger forever.
+            purgeTombstonesUseCase()
+
             val deviceId = prefs.getDeviceId()
 
             // Step 1: Try to download the remote file

@@ -11,6 +11,7 @@ import com.eahm.drinkwaterapp.backup.data.usecase.ConnectBackupUseCase
 import com.eahm.drinkwaterapp.backup.data.usecase.DisconnectBackupUseCase
 import com.eahm.drinkwaterapp.backup.data.usecase.InitialConnectionSyncUseCase
 import com.eahm.drinkwaterapp.backup.data.usecase.MigrateBackupUseCase
+import com.eahm.drinkwaterapp.backup.data.usecase.PurgeTombstonesUseCase
 import com.eahm.drinkwaterapp.backup.data.usecase.RestoreBackupUseCase
 import com.eahm.drinkwaterapp.backup.data.usecase.SyncBackupUseCase
 import com.eahm.drinkwaterapp.backup.domain.BackupSyncState
@@ -46,6 +47,7 @@ class BackupRepositoryImplTest {
             mergeEngine = MergeEngine(),
             conflictResolver = SyncConflictResolver(),
             recoveryResolver = BackupRecoveryResolver(),
+            purgeTombstonesUseCase = PurgeTombstonesUseCase(dataSource, prefs),
         )
         val restoreUseCase = RestoreBackupUseCase(dataSource)
         val checkStatusUseCase = CheckBackupStatusUseCase()

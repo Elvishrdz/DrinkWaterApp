@@ -3,6 +3,7 @@ package com.eahm.drinkwaterapp.feature.history.v2
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.eahm.drinkwaterapp.backup.data.SyncCoordinator
 import com.eahm.drinkwaterapp.core.bindings.toUI
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
@@ -34,6 +35,7 @@ import kotlin.time.ExperimentalTime
 internal class HistoryV2ViewModel(
     val application: Application,
     val database: AppDatabase,
+    private val syncCoordinator: SyncCoordinator,
 ) : ViewModel() {
 
     private companion object {
@@ -141,7 +143,11 @@ internal class HistoryV2ViewModel(
 
     fun onDelete(entity: HistoryEntity) {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) { dao.delete(entity) }
+            withContext(Dispatchers.IO) {
+                val now = System.currentTimeMillis()
+                dao.softDelete(id = entity.id, deletedAt = now, updatedAt = now)
+            }
+            syncCoordinator.onDataChanged()
         }
     }
 

@@ -23,9 +23,20 @@ interface HistoryDao {
     @Delete
     fun delete(record: HistoryEntity)
 
-    @Query("SELECT * FROM HistoryEntity ORDER BY timestamp ASC LIMIT 1")
+    /**
+     * Soft-deletes a record so the deletion can be synced as a tombstone (the cloud merge
+     * needs to know the record was removed, not just see it missing). Physical removal of
+     * expired tombstones is handled by the backup purge policy.
+     */
+    @Query(
+        "UPDATE HistoryEntity SET deleted_at = :deletedAt, updated_at = :updatedAt WHERE id = :id"
+    )
+    suspend fun softDelete(id: String, deletedAt: Long, updatedAt: Long)
+
+    @Query("SELECT * FROM HistoryEntity WHERE deleted_at IS NULL ORDER BY timestamp ASC LIMIT 1")
     fun getEarliestRecord(): Flow<HistoryEntity?>
 
+    /** Returns ALL records including tombstones — used by the backup layer, not the UI. */
     @Query("SELECT * FROM HistoryEntity")
     fun getAll(): Flow<List<HistoryEntity>>
 
@@ -43,16 +54,16 @@ interface HistoryDao {
     @Query(
         """
             SELECT * FROM HistoryEntity
-            WHERE timestamp BETWEEN :start AND :end       
+            WHERE timestamp BETWEEN :start AND :end AND deleted_at IS NULL
         """
     )
     fun findByTimestamp(start: LocalDateTime, end: LocalDateTime): Flow<List<HistoryEntity>>
 
     @Query(
         """
-        SELECT SUM(drink_amount) 
+        SELECT SUM(drink_amount)
         FROM HistoryEntity
-        WHERE timestamp BETWEEN :start AND :end       
+        WHERE timestamp BETWEEN :start AND :end AND deleted_at IS NULL
         """
     )
     fun getTotalDrinkAmount(start: LocalDateTime, end: LocalDateTime): Flow<Float>
@@ -70,7 +81,7 @@ interface HistoryDao {
             (timestamp / 86400000) as day,
             SUM(drink_amount) as total_drink_amount
         FROM HistoryEntity
-        WHERE drink_amount > 0
+        WHERE drink_amount > 0 AND deleted_at IS NULL
         GROUP BY (timestamp / 86400000)
         ORDER BY total_drink_amount DESC
         LIMIT 1

@@ -48,7 +48,7 @@ class StreakRepositoryImpl(
             ) { records, goalEntity ->
                 computeStreaks(
                     today = today,
-                    records = records,
+                    records = records.filter { it.deletedAt == null },
                     goalThreshold = goalEntity?.goalMl ?: DEFAULT_GOAL_ML,
                 )
             }
