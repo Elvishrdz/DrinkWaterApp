@@ -10,6 +10,11 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.eahm.drinkwaterapp.age.api.AdTreatment
+import com.eahm.drinkwaterapp.age.api.AgePreferences
+import com.eahm.drinkwaterapp.age.api.AgeSignals
+import com.eahm.drinkwaterapp.age.api.AgeSource
+import com.eahm.drinkwaterapp.age.api.AgeStatus
 import com.eahm.drinkwaterapp.backup.domain.BackupPreferences
 import com.eahm.drinkwaterapp.backup.domain.model.SeenDevice
 import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
@@ -26,14 +31,16 @@ val prefsStorageModule = module {
     single<DataStorePrefsStorage> { DataStorePrefsStorage(get()) }
     single<PrefsStorage> { get<DataStorePrefsStorage>() }
     single<BackupPreferences> { get<DataStorePrefsStorage>() }
+    single<AgePreferences> { get<DataStorePrefsStorage>() }
 }
 
 val initialInterval = ActiveTime(0, 45)
 const val initialAmountPerDrink = 150f
 
+@Suppress("TooManyFunctions")
 internal class DataStorePrefsStorage(
     private val dataStore: DataStore<Preferences>,
-) : PrefsStorage, BackupPreferences {
+) : PrefsStorage, BackupPreferences, AgePreferences {
 
     private val initialDrinkSuggestions = setOf(
         DrinkSuggestion(1, 50f),
@@ -87,6 +94,13 @@ internal class DataStorePrefsStorage(
     private val seenDevicesKey = stringPreferencesKey("SYNC_SEEN_DEVICES")
     private val tombstoneWarningPendingKey = booleanPreferencesKey("SYNC_TOMBSTONE_WARNING_PENDING")
     private val initialSyncPendingKey = booleanPreferencesKey("BACKUP_INITIAL_SYNC_PENDING")
+
+    // Age signals keys (Play Age Signals / compliance). adTreatment present => a signal is stored.
+    private val ageAdTreatmentKey = stringPreferencesKey("AGE_AD_TREATMENT")
+    private val ageSourceKey = stringPreferencesKey("AGE_SOURCE")
+    private val ageStatusKey = stringPreferencesKey("AGE_STATUS")
+    private val ageLowerKey = intPreferencesKey("AGE_LOWER")
+    private val ageUpperKey = intPreferencesKey("AGE_UPPER")
 
     private val json = Json {
         ignoreUnknownKeys = true
@@ -478,6 +492,46 @@ internal class DataStorePrefsStorage(
             prefs.remove(seenDevicesKey)
             prefs.remove(tombstoneWarningPendingKey)
             prefs.remove(initialSyncPendingKey)
+        }
+    }
+
+    override suspend fun getAgeSignals(): AgeSignals? {
+        val prefs = dataStore.data.first()
+        val treatment = prefs[ageAdTreatmentKey]
+            ?.let { runCatching { AdTreatment.valueOf(it) }.getOrNull() }
+            ?: return null
+        val source = prefs[ageSourceKey]
+            ?.let { runCatching { AgeSource.valueOf(it) }.getOrNull() }
+            ?: AgeSource.API
+        val status = prefs[ageStatusKey]
+            ?.let { runCatching { AgeStatus.valueOf(it) }.getOrNull() }
+
+        return AgeSignals(
+            adTreatment = treatment,
+            source = source,
+            ageLower = prefs[ageLowerKey],
+            ageUpper = prefs[ageUpperKey],
+            status = status,
+        )
+    }
+
+    override suspend fun setAgeSignals(signals: AgeSignals) {
+        dataStore.edit { prefs ->
+            prefs[ageAdTreatmentKey] = signals.adTreatment.name
+            prefs[ageSourceKey] = signals.source.name
+            signals.status?.let { prefs[ageStatusKey] = it.name } ?: prefs.remove(ageStatusKey)
+            signals.ageLower?.let { prefs[ageLowerKey] = it } ?: prefs.remove(ageLowerKey)
+            signals.ageUpper?.let { prefs[ageUpperKey] = it } ?: prefs.remove(ageUpperKey)
+        }
+    }
+
+    override suspend fun clearAgeSignals() {
+        dataStore.edit { prefs ->
+            prefs.remove(ageAdTreatmentKey)
+            prefs.remove(ageSourceKey)
+            prefs.remove(ageStatusKey)
+            prefs.remove(ageLowerKey)
+            prefs.remove(ageUpperKey)
         }
     }
 

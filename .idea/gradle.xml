@@ -21,6 +21,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/ads" />
+            <option value="$PROJECT_DIR$/age" />
             <option value="$PROJECT_DIR$/analytics" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/backup" />

@@ -18,6 +18,8 @@ ksp = "2.3.1"
 datastore = "1.2.1"
 kotlinxSerializationJson = "1.11.0"
 playServicesAds = "25.2.0"
+ageSignals = "0.0.3"
+coroutines = "1.10.2"
 viewModel = "2.10.0"
 picktimeCompose = "1.1.6"
 room = "2.8.4"
@@ -83,6 +85,14 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 picktime-compose = { module = "com.github.anhaki:PickTime-Compose", version.ref = "picktimeCompose" }
 play-services-ads = { module = "com.google.android.gms:play-services-ads", version.ref = "playServicesAds" }
+
+# Play Age Signals
+play-age-signals = { module = "com.google.android.play:age-signals", version.ref = "ageSignals" }
+
+# Coroutines
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 room-gradle-plugin = { module = "androidx.room:room-gradle-plugin", version.ref = "roomGradlePlugin" }
 androidx-cardview = { group = "androidx.cardview", name = "cardview", version.ref = "cardview" }
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }

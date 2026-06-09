@@ -43,6 +43,7 @@ android {
 dependencies {
     coreLibraryDesugaring(libs.desugar.jdk.libs)
     implementation(project(":ads"))
+    implementation(project(":age"))
     implementation(project(":analytics"))
     implementation(project(":backup"))
 

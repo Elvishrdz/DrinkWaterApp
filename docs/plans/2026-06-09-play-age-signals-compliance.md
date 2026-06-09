@@ -16,9 +16,10 @@ Make DrinkWaterApp compliant with app-store age-verification laws by:
 1. Integrating the **Play Age Signals API** to obtain each user's age/verification status at
    runtime.
 2. Storing a **minor flag** internally (the one allowed downstream use: age-appropriate experience).
-3. Providing a **fallback age-collection screen** when the API can't deliver a signal (network
-   error, no response, not in scope, not shared) so we are compliant regardless of API
-   availability.
+3. Providing a **one-time bootstrap age-collection screen**, shown only on first run when the API
+   gives no usable signal (`UNKNOWN` or error) and we have no stored age — so we always hold an
+   initial age regardless of API availability. A definitive API response (real status or
+   "not covered") skips it; once any age is stored it is never shown again.
 4. Driving **age-appropriate ad serving** off that flag via AdMob's `RequestConfiguration`
    (TFUA — tag for under the age of consent), while preserving our existing
    purchased = no-ads behavior and our banner-placeholder UX.
@@ -105,11 +106,24 @@ consumers.
 
 - `PlayAgeSignalsProvider` adapts the Play Tasks `addOnSuccessListener`/`addOnFailureListener`
   callback into a suspend call returning `AgeResolution` (`suspendCancellableCoroutine`).
-- **`AgeResolution`** is the key abstraction the fallback hinges on:
-    - `Resolved(AgeSignals)` — API returned a usable `userStatus` (incl. `UNKNOWN` with an age
-      range we can act on).
-    - `Unavailable(reason)` — network/error/no-response/non-retryable/`null` status (not in scope
-      or not shared). → triggers the **fallback age screen**.
+- **`AgeResolution`** is the key abstraction — and it must distinguish **jurisdiction**, because the
+  law (Texas SB 2420 today; more states later) only applies to covered users. The API tells us this
+  directly via `userStatus`:
+    - `Covered(AgeSignals)` — a real status (`VERIFIED`/`DECLARED`/`SUPERVISED`/`SUPERVISED_*`).
+      User
+      is in a covered jurisdiction with a known signal. Use it.
+    - `CoveredAgeUnknown` — `userStatus == UNKNOWN` = **"age unknown in applicable jurisdiction"**.
+      Covered (e.g. a Texan) but no age on file. → **the only case that triggers the fallback age
+      screen.**
+    - `NotCovered` — `userStatus == null` = **"not in applicable region"** (most users worldwide).
+      → **no screen, standard ads.** We do **not** ask these users for their age.
+    - `Undetermined(reason)` — an actual error (network/service/transient/non-retryable), so we got
+      **neither** a status nor a definitive `null`. Jurisdiction unknown. → retry next cold start;
+      prompt **only on first run if no age is stored yet** (see fallback §2).
+- **Why this matters:** any **definitive** API response — a real status **or** `null` — lets us act
+  and **skip the screen**. The screen is a **one-time bootstrap**: shown only on first run when the
+  API gave us no usable data (`UNKNOWN` or error) and we have nothing stored. Once any age exists
+  (declared or API-sourced), it is never shown again, even if the API later fails.
 - **`AdTreatment` bracket** derived rule (single source of truth, computed in `:age`) — **not a
   binary minor flag**, because ad law has two thresholds (COPPA under-13 → TFCD,
   under-age-of-consent
@@ -125,15 +139,24 @@ consumers.
 - Persist last resolved `AgeSignals` in DataStore so ads apply the right config immediately on next
   launch before the async call returns. Refresh on each app start (per decision — cold start only).
 - Retry policy: retry retryable error codes with exponential backoff (max ~3); exhausted/
-  non-retryable → `Unavailable` → fallback screen.
+  non-retryable → `Undetermined` (jurisdiction unknown), **not** an automatic prompt.
 
-### 2. Fallback age-collection screen (only when API can't deliver)
+### 2. Fallback age-collection screen (only when the law requires it)
 
-Per decision: rely on the API first; if it can't provide a signal, collect the age ourselves to
-stay compliant.
+Per decision: the screen is a **one-time bootstrap** to guarantee we always have an initial age.
+Rule: **show it only on first run, when we have no stored age AND the API gave us no usable data.**
 
-- **Trigger:** `AgeResolution.Unavailable` **and** no declared age cached. If the API later
-  succeeds, the declared value is superseded and the screen is never shown again.
+- **Single trigger:** `noStoredAge && (CoveredAgeUnknown || Undetermined)`.
+    - `CoveredAgeUnknown` (`UNKNOWN`) — covered jurisdiction, age missing.
+    - `Undetermined` (API error) — jurisdiction unknown; on first run we still collect, regardless
+      of
+      country (acceptable per decision — collecting once for everyone is fine).
+- **`NotCovered` (`null`) → never show the screen**, even on first run. A `null` is a definitive
+  answer ("not covered"); we store that we resolved and serve standard ads.
+- **`Covered` (real status) → never show**; use the API value.
+- **Once any age is stored (declared OR API), never show again** — including when the API later
+  fails. A subsequent definitive API result still supersedes a declared value (updates the bracket),
+  but does not re-trigger the screen.
 - **Collected once, persisted.** One-time collection is sufficient for compliance — we do **not**
   re-prompt every launch. Once stored (`source = DECLARED`), the gate is satisfied. The user can
   change it later via a **Settings option** (see §6). The API still re-resolves per cold start; only
@@ -141,15 +164,20 @@ stay compliant.
 - **Placement in startup flow (per decision):** the gate sits **after consent (legal + tracking),
   before onboarding**. Existing flow gates on `consentCompleted` → `onboardingCompleted`
   (`MainViewModel.kt:38`); insert an `ageDecided` gate between them. Add `ageDecided` to
-  `MainState.Ready` and resolve it from the `:age` repo (declared age set, OR API `Resolved`).
+  `MainState.Ready`, resolved from the `:age` repo. **`ageDecided` is true** whenever any age is
+  stored OR the API returned a definitive result (`Covered` or `NotCovered`); it is **false only**
+  on
+  first run with no stored age and a non-definitive API result (`CoveredAgeUnknown`/`Undetermined`),
+  per §2.
     - **Recovery rule:** if consent is already accepted (screen not re-shown) **and** onboarding is
-      complete **but** age is still unset → show the age screen anyway. So the gate is "age not
+      complete **but** `ageDecided` is still false → show the age screen anyway. The gate is "age
+      not
       decided", evaluated independently of where the user is in the flow.
 - **Purchased users:** since age is used **only** for ads, if ads are already removed via purchase
   there is no age-dependent behavior left — **skip the screen entirely**.
-- **UX / content (per Q1 resolution — 3 buckets, not binary):**
-    - Collect **birth year** (derive bucket) **or** three explicit choices: *under 13 / 13–17 / 18+*
-      — enough to set TFCD vs TFUA vs standard correctly.
+- **UX / content (per decision — birth year):**
+    - Collect **birth year**; derive the `AdTreatment` bucket from it (`<13` → CHILD_DIRECTED,
+      `13–17` → UNDER_AGE_OF_CONSENT, `18+` → STANDARD) — enough to set TFCD vs TFUA vs standard.
     - Clear disclosure: this age is used **only** to keep ads age-appropriate and for legal
       compliance; it is not shared, profiled, or used for targeting.
     - Persist via `AgeRepository.submitDeclaredAge()` → cached with `source = DECLARED`.
@@ -210,8 +238,8 @@ Precedence: `purchased → render nothing` › `ad available → render ad (TFUA
   declaration path.
 - Set up monitoring of **parental-approval revocation reports**.
 - Confirm the **`.dev`/`.staging` flavors** behavior — Age Signals returns `APP_NOT_OWNED` for
-  sideloaded/non-Play installs, so dev builds will hit `Unavailable` → the fallback screen path is
-  also the natural dev experience. Provide a `FakeAgeSignalsManager`
+  sideloaded/non-Play installs, so dev builds hit `Undetermined` → on first run with no stored age
+  the bootstrap screen shows (then never again). Provide a `FakeAgeSignalsManager`
   (`com.google.android.play.agesignals.testing`) wiring for tests.
 
 ### 6. Settings: change declared age
@@ -234,11 +262,13 @@ Precedence: `purchased → render nothing` › `ad available → render ad (TFUA
    `AgePreferences` DataStore, Koin module); register module in the Application `startKoin`.
 4. Resolve age on app start; persist + expose `StateFlow<AgeSignals?>` and an `AgeResolution`
    signal the UI can observe to decide whether to show the fallback screen.
-5. Build the **fallback age-collection screen** in `:compose` (MVI ViewModel + composable + 3-bucket
-   /birth-year input + disclosure copy); write declared bracket back to `:age`.
+5. Build the **bootstrap age-collection screen** in `:compose` (MVI ViewModel + composable +
+   birth-year input + disclosure copy); derive bracket and write back to `:age`.
 6. Wire the **age gate into the startup flow**: add `ageDecided` to `MainState.Ready`
-   (`MainViewModel.kt:38`), gate **after consent, before onboarding**, with the recovery rule
-   (decided = declared set OR API `Resolved`; skip if ads purchased).
+   (`MainViewModel.kt:38`), gate **after consent, before onboarding**, with the recovery rule. Gate
+   fires **only** on first run with no stored age and a non-definitive API result
+   (`CoveredAgeUnknown`/`Undetermined`); `NotCovered`/`Covered`/any stored age pass through; skip if
+   ads purchased.
 7. Wire `AdTreatment` into ad serving: set **both** TFCD and TFUA on `RequestConfiguration` in
    `DrinkWaterAppAds`, re-applied after resolution (identical for API-sourced and declared age).
 8. Build the **house "remove ads" fallback ad** for the banner empty state; keep placeholder;
@@ -246,10 +276,12 @@ Precedence: `purchased → render nothing` › `ad available → render ad (TFUA
 9. Add **Settings entry** to view/change the declared age (editable only when `source = DECLARED`);
    re-apply ad config on change.
 10. Tests:
-    - `:age` repository (each `userStatus` → bracket, retry on retryable codes, non-retryable/`null`
-      → `Unavailable`, declared-age write, API supersedes declared) via `FakeAgeSignalsManager`.
-    - Age-gate logic (shown only when not decided; recovery rule; skipped when purchased; hidden
-      after submit or API success).
+    - `:age` repository: `null` → `NotCovered`; `UNKNOWN` → `CoveredAgeUnknown`; real statuses →
+      `Covered` + bracket; errors → `Undetermined`; retry on retryable codes; declared-age write;
+      API supersedes declared. Via `FakeAgeSignalsManager`.
+    - Age-gate logic (fires only on first run + no stored age + `CoveredAgeUnknown`/`Undetermined`;
+      `NotCovered`/`Covered`/any stored age never prompts; recovery rule; skipped when purchased;
+      not re-shown after a later API failure).
     - Ads decision: under-13 → TFCD; 13–17 → TFUA; 18+ → neither; purchased → nothing; empty fill →
       house ad.
 11. Play Console: SKU age ratings, Age signals section, significant-change assessment doc,
@@ -260,28 +292,30 @@ Precedence: `purchased → render nothing` › `ad available → render ad (TFUA
 
 ## Resolved decisions
 
-1. **API unavailable (network/error/no response/not shared)** → fall back to a **compliant default
-   via an age-collection screen**. The screen discloses the age is used only for age-appropriate
-   ads and legal compliance, and adapts the app for minors. If the API later succeeds, the screen
-   is **not** shown (API signal supersedes). Age affects **ads only**. *(Resolved.)*
+1. **One-time bootstrap, scoped by the API** → the screen is shown **only on first run** when we
+   have no stored age and the API gave no usable data (`UNKNOWN` or error). Any definitive API
+   response — real status **or** `null` (not covered) — skips it. Once any age is stored (declared
+   or
+   API), it is never shown again, even if the API later fails. Disclosure says age is used only for
+   age-appropriate ads + compliance; a later definitive API result supersedes a declared value. Age
+   affects **ads only**. *(Resolved.)*
 2. **Module placement** → a **new dedicated `:age` module**, isolating the Play library from our
    domain. Android-only now; structured for later KMP `expect/actual` iOS support. *(Resolved.)*
 3. **Refresh cadence** → **cold start only** for now. Play caches server-side; per-launch suffices.
    *(Resolved.)*
 4. **iOS** → out of scope; Apple has its own Declared Age Range API. Deferred to a future plan,
    enabled by the `:age` `api/` contract staying Play-free. *(Resolved / future.)*
-
----
-
-## Resolved decisions (continued)
-
-5. **Fallback input granularity** → **3 buckets, not binary.** A binary under-18/18+ toggle is
-   **not** sufficient for the law: ad compliance has two thresholds — COPPA (under 13 → TFCD) and
-   under-age-of-consent (13–17 → TFUA). Collect **birth year** (derive bucket) or three explicit
-   choices *under 13 / 13–17 / 18+*, and set both AdMob tags accordingly. *(Resolved.)*
+5. **Input granularity** → **birth year**, deriving the bracket (`<13` → TFCD, `13–17` → TFUA,
+   `18+` → standard). A binary under-18/18+ toggle is **not** sufficient: ad compliance has two
+   thresholds — COPPA (under 13) and under-age-of-consent (13–17) — so we set both AdMob tags from
+   the derived bracket. *(Resolved.)*
 6. **Collection frequency** → **once, persisted** — sufficient for compliance; no per-launch
    re-prompt. Editable later via a Settings option. The API still re-resolves per cold start.
    *(Resolved.)*
 7. **Gate placement** → **after consent (legal + tracking), before onboarding**, via an `ageDecided`
    gate in `MainState`. **Recovery rule:** if consent already accepted and onboarding complete but
    age still unset → show the age screen. Skipped entirely when ads are purchased. *(Resolved.)*
+
+8. **Hard API failure (`Undetermined`)** → **no region guard.** On first run with no stored age, we
+   collect age regardless of country (a one-time prompt for everyone is acceptable). On later
+   failures, if any age is already stored we do **not** re-prompt. *(Resolved.)*
