@@ -77,13 +77,6 @@ internal class DrinkViewModel(
             dateTimeZoneChangedObserver.currentDateTime.collect { historyDate.value = it }
         }
 
-        viewModelScope.launch {
-            drinkStatsObserver.goalReachedEvent.collect {
-                confettiController.showConfetti()
-                displayGoalReachedOverlay()
-            }
-        }
-
         // Load tombstone warning flag — only shown when backup is enabled
         viewModelScope.launch {
             val hasProvider = backupPreferences.getBackupProvider() != null
@@ -278,6 +271,16 @@ internal class DrinkViewModel(
         viewModelScope.launch {
             val isFirstDrink = !prefsStorage.getFirstDrinkDialogSeen().first()
 
+            // Snapshot today's total/goal BEFORE inserting so we can tell whether THIS drink
+            // is the one that crosses the goal. Celebrating here (not by observing the
+            // aggregate) means background backup writes and lowering the goal never fire it.
+            val statsBefore = drinkStatsObserver.drinkStats.first()
+
+            @Suppress("Indentation")
+            val crossedGoal = statsBefore.goalAmount > 0f &&
+                    statsBefore.drinkAmount < statsBefore.goalAmount &&
+                    (statsBefore.drinkAmount + amount) >= statsBefore.goalAmount
+
             withContext(Dispatchers.IO) {
                 val record = HistoryEntity(
                     amount = amount,
@@ -288,6 +291,11 @@ internal class DrinkViewModel(
                 syncCoordinator.onDataChanged()
 
                 drinkAlarmManagerV2.restoreAlarm(source = "drink-button")
+            }
+
+            if (crossedGoal) {
+                confettiController.showConfetti()
+                displayGoalReachedOverlay()
             }
 
             val animEnabled = prefsStorage.getWaterAnimationEnabled().first()
