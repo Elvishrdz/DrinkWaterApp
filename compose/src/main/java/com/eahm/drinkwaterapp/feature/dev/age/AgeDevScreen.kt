@@ -1,7 +1,9 @@
 package com.eahm.drinkwaterapp.feature.dev.age
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -12,18 +14,22 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.age.api.AgeSignals
+import com.eahm.drinkwaterapp.age.api.AgeSimulatedResponse
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 
 private const val YEAR_INPUT_LENGTH = 4
@@ -31,8 +37,8 @@ private const val YEAR_INPUT_LENGTH = 4
 @Composable
 internal fun AgeDevScreen(
     state: AgeDevState,
-    onSimulate: (AgeSimulation) -> Unit,
-    onUseRealApi: () -> Unit,
+    onSetOverrideEnabled: (Boolean) -> Unit,
+    onSelectResponse: (AgeSimulatedResponse) -> Unit,
     onRefresh: () -> Unit,
     onClearStored: () -> Unit,
     onSubmitBirthYear: (Int) -> Unit,
@@ -51,23 +57,17 @@ internal fun AgeDevScreen(
             DwPrimaryButton(text = "Back to Menu", onClick = onBackClicked)
 
             SectionTitle("Current state")
-            LabelValue("Override", state.overrideLabel)
+            LabelValue("Stored age (DataStore)", state.storedSignal.describe())
+            LabelValue("Live age (repository)", state.liveSignal.describe())
             LabelValue("Needs age collection", state.needsAgeCollection.toString())
-            LabelValue("Stored (DataStore)", state.storedSignal.describe())
-            LabelValue("Live (repository)", state.liveSignal.describe())
 
             HorizontalDivider()
-            SectionTitle("Simulate Play API response")
-            AgeSimulation.entries.forEach { sim ->
-                Button(
-                    onClick = { onSimulate(sim) },
-                    modifier = Modifier.fillMaxWidth(),
-                ) { Text(sim.label) }
-            }
-            OutlinedButton(
-                onClick = onUseRealApi,
-                modifier = Modifier.fillMaxWidth(),
-            ) { Text("Use real Play API") }
+            SectionTitle("Override Play API (debug only)")
+            OverrideSection(
+                state = state,
+                onSetOverrideEnabled = onSetOverrideEnabled,
+                onSelectResponse = onSelectResponse,
+            )
             OutlinedButton(
                 onClick = onRefresh,
                 modifier = Modifier.fillMaxWidth(),
@@ -87,6 +87,44 @@ internal fun AgeDevScreen(
             HorizontalDivider()
             SectionTitle("Submit a declared birth year")
             BirthYearInput(onSubmit = onSubmitBirthYear)
+        }
+    }
+}
+
+@Composable
+private fun OverrideSection(
+    state: AgeDevState,
+    onSetOverrideEnabled: (Boolean) -> Unit,
+    onSelectResponse: (AgeSimulatedResponse) -> Unit,
+) {
+    if (!state.overrideAvailable) {
+        Text("Override is disabled on release builds.")
+        return
+    }
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text("Use a fixed response (applied next startup)")
+        Switch(checked = state.overrideEnabled, onCheckedChange = onSetOverrideEnabled)
+    }
+
+    if (state.overrideEnabled) {
+        AgeSimulatedResponse.entries.forEach { response ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onSelectResponse(response) },
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                RadioButton(
+                    selected = state.selectedResponse == response,
+                    onClick = { onSelectResponse(response) },
+                )
+                Text(response.label)
+            }
         }
     }
 }
@@ -126,4 +164,4 @@ private fun LabelValue(label: String, value: String) {
 private fun AgeSignals?.describe(): String = this?.let {
     "treatment=${it.adTreatment}, source=${it.source}, status=${it.status}, " +
             "age=${it.ageLower}..${it.ageUpper}"
-} ?: "none"
+} ?: "Not set"

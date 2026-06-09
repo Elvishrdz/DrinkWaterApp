@@ -11,6 +11,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.eahm.drinkwaterapp.age.api.AdTreatment
+import com.eahm.drinkwaterapp.age.api.AgeDebugPreferences
 import com.eahm.drinkwaterapp.age.api.AgePreferences
 import com.eahm.drinkwaterapp.age.api.AgeSignals
 import com.eahm.drinkwaterapp.age.api.AgeSource
@@ -32,6 +33,7 @@ val prefsStorageModule = module {
     single<PrefsStorage> { get<DataStorePrefsStorage>() }
     single<BackupPreferences> { get<DataStorePrefsStorage>() }
     single<AgePreferences> { get<DataStorePrefsStorage>() }
+    single<AgeDebugPreferences> { get<DataStorePrefsStorage>() }
 }
 
 val initialInterval = ActiveTime(0, 45)
@@ -40,7 +42,7 @@ const val initialAmountPerDrink = 150f
 @Suppress("TooManyFunctions")
 internal class DataStorePrefsStorage(
     private val dataStore: DataStore<Preferences>,
-) : PrefsStorage, BackupPreferences, AgePreferences {
+) : PrefsStorage, BackupPreferences, AgePreferences, AgeDebugPreferences {
 
     private val initialDrinkSuggestions = setOf(
         DrinkSuggestion(1, 50f),
@@ -101,6 +103,10 @@ internal class DataStorePrefsStorage(
     private val ageStatusKey = stringPreferencesKey("AGE_STATUS")
     private val ageLowerKey = intPreferencesKey("AGE_LOWER")
     private val ageUpperKey = intPreferencesKey("AGE_UPPER")
+
+    // Age debug override keys (developer menu; honored only on debuggable builds)
+    private val ageDebugOverrideEnabledKey = booleanPreferencesKey("AGE_DEBUG_OVERRIDE_ENABLED")
+    private val ageDebugSelectedResponseKey = stringPreferencesKey("AGE_DEBUG_SELECTED_RESPONSE")
 
     private val json = Json {
         ignoreUnknownKeys = true
@@ -532,6 +538,28 @@ internal class DataStorePrefsStorage(
             prefs.remove(ageStatusKey)
             prefs.remove(ageLowerKey)
             prefs.remove(ageUpperKey)
+        }
+    }
+
+    // --- Age debug override prefs implementation ---
+
+    override suspend fun isOverrideEnabled(): Boolean =
+        dataStore.data.map { it[ageDebugOverrideEnabledKey] ?: false }.first()
+
+    override suspend fun setOverrideEnabled(enabled: Boolean) {
+        dataStore.edit { it[ageDebugOverrideEnabledKey] = enabled }
+    }
+
+    override suspend fun getSelectedResponse(): String? =
+        dataStore.data.map { it[ageDebugSelectedResponseKey] }.first()
+
+    override suspend fun setSelectedResponse(name: String?) {
+        dataStore.edit { prefs ->
+            if (name == null) {
+                prefs.remove(ageDebugSelectedResponseKey)
+            } else {
+                prefs[ageDebugSelectedResponseKey] = name
+            }
         }
     }
 

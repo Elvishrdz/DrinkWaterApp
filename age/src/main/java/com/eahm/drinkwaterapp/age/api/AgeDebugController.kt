@@ -1,14 +1,18 @@
 package com.eahm.drinkwaterapp.age.api
 
 /**
- * Developer-menu seam for simulating Play Age Signals API responses without a real device/account.
- * In production the override is always null, so [AgeSignalsProvider] delegates to the real Play API.
+ * Developer-menu seam for pinning a fixed Play Age Signals response. The pinned response is
+ * persisted and applied on the next app startup. **Only functional on debug builds** — on release
+ * [isAvailable] is false and [AgeSignalsProvider] always calls the real API.
  */
 interface AgeDebugController {
 
-    /** The currently simulated resolution, or null when the real API is used. */
-    val override: AgeResolution?
+    /** True only on debuggable builds. When false, overriding the API is impossible. */
+    val isAvailable: Boolean
 
-    /** Forces [AgeSignalsProvider.resolve] to return [resolution]; pass null to use the real API. */
-    fun simulate(resolution: AgeResolution?)
+    suspend fun isOverrideEnabled(): Boolean
+    suspend fun setOverrideEnabled(enabled: Boolean)
+
+    suspend fun getSelectedResponse(): AgeSimulatedResponse?
+    suspend fun setSelectedResponse(response: AgeSimulatedResponse?)
 }

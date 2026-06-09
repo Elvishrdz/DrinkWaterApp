@@ -35,8 +35,8 @@ internal fun AgeDevRoot(
 
     AgeDevScreen(
         state = state,
-        onSimulate = viewModel::simulate,
-        onUseRealApi = viewModel::useRealApi,
+        onSetOverrideEnabled = viewModel::setOverrideEnabled,
+        onSelectResponse = viewModel::selectResponse,
         onRefresh = viewModel::refresh,
         onClearStored = viewModel::clearStoredAge,
         onSubmitBirthYear = viewModel::submitBirthYear,
