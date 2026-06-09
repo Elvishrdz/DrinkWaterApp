@@ -330,11 +330,14 @@ internal class BackupDevViewModel(
     private fun describe(infos: List<WorkInfo>): String {
         if (infos.isEmpty()) return "—"
         // Show every WorkInfo for this unique name so queued follow-ups (e.g. an appended
-        // on-change sync waiting behind a running one) are visible, not just the first.
-        return infos.joinToString(", ") { info ->
+        // on-change sync waiting behind a running one) are visible, not just the first. Each entry
+        // is a distinct work; index them (#1, #2) so two works aren't mistaken for one retried
+        // work. "attempt" is that single work's retry count (0 = first run), not a work index.
+        return infos.mapIndexed { index, info ->
+            val label = if (infos.size > 1) "#${index + 1} " else ""
             val attempt = if (info.runAttemptCount > 0) " (attempt ${info.runAttemptCount})" else ""
-            "${info.state}$attempt"
-        }
+            "$label${info.state}$attempt"
+        }.joinToString(", ")
     }
 
     /** Count of WorkInfos currently in the ENQUEUED (queued, waiting to run) state. */
