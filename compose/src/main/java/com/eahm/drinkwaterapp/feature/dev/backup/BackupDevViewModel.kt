@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import com.eahm.drinkwaterapp.backup.data.BackupChangeTracker
 import com.eahm.drinkwaterapp.backup.data.BackupProviderRegistry
 import com.eahm.drinkwaterapp.backup.data.SyncConflictResolver
 import com.eahm.drinkwaterapp.backup.data.usecase.CheckBackupStatusUseCase
@@ -57,6 +58,7 @@ internal class BackupDevViewModel(
     private val scheduler: BackupScheduler,
     private val workManager: WorkManager,
     private val backupSyncNotifier: BackupSyncNotifier,
+    private val changeTracker: BackupChangeTracker,
 ) : ViewModel() {
 
     // Accumulated merge stats across all sync calls in this session
@@ -160,7 +162,10 @@ internal class BackupDevViewModel(
             }
 
             BackupDevAction.TriggerOnChangeSync -> {
-                log("Enqueue on-change sync (debounced KEEP work)…")
+                // Faithfully simulate a save: mark the change (so a sync running right now will
+                // detect it and queue exactly one follow-up) then enqueue with KEEP.
+                changeTracker.markChanged()
+                log("Simulate save → markChanged + enqueue on-change (KEEP)…")
                 scheduler.triggerOnChangeSync()
             }
 
