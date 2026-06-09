@@ -8,6 +8,7 @@ import com.eahm.drinkwaterapp.backup.data.usecase.SyncBackupUseCase
 import com.eahm.drinkwaterapp.backup.domain.model.BackupError
 import com.eahm.drinkwaterapp.backup.domain.model.BackupResult
 import com.eahm.drinkwaterapp.backup.domain.model.SyncResult
+import com.eahm.drinkwaterapp.backup.domain.model.TombstonePolicy
 import com.eahm.drinkwaterapp.backup.fake.FakeBackupDataSource
 import com.eahm.drinkwaterapp.backup.fake.FakeBackupPreferences
 import com.eahm.drinkwaterapp.backup.fake.FakeCloudBackupProvider
@@ -36,6 +37,7 @@ class SyncBackupUseCaseTest {
         conflictResolver = conflictResolver,
         recoveryResolver = recoveryResolver,
         purgeTombstonesUseCase = PurgeTombstonesUseCase(dataSource, prefs),
+        tombstonePolicy = TombstonePolicy(),
     )
 
     @Test

@@ -13,10 +13,16 @@ class MergeEngine {
         private const val PREFS_CONFLICT_WINDOW_MS = 300_000L
     }
 
+    /**
+     * @param expiryThreshold epoch-ms cutoff (= now − retention). Remote-only tombstones
+     * older than this are NOT re-added (Rule 3), and a local tombstone newer than this wins
+     * over a re-introduced remote live record (Rule 4). See docs/guide/tombstone-purge-guide.md.
+     */
     fun merge(
         local: BackupData,
         remote: BackupData,
         localDeviceId: String,
+        expiryThreshold: Long,
     ): MergeResult {
         var appliedRemoteRecords = 0
         var autoResolvedConflicts = 0
@@ -30,11 +36,23 @@ class MergeEngine {
         for ((id, remoteRecord) in remoteById) {
             val localRecord = localById[id]
             if (localRecord == null) {
+                // Rule 3: don't re-add a remote-only tombstone past retention — it's being
+                // purged on every device, so re-adding it would resurrect the dead row.
+                if (remoteRecord.deletedAt != null && remoteRecord.deletedAt < expiryThreshold) {
+                    continue
+                }
                 // New record from remote
                 localById[id] = remoteRecord
                 if (remoteRecord.deletedAt == null) appliedRemoteRecords++
                 else tombstonesApplied++ // tombstone for a record we never had — just store it
             } else {
+                // Rule 4: a still-valid local tombstone beats a re-introduced remote live
+                // record (a stale device that never saw the deletion), within retention.
+                val localIsActiveTombstone = localRecord.deletedAt != null &&
+                    localRecord.deletedAt >= expiryThreshold
+                if (localIsActiveTombstone && remoteRecord.deletedAt == null) {
+                    continue
+                }
                 // Both sides have it
                 if (remoteRecord.updatedAt > localRecord.updatedAt) {
                     localById[id] = remoteRecord
@@ -55,6 +73,10 @@ class MergeEngine {
         for ((date, remoteGoal) in remoteByDate) {
             val localGoal = localByDate[date]
             if (localGoal == null) {
+                // Rule 3 for goals: skip expired remote-only goal tombstones.
+                if (remoteGoal.deletedAt != null && remoteGoal.deletedAt < expiryThreshold) {
+                    continue
+                }
                 localByDate[date] = remoteGoal
                 appliedRemoteRecords++
             } else if (localGoal.goalMl != remoteGoal.goalMl || localGoal.deletedAt != remoteGoal.deletedAt) {

@@ -18,6 +18,7 @@ import com.eahm.drinkwaterapp.backup.domain.BackupSyncState
 import com.eahm.drinkwaterapp.backup.domain.model.BackupError
 import com.eahm.drinkwaterapp.backup.domain.model.BackupResult
 import com.eahm.drinkwaterapp.backup.domain.model.CloudProviderType
+import com.eahm.drinkwaterapp.backup.domain.model.TombstonePolicy
 import com.eahm.drinkwaterapp.backup.domain.model.SyncResult
 import com.eahm.drinkwaterapp.backup.fake.FakeBackupDataSource
 import com.eahm.drinkwaterapp.backup.fake.FakeBackupPreferences
@@ -48,10 +49,11 @@ class BackupRepositoryImplTest {
             conflictResolver = SyncConflictResolver(),
             recoveryResolver = BackupRecoveryResolver(),
             purgeTombstonesUseCase = PurgeTombstonesUseCase(dataSource, prefs),
+            tombstonePolicy = TombstonePolicy(),
         )
         val restoreUseCase = RestoreBackupUseCase(dataSource)
         val checkStatusUseCase = CheckBackupStatusUseCase()
-        val disconnectUseCase = DisconnectBackupUseCase(registry, prefs, scheduler)
+        val disconnectUseCase = DisconnectBackupUseCase(registry, prefs, scheduler, dataSource)
         val migrateUseCase = MigrateBackupUseCase(mutex, prefs)
         val initialConnectionSyncUseCase = InitialConnectionSyncUseCase(
             syncUseCase = syncUseCase,

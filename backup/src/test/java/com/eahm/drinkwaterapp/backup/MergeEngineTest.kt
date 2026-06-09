@@ -59,7 +59,7 @@ class MergeEngineTest {
             ),
             dailyGoals = emptyList(), preferences = emptyPrefs()
         )
-        val result = engine.merge(local, remote, localDeviceId)
+        val result = engine.merge(local, remote, localDeviceId, expiryThreshold = 0L)
         assertEquals(3, result.mergedData.history.size)
         assertTrue(result.mergedData.history.any { it.id == "a" })
         assertTrue(result.mergedData.history.any { it.id == "b" })
@@ -83,7 +83,7 @@ class MergeEngineTest {
             ),
             dailyGoals = emptyList(), preferences = emptyPrefs()
         )
-        val result = engine.merge(local, remote, localDeviceId)
+        val result = engine.merge(local, remote, localDeviceId, expiryThreshold = 0L)
         assertEquals(1, result.mergedData.history.size)
         assertEquals(200f, result.mergedData.history.first().amount)
         assertEquals(1, result.appliedRemoteRecords)
@@ -106,7 +106,7 @@ class MergeEngineTest {
             ),
             dailyGoals = emptyList(), preferences = emptyPrefs()
         )
-        val result = engine.merge(local, remote, localDeviceId)
+        val result = engine.merge(local, remote, localDeviceId, expiryThreshold = 0L)
         assertEquals(1, result.mergedData.history.size)
         assertEquals(now, result.mergedData.history.first().deletedAt)
         assertEquals(1, result.tombstonesApplied)
@@ -129,10 +129,73 @@ class MergeEngineTest {
             ),
             dailyGoals = emptyList(), preferences = emptyPrefs()
         )
-        val result = engine.merge(local, remote, localDeviceId)
+        val result = engine.merge(local, remote, localDeviceId, expiryThreshold = 0L)
         assertEquals(1, result.mergedData.history.size)
         assertEquals(null, result.mergedData.history.first().deletedAt)
         assertEquals(0, result.tombstonesApplied)
+    }
+
+    @Test
+    fun `remote-only tombstone older than expiry is not re-added (Rule 3)`() {
+        val local = BackupData(emptyList(), emptyList(), emptyPrefs())
+        val remote = BackupData(
+            history = listOf(
+                historyRecord("a", deviceId = remoteDeviceId, updatedAt = now - 100_000, deletedAt = now - 100_000)
+            ),
+            dailyGoals = emptyList(), preferences = emptyPrefs()
+        )
+        // expiry cutoff is AFTER the tombstone's deletedAt → expired → must be skipped
+        val result = engine.merge(local, remote, localDeviceId, expiryThreshold = now - 50_000)
+        assertTrue(result.mergedData.history.isEmpty())
+        assertEquals(0, result.tombstonesApplied)
+    }
+
+    @Test
+    fun `remote-only tombstone within retention is still applied`() {
+        val local = BackupData(emptyList(), emptyList(), emptyPrefs())
+        val remote = BackupData(
+            history = listOf(
+                historyRecord("a", deviceId = remoteDeviceId, updatedAt = now, deletedAt = now)
+            ),
+            dailyGoals = emptyList(), preferences = emptyPrefs()
+        )
+        val result = engine.merge(local, remote, localDeviceId, expiryThreshold = now - 50_000)
+        assertEquals(1, result.mergedData.history.size)
+        assertEquals(now, result.mergedData.history.first().deletedAt)
+        assertEquals(1, result.tombstonesApplied)
+    }
+
+    @Test
+    fun `local tombstone within retention beats re-introduced remote live record (Rule 4)`() {
+        val local = BackupData(
+            history = listOf(historyRecord("a", updatedAt = now - 10_000, deletedAt = now - 10_000)),
+            dailyGoals = emptyList(), preferences = emptyPrefs()
+        )
+        val remote = BackupData(
+            // Remote live with NEWER updatedAt — a stale device re-introducing a deleted record.
+            history = listOf(historyRecord("a", deviceId = remoteDeviceId, updatedAt = now, deletedAt = null)),
+            dailyGoals = emptyList(), preferences = emptyPrefs()
+        )
+        val result = engine.merge(local, remote, localDeviceId, expiryThreshold = now - 60_000)
+        assertEquals(1, result.mergedData.history.size)
+        // Tombstone kept despite remote being "newer".
+        assertEquals(now - 10_000, result.mergedData.history.first().deletedAt)
+    }
+
+    @Test
+    fun `expired local tombstone does not force-win over newer remote live record`() {
+        val local = BackupData(
+            history = listOf(historyRecord("a", updatedAt = now - 100_000, deletedAt = now - 100_000)),
+            dailyGoals = emptyList(), preferences = emptyPrefs()
+        )
+        val remote = BackupData(
+            history = listOf(historyRecord("a", deviceId = remoteDeviceId, updatedAt = now, deletedAt = null)),
+            dailyGoals = emptyList(), preferences = emptyPrefs()
+        )
+        // Tombstone deletedAt (now-100k) < expiry (now-50k) → not active → falls through to updatedAt.
+        val result = engine.merge(local, remote, localDeviceId, expiryThreshold = now - 50_000)
+        assertEquals(1, result.mergedData.history.size)
+        assertEquals(null, result.mergedData.history.first().deletedAt)
     }
 
     // ---- Goal tests ----
@@ -146,7 +209,7 @@ class MergeEngineTest {
             dailyGoals = listOf(goalRecord(date = 1000, goalMl = 2000f, deviceId = remoteDeviceId)),
             preferences = emptyPrefs()
         )
-        val result = engine.merge(local, remote, localDeviceId)
+        val result = engine.merge(local, remote, localDeviceId, expiryThreshold = 0L)
         assertEquals(1, result.mergedData.dailyGoals.size)
         assertEquals(2000f, result.mergedData.dailyGoals.first().goalMl)
     }
@@ -170,7 +233,7 @@ class MergeEngineTest {
             ),
             preferences = emptyPrefs()
         )
-        val result = engine.merge(local, remote, localDeviceId)
+        val result = engine.merge(local, remote, localDeviceId, expiryThreshold = 0L)
         assertEquals(1, result.conflicts.size)
         assertIs<SyncConflict.GoalConflict>(result.conflicts.first())
         assertEquals(1000, (result.conflicts.first() as SyncConflict.GoalConflict).effectiveDate)
@@ -195,7 +258,7 @@ class MergeEngineTest {
             ),
             preferences = emptyPrefs()
         )
-        val result = engine.merge(local, remote, localDeviceId)
+        val result = engine.merge(local, remote, localDeviceId, expiryThreshold = 0L)
         assertTrue(result.conflicts.isEmpty())
         assertEquals(1, result.autoResolvedConflicts)
         assertEquals(2500f, result.mergedData.dailyGoals.first().goalMl)
@@ -212,7 +275,7 @@ class MergeEngineTest {
         val remote =
             BackupData(history = emptyList(), dailyGoals = emptyList(), preferences = remotePrefs)
         // local is newer, so we keep local — no conflict emitted (remote.updatedAt < local.updatedAt)
-        val result = engine.merge(local, remote, localDeviceId)
+        val result = engine.merge(local, remote, localDeviceId, expiryThreshold = 0L)
         // local wins (updatedAt >= remote), conflict only emitted when remote wins
         assertEquals(0, result.conflicts.filterIsInstance<SyncConflict.PreferencesConflict>().size)
         assertEquals("ML", result.mergedData.preferences.unitPreference)
@@ -226,7 +289,7 @@ class MergeEngineTest {
             BackupData(history = emptyList(), dailyGoals = emptyList(), preferences = localPrefs)
         val remote =
             BackupData(history = emptyList(), dailyGoals = emptyList(), preferences = remotePrefs)
-        val result = engine.merge(local, remote, localDeviceId)
+        val result = engine.merge(local, remote, localDeviceId, expiryThreshold = 0L)
         assertEquals(1, result.conflicts.filterIsInstance<SyncConflict.PreferencesConflict>().size)
         // Merged prefs is remote (remote is newer)
         assertEquals("FL_OZ", result.mergedData.preferences.unitPreference)
@@ -240,7 +303,7 @@ class MergeEngineTest {
             BackupData(history = emptyList(), dailyGoals = emptyList(), preferences = localPrefs)
         val remote =
             BackupData(history = emptyList(), dailyGoals = emptyList(), preferences = remotePrefs)
-        val result = engine.merge(local, remote, localDeviceId)
+        val result = engine.merge(local, remote, localDeviceId, expiryThreshold = 0L)
         assertTrue(result.conflicts.isEmpty())
         assertEquals(1, result.autoResolvedConflicts)
         assertEquals("FL_OZ", result.mergedData.preferences.unitPreference)

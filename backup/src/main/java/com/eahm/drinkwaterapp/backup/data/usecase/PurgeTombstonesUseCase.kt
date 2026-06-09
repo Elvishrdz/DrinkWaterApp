@@ -26,13 +26,21 @@ class PurgeTombstonesUseCase(
         val expiryThreshold = now - policy.retentionMs
         val warningThreshold = now - (policy.retentionMs - WARNING_THRESHOLD_MS)
 
-        // Ask data source to purge expired tombstones and report near-expiry ones
         val nearExpiry = dataSource.findNearExpiryTombstones(warningThreshold, expiryThreshold)
-        dataSource.purgeExpiredTombstones(expiryThreshold)
-
         val syncPending = prefs.getSyncPending()
-        val shouldWarn = nearExpiry > 0 && syncPending
 
+        // Rule 1: only purge tombstones we're certain reached the cloud.
+        //  - Skip entirely while there are unsynced local changes (syncPending).
+        //  - Cap the purge cutoff at lastRemoteSyncAt, so a tombstone is removed only if a
+        //    successful upload happened AFTER its deletion (deleted_at <= lastRemoteSyncAt).
+        // This prevents a long-offline device from purging a deletion before it's uploaded.
+        if (!syncPending) {
+            val lastRemoteSyncAt = prefs.getLastRemoteSyncAt() ?: 0L
+            val safeThreshold = minOf(expiryThreshold, lastRemoteSyncAt)
+            dataSource.purgeExpiredTombstones(safeThreshold)
+        }
+
+        val shouldWarn = nearExpiry > 0 && syncPending
         prefs.setTombstoneWarningPending(shouldWarn)
 
         return TombstoneCheckResult(nearExpiryCount = nearExpiry, warningSet = shouldWarn)

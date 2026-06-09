@@ -13,6 +13,7 @@ import com.eahm.drinkwaterapp.backup.domain.model.CorruptedBackup
 import com.eahm.drinkwaterapp.backup.domain.model.SeenDevice
 import com.eahm.drinkwaterapp.backup.domain.model.SyncConflict
 import com.eahm.drinkwaterapp.backup.domain.model.SyncResult
+import com.eahm.drinkwaterapp.backup.domain.model.TombstonePolicy
 import kotlinx.coroutines.sync.Mutex
 import java.security.MessageDigest
 
@@ -24,6 +25,7 @@ class SyncBackupUseCase(
     private val conflictResolver: SyncConflictResolver,
     private val recoveryResolver: BackupRecoveryResolver,
     private val purgeTombstonesUseCase: PurgeTombstonesUseCase,
+    private val tombstonePolicy: TombstonePolicy,
 ) {
 
     suspend operator fun invoke(
@@ -37,10 +39,6 @@ class SyncBackupUseCase(
         if (!mutex.tryLock()) return BackupResult.Success(SyncResult.AlreadyInProgress)
 
         return try {
-            // Physically remove tombstones older than the retention window before syncing,
-            // so deletions propagate once and don't linger forever.
-            purgeTombstonesUseCase()
-
             val deviceId = prefs.getDeviceId()
 
             // Step 1: Try to download the remote file
@@ -99,8 +97,9 @@ class SyncBackupUseCase(
             // Step 4: Read local data
             val localData = dataSource.readLocalData(deviceId)
 
-            // Step 5: Merge
-            val mergeResult = mergeEngine.merge(localData, remoteData, deviceId)
+            // Step 5: Merge (retention-aware so expired tombstones aren't resurrected)
+            val expiryThreshold = System.currentTimeMillis() - tombstonePolicy.retentionMs
+            val mergeResult = mergeEngine.merge(localData, remoteData, deviceId, expiryThreshold)
 
             // Step 6: Resolve user conflicts (suspends per conflict)
             var mergedData = mergeResult.mergedData
@@ -144,6 +143,10 @@ class SyncBackupUseCase(
             prefs.setLastRemoteSyncAt(now)
             prefs.setBackupLastError(null)
             prefs.setSyncPending(false)
+
+            // Purge AFTER a successful upload: our tombstones are now in the cloud, so
+            // physically removing expired+synced ones can't lose a deletion (Rules 1 & 2).
+            purgeTombstonesUseCase()
 
             BackupResult.Success(SyncResult.Uploaded)
 
@@ -209,6 +212,8 @@ class SyncBackupUseCase(
             prefs.setLastRemoteSyncAt(now)
             prefs.setBackupLastError(null)
             prefs.setSyncPending(false)
+            // Purge expired+synced tombstones now that the upload (which included them) landed.
+            purgeTombstonesUseCase()
             BackupResult.Success(SyncResult.Uploaded)
         } else {
             val failure = uploadResult as BackupResult.Failure

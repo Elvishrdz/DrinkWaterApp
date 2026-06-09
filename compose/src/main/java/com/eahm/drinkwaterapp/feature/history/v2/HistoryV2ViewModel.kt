@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.backup.data.SyncCoordinator
+import com.eahm.drinkwaterapp.backup.domain.BackupPreferences
 import com.eahm.drinkwaterapp.core.bindings.toUI
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
@@ -36,6 +37,7 @@ internal class HistoryV2ViewModel(
     val application: Application,
     val database: AppDatabase,
     private val syncCoordinator: SyncCoordinator,
+    private val backupPreferences: BackupPreferences,
 ) : ViewModel() {
 
     private companion object {
@@ -144,8 +146,14 @@ internal class HistoryV2ViewModel(
     fun onDelete(entity: HistoryEntity) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val now = System.currentTimeMillis()
-                dao.softDelete(id = entity.id, deletedAt = now, updatedAt = now)
+                if (backupPreferences.getBackupEnabled()) {
+                    // Backup on: soft delete so the removal syncs as a tombstone.
+                    val now = System.currentTimeMillis()
+                    dao.softDelete(id = entity.id, deletedAt = now, updatedAt = now)
+                } else {
+                    // Backup off: nothing to reconcile — delete for real, no tombstone.
+                    dao.delete(entity)
+                }
             }
             syncCoordinator.onDataChanged()
         }

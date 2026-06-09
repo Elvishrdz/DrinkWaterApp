@@ -4,8 +4,9 @@ How record deletions propagate across devices via the cloud backup, why we keep
 "tombstones", and the rules the purge must follow so deletions are never lost and deleted
 records never come back as ghosts.
 
-> Status: this documents the **target design**. Parts of it are not implemented yet — see
-> [Current state vs. target](#current-state-vs-target) at the end.
+> Status: **implemented**. This documents the live design;
+> see [§9](#9-current-state-vs-target--implemented)
+> for the implementation map and the one remaining inherent limit.
 
 ---
 
@@ -110,8 +111,8 @@ Purging before the upload is unsafe (Rule 1 violation in disguise). Purge at the
 when the session uploaded successfully, so the current device's tombstones are guaranteed to
 be in the cloud copy we just wrote.
 
-> Current code runs purge at the **start** of the sync — this is the main ordering bug to
-> fix (see §8).
+> Implemented: `SyncBackupUseCase` calls `purgeTombstonesUseCase()` right after a successful
+> upload (both the merge path and the `uploadLocal` first‑sync path).
 
 ### Rule 3 — The merge must be retention‑aware
 
@@ -215,48 +216,48 @@ re‑connect, a **Merge** could resurrect them. This is already user‑mediated 
 first‑connection dialog: choosing **Upload local (replace backup)** makes the local
 deletions win. No extra machinery needed — just be aware of it.
 
-> Current state: ❌ not handled — `onDelete` always soft‑deletes regardless of backup state,
-> so non‑backup users accumulate hidden tombstones that are never purged. Fix = make the
-> delete conditional + purge‑all on disable.
+Backup‑off deletes are now hard deletes, and `DisconnectBackupUseCase` purges all remaining
+tombstones (`purgeExpiredTombstones(Long.MAX_VALUE)`), so non‑backup users never accumulate
+hidden rows.
 
 ---
 
-## 9. Current state vs. target
+## 9. Current state vs. target — ✅ IMPLEMENTED
 
-| Behavior                                        | Current               | Target                                            |
-|-------------------------------------------------|-----------------------|---------------------------------------------------|
-| Soft delete writes a tombstone                  | ✅                     | ✅                                                 |
-| Tombstones hidden from UI/stats/streaks         | ✅                     | ✅                                                 |
-| Tombstone uploaded & applied by merge           | ✅                     | ✅                                                 |
-| Purge **timing**                                | ❌ before sync         | ✅ after successful upload                         |
-| Purge **only when synced** (Rule 1)             | ❌ time‑only           | ✅ `!syncPending && lastRemoteSyncAt ≥ deleted_at` |
-| Merge skips expired remote tombstones (Rule 3)  | ❌ re‑adds them        | ✅ skip                                            |
-| Tombstone wins over re‑introduced live (Rule 4) | ❌ `updated_at` only   | ✅ tombstone wins in‑window                        |
-| Retention window                                | ⚠️ 15 days            | 60 days                                           |
-| Near‑expiry warning consumed by UI              | ❌ flag set, unused    | ✅ shown                                           |
-| Delete conditional on backup state (§8)         | ❌ always soft‑deletes | ✅ hard delete when backup off                     |
-| Purge leftover tombstones on disable (§8)       | ❌ none                | ✅ purge‑all on disconnect                         |
+All target rules below are implemented as of this change.
 
-### Why the current version is unsafe (summary)
+| Behavior                                        | State                                             |
+|-------------------------------------------------|---------------------------------------------------|
+| Soft delete writes a tombstone (backup on)      | ✅                                                 |
+| Tombstones hidden from UI/stats/streaks         | ✅                                                 |
+| Tombstone uploaded & applied by merge           | ✅                                                 |
+| Purge timing — after successful upload (Rule 2) | ✅ `SyncBackupUseCase` (merge + `uploadLocal`)     |
+| Purge only when synced (Rule 1)                 | ✅ `!syncPending && deleted_at ≤ lastRemoteSyncAt` |
+| Merge skips expired remote tombstones (Rule 3)  | ✅ `MergeEngine` history + goals                   |
+| Tombstone wins over re‑introduced live (Rule 4) | ✅ `MergeEngine`, within retention                 |
+| Retention window                                | ✅ 60 days (`TombstonePolicy`)                     |
+| Near‑expiry warning consumed by UI              | ✅ `TombstoneSyncWarningDialog` (pre‑existing)     |
+| Delete conditional on backup state (§8)         | ✅ hard delete when backup off (both history VMs)  |
+| Purge leftover tombstones on disable (§8)       | ✅ `DisconnectBackupUseCase` purges all            |
 
-1. **Purge before sync** can delete an unsynced tombstone → deletion lost + resurrection (case D).
-2. **Merge re‑adds expired remote tombstones** → purge is undone every sync; cloud never
-   sheds tombstones (grows unbounded).
-3. **15‑day retention** is likely shorter than real offline periods → avoidable resurrection.
+### Key implementation points
 
-### Planned changes (implement on request)
+- `MergeEngine.merge(local, remote, deviceId, expiryThreshold)` — new `expiryThreshold` arg
+  (= `now − retentionMs`, computed in `SyncBackupUseCase`).
+- `PurgeTombstonesUseCase` caps the purge cutoff at `min(expiryThreshold, lastRemoteSyncAt)`
+  and skips entirely while `syncPending`.
+- Purge moved from start‑of‑sync to **after** each successful upload.
+- History `onDelete` (both `HistoryViewModel` and `HistoryV2ViewModel`) branches on
+  `backupPreferences.getBackupEnabled()`.
 
-1. Move `purgeTombstonesUseCase()` to **after** a successful upload in `SyncBackupUseCase`
-   (both the merge path and the `uploadLocal` first‑sync path).
-2. Add the sync‑aware condition to `PurgeTombstonesUseCase` /
-   `BackupDataSource.purgeExpiredTombstones` (`!syncPending`, `lastRemoteSyncAt ≥ deleted_at`).
-3. Thread `expiryThreshold` into `MergeEngine.merge(...)`; skip remote‑only tombstones older
-   than it; make a still‑held tombstone win over a re‑introduced remote live record.
-4. Bump `TombstonePolicy.retentionDays` 15 → 60.
-5. Consume `KEY_TOMBSTONE_WARNING_PENDING` in the UI.
-6. Make `onDelete` conditional on `getBackupEnabled()` — hard delete when backup is off
-   (both history ViewModels); purge all remaining tombstones on disconnect/disable.
+### Tests
 
-Tests to add: offline‑resurrection (case C boundary), unsynced‑old‑tombstone preserved
-(case D), merge skips expired remote tombstone (Rule 3), tombstone‑wins‑over‑live (Rule 4),
-purge gated on sync status (Rule 1).
+`MergeEngineTest` covers Rule 3 (expired remote‑only tombstone skipped / within‑retention
+applied) and Rule 4 (local tombstone beats re‑introduced live; expired tombstone falls
+through). Existing sync/disconnect tests updated for the new constructor params.
+
+### Remaining inherent limit (not a bug)
+
+Case C (device offline **longer** than 60 days, still holding a live copy of a deleted
+record) can still resurrect it — unavoidable in a last‑writer‑wins file model; only widened
+by the retention window.

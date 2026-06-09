@@ -4,6 +4,7 @@ import com.eahm.drinkwaterapp.backup.data.BackupProviderRegistry
 import com.eahm.drinkwaterapp.backup.data.usecase.DisconnectBackupUseCase
 import com.eahm.drinkwaterapp.backup.domain.model.BackupResult
 import com.eahm.drinkwaterapp.backup.domain.model.CloudProviderType
+import com.eahm.drinkwaterapp.backup.fake.FakeBackupDataSource
 import com.eahm.drinkwaterapp.backup.fake.FakeBackupPreferences
 import com.eahm.drinkwaterapp.backup.fake.FakeBackupScheduler
 import com.eahm.drinkwaterapp.backup.fake.FakeCloudBackupProvider
@@ -27,7 +28,7 @@ class DisconnectBackupUseCaseTest {
         val prefs = FakeBackupPreferences().apply {
             backupProvider = CloudProviderType.GOOGLE_DRIVE.id
         }
-        val useCase = DisconnectBackupUseCase(buildRegistry(provider), prefs, FakeBackupScheduler())
+        val useCase = DisconnectBackupUseCase(buildRegistry(provider), prefs, FakeBackupScheduler(), FakeBackupDataSource())
 
         useCase()
 
@@ -40,7 +41,7 @@ class DisconnectBackupUseCaseTest {
             backupProvider = CloudProviderType.GOOGLE_DRIVE.id
             backupEnabled = true
         }
-        val useCase = DisconnectBackupUseCase(buildRegistry(), prefs, FakeBackupScheduler())
+        val useCase = DisconnectBackupUseCase(buildRegistry(), prefs, FakeBackupScheduler(), FakeBackupDataSource())
 
         useCase()
 
@@ -50,7 +51,7 @@ class DisconnectBackupUseCaseTest {
     @Test
     fun `disconnect cancels scheduler`() = runTest {
         val scheduler = FakeBackupScheduler()
-        val useCase = DisconnectBackupUseCase(buildRegistry(), FakeBackupPreferences(), scheduler)
+        val useCase = DisconnectBackupUseCase(buildRegistry(), FakeBackupPreferences(), scheduler, FakeBackupDataSource())
 
         useCase()
 
@@ -60,7 +61,7 @@ class DisconnectBackupUseCaseTest {
     @Test
     fun `disconnect succeeds even when no provider is set`() = runTest {
         val prefs = FakeBackupPreferences() // backupProvider = null
-        val useCase = DisconnectBackupUseCase(buildRegistry(), prefs, FakeBackupScheduler())
+        val useCase = DisconnectBackupUseCase(buildRegistry(), prefs, FakeBackupScheduler(), FakeBackupDataSource())
 
         val result = useCase()
 
