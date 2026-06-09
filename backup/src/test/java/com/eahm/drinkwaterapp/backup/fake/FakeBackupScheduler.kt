@@ -1,19 +1,20 @@
 package com.eahm.drinkwaterapp.backup.fake
 
 import com.eahm.drinkwaterapp.backup.domain.BackupScheduler
+import com.eahm.drinkwaterapp.backup.domain.model.BackupSchedule
 
 class FakeBackupScheduler : BackupScheduler {
-    var scheduleDailyAutoSyncCalled = false
-    var lastScheduledHour: Int = -1
+    var scheduleAutoSyncCalled = false
+    var lastSchedule: BackupSchedule? = null
     var triggerManualSyncCalled = false
     var triggerOnChangeSyncCalled = false
     var enqueueFollowUpOnChangeSyncCount = 0
     var triggerForegroundSyncCalled = false
     var cancelAllCalled = false
 
-    override fun scheduleDailyAutoSync(hourOfDay: Int) {
-        scheduleDailyAutoSyncCalled = true
-        lastScheduledHour = hourOfDay
+    override fun scheduleAutoSync(schedule: BackupSchedule) {
+        scheduleAutoSyncCalled = true
+        lastSchedule = schedule
     }
 
     override fun triggerManualSync() {

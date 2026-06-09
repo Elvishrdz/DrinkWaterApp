@@ -18,6 +18,7 @@ import com.eahm.drinkwaterapp.backup.data.BackupRecoveryResolver
 import com.eahm.drinkwaterapp.backup.data.InitialSyncResolver
 import com.eahm.drinkwaterapp.backup.data.SyncConflictResolver
 import com.eahm.drinkwaterapp.backup.data.SyncCoordinator
+import com.eahm.drinkwaterapp.backup.data.currentBackupSchedule
 import com.eahm.drinkwaterapp.backup.data.observer.ConnectivityObserver
 import com.eahm.drinkwaterapp.backup.data.provider.DropboxBackupProvider
 import com.eahm.drinkwaterapp.backup.data.provider.GoogleDriveBackupProvider
@@ -25,6 +26,7 @@ import com.eahm.drinkwaterapp.backup.domain.BackupPreferences
 import com.eahm.drinkwaterapp.backup.domain.BackupRepository
 import com.eahm.drinkwaterapp.backup.domain.BackupScheduler
 import com.eahm.drinkwaterapp.backup.domain.model.BackupResult
+import com.eahm.drinkwaterapp.backup.domain.model.BackupScheduleMode
 import com.eahm.drinkwaterapp.backup.domain.model.BackupSyncStatus
 import com.eahm.drinkwaterapp.backup.domain.model.CloudProviderType
 import com.eahm.drinkwaterapp.backup.domain.model.InitialSyncDecision
@@ -109,6 +111,8 @@ internal class SettingsViewModel(
         val seenDevices = backupPreferences.getSeenDevices()
         val syncPending = backupPreferences.getSyncPending()
         val autoHour = backupPreferences.getBackupAutoHour()
+        val scheduleMode = BackupScheduleMode.fromName(backupPreferences.getBackupScheduleMode())
+        val intervalHours = backupPreferences.getBackupIntervalHours()
         _backupUiState.update {
             it.copy(
                 isConnected = providerType != null,
@@ -118,6 +122,8 @@ internal class SettingsViewModel(
                 seenDevices = seenDevices,
                 syncPending = syncPending,
                 autoBackupHour = autoHour,
+                scheduleMode = scheduleMode,
+                intervalHours = intervalHours,
             )
         }
     }
@@ -509,19 +515,38 @@ internal class SettingsViewModel(
         }
     }
 
-    /** (Re)arm the daily background backup at the user's chosen hour. */
+    /** (Re)arm the background backup using the persisted schedule (daily hour or interval). */
     private suspend fun scheduleDailyAutoSync() {
-        backupScheduler.scheduleDailyAutoSync(backupPreferences.getBackupAutoHour())
+        backupScheduler.scheduleAutoSync(backupPreferences.currentBackupSchedule())
     }
 
-    /** User picked a new daily backup hour — persist it and reschedule. */
+    /** User picked the fixed daily-hour mode at [hour] — persist it and reschedule. */
     fun onAutoBackupHourChanged(hour: Int) {
         viewModelScope.launch {
+            backupPreferences.setBackupScheduleMode(BackupScheduleMode.DAILY.name)
             backupPreferences.setBackupAutoHour(hour)
-            _backupUiState.update { it.copy(autoBackupHour = hour) }
-            if (backupPreferences.getBackupProvider() != null) {
-                backupScheduler.scheduleDailyAutoSync(hour)
+            _backupUiState.update {
+                it.copy(autoBackupHour = hour, scheduleMode = BackupScheduleMode.DAILY)
             }
+            rescheduleIfConnected()
+        }
+    }
+
+    /** User picked the interval mode of every [hours] hours — persist it and reschedule. */
+    fun onBackupIntervalChanged(hours: Int) {
+        viewModelScope.launch {
+            backupPreferences.setBackupScheduleMode(BackupScheduleMode.INTERVAL.name)
+            backupPreferences.setBackupIntervalHours(hours)
+            _backupUiState.update {
+                it.copy(intervalHours = hours, scheduleMode = BackupScheduleMode.INTERVAL)
+            }
+            rescheduleIfConnected()
+        }
+    }
+
+    private suspend fun rescheduleIfConnected() {
+        if (backupPreferences.getBackupProvider() != null) {
+            backupScheduler.scheduleAutoSync(backupPreferences.currentBackupSchedule())
         }
     }
 

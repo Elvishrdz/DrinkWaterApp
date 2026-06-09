@@ -8,6 +8,8 @@ class FakeBackupPreferences : BackupPreferences {
     var backupProvider: String? = null
     var backupLastSyncAt: Long? = null
     var backupAutoHour: Int = 2
+    var backupScheduleMode: String? = null
+    var backupIntervalHours: Int = 6
     var backupUserDisplayName: String? = null
     var backupContentHash: String? = null
     var backupLastError: String? = null
@@ -32,6 +34,16 @@ class FakeBackupPreferences : BackupPreferences {
     override suspend fun getBackupAutoHour() = backupAutoHour
     override suspend fun setBackupAutoHour(hour: Int) {
         backupAutoHour = hour
+    }
+
+    override suspend fun getBackupScheduleMode() = backupScheduleMode
+    override suspend fun setBackupScheduleMode(mode: String) {
+        backupScheduleMode = mode
+    }
+
+    override suspend fun getBackupIntervalHours() = backupIntervalHours
+    override suspend fun setBackupIntervalHours(hours: Int) {
+        backupIntervalHours = hours
     }
 
     override suspend fun getBackupUserDisplayName() = backupUserDisplayName
@@ -60,6 +72,8 @@ class FakeBackupPreferences : BackupPreferences {
         backupProvider = null
         backupLastSyncAt = null
         backupAutoHour = 2
+        backupScheduleMode = null
+        backupIntervalHours = 6
         backupUserDisplayName = null
         backupContentHash = null
         backupLastError = null

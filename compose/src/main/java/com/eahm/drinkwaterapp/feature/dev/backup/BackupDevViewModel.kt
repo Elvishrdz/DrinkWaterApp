@@ -7,6 +7,7 @@ import androidx.work.WorkManager
 import com.eahm.drinkwaterapp.backup.data.BackupChangeTracker
 import com.eahm.drinkwaterapp.backup.data.BackupProviderRegistry
 import com.eahm.drinkwaterapp.backup.data.SyncConflictResolver
+import com.eahm.drinkwaterapp.backup.data.currentBackupSchedule
 import com.eahm.drinkwaterapp.backup.data.usecase.CheckBackupStatusUseCase
 import com.eahm.drinkwaterapp.backup.data.usecase.ConnectBackupUseCase
 import com.eahm.drinkwaterapp.backup.data.usecase.DisconnectBackupUseCase
@@ -187,9 +188,9 @@ internal class BackupDevViewModel(
     }
 
     private fun scheduleDailySync() = viewModelScope.launch {
-        val hour = backupPreferences.getBackupAutoHour()
-        scheduler.scheduleDailyAutoSync(hour)
-        log("Scheduled daily auto-sync at ${"%02d".format(hour)}:00")
+        val schedule = backupPreferences.currentBackupSchedule()
+        scheduler.scheduleAutoSync(schedule)
+        log("Scheduled auto-sync: $schedule")
     }
 
     private fun setNotificationMode(mode: BackupNotificationMode) = viewModelScope.launch {

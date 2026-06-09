@@ -79,6 +79,12 @@ interface PrefsStorage {
     suspend fun getBackupAutoHour(): Int
     suspend fun setBackupAutoHour(hour: Int)
 
+    suspend fun getBackupScheduleMode(): String?
+    suspend fun setBackupScheduleMode(mode: String)
+
+    suspend fun getBackupIntervalHours(): Int
+    suspend fun setBackupIntervalHours(hours: Int)
+
     suspend fun getBackupUserDisplayName(): String?
     suspend fun setBackupUserDisplayName(name: String?)
 

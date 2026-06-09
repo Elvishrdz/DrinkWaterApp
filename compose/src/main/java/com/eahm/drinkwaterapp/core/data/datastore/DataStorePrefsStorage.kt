@@ -70,6 +70,8 @@ internal class DataStorePrefsStorage(
     private val backupProviderKey = stringPreferencesKey("BACKUP_PROVIDER")
     private val backupLastSyncAtKey = longPreferencesKey("BACKUP_LAST_SYNC_AT")
     private val backupAutoHourKey = intPreferencesKey("BACKUP_AUTO_HOUR")
+    private val backupScheduleModeKey = stringPreferencesKey("BACKUP_SCHEDULE_MODE")
+    private val backupIntervalHoursKey = intPreferencesKey("BACKUP_INTERVAL_HOURS")
     private val backupUserDisplayNameKey = stringPreferencesKey("BACKUP_USER_DISPLAY_NAME")
     private val backupContentHashKey = stringPreferencesKey("BACKUP_CONTENT_HASH")
     private val backupLastErrorKey = stringPreferencesKey("BACKUP_LAST_ERROR")
@@ -391,6 +393,20 @@ internal class DataStorePrefsStorage(
         dataStore.edit { it[backupAutoHourKey] = hour.coerceIn(MIN_HOUR, MAX_HOUR) }
     }
 
+    override suspend fun getBackupScheduleMode(): String? =
+        dataStore.data.map { it[backupScheduleModeKey] }.first()
+
+    override suspend fun setBackupScheduleMode(mode: String) {
+        dataStore.edit { it[backupScheduleModeKey] = mode }
+    }
+
+    override suspend fun getBackupIntervalHours(): Int =
+        dataStore.data.map { it[backupIntervalHoursKey] ?: DEFAULT_INTERVAL_HOURS }.first()
+
+    override suspend fun setBackupIntervalHours(hours: Int) {
+        dataStore.edit { it[backupIntervalHoursKey] = hours }
+    }
+
     override suspend fun getBackupUserDisplayName(): String? =
         dataStore.data.map { it[backupUserDisplayNameKey] }.first()
 
@@ -450,6 +466,8 @@ internal class DataStorePrefsStorage(
             prefs.remove(backupProviderKey)
             prefs.remove(backupLastSyncAtKey)
             prefs.remove(backupAutoHourKey)
+            prefs.remove(backupScheduleModeKey)
+            prefs.remove(backupIntervalHoursKey)
             prefs.remove(backupUserDisplayNameKey)
             prefs.remove(backupContentHashKey)
             prefs.remove(backupLastErrorKey)
@@ -559,6 +577,7 @@ internal class DataStorePrefsStorage(
 
     private companion object {
         const val DEFAULT_BACKUP_HOUR = 2
+        const val DEFAULT_INTERVAL_HOURS = 6
         const val MIN_HOUR = 0
         const val MAX_HOUR = 23
     }

@@ -9,6 +9,7 @@ import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.eahm.drinkwaterapp.backup.data.worker.CloudBackupWorker
 import com.eahm.drinkwaterapp.backup.domain.BackupScheduler
+import com.eahm.drinkwaterapp.backup.domain.model.BackupSchedule
 import com.eahm.drinkwaterapp.backup.domain.model.SyncTrigger
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
@@ -21,15 +22,21 @@ class WorkManagerBackupScheduler(
         .setRequiredNetworkType(NetworkType.CONNECTED)
         .build()
 
-    override fun scheduleDailyAutoSync(hourOfDay: Int) {
+    override fun scheduleAutoSync(schedule: BackupSchedule) {
+        val initialDelayMs = when (schedule) {
+            is BackupSchedule.Daily -> millisUntilNext(schedule.hourOfDay)
+            is BackupSchedule.EveryHours ->
+                TimeUnit.HOURS.toMillis(schedule.hours.coerceAtLeast(1).toLong())
+        }
+
         val request = OneTimeWorkRequestBuilder<CloudBackupWorker>()
-            .setInitialDelay(millisUntilNext(hourOfDay), TimeUnit.MILLISECONDS)
+            .setInitialDelay(initialDelayMs, TimeUnit.MILLISECONDS)
             .setConstraints(networkConstraints)
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 30, TimeUnit.MINUTES)
             .setInputData(triggerData(SyncTrigger.PERIODIC))
             .build()
 
-        // REPLACE so changing the hour reschedules the pending job instead of stacking jobs.
+        // REPLACE so changing the schedule reschedules the pending job instead of stacking jobs.
         // (ExistingWorkPolicy has no UPDATE — that's periodic-only.)
         workManager.enqueueUniqueWork(
             CloudBackupWorker.WORK_NAME_PERIODIC,

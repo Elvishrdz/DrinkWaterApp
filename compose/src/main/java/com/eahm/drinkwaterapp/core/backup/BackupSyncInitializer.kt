@@ -3,6 +3,7 @@ package com.eahm.drinkwaterapp.core.backup
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
+import com.eahm.drinkwaterapp.backup.data.currentBackupSchedule
 import com.eahm.drinkwaterapp.backup.data.observer.ConnectivityObserver
 import com.eahm.drinkwaterapp.backup.domain.BackupPreferences
 import com.eahm.drinkwaterapp.backup.domain.BackupScheduler
@@ -34,7 +35,7 @@ internal class BackupSyncInitializer(
     override fun initialize() {
         scope.launch {
             if (prefs.getBackupEnabled()) {
-                scheduler.scheduleDailyAutoSync(prefs.getBackupAutoHour())
+                scheduler.scheduleAutoSync(prefs.currentBackupSchedule())
             }
         }
 

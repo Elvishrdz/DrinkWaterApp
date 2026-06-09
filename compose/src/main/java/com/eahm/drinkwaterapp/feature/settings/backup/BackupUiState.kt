@@ -2,6 +2,7 @@ package com.eahm.drinkwaterapp.feature.settings.backup
 
 import androidx.compose.runtime.Immutable
 import com.eahm.drinkwaterapp.backup.domain.model.BackupError
+import com.eahm.drinkwaterapp.backup.domain.model.BackupScheduleMode
 import com.eahm.drinkwaterapp.backup.domain.model.CloudProviderType
 import com.eahm.drinkwaterapp.backup.domain.model.CorruptedBackup
 import com.eahm.drinkwaterapp.backup.domain.model.ExistingRemoteBackup
@@ -11,8 +12,12 @@ import com.eahm.drinkwaterapp.backup.domain.model.SyncConflict
 @Immutable
 data class BackupUiState(
     val isConnected: Boolean = false,
-    // Hour of day (0–23) the daily auto-backup runs.
+    // Hour of day (0–23) the daily auto-backup runs (used when scheduleMode == DAILY).
     val autoBackupHour: Int = 2,
+    // Which automatic-backup scheduling mode is active.
+    val scheduleMode: BackupScheduleMode = BackupScheduleMode.DAILY,
+    // Interval in hours (used when scheduleMode == INTERVAL).
+    val intervalHours: Int = 6,
     // Contextual status/error message for the backup section.
     val statusMessage: BackupStatusMessage = BackupStatusMessage.NONE,
     val providerType: CloudProviderType? = null,

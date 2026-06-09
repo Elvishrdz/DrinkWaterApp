@@ -16,6 +16,14 @@ interface BackupPreferences {
     suspend fun getBackupAutoHour(): Int
     suspend fun setBackupAutoHour(hour: Int)
 
+    /** Which scheduling mode is active: "DAILY" (fixed hour) or "INTERVAL" (every N hours). */
+    suspend fun getBackupScheduleMode(): String?
+    suspend fun setBackupScheduleMode(mode: String)
+
+    /** Interval in hours (e.g. 2, 4, 6) used when the schedule mode is INTERVAL. */
+    suspend fun getBackupIntervalHours(): Int
+    suspend fun setBackupIntervalHours(hours: Int)
+
     suspend fun getBackupUserDisplayName(): String?
     suspend fun setBackupUserDisplayName(name: String?)
 

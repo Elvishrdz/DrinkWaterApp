@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.R
+import com.eahm.drinkwaterapp.backup.domain.model.BackupScheduleMode
 import com.eahm.drinkwaterapp.backup.domain.model.CloudProviderType
 import com.eahm.drinkwaterapp.backup.domain.model.InitialSyncDecision
 import com.eahm.drinkwaterapp.core.designsystem.component.extension.outlineBorderStyle
@@ -73,8 +74,24 @@ internal fun BackupSettingsSection(
     onResolveInitialSync: (InitialSyncDecision) -> Unit = {},
     onDismissInitialSync: () -> Unit = {},
     onAutoBackupHourChanged: (Int) -> Unit = {},
+    onBackupIntervalChanged: (Int) -> Unit = {},
 ) {
     var showHourPicker by remember { mutableStateOf(false) }
+    var showFrequencyPicker by remember { mutableStateOf(false) }
+    if (showFrequencyPicker) {
+        BackupFrequencyDialog(
+            state = state,
+            onIntervalSelected = {
+                onBackupIntervalChanged(it)
+                showFrequencyPicker = false
+            },
+            onDailySelected = {
+                showFrequencyPicker = false
+                showHourPicker = true
+            },
+            onDismiss = { showFrequencyPicker = false },
+        )
+    }
     if (showHourPicker) {
         BackupHourPickerDialog(
             selectedHour = state.autoBackupHour,
@@ -173,15 +190,10 @@ internal fun BackupSettingsSection(
                     icon = DwIcons.History,
                     iconBg = DwTintWater,
                     iconTint = DwWater,
-                    label = stringResource(R.string.backup_row_auto_hour),
-                    onClick = if (state.isSyncing) null else fun() { showHourPicker = true },
+                    label = stringResource(R.string.backup_row_frequency),
+                    onClick = if (state.isSyncing) null else fun() { showFrequencyPicker = true },
                 ) {
-                    BackupValueTrailing(
-                        value = stringResource(
-                            R.string.backup_auto_hour_value,
-                            state.autoBackupHour,
-                        ),
-                    )
+                    BackupValueTrailing(value = backupFrequencyLabel(state))
                 }
 
                 HorizontalDivider(color = DwInk100)
@@ -408,6 +420,66 @@ private fun backupStatusMessage(message: BackupStatusMessage): String? = when (m
     BackupStatusMessage.FAILED_USE_MANUAL -> stringResource(R.string.backup_status_failed_manual)
 }
 
+/** Trailing summary for the frequency row: "Every N hours" or "Daily at HH:00". */
+@Composable
+private fun backupFrequencyLabel(state: BackupUiState): String = when (state.scheduleMode) {
+    BackupScheduleMode.INTERVAL ->
+        stringResource(R.string.backup_frequency_interval, state.intervalHours)
+
+    BackupScheduleMode.DAILY ->
+        stringResource(R.string.backup_frequency_daily, state.autoBackupHour)
+}
+
+@Composable
+private fun BackupFrequencyDialog(
+    state: BackupUiState,
+    onIntervalSelected: (Int) -> Unit,
+    onDailySelected: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = stringResource(R.string.backup_row_frequency)) },
+        text = {
+            Column {
+                BACKUP_INTERVAL_OPTIONS.forEach { hours ->
+                    val selected = state.scheduleMode == BackupScheduleMode.INTERVAL &&
+                            state.intervalHours == hours
+                    FrequencyOption(
+                        text = stringResource(R.string.backup_frequency_interval, hours),
+                        selected = selected,
+                        onClick = { onIntervalSelected(hours) },
+                    )
+                }
+                FrequencyOption(
+                    text = stringResource(R.string.backup_frequency_daily_option),
+                    selected = state.scheduleMode == BackupScheduleMode.DAILY,
+                    onClick = onDailySelected,
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = stringResource(R.string.backup_hour_picker_cancel))
+            }
+        },
+    )
+}
+
+@Composable
+private fun FrequencyOption(text: String, selected: Boolean, onClick: () -> Unit) {
+    Text(
+        text = text,
+        fontFamily = PlusJakartaSans,
+        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+        color = if (selected) DwMagenta else MaterialTheme.colorScheme.onSurface,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 12.dp, horizontal = 8.dp),
+    )
+}
+
 @Composable
 private fun BackupHourPickerDialog(
     selectedHour: Int,
@@ -447,6 +519,10 @@ private fun BackupHourPickerDialog(
 
 private const val HOURS_IN_DAY = 24
 private val HOUR_PICKER_MAX_HEIGHT = 280.dp
+
+/** Selectable interval options (in hours) for automatic backups. */
+@Suppress("MagicNumber")
+private val BACKUP_INTERVAL_OPTIONS = listOf(2, 4, 6)
 
 @DwPreview
 @Composable

@@ -6,6 +6,7 @@ import androidx.work.WorkerParameters
 import com.eahm.drinkwaterapp.backup.data.BackupChangeTracker
 import com.eahm.drinkwaterapp.backup.data.BackupProviderRegistry
 import com.eahm.drinkwaterapp.backup.data.BackupSyncStatusHolder
+import com.eahm.drinkwaterapp.backup.data.currentBackupSchedule
 import com.eahm.drinkwaterapp.backup.data.usecase.SyncBackupUseCase
 import com.eahm.drinkwaterapp.backup.domain.BackupPreferences
 import com.eahm.drinkwaterapp.backup.domain.BackupScheduler
@@ -38,11 +39,12 @@ class CloudBackupWorker(
 
         val result = runSync(trigger)
 
-        // The daily auto-backup is implemented as self-rescheduling one-time work: once it reaches
-        // a terminal state (not a retry), re-arm it for the next day. WorkManager handles the
-        // retry case itself, so we must not reschedule then or we'd stack jobs.
+        // The auto-backup is implemented as self-rescheduling one-time work: once it reaches a
+        // terminal state (not a retry), re-arm the next run using the latest persisted schedule
+        // (fixed daily hour or interval). WorkManager handles the retry case itself, so we must
+        // not reschedule then or we'd stack jobs.
         if (trigger == SyncTrigger.PERIODIC && result != Result.retry()) {
-            scheduler.scheduleDailyAutoSync(prefs.getBackupAutoHour())
+            scheduler.scheduleAutoSync(prefs.currentBackupSchedule())
         }
 
         // If a change landed during this run, enqueue exactly one follow-up on-change sync so the

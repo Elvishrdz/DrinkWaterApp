@@ -660,6 +660,10 @@
     <string name="backup_row_auto_hour">Tägliche Sicherungszeit</string>
     <string name="backup_auto_hour_value">%1$02d:00</string>
     <string name="backup_hour_picker_cancel">Abbrechen</string>
+    <string name="backup_row_frequency">Sicherungshäufigkeit</string>
+    <string name="backup_frequency_interval">Alle %1$d Stunden</string>
+    <string name="backup_frequency_daily">Täglich um %1$02d:00</string>
+    <string name="backup_frequency_daily_option">Täglich zu fester Zeit</string>
     <string name="backup_status_waiting_connection">Die Sicherung wartet auf eine Verbindung. Sie wird automatisch wiederholt, sobald du wieder online bist.</string>
     <string name="backup_status_will_retry">Automatische Sicherung fehlgeschlagen. Sie wird in Kürze wiederholt.</string>
     <string name="backup_status_on_save_retry">Deine letzte Änderung konnte nicht gesichert werden. Wir versuchen es automatisch erneut.</string>
