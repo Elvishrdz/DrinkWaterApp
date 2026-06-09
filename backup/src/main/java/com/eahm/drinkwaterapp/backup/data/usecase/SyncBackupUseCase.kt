@@ -2,6 +2,7 @@ package com.eahm.drinkwaterapp.backup.data.usecase
 
 import com.eahm.drinkwaterapp.backup.data.BackupMigrationManager
 import com.eahm.drinkwaterapp.backup.data.BackupRecoveryResolver
+import com.eahm.drinkwaterapp.backup.data.BackupSyncLock
 import com.eahm.drinkwaterapp.backup.data.MergeEngine
 import com.eahm.drinkwaterapp.backup.data.SyncConflictResolver
 import com.eahm.drinkwaterapp.backup.domain.BackupDataSource
@@ -14,11 +15,10 @@ import com.eahm.drinkwaterapp.backup.domain.model.SeenDevice
 import com.eahm.drinkwaterapp.backup.domain.model.SyncConflict
 import com.eahm.drinkwaterapp.backup.domain.model.SyncResult
 import com.eahm.drinkwaterapp.backup.domain.model.TombstonePolicy
-import kotlinx.coroutines.sync.Mutex
 import java.security.MessageDigest
 
 class SyncBackupUseCase(
-    private val mutex: Mutex,
+    private val lock: BackupSyncLock,
     private val dataSource: BackupDataSource,
     private val prefs: BackupPreferences,
     private val mergeEngine: MergeEngine,
@@ -36,7 +36,7 @@ class SyncBackupUseCase(
         if (prefs.getInitialSyncPending()) {
             return BackupResult.Success(SyncResult.SkippedNoChanges)
         }
-        if (!mutex.tryLock()) return BackupResult.Success(SyncResult.AlreadyInProgress)
+        if (!lock.mutex.tryLock()) return BackupResult.Success(SyncResult.AlreadyInProgress)
 
         return try {
             val deviceId = prefs.getDeviceId()
@@ -151,7 +151,7 @@ class SyncBackupUseCase(
             BackupResult.Success(SyncResult.Uploaded)
 
         } finally {
-            mutex.unlock()
+            lock.mutex.unlock()
         }
     }
 
@@ -167,11 +167,11 @@ class SyncBackupUseCase(
     suspend fun overwriteRemoteWithLocal(
         provider: CloudBackupProvider,
     ): BackupResult<SyncResult> {
-        if (!mutex.tryLock()) return BackupResult.Success(SyncResult.AlreadyInProgress)
+        if (!lock.mutex.tryLock()) return BackupResult.Success(SyncResult.AlreadyInProgress)
         return try {
             uploadLocal(provider, prefs.getDeviceId(), force = true)
         } finally {
-            mutex.unlock()
+            lock.mutex.unlock()
         }
     }
 

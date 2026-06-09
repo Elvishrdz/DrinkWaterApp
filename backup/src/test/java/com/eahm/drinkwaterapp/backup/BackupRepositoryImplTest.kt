@@ -3,6 +3,8 @@ package com.eahm.drinkwaterapp.backup
 import com.eahm.drinkwaterapp.backup.data.BackupProviderRegistry
 import com.eahm.drinkwaterapp.backup.data.BackupRecoveryResolver
 import com.eahm.drinkwaterapp.backup.data.BackupRepositoryImpl
+import com.eahm.drinkwaterapp.backup.data.BackupSyncLock
+import com.eahm.drinkwaterapp.backup.data.BackupSyncStatusHolder
 import com.eahm.drinkwaterapp.backup.data.InitialSyncResolver
 import com.eahm.drinkwaterapp.backup.data.MergeEngine
 import com.eahm.drinkwaterapp.backup.data.SyncConflictResolver
@@ -18,13 +20,12 @@ import com.eahm.drinkwaterapp.backup.domain.BackupSyncState
 import com.eahm.drinkwaterapp.backup.domain.model.BackupError
 import com.eahm.drinkwaterapp.backup.domain.model.BackupResult
 import com.eahm.drinkwaterapp.backup.domain.model.CloudProviderType
-import com.eahm.drinkwaterapp.backup.domain.model.TombstonePolicy
 import com.eahm.drinkwaterapp.backup.domain.model.SyncResult
+import com.eahm.drinkwaterapp.backup.domain.model.TombstonePolicy
 import com.eahm.drinkwaterapp.backup.fake.FakeBackupDataSource
 import com.eahm.drinkwaterapp.backup.fake.FakeBackupPreferences
 import com.eahm.drinkwaterapp.backup.fake.FakeBackupScheduler
 import com.eahm.drinkwaterapp.backup.fake.FakeCloudBackupProvider
-import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -37,12 +38,13 @@ class BackupRepositoryImplTest {
         googleProvider: FakeCloudBackupProvider = FakeCloudBackupProvider(CloudProviderType.GOOGLE_DRIVE),
         dropboxProvider: FakeCloudBackupProvider = FakeCloudBackupProvider(CloudProviderType.DROPBOX),
         dataSource: FakeBackupDataSource = FakeBackupDataSource(),
+        statusHolder: BackupSyncStatusHolder = BackupSyncStatusHolder(prefs),
     ): BackupRepositoryImpl {
         val registry = BackupProviderRegistry(googleProvider, dropboxProvider)
         val scheduler = FakeBackupScheduler()
-        val mutex = Mutex()
+        val lock = BackupSyncLock()
         val syncUseCase = SyncBackupUseCase(
-            mutex = mutex,
+            lock = lock,
             dataSource = dataSource,
             prefs = prefs,
             mergeEngine = MergeEngine(),
@@ -54,7 +56,7 @@ class BackupRepositoryImplTest {
         val restoreUseCase = RestoreBackupUseCase(dataSource)
         val checkStatusUseCase = CheckBackupStatusUseCase()
         val disconnectUseCase = DisconnectBackupUseCase(registry, prefs, scheduler, dataSource)
-        val migrateUseCase = MigrateBackupUseCase(mutex, prefs)
+        val migrateUseCase = MigrateBackupUseCase(lock, prefs)
         val initialConnectionSyncUseCase = InitialConnectionSyncUseCase(
             syncUseCase = syncUseCase,
             restoreUseCase = restoreUseCase,
@@ -67,6 +69,7 @@ class BackupRepositoryImplTest {
         return BackupRepositoryImpl(
             registry = registry,
             prefs = prefs,
+            statusHolder = statusHolder,
             connectUseCase = connectUseCase,
             syncUseCase = syncUseCase,
             initialConnectionSyncUseCase = initialConnectionSyncUseCase,
@@ -106,17 +109,19 @@ class BackupRepositoryImplTest {
         val prefs = FakeBackupPreferences().apply {
             backupProvider = CloudProviderType.GOOGLE_DRIVE.id
         }
-        val repo = buildRepository(prefs = prefs)
-        // Force state to InProgress
-        val field = repo::class.java.getDeclaredField("_syncState")
-        field.isAccessible = true
-        @Suppress("UNCHECKED_CAST")
-        val stateFlow = field.get(repo) as kotlinx.coroutines.flow.MutableStateFlow<BackupSyncState>
-        stateFlow.value = BackupSyncState.InProgress
+        // Force a sync to be already running via the shared status holder.
+        val statusHolder = BackupSyncStatusHolder(prefs)
+        statusHolder.onStarted(com.eahm.drinkwaterapp.backup.domain.model.SyncTrigger.PERIODIC)
+        val repo = buildRepository(prefs = prefs, statusHolder = statusHolder)
 
         val result = repo.sync()
         assertTrue(result is BackupResult.Success)
         assertEquals(SyncResult.AlreadyInProgress, result.value)
+        // The prior running state must NOT be reported as a fresh success (no false checkmark).
+        assertEquals(
+            null,
+            statusHolder.status.value.lastOutcome,
+        )
     }
 
     @Test

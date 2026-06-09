@@ -13,19 +13,21 @@ import com.eahm.drinkwaterapp.backup.domain.BackupSyncState
 import com.eahm.drinkwaterapp.backup.domain.CloudBackupProvider
 import com.eahm.drinkwaterapp.backup.domain.model.BackupError
 import com.eahm.drinkwaterapp.backup.domain.model.BackupResult
+import com.eahm.drinkwaterapp.backup.domain.model.BackupSyncStatus
 import com.eahm.drinkwaterapp.backup.domain.model.CloudProviderType
 import com.eahm.drinkwaterapp.backup.domain.model.CloudUser
 import com.eahm.drinkwaterapp.backup.domain.model.RemoteBackupStatus
+import com.eahm.drinkwaterapp.backup.domain.model.SyncDisposition
 import com.eahm.drinkwaterapp.backup.domain.model.SyncResult
+import com.eahm.drinkwaterapp.backup.domain.model.SyncTrigger
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 
 class BackupRepositoryImpl(
     private val registry: BackupProviderRegistry,
     private val prefs: BackupPreferences,
+    private val statusHolder: BackupSyncStatusHolder,
     private val connectUseCase: ConnectBackupUseCase,
     private val syncUseCase: SyncBackupUseCase,
     private val initialConnectionSyncUseCase: InitialConnectionSyncUseCase,
@@ -35,8 +37,8 @@ class BackupRepositoryImpl(
     private val migrateUseCase: MigrateBackupUseCase,
 ) : BackupRepository {
 
-    private val _syncState = MutableStateFlow<BackupSyncState>(BackupSyncState.Idle)
-    override val syncState: StateFlow<BackupSyncState> = _syncState.asStateFlow()
+    override val syncState: StateFlow<BackupSyncState> = statusHolder.legacyState
+    override val syncStatus: StateFlow<BackupSyncStatus> = statusHolder.status
 
     private suspend fun resolveProvider(): BackupResult<CloudBackupProvider> {
         val providerId = prefs.getBackupProvider()
@@ -49,28 +51,41 @@ class BackupRepositoryImpl(
     override suspend fun connect(
         providerType: CloudProviderType,
     ): BackupResult<CloudUser> = withContext(Dispatchers.IO) {
-        _syncState.value = BackupSyncState.InProgress
+        statusHolder.onStarted(SyncTrigger.CONNECT)
         connectUseCase(providerType).also { result ->
-            _syncState.value = when (result) {
-                is BackupResult.Success -> BackupSyncState.Success(System.currentTimeMillis())
-                is BackupResult.Failure -> BackupSyncState.Error(result.error)
+            when (result) {
+                is BackupResult.Success ->
+                    statusHolder.onSuccess(SyncTrigger.CONNECT, System.currentTimeMillis())
+
+                is BackupResult.Failure ->
+                    statusHolder.onFailure(
+                        SyncTrigger.CONNECT,
+                        result.error,
+                        dispositionFor(result.error),
+                    )
             }
         }
     }
 
     override suspend fun sync(
         allowInitialDecision: Boolean,
+        trigger: SyncTrigger,
     ): BackupResult<SyncResult> = withContext(Dispatchers.IO) {
-        if (_syncState.value is BackupSyncState.InProgress) {
+        // Cross-path guard: if any sync (incl. the background worker) is already running, skip.
+        // The BackupSyncLock inside the use cases is the real data-safety backstop.
+        if (statusHolder.isRunning) {
             return@withContext BackupResult.Success(SyncResult.AlreadyInProgress)
         }
-        _syncState.value = BackupSyncState.InProgress
+
         val provider = resolveProvider()
         if (provider is BackupResult.Failure) {
-            _syncState.value = BackupSyncState.Error(provider.error)
+            statusHolder.onStarted(trigger)
+            statusHolder.onFailure(trigger, provider.error, dispositionFor(provider.error))
             return@withContext provider
         }
         val cloudProvider = (provider as BackupResult.Success).value
+
+        statusHolder.onStarted(trigger)
 
         // First connection still undecided: interactive "Sync now" re-prompts the choice.
         // Otherwise normal sync runs — and SyncBackupUseCase itself skips while a decision
@@ -81,9 +96,17 @@ class BackupRepositoryImpl(
             syncUseCase(cloudProvider)
         }
         syncCall.also { result ->
-            _syncState.value = when (result) {
-                is BackupResult.Success -> BackupSyncState.Success(syncedAt = System.currentTimeMillis())
-                is BackupResult.Failure -> BackupSyncState.Error(error = result.error)
+            when (result) {
+                is BackupResult.Success ->
+                    if (result.value is SyncResult.AlreadyInProgress) {
+                        // Lost the lock race — leave the prior outcome untouched, don't fake success.
+                        statusHolder.onSkipped()
+                    } else {
+                        statusHolder.onSuccess(trigger, System.currentTimeMillis())
+                    }
+
+                is BackupResult.Failure ->
+                    statusHolder.onFailure(trigger, result.error, dispositionFor(result.error))
             }
         }
     }
@@ -113,4 +136,16 @@ class BackupRepositoryImpl(
         val toProvider = registry.get(to)
         migrateUseCase(fromProvider, toProvider)
     }
+
+    /**
+     * Disposition for failures on interactive/connect paths. These are not auto-retried by
+     * WorkManager, but the on-save/reconnect machinery re-attempts once connectivity returns —
+     * so a network failure is "waiting for connection", everything else needs a manual retry.
+     */
+    private fun dispositionFor(error: BackupError): SyncDisposition =
+        if (error is BackupError.NetworkUnavailable) {
+            SyncDisposition.WAITING_FOR_CONNECTION
+        } else {
+            SyncDisposition.FAILED
+        }
 }

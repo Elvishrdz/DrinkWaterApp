@@ -303,6 +303,7 @@ internal fun SettingsScreen(
         onResolveCorruption = viewModel::onResolveCorruption,
         onResolveInitialSync = viewModel::onResolveInitialSync,
         onDismissInitialSync = viewModel::onDismissInitialSync,
+        onAutoBackupHourChanged = viewModel::onAutoBackupHourChanged,
         modifier = modifier,
     )
 
@@ -471,6 +472,7 @@ internal fun SettingsContent(
     onResolveCorruption: (overwrite: Boolean) -> Unit = {},
     onResolveInitialSync: (InitialSyncDecision) -> Unit = {},
     onDismissInitialSync: () -> Unit = {},
+    onAutoBackupHourChanged: (Int) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -582,6 +584,7 @@ internal fun SettingsContent(
                         onResolveCorruption = onResolveCorruption,
                         onResolveInitialSync = onResolveInitialSync,
                         onDismissInitialSync = onDismissInitialSync,
+                        onAutoBackupHourChanged = onAutoBackupHourChanged,
                     )
 
                     if (showProviderPickerSheet) {

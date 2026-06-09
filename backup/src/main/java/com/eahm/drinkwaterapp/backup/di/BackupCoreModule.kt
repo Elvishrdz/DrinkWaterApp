@@ -2,6 +2,8 @@ package com.eahm.drinkwaterapp.backup.di
 
 import com.eahm.drinkwaterapp.backup.data.BackupRecoveryResolver
 import com.eahm.drinkwaterapp.backup.data.BackupRepositoryImpl
+import com.eahm.drinkwaterapp.backup.data.BackupSyncLock
+import com.eahm.drinkwaterapp.backup.data.BackupSyncStatusHolder
 import com.eahm.drinkwaterapp.backup.data.InitialSyncResolver
 import com.eahm.drinkwaterapp.backup.data.MergeEngine
 import com.eahm.drinkwaterapp.backup.data.SyncConflictResolver
@@ -17,14 +19,14 @@ import com.eahm.drinkwaterapp.backup.data.usecase.RestoreBackupUseCase
 import com.eahm.drinkwaterapp.backup.data.usecase.SyncBackupUseCase
 import com.eahm.drinkwaterapp.backup.domain.BackupRepository
 import com.eahm.drinkwaterapp.backup.domain.model.TombstonePolicy
-import kotlinx.coroutines.sync.Mutex
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
 val backupCoreModule = module {
-    single { Mutex() }
+    singleOf(::BackupSyncLock)
+    singleOf(::BackupSyncStatusHolder)
 
     // BackupProviderRegistry is registered by the host module (BackupModule in :compose)
     // using explicit typed get() because both params are CloudBackupProvider.

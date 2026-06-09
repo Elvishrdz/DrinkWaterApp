@@ -11,6 +11,10 @@ import com.eahm.drinkwaterapp.backup.domain.model.SyncConflict
 @Immutable
 data class BackupUiState(
     val isConnected: Boolean = false,
+    // Hour of day (0–23) the daily auto-backup runs.
+    val autoBackupHour: Int = 2,
+    // Contextual status/error message for the backup section.
+    val statusMessage: BackupStatusMessage = BackupStatusMessage.NONE,
     val providerType: CloudProviderType? = null,
     val lastSyncAt: Long? = null,
     val isSyncing: Boolean = false,
@@ -33,6 +37,29 @@ data class BackupUiState(
 enum class BackupUIError {
     NOT_SIGNED_IN,
     UNKNOWN,
+}
+
+/**
+ * Contextual backup status shown in Settings. Derived from the unified sync status (trigger +
+ * disposition) plus pending/connectivity state. Maps to a user-facing string in the UI layer.
+ */
+enum class BackupStatusMessage {
+    NONE,
+
+    /** A sync is running right now. */
+    SYNCING,
+
+    /** Pending changes can't upload until the connection returns — retry is guaranteed. */
+    WAITING_FOR_CONNECTION,
+
+    /** A background sync failed but will be retried automatically soon. */
+    WILL_RETRY,
+
+    /** An on-save backup failed; it will be retried automatically on the next change/sync. */
+    ON_SAVE_RETRY,
+
+    /** Sync failed with no guaranteed retry — prompt the user to sync manually. */
+    FAILED_USE_MANUAL,
 }
 
 internal fun BackupError.toUI(): BackupUIError {

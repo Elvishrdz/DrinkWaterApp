@@ -7,10 +7,11 @@ class FakeBackupPreferences : BackupPreferences {
     var backupEnabled: Boolean = false
     var backupProvider: String? = null
     var backupLastSyncAt: Long? = null
-    var backupAutoIntervalDays: Int = 1
+    var backupAutoHour: Int = 2
     var backupUserDisplayName: String? = null
     var backupContentHash: String? = null
     var backupLastError: String? = null
+    var backupLastFailure: String? = null
     var clearCalled: Boolean = false
 
     override suspend fun getBackupEnabled() = backupEnabled
@@ -28,9 +29,9 @@ class FakeBackupPreferences : BackupPreferences {
         backupLastSyncAt = millis
     }
 
-    override suspend fun getBackupAutoIntervalDays() = backupAutoIntervalDays
-    override suspend fun setBackupAutoIntervalDays(days: Int) {
-        backupAutoIntervalDays = days
+    override suspend fun getBackupAutoHour() = backupAutoHour
+    override suspend fun setBackupAutoHour(hour: Int) {
+        backupAutoHour = hour
     }
 
     override suspend fun getBackupUserDisplayName() = backupUserDisplayName
@@ -48,15 +49,21 @@ class FakeBackupPreferences : BackupPreferences {
         backupLastError = code
     }
 
+    override suspend fun getBackupLastFailure() = backupLastFailure
+    override suspend fun setBackupLastFailure(value: String?) {
+        backupLastFailure = value
+    }
+
     override suspend fun clearBackupKeys() {
         clearCalled = true
         backupEnabled = false
         backupProvider = null
         backupLastSyncAt = null
-        backupAutoIntervalDays = 1
+        backupAutoHour = 2
         backupUserDisplayName = null
         backupContentHash = null
         backupLastError = null
+        backupLastFailure = null
         deviceId = ""
         syncPending = false
         lastRemoteSyncAt = null

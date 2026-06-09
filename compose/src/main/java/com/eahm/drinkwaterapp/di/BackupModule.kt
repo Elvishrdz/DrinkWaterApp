@@ -10,8 +10,10 @@ import com.eahm.drinkwaterapp.backup.domain.BackupDataSource
 import com.eahm.drinkwaterapp.backup.domain.BackupPreferences
 import com.eahm.drinkwaterapp.backup.domain.BackupScheduler
 import com.eahm.drinkwaterapp.core.backup.BackupSerializer
+import com.eahm.drinkwaterapp.core.backup.BackupSyncInitializer
 import com.eahm.drinkwaterapp.core.backup.WorkManagerBackupScheduler
 import com.eahm.drinkwaterapp.core.data.datastore.DataStorePrefsStorage
+import com.eahm.drinkwaterapp.system.initializer.AppInitializer
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -62,6 +64,9 @@ internal val backupModule = module {
         BackupSerializer(get(), get(), get(), get(), get(backupJsonQualifier))
     } bind BackupDataSource::class
     singleOf(::WorkManagerBackupScheduler) bind BackupScheduler::class
+
+    // Activates daily auto-sync + foreground/reconnect triggers at app start.
+    singleOf(::BackupSyncInitializer) bind AppInitializer::class
 
     // BackupPreferences bridge — reuse the DataStorePrefsStorage single
     single<BackupPreferences> { get<DataStorePrefsStorage>() }

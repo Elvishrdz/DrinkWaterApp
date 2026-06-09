@@ -18,15 +18,18 @@ import com.eahm.drinkwaterapp.backup.data.BackupRecoveryResolver
 import com.eahm.drinkwaterapp.backup.data.InitialSyncResolver
 import com.eahm.drinkwaterapp.backup.data.SyncConflictResolver
 import com.eahm.drinkwaterapp.backup.data.SyncCoordinator
+import com.eahm.drinkwaterapp.backup.data.observer.ConnectivityObserver
 import com.eahm.drinkwaterapp.backup.data.provider.DropboxBackupProvider
 import com.eahm.drinkwaterapp.backup.data.provider.GoogleDriveBackupProvider
 import com.eahm.drinkwaterapp.backup.domain.BackupPreferences
 import com.eahm.drinkwaterapp.backup.domain.BackupRepository
 import com.eahm.drinkwaterapp.backup.domain.BackupScheduler
-import com.eahm.drinkwaterapp.backup.domain.BackupSyncState
 import com.eahm.drinkwaterapp.backup.domain.model.BackupResult
+import com.eahm.drinkwaterapp.backup.domain.model.BackupSyncStatus
 import com.eahm.drinkwaterapp.backup.domain.model.CloudProviderType
 import com.eahm.drinkwaterapp.backup.domain.model.InitialSyncDecision
+import com.eahm.drinkwaterapp.backup.domain.model.SyncDisposition
+import com.eahm.drinkwaterapp.backup.domain.model.SyncTrigger
 import com.eahm.drinkwaterapp.core.billing.PurchaseManager
 import com.eahm.drinkwaterapp.core.config.AppInfoService
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
@@ -39,6 +42,7 @@ import com.eahm.drinkwaterapp.core.database.entity.DailyGoalEntity
 import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.feature.drink.DateTimeZoneChangedObserver
+import com.eahm.drinkwaterapp.feature.settings.backup.BackupStatusMessage
 import com.eahm.drinkwaterapp.feature.settings.backup.BackupUiState
 import com.eahm.drinkwaterapp.feature.settings.backup.toUI
 import com.eahm.drinkwaterapp.feature.settings.data.ActiveTimes
@@ -74,6 +78,7 @@ internal class SettingsViewModel(
     private val backupRepository: BackupRepository,
     private val backupPreferences: BackupPreferences,
     private val backupScheduler: BackupScheduler,
+    private val connectivityObserver: ConnectivityObserver,
     private val googleDriveProvider: GoogleDriveBackupProvider,
     private val dropboxProvider: DropboxBackupProvider,
     private val syncCoordinator: SyncCoordinator,
@@ -86,6 +91,12 @@ internal class SettingsViewModel(
 
     private val _backupUiState = MutableStateFlow(BackupUiState())
 
+    private val connectivity = connectivityObserver.isConnected.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Lazily,
+        initialValue = true,
+    )
+
     init {
         viewModelScope.launch { refreshBackupState() }
     }
@@ -97,6 +108,7 @@ internal class SettingsViewModel(
         val syncOnSave = backupPreferences.getSyncOnSaveEnabled()
         val seenDevices = backupPreferences.getSeenDevices()
         val syncPending = backupPreferences.getSyncPending()
+        val autoHour = backupPreferences.getBackupAutoHour()
         _backupUiState.update {
             it.copy(
                 isConnected = providerType != null,
@@ -105,7 +117,39 @@ internal class SettingsViewModel(
                 syncOnSaveEnabled = syncOnSave,
                 seenDevices = seenDevices,
                 syncPending = syncPending,
+                autoBackupHour = autoHour,
             )
+        }
+    }
+
+    /**
+     * Maps the unified sync status (+ pending/connectivity) to the contextual message shown in
+     * Settings. A running sync always wins; otherwise we honour the last outcome's disposition,
+     * and surface "waiting for connection" even before the worker runs (offline + pending).
+     */
+    private fun computeStatusMessage(
+        status: BackupSyncStatus,
+        connected: Boolean,
+        syncPending: Boolean,
+    ): BackupStatusMessage {
+        if (status.running) return BackupStatusMessage.SYNCING
+        if (syncPending && !connected) return BackupStatusMessage.WAITING_FOR_CONNECTION
+
+        val failure = status.lastOutcome as? BackupSyncStatus.Outcome.Failure
+            ?: return BackupStatusMessage.NONE
+
+        val onSaveRetry = failure.trigger == SyncTrigger.ON_SAVE &&
+            failure.disposition != SyncDisposition.FAILED
+
+        return when {
+            onSaveRetry -> BackupStatusMessage.ON_SAVE_RETRY
+
+            failure.disposition == SyncDisposition.WAITING_FOR_CONNECTION ->
+                BackupStatusMessage.WAITING_FOR_CONNECTION
+
+            failure.disposition == SyncDisposition.WILL_RETRY -> BackupStatusMessage.WILL_RETRY
+
+            else -> BackupStatusMessage.FAILED_USE_MANUAL
         }
     }
 
@@ -208,11 +252,21 @@ internal class SettingsViewModel(
         .combine(_backupUiState) { state, backup ->
             state.copy(backupUiState = backup)
         }
-        .combine(backupRepository.syncState) { state, syncState ->
+        .combine(
+            combine(backupRepository.syncStatus, connectivity) { status, connected ->
+                status to connected
+            }
+        ) { state, (status, connected) ->
+            val failure = status.lastOutcome as? BackupSyncStatus.Outcome.Failure
             state.copy(
                 backupUiState = state.backupUiState.copy(
-                    isSyncing = syncState is BackupSyncState.InProgress,
-                    error = (syncState as? BackupSyncState.Error)?.error?.toUI(),
+                    isSyncing = status.running,
+                    error = failure?.error?.toUI(),
+                    statusMessage = computeStatusMessage(
+                        status = status,
+                        connected = connected,
+                        syncPending = state.backupUiState.syncPending,
+                    ),
                 )
             )
         }
@@ -404,6 +458,7 @@ internal class SettingsViewModel(
 
             if (result is BackupResult.Success) {
                 backupRepository.connect(CloudProviderType.GOOGLE_DRIVE)
+                scheduleDailyAutoSync()
                 refreshBackupState()
             }
         }
@@ -428,6 +483,7 @@ internal class SettingsViewModel(
             )
             if (result is BackupResult.Success) {
                 backupRepository.connect(CloudProviderType.DROPBOX)
+                scheduleDailyAutoSync()
                 refreshBackupState()
             }
         }
@@ -438,7 +494,24 @@ internal class SettingsViewModel(
     fun onConnectBackup(providerType: CloudProviderType) {
         viewModelScope.launch {
             backupRepository.connect(providerType)
+            scheduleDailyAutoSync()
             refreshBackupState()
+        }
+    }
+
+    /** (Re)arm the daily background backup at the user's chosen hour. */
+    private suspend fun scheduleDailyAutoSync() {
+        backupScheduler.scheduleDailyAutoSync(backupPreferences.getBackupAutoHour())
+    }
+
+    /** User picked a new daily backup hour — persist it and reschedule. */
+    fun onAutoBackupHourChanged(hour: Int) {
+        viewModelScope.launch {
+            backupPreferences.setBackupAutoHour(hour)
+            _backupUiState.update { it.copy(autoBackupHour = hour) }
+            if (backupPreferences.getBackupProvider() != null) {
+                backupScheduler.scheduleDailyAutoSync(hour)
+            }
         }
     }
 

@@ -1,7 +1,12 @@
 package com.eahm.drinkwaterapp.backup.domain
 
 interface BackupScheduler {
-    fun scheduleAutoSync(intervalDays: Int = 1)
+    /**
+     * Schedule (or reschedule) the daily auto-backup to run at [hourOfDay] (0–23). Implemented as
+     * a self-rescheduling one-time work request, since WorkManager periodic work cannot target a
+     * clock time. The worker re-arms the next day on completion.
+     */
+    fun scheduleDailyAutoSync(hourOfDay: Int)
     fun triggerManualSync()
     fun cancelAll()
 

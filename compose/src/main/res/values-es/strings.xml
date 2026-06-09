@@ -659,6 +659,13 @@
     <string name="backup_row_restore">Restaurar desde copia</string>
     <string name="backup_info_auto">Las nuevas entradas se respaldan automáticamente.</string>
     <string name="backup_info_manual">La copia automática está desactivada: usa Sincronizar ahora.</string>
+    <string name="backup_row_auto_hour">Hora de copia diaria</string>
+    <string name="backup_auto_hour_value">%1$02d:00</string>
+    <string name="backup_hour_picker_cancel">Cancelar</string>
+    <string name="backup_status_waiting_connection">La copia está esperando conexión. Se reintentará automáticamente cuando vuelvas a estar en línea.</string>
+    <string name="backup_status_will_retry">La copia automática falló. Se reintentará en breve.</string>
+    <string name="backup_status_on_save_retry">No se pudo guardar tu último cambio en la copia. Lo intentaremos de nuevo automáticamente.</string>
+    <string name="backup_status_failed_manual">La copia automática falló. Toca Sincronizar ahora para reintentar.</string>
 
     <!-- Backup — Restore confirmation -->
     <string name="backup_restore_title">¿Restaurar desde la copia?</string>

@@ -73,8 +73,8 @@ interface PrefsStorage {
     suspend fun getBackupLastSyncAt(): Long?
     suspend fun setBackupLastSyncAt(millis: Long)
 
-    suspend fun getBackupAutoIntervalDays(): Int
-    suspend fun setBackupAutoIntervalDays(days: Int)
+    suspend fun getBackupAutoHour(): Int
+    suspend fun setBackupAutoHour(hour: Int)
 
     suspend fun getBackupUserDisplayName(): String?
     suspend fun setBackupUserDisplayName(name: String?)
@@ -84,6 +84,9 @@ interface PrefsStorage {
 
     suspend fun getBackupLastError(): String?
     suspend fun setBackupLastError(code: String?)
+
+    suspend fun getBackupLastFailure(): String?
+    suspend fun setBackupLastFailure(value: String?)
 
     suspend fun clear()
 }

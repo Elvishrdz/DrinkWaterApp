@@ -3,7 +3,7 @@
 **Built on top of:** `docs/plans/2026-05-26-cloud-backup-feature.md`,
 `docs/plans/2026-06-07-multiplatform-sync.md`
 **Date:** 2026-06-09
-**Status:** Planning
+**Status:** Implemented (2026-06-09)
 
 ---
 

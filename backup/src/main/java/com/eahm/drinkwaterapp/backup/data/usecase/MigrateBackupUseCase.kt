@@ -1,13 +1,13 @@
 package com.eahm.drinkwaterapp.backup.data.usecase
 
+import com.eahm.drinkwaterapp.backup.data.BackupSyncLock
 import com.eahm.drinkwaterapp.backup.domain.BackupPreferences
 import com.eahm.drinkwaterapp.backup.domain.CloudBackupProvider
 import com.eahm.drinkwaterapp.backup.domain.model.BackupError
 import com.eahm.drinkwaterapp.backup.domain.model.BackupResult
-import kotlinx.coroutines.sync.Mutex
 
 class MigrateBackupUseCase(
-    private val mutex: Mutex,
+    private val lock: BackupSyncLock,
     private val prefs: BackupPreferences,
 ) {
     suspend operator fun invoke(
@@ -16,7 +16,7 @@ class MigrateBackupUseCase(
     ): BackupResult<Unit> {
         if (from === to) return BackupResult.Failure(BackupError.SameProviderMigration)
 
-        if (!mutex.tryLock()) return BackupResult.Failure(BackupError.Unknown(null))
+        if (!lock.mutex.tryLock()) return BackupResult.Failure(BackupError.Unknown(null))
         return try {
             val backupFile = when (val dl = from.download()) {
                 is BackupResult.Success -> dl.value
@@ -31,7 +31,7 @@ class MigrateBackupUseCase(
 
             BackupResult.Success(Unit)
         } finally {
-            mutex.unlock()
+            lock.mutex.unlock()
         }
     }
 }

@@ -3,14 +3,16 @@ package com.eahm.drinkwaterapp.backup.fake
 import com.eahm.drinkwaterapp.backup.domain.BackupScheduler
 
 class FakeBackupScheduler : BackupScheduler {
-    var scheduleAutoSyncCalled = false
-    var lastScheduledIntervalDays: Int = -1
+    var scheduleDailyAutoSyncCalled = false
+    var lastScheduledHour: Int = -1
     var triggerManualSyncCalled = false
+    var triggerOnChangeSyncCalled = false
+    var triggerForegroundSyncCalled = false
     var cancelAllCalled = false
 
-    override fun scheduleAutoSync(intervalDays: Int) {
-        scheduleAutoSyncCalled = true
-        lastScheduledIntervalDays = intervalDays
+    override fun scheduleDailyAutoSync(hourOfDay: Int) {
+        scheduleDailyAutoSyncCalled = true
+        lastScheduledHour = hourOfDay
     }
 
     override fun triggerManualSync() {
@@ -21,6 +23,11 @@ class FakeBackupScheduler : BackupScheduler {
         cancelAllCalled = true
     }
 
-    override fun triggerOnChangeSync() {}
-    override fun triggerForegroundSync() {}
+    override fun triggerOnChangeSync() {
+        triggerOnChangeSyncCalled = true
+    }
+
+    override fun triggerForegroundSync() {
+        triggerForegroundSyncCalled = true
+    }
 }

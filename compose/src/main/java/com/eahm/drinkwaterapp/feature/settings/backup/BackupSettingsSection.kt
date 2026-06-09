@@ -8,16 +8,25 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -63,7 +72,19 @@ internal fun BackupSettingsSection(
     onResolveCorruption: (overwrite: Boolean) -> Unit = {},
     onResolveInitialSync: (InitialSyncDecision) -> Unit = {},
     onDismissInitialSync: () -> Unit = {},
+    onAutoBackupHourChanged: (Int) -> Unit = {},
 ) {
+    var showHourPicker by remember { mutableStateOf(false) }
+    if (showHourPicker) {
+        BackupHourPickerDialog(
+            selectedHour = state.autoBackupHour,
+            onHourSelected = {
+                onAutoBackupHourChanged(it)
+                showHourPicker = false
+            },
+            onDismiss = { showHourPicker = false },
+        )
+    }
     state.pendingConflict?.let { conflict ->
         SyncConflictSheet(
             conflict = conflict,
@@ -99,6 +120,11 @@ internal fun BackupSettingsSection(
                 }
 
                 BackupErrorRow(errorMessage = errorMessage)
+                HorizontalDivider(color = DwInk100)
+            }
+
+            backupStatusMessage(state.statusMessage)?.let { message ->
+                BackupErrorRow(errorMessage = message)
                 HorizontalDivider(color = DwInk100)
             }
 
@@ -144,6 +170,22 @@ internal fun BackupSettingsSection(
 
                 HorizontalDivider(color = DwInk100)
                 BackupRow(
+                    icon = DwIcons.History,
+                    iconBg = DwTintWater,
+                    iconTint = DwWater,
+                    label = stringResource(R.string.backup_row_auto_hour),
+                    onClick = if (state.isSyncing) null else fun() { showHourPicker = true },
+                ) {
+                    BackupValueTrailing(
+                        value = stringResource(
+                            R.string.backup_auto_hour_value,
+                            state.autoBackupHour,
+                        ),
+                    )
+                }
+
+                HorizontalDivider(color = DwInk100)
+                BackupRow(
                     icon = DwIcons.Repeat,
                     iconBg = DwTintMagenta,
                     iconTint = DwMagenta,
@@ -165,7 +207,7 @@ internal fun BackupSettingsSection(
                     iconBg = DwInk100,
                     iconTint = DwInk500,
                     label = stringResource(R.string.backup_row_disconnect),
-                    onClick = onDisconnect,
+                    onClick = if (state.isSyncing) null else onDisconnect,
                 ) {
                     BackupChevronTrailing()
                 }
@@ -352,6 +394,59 @@ private fun BackupChevronTrailing() {
         modifier = Modifier.size(16.dp),
     )
 }
+
+/** Maps a [BackupStatusMessage] to user-facing copy. Returns null when there's nothing to show. */
+@Composable
+private fun backupStatusMessage(message: BackupStatusMessage): String? = when (message) {
+    BackupStatusMessage.NONE,
+    BackupStatusMessage.SYNCING -> null // SYNCING is reflected in the provider row instead.
+    BackupStatusMessage.WAITING_FOR_CONNECTION ->
+        stringResource(R.string.backup_status_waiting_connection)
+
+    BackupStatusMessage.WILL_RETRY -> stringResource(R.string.backup_status_will_retry)
+    BackupStatusMessage.ON_SAVE_RETRY -> stringResource(R.string.backup_status_on_save_retry)
+    BackupStatusMessage.FAILED_USE_MANUAL -> stringResource(R.string.backup_status_failed_manual)
+}
+
+@Composable
+private fun BackupHourPickerDialog(
+    selectedHour: Int,
+    onHourSelected: (Int) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = stringResource(R.string.backup_row_auto_hour)) },
+        text = {
+            Column(
+                modifier = Modifier
+                    .heightIn(max = HOUR_PICKER_MAX_HEIGHT)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                for (hour in 0 until HOURS_IN_DAY) {
+                    Text(
+                        text = stringResource(R.string.backup_auto_hour_value, hour),
+                        fontFamily = PlusJakartaSans,
+                        fontWeight = if (hour == selectedHour) FontWeight.Bold else FontWeight.Normal,
+                        color = if (hour == selectedHour) DwMagenta else MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onHourSelected(hour) }
+                            .padding(vertical = 12.dp, horizontal = 8.dp),
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = stringResource(R.string.backup_hour_picker_cancel))
+            }
+        },
+    )
+}
+
+private const val HOURS_IN_DAY = 24
+private val HOUR_PICKER_MAX_HEIGHT = 280.dp
 
 @DwPreview
 @Composable

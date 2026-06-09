@@ -12,8 +12,9 @@ interface BackupPreferences {
     suspend fun getBackupLastSyncAt(): Long?
     suspend fun setBackupLastSyncAt(millis: Long)
 
-    suspend fun getBackupAutoIntervalDays(): Int
-    suspend fun setBackupAutoIntervalDays(days: Int)
+    /** Hour of day (0–23) at which the daily auto-backup should run. */
+    suspend fun getBackupAutoHour(): Int
+    suspend fun setBackupAutoHour(hour: Int)
 
     suspend fun getBackupUserDisplayName(): String?
     suspend fun setBackupUserDisplayName(name: String?)
@@ -23,6 +24,13 @@ interface BackupPreferences {
 
     suspend fun getBackupLastError(): String?
     suspend fun setBackupLastError(code: String?)
+
+    /**
+     * Persisted last-failure descriptor in the form "TRIGGER|DISPOSITION" so the Settings UI can
+     * restore the failure message after process death. Null when the last sync succeeded.
+     */
+    suspend fun getBackupLastFailure(): String?
+    suspend fun setBackupLastFailure(value: String?)
 
     suspend fun clearBackupKeys()
 

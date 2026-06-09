@@ -659,6 +659,13 @@
     <string name="backup_row_restore">Restore from backup</string>
     <string name="backup_info_auto">New entries back up automatically.</string>
     <string name="backup_info_manual">Automatic backup is off — use Sync now.</string>
+    <string name="backup_row_auto_hour">Daily backup time</string>
+    <string name="backup_auto_hour_value">%1$02d:00</string>
+    <string name="backup_hour_picker_cancel">Cancel</string>
+    <string name="backup_status_waiting_connection">Backup is waiting for a connection. It will retry automatically when you\'re back online.</string>
+    <string name="backup_status_will_retry">Auto-backup failed. It will retry shortly.</string>
+    <string name="backup_status_on_save_retry">Couldn\'t save your last change to backup. We\'ll try again automatically.</string>
+    <string name="backup_status_failed_manual">Auto-backup failed. Tap Sync now to retry.</string>
 
     <!-- Backup — Restore confirmation -->
     <string name="backup_restore_title">Restore from backup?</string>

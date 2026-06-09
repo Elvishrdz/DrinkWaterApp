@@ -1,6 +1,7 @@
 package com.eahm.drinkwaterapp.backup
 
 import com.eahm.drinkwaterapp.backup.data.BackupRecoveryResolver
+import com.eahm.drinkwaterapp.backup.data.BackupSyncLock
 import com.eahm.drinkwaterapp.backup.data.MergeEngine
 import com.eahm.drinkwaterapp.backup.data.SyncConflictResolver
 import com.eahm.drinkwaterapp.backup.data.usecase.PurgeTombstonesUseCase
@@ -12,7 +13,6 @@ import com.eahm.drinkwaterapp.backup.domain.model.TombstonePolicy
 import com.eahm.drinkwaterapp.backup.fake.FakeBackupDataSource
 import com.eahm.drinkwaterapp.backup.fake.FakeBackupPreferences
 import com.eahm.drinkwaterapp.backup.fake.FakeCloudBackupProvider
-import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -25,12 +25,12 @@ class SyncBackupUseCaseTest {
     private fun buildUseCase(
         dataSource: FakeBackupDataSource = FakeBackupDataSource(),
         prefs: FakeBackupPreferences = FakeBackupPreferences(),
-        mutex: Mutex = Mutex(),
+        lock: BackupSyncLock = BackupSyncLock(),
         mergeEngine: MergeEngine = MergeEngine(),
         conflictResolver: SyncConflictResolver = SyncConflictResolver(),
         recoveryResolver: BackupRecoveryResolver = BackupRecoveryResolver(),
     ) = SyncBackupUseCase(
-        mutex = mutex,
+        lock = lock,
         dataSource = dataSource,
         prefs = prefs,
         mergeEngine = mergeEngine,
@@ -73,8 +73,8 @@ class SyncBackupUseCaseTest {
 
     @Test
     fun `returns AlreadyInProgress when mutex is locked`() = runTest {
-        val mutex = Mutex(locked = true)
-        val useCase = buildUseCase(mutex = mutex)
+        val lock = BackupSyncLock().apply { mutex.tryLock() }
+        val useCase = buildUseCase(lock = lock)
         val result = useCase(FakeCloudBackupProvider())
         assertTrue(result is BackupResult.Success)
         assertEquals(SyncResult.AlreadyInProgress, result.value)

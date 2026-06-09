@@ -69,10 +69,11 @@ internal class DataStorePrefsStorage(
 
     private val backupProviderKey = stringPreferencesKey("BACKUP_PROVIDER")
     private val backupLastSyncAtKey = longPreferencesKey("BACKUP_LAST_SYNC_AT")
-    private val backupAutoIntervalDaysKey = intPreferencesKey("BACKUP_AUTO_INTERVAL_DAYS")
+    private val backupAutoHourKey = intPreferencesKey("BACKUP_AUTO_HOUR")
     private val backupUserDisplayNameKey = stringPreferencesKey("BACKUP_USER_DISPLAY_NAME")
     private val backupContentHashKey = stringPreferencesKey("BACKUP_CONTENT_HASH")
     private val backupLastErrorKey = stringPreferencesKey("BACKUP_LAST_ERROR")
+    private val backupLastFailureKey = stringPreferencesKey("BACKUP_LAST_FAILURE")
 
     // Sync / device identity keys
     private val deviceIdKey = stringPreferencesKey("SYNC_DEVICE_ID")
@@ -378,11 +379,11 @@ internal class DataStorePrefsStorage(
         dataStore.edit { it[backupLastSyncAtKey] = millis }
     }
 
-    override suspend fun getBackupAutoIntervalDays(): Int =
-        dataStore.data.map { it[backupAutoIntervalDaysKey] ?: 1 }.first()
+    override suspend fun getBackupAutoHour(): Int =
+        dataStore.data.map { it[backupAutoHourKey] ?: DEFAULT_BACKUP_HOUR }.first()
 
-    override suspend fun setBackupAutoIntervalDays(days: Int) {
-        dataStore.edit { it[backupAutoIntervalDaysKey] = days }
+    override suspend fun setBackupAutoHour(hour: Int) {
+        dataStore.edit { it[backupAutoHourKey] = hour.coerceIn(MIN_HOUR, MAX_HOUR) }
     }
 
     override suspend fun getBackupUserDisplayName(): String? =
@@ -415,6 +416,19 @@ internal class DataStorePrefsStorage(
         }
     }
 
+    override suspend fun getBackupLastFailure(): String? =
+        dataStore.data.map { it[backupLastFailureKey] }.first()
+
+    override suspend fun setBackupLastFailure(value: String?) {
+        dataStore.edit { prefs ->
+            if (value != null) {
+                prefs[backupLastFailureKey] = value
+            } else {
+                prefs.remove(backupLastFailureKey)
+            }
+        }
+    }
+
     override suspend fun clearBackupKeys() {
         dataStore.edit { prefs ->
             // NOTE: deviceIdKey is intentionally NOT cleared — the device identifier is a
@@ -423,10 +437,11 @@ internal class DataStorePrefsStorage(
             prefs.remove(backupEnabledKey)
             prefs.remove(backupProviderKey)
             prefs.remove(backupLastSyncAtKey)
-            prefs.remove(backupAutoIntervalDaysKey)
+            prefs.remove(backupAutoHourKey)
             prefs.remove(backupUserDisplayNameKey)
             prefs.remove(backupContentHashKey)
             prefs.remove(backupLastErrorKey)
+            prefs.remove(backupLastFailureKey)
             prefs.remove(syncPendingKey)
             prefs.remove(lastRemoteSyncAtKey)
             prefs.remove(syncOnSaveEnabledKey)
@@ -528,5 +543,11 @@ internal class DataStorePrefsStorage(
             it.remove(timeFormatPreferenceKey)
             it.remove(unitPreferenceKey)
         }
+    }
+
+    private companion object {
+        const val DEFAULT_BACKUP_HOUR = 2
+        const val MIN_HOUR = 0
+        const val MAX_HOUR = 23
     }
 }
