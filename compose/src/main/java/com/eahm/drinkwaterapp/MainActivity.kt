@@ -11,9 +11,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.eahm.drinkwaterapp.core.data.systemnotifications.handleNotificationIntentOnCreate
 import com.eahm.drinkwaterapp.core.data.systemnotifications.handleNotificationIntentOnNewIntent
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
+import com.eahm.drinkwaterapp.feature.age.AgeCollectionRoot
 import com.eahm.drinkwaterapp.feature.consent.ConsentRoot
 import com.eahm.drinkwaterapp.feature.home.HomeScreen
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingScreen
+import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.context.GlobalContext
 
 class MainActivity : AppCompatActivity() {
@@ -35,6 +37,11 @@ class MainActivity : AppCompatActivity() {
                     is MainState.Ready -> when {
                         !data.consentCompleted -> ConsentRoot(
                             onConsentCompleted = viewModel::onConsentCompleted,
+                        )
+
+                        data.ageCollectionRequired -> AgeCollectionRoot(
+                            onComplete = viewModel::onAgeCollected,
+                            viewModel = koinViewModel(),
                         )
 
                         !data.onboardingCompleted -> OnboardingScreen(

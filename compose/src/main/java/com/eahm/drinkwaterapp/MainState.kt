@@ -7,5 +7,6 @@ sealed interface MainState {
     data class Ready(
         val consentCompleted: Boolean,
         val onboardingCompleted: Boolean,
+        val ageCollectionRequired: Boolean,
     ) : MainState
 }
