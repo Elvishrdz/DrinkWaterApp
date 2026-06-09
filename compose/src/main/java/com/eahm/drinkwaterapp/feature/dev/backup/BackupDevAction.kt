@@ -31,6 +31,14 @@ sealed interface BackupDevAction {
     data object SimulatePrefsConflict : BackupDevAction
     data object SimulateTombstoneWarning : BackupDevAction
 
+    // Background work (WorkManager) controls
+    data object RunBackgroundSyncNow : BackupDevAction
+    data object TriggerOnChangeSync : BackupDevAction
+    data object TriggerForegroundSync : BackupDevAction
+    data object ScheduleDailySync : BackupDevAction
+    data object CancelAllWork : BackupDevAction
+    data class SetBackupNotification(val enabled: Boolean) : BackupDevAction
+
     // Log
     data object ClearLog : BackupDevAction
 }

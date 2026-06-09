@@ -2,6 +2,8 @@ package com.eahm.drinkwaterapp.feature.dev.backup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import com.eahm.drinkwaterapp.backup.data.BackupProviderRegistry
 import com.eahm.drinkwaterapp.backup.data.SyncConflictResolver
 import com.eahm.drinkwaterapp.backup.data.usecase.CheckBackupStatusUseCase
@@ -10,13 +12,18 @@ import com.eahm.drinkwaterapp.backup.data.usecase.DisconnectBackupUseCase
 import com.eahm.drinkwaterapp.backup.data.usecase.MigrateBackupUseCase
 import com.eahm.drinkwaterapp.backup.data.usecase.RestoreBackupUseCase
 import com.eahm.drinkwaterapp.backup.data.usecase.SyncBackupUseCase
+import com.eahm.drinkwaterapp.backup.data.worker.CloudBackupWorker
 import com.eahm.drinkwaterapp.backup.domain.BackupPreferences
 import com.eahm.drinkwaterapp.backup.domain.BackupRepository
+import com.eahm.drinkwaterapp.backup.domain.BackupScheduler
 import com.eahm.drinkwaterapp.backup.domain.model.BackupResult
+import com.eahm.drinkwaterapp.backup.domain.model.BackupSyncStatus
 import com.eahm.drinkwaterapp.backup.domain.model.CloudProviderType
 import com.eahm.drinkwaterapp.backup.domain.model.GoalRecord
 import com.eahm.drinkwaterapp.backup.domain.model.PreferencesRecord
 import com.eahm.drinkwaterapp.backup.domain.model.SyncConflict
+import com.eahm.drinkwaterapp.core.backup.BackupSyncNotifier
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,6 +53,9 @@ internal class BackupDevViewModel(
     private val repository: BackupRepository,
     private val conflictResolver: SyncConflictResolver,
     private val backupPreferences: BackupPreferences,
+    private val scheduler: BackupScheduler,
+    private val workManager: WorkManager,
+    private val backupSyncNotifier: BackupSyncNotifier,
 ) : ViewModel() {
 
     // Accumulated merge stats across all sync calls in this session
@@ -58,10 +68,26 @@ internal class BackupDevViewModel(
 
     private val _log = MutableStateFlow<List<String>>(emptyList())
     private val _backupPreview = MutableStateFlow<String?>(null)
+    private val _notificationEnabled = MutableStateFlow(false)
 
     private val prettyJson = Json {
         prettyPrint = true
         prettyPrintIndent = "  "
+    }
+
+    /** Live WorkManager state for each unique backup work name, summarised for display. */
+    private val workSummary = combine(
+        workManager.getWorkInfosForUniqueWorkFlow(CloudBackupWorker.WORK_NAME_PERIODIC),
+        workManager.getWorkInfosForUniqueWorkFlow(CloudBackupWorker.WORK_NAME_MANUAL),
+        workManager.getWorkInfosForUniqueWorkFlow(CloudBackupWorker.WORK_NAME_ON_CHANGE),
+        workManager.getWorkInfosForUniqueWorkFlow(CloudBackupWorker.WORK_NAME_FOREGROUND),
+    ) { periodic, manual, onChange, foreground ->
+        buildString {
+            appendLine("daily:      ${describe(periodic)}")
+            appendLine("manual:     ${describe(manual)}")
+            appendLine("on-change:  ${describe(onChange)}")
+            append("foreground: ${describe(foreground)}")
+        }
     }
 
     val state = combine(
@@ -77,11 +103,23 @@ internal class BackupDevViewModel(
         state.copy(autoResolvedConflicts = autoResolved)
     }.combine(_backupPreview) { state, preview ->
         state.copy(backupPreview = preview)
+    }.combine(repository.syncStatus) { state, status ->
+        state.copy(syncStatusLabel = describeStatus(status))
+    }.combine(workSummary) { state, summary ->
+        state.copy(workInfoSummary = summary)
+    }.combine(_notificationEnabled) { state, enabled ->
+        state.copy(backupNotificationEnabled = enabled)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
         initialValue = BackupDevState(),
     )
+
+    init {
+        viewModelScope.launch {
+            _notificationEnabled.value = backupSyncNotifier.isEnabled()
+        }
+    }
 
     fun onAction(action: BackupDevAction) {
         when (action) {
@@ -113,29 +151,65 @@ internal class BackupDevViewModel(
             BackupDevAction.SimulateGoalConflict -> simulateGoalConflict()
             BackupDevAction.SimulatePrefsConflict -> simulatePrefsConflict()
             BackupDevAction.SimulateTombstoneWarning -> simulateTombstoneWarning()
+
+            BackupDevAction.RunBackgroundSyncNow -> {
+                log("Enqueue background sync (manual one-time work)…")
+                scheduler.triggerManualSync()
+            }
+
+            BackupDevAction.TriggerOnChangeSync -> {
+                log("Enqueue on-change sync (debounced KEEP work)…")
+                scheduler.triggerOnChangeSync()
+            }
+
+            BackupDevAction.TriggerForegroundSync -> {
+                log("Enqueue foreground sync…")
+                scheduler.triggerForegroundSync()
+            }
+
+            BackupDevAction.ScheduleDailySync -> scheduleDailySync()
+            BackupDevAction.CancelAllWork -> {
+                log("Cancel all backup work…")
+                scheduler.cancelAll()
+            }
+
+            is BackupDevAction.SetBackupNotification -> setBackupNotification(action.enabled)
+
             BackupDevAction.ClearLog -> _log.value = emptyList()
         }
     }
 
-    private fun connectProvider(type: CloudProviderType) = viewModelScope.launch {
+    private fun scheduleDailySync() = viewModelScope.launch {
+        val hour = backupPreferences.getBackupAutoHour()
+        scheduler.scheduleDailyAutoSync(hour)
+        log("Scheduled daily auto-sync at ${"%02d".format(hour)}:00")
+    }
+
+    private fun setBackupNotification(enabled: Boolean) = viewModelScope.launch {
+        backupSyncNotifier.setEnabled(enabled)
+        _notificationEnabled.value = enabled
+        log("Backup status notification ${if (enabled) "enabled" else "disabled"}")
+    }
+
+    private fun connectProvider(type: CloudProviderType) = viewModelScope.launch(Dispatchers.IO) {
         log("Connect ${type.displayName}…")
         val result = connectUseCase(type)
         log("${type.displayName} connect → $result")
     }
 
-    private fun syncProvider(type: CloudProviderType) = viewModelScope.launch {
+    private fun syncProvider(type: CloudProviderType) = viewModelScope.launch(Dispatchers.IO) {
         log("Sync ${type.displayName}…")
         val result = syncUseCase(registry.get(type))
         log("${type.displayName} sync → $result")
     }
 
-    private fun restoreProvider(type: CloudProviderType) = viewModelScope.launch {
+    private fun restoreProvider(type: CloudProviderType) = viewModelScope.launch(Dispatchers.IO) {
         log("Restore ${type.displayName}…")
         val result = restoreUseCase(registry.get(type))
         log("${type.displayName} restore → $result")
     }
 
-    private fun checkStatus(type: CloudProviderType) = viewModelScope.launch {
+    private fun checkStatus(type: CloudProviderType) = viewModelScope.launch(Dispatchers.IO) {
         log("Check status ${type.displayName}…")
         val result = checkStatusUseCase(registry.get(type))
         log("${type.displayName} status → $result")
@@ -152,7 +226,7 @@ internal class BackupDevViewModel(
      * so the next sync behaves like a first-ever upload — i.e. as if the backup never
      * existed (fresh install).
      */
-    private fun deleteRemoteFile(type: CloudProviderType) = viewModelScope.launch {
+    private fun deleteRemoteFile(type: CloudProviderType) = viewModelScope.launch(Dispatchers.IO) {
         log("Delete remote file ${type.displayName}…")
         when (val result = registry.get(type).deleteRemoteFile()) {
             is BackupResult.Success -> {
@@ -171,7 +245,7 @@ internal class BackupDevViewModel(
      * Downloads the remote backup and shows its pretty-printed JSON in the viewer sheet.
      * On failure, logs why so the reason is visible in the log panel.
      */
-    private fun visualizeBackup(type: CloudProviderType) = viewModelScope.launch {
+    private fun visualizeBackup(type: CloudProviderType) = viewModelScope.launch(Dispatchers.IO) {
         log("Fetch backup file ${type.displayName}…")
         when (val result = registry.get(type).download()) {
             is BackupResult.Success -> {
@@ -187,11 +261,12 @@ internal class BackupDevViewModel(
         }
     }
 
-    private fun migrate(from: CloudProviderType, to: CloudProviderType) = viewModelScope.launch {
-        log("Migrate ${from.displayName} → ${to.displayName}…")
-        val result = migrateUseCase(registry.get(from), registry.get(to))
-        log("Migrate → $result")
-    }
+    private fun migrate(from: CloudProviderType, to: CloudProviderType) =
+        viewModelScope.launch(Dispatchers.IO) {
+            log("Migrate ${from.displayName} → ${to.displayName}…")
+            val result = migrateUseCase(registry.get(from), registry.get(to))
+            log("Migrate → $result")
+        }
 
     private fun simulateGoalConflict() = viewModelScope.launch {
         log("[SIM] Injecting GoalConflict into SyncConflictResolver…")
@@ -243,5 +318,22 @@ internal class BackupDevViewModel(
         val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
         val ts = "%02d:%02d:%02d".format(now.hour, now.minute, now.second)
         _log.update { it + "[$ts] $message" }
+    }
+
+    private fun describe(infos: List<WorkInfo>): String {
+        val info = infos.firstOrNull() ?: return "—"
+        val attempt = if (info.runAttemptCount > 0) " (attempt ${info.runAttemptCount})" else ""
+        return "${info.state}$attempt"
+    }
+
+    private fun describeStatus(status: BackupSyncStatus): String = when {
+        status.running -> "Running (${status.activeTrigger?.name ?: "?"})"
+        else -> when (val outcome = status.lastOutcome) {
+            is BackupSyncStatus.Outcome.Success -> "Success (${outcome.trigger.name})"
+            is BackupSyncStatus.Outcome.Failure ->
+                "Failed (${outcome.trigger.name} → ${outcome.disposition.name})"
+
+            null -> "Idle"
+        }
     }
 }

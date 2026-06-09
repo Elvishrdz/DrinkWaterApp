@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -95,6 +96,7 @@ internal fun BackupDevScreen(
             ) {
                 var googleExpanded by rememberSaveable { mutableStateOf(true) }
                 var dropboxExpanded by rememberSaveable { mutableStateOf(false) }
+                var backgroundWorkExpanded by rememberSaveable { mutableStateOf(true) }
                 var migrationExpanded by rememberSaveable { mutableStateOf(false) }
                 var simulationExpanded by rememberSaveable { mutableStateOf(false) }
                 var statsExpanded by rememberSaveable { mutableStateOf(false) }
@@ -129,6 +131,14 @@ internal fun BackupDevScreen(
                         onVisualize = { onAction(BackupDevAction.VisualizeDropbox) },
                         onDeleteFile = { onAction(BackupDevAction.DeleteFileDropbox) },
                     )
+                }
+
+                CollapsibleSection(
+                    title = "Background Work",
+                    expanded = backgroundWorkExpanded,
+                    onToggle = { backgroundWorkExpanded = !backgroundWorkExpanded },
+                ) {
+                    BackgroundWorkControls(state = state, onAction = onAction)
                 }
 
                 CollapsibleSection(
@@ -322,6 +332,66 @@ private fun CollapsibleSection(
         }
         if (expanded) content()
         HorizontalDivider()
+    }
+}
+
+@Composable
+private fun BackgroundWorkControls(
+    state: BackupDevState,
+    onAction: (BackupDevAction) -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(
+            text = "Status: ${state.syncStatusLabel}",
+            style = MaterialTheme.typography.bodySmall,
+            fontFamily = FontFamily.Monospace,
+            fontWeight = FontWeight.Bold,
+        )
+        Text(
+            text = state.workInfoSummary,
+            style = MaterialTheme.typography.bodySmall,
+            fontFamily = FontFamily.Monospace,
+        )
+
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            OutlinedButton(onClick = { onAction(BackupDevAction.RunBackgroundSyncNow) }) {
+                Text("Run now")
+            }
+            OutlinedButton(onClick = { onAction(BackupDevAction.TriggerOnChangeSync) }) {
+                Text("On-change")
+            }
+            OutlinedButton(onClick = { onAction(BackupDevAction.TriggerForegroundSync) }) {
+                Text("Foreground")
+            }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            OutlinedButton(onClick = { onAction(BackupDevAction.ScheduleDailySync) }) {
+                Text("Schedule daily")
+            }
+            OutlinedButton(
+                onClick = { onAction(BackupDevAction.CancelAllWork) },
+                colors = androidx.compose.material3.ButtonDefaults.outlinedButtonColors(
+                    contentColor = MaterialTheme.colorScheme.error,
+                ),
+            ) {
+                Text("Cancel all")
+            }
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = "Status notification",
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            Switch(
+                checked = state.backupNotificationEnabled,
+                onCheckedChange = { onAction(BackupDevAction.SetBackupNotification(it)) },
+            )
+        }
     }
 }
 

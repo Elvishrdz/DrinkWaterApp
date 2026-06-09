@@ -88,5 +88,9 @@ interface PrefsStorage {
     suspend fun getBackupLastFailure(): String?
     suspend fun setBackupLastFailure(value: String?)
 
+    /** Dev-only: show a dedicated status notification for background backups. */
+    suspend fun getDevBackupNotificationEnabled(): Boolean
+    suspend fun setDevBackupNotificationEnabled(enabled: Boolean)
+
     suspend fun clear()
 }
