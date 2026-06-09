@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 class SyncCoordinator(
     private val scheduler: BackupScheduler,
     private val prefs: BackupPreferences,
-    private val debounceMs: Long = 30_000L,
+    private val debounceMs: Long = 7_000L,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob()),
 ) {
 

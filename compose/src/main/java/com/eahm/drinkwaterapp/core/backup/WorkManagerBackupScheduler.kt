@@ -58,9 +58,12 @@ class WorkManagerBackupScheduler(
             .setInputData(triggerData(SyncTrigger.ON_SAVE))
             .build()
 
+        // APPEND_OR_REPLACE: if an on-change sync is already running, queue this one to run after
+        // it (with the latest DB state) instead of dropping it — so the newest write always wins
+        // without cancelling an in-flight upload.
         workManager.enqueueUniqueWork(
             CloudBackupWorker.WORK_NAME_ON_CHANGE,
-            ExistingWorkPolicy.KEEP,
+            ExistingWorkPolicy.APPEND_OR_REPLACE,
             request,
         )
     }
