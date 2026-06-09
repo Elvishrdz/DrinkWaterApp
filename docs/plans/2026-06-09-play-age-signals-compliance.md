@@ -110,11 +110,16 @@ consumers.
       range we can act on).
     - `Unavailable(reason)` — network/error/no-response/non-retryable/`null` status (not in scope
       or not shared). → triggers the **fallback age screen**.
-- **`isMinor`** derived rule (single source of truth, computed in `:age`):
-    - `SUPERVISED`, `SUPERVISED_APPROVAL_*` → minor.
-    - `ageUpper != null && ageUpper < 18` → minor.
-    - `VERIFIED` / `DECLARED` with `ageLower >= 18` → adult.
-    - Declared via fallback screen: `age < 18` → minor, else adult.
+- **`AdTreatment` bracket** derived rule (single source of truth, computed in `:age`) — **not a
+  binary minor flag**, because ad law has two thresholds (COPPA under-13 → TFCD,
+  under-age-of-consent
+  13–17 → TFUA). Three buckets, aligned to Play's default ranges:
+    - `CHILD_DIRECTED` (under 13): `ageUpper != null && ageUpper < 13`. → TFCD.
+    - `UNDER_AGE_OF_CONSENT` (13–17): minor but not under 13 — `SUPERVISED`/`SUPERVISED_APPROVAL_*`,
+      or `ageUpper in 13..17`. → TFUA.
+    - `STANDARD` (18+): `VERIFIED`/`DECLARED` with `ageLower >= 18`.
+    - Declared via fallback screen: bracket comes straight from the user's chosen bucket (or derived
+      from birth year). `isMinor` remains a convenience derived from `AdTreatment != STANDARD`.
 - **`source`** field on `AgeSignals`: `API` or `DECLARED` — so we know provenance and can prefer a
   fresh API result over a stale declared one.
 - Persist last resolved `AgeSignals` in DataStore so ads apply the right config immediately on next
@@ -127,14 +132,24 @@ consumers.
 Per decision: rely on the API first; if it can't provide a signal, collect the age ourselves to
 stay compliant.
 
-- **Trigger:** `AgeResolution.Unavailable` **and** no previously declared age cached. If the API
-  later succeeds, the declared value is superseded and the screen is never shown again.
-- **Shown:** as a gate before the user reaches ad-bearing surfaces (or at first launch after
-  resolution fails). Purchased users (ads removed) still see it only if compliance needs the
-  signal — but since age is *only* used for ads here, **if ads are already removed via purchase we
-  can skip the screen entirely** (no age-dependent behavior remains).
-- **UX / content:**
-    - Collect age (or birth year / an "I am under 18 / 18+" choice — simplest defensible).
+- **Trigger:** `AgeResolution.Unavailable` **and** no declared age cached. If the API later
+  succeeds, the declared value is superseded and the screen is never shown again.
+- **Collected once, persisted.** One-time collection is sufficient for compliance — we do **not**
+  re-prompt every launch. Once stored (`source = DECLARED`), the gate is satisfied. The user can
+  change it later via a **Settings option** (see §6). The API still re-resolves per cold start; only
+  the declared fallback is one-time.
+- **Placement in startup flow (per decision):** the gate sits **after consent (legal + tracking),
+  before onboarding**. Existing flow gates on `consentCompleted` → `onboardingCompleted`
+  (`MainViewModel.kt:38`); insert an `ageDecided` gate between them. Add `ageDecided` to
+  `MainState.Ready` and resolve it from the `:age` repo (declared age set, OR API `Resolved`).
+    - **Recovery rule:** if consent is already accepted (screen not re-shown) **and** onboarding is
+      complete **but** age is still unset → show the age screen anyway. So the gate is "age not
+      decided", evaluated independently of where the user is in the flow.
+- **Purchased users:** since age is used **only** for ads, if ads are already removed via purchase
+  there is no age-dependent behavior left — **skip the screen entirely**.
+- **UX / content (per Q1 resolution — 3 buckets, not binary):**
+    - Collect **birth year** (derive bucket) **or** three explicit choices: *under 13 / 13–17 / 18+*
+      — enough to set TFCD vs TFUA vs standard correctly.
     - Clear disclosure: this age is used **only** to keep ads age-appropriate and for legal
       compliance; it is not shared, profiled, or used for targeting.
     - Persist via `AgeRepository.submitDeclaredAge()` → cached with `source = DECLARED`.
@@ -147,17 +162,25 @@ In `DrinkWaterAppAds` (or a new `AdsConfigurator`), before/around `MobileAds.ini
 
 ```kotlin
 val config = RequestConfiguration.Builder()
-    .setTagForUnderAgeOfConsent(
-        if (isMinor) RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_TRUE
-        else RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_UNSPECIFIED
+    .setTagForChildDirectedTreatment(            // COPPA, under 13
+        if (treatment == CHILD_DIRECTED) TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE
+        else TAG_FOR_CHILD_DIRECTED_TREATMENT_UNSPECIFIED
+    )
+    .setTagForUnderAgeOfConsent(                 // under age of consent, 13–17
+        if (treatment == UNDER_AGE_OF_CONSENT) TAG_FOR_UNDER_AGE_OF_CONSENT_TRUE
+        else TAG_FOR_UNDER_AGE_OF_CONSENT_UNSPECIFIED
     )
     .build()
 MobileAds.setRequestConfiguration(config)
 ```
 
-- AdMob *does* have a minor config — `TAG_FOR_UNDER_AGE_OF_CONSENT` (TFUA). Setting it true makes
-  Google serve only age-appropriate / non-personalized ads. We still serve ads (per decision), and
-  the `isMinor` flag comes from API **or** the declared fallback — same code path, single source.
+- AdMob has **two** minor configs (per Q1): `TAG_FOR_CHILD_DIRECTED_TREATMENT` (TFCD, COPPA / under
+    13) and `TAG_FOR_UNDER_AGE_OF_CONSENT` (TFUA, 13–17). We drive both off the `AdTreatment`
+        bracket.
+        Setting either makes Google serve only age-appropriate / non-personalized ads. We still
+        serve ads
+        (per decision); the bracket comes from API **or** declared fallback — same code path, single
+        source.
 - Since `MobileAds.initialize` runs once at startup but age resolves async, **re-apply
   `setRequestConfiguration` once age is resolved** (it affects subsequent ad requests). Banner
   requests made after resolution pick up the TFUA flag.
@@ -191,6 +214,14 @@ Precedence: `purchased → render nothing` › `ad available → render ad (TFUA
   also the natural dev experience. Provide a `FakeAgeSignalsManager`
   (`com.google.android.play.agesignals.testing`) wiring for tests.
 
+### 6. Settings: change declared age
+
+- Add a Settings entry to **view/change the declared age bracket** (the one-time fallback value).
+- Editable **only** when the age is `DECLARED` (user-provided). When age is `API`-sourced, show it
+  read-only (or hide), since the API is authoritative and we must not let users override the signal.
+- Writing a new value updates `:age` (`submitDeclaredAge`) and re-applies the AdMob
+  `RequestConfiguration` so the new bracket takes effect on subsequent ad requests.
+
 ---
 
 ## Implementation steps
@@ -203,21 +234,27 @@ Precedence: `purchased → render nothing` › `ad available → render ad (TFUA
    `AgePreferences` DataStore, Koin module); register module in the Application `startKoin`.
 4. Resolve age on app start; persist + expose `StateFlow<AgeSignals?>` and an `AgeResolution`
    signal the UI can observe to decide whether to show the fallback screen.
-5. Build the **fallback age-collection screen** in `:compose` (MVI ViewModel + composable +
-   disclosure copy), gated on `Unavailable` && no declared age; write declared age back to `:age`.
-6. Wire `isMinor` into ad serving: `RequestConfiguration` TFUA in `DrinkWaterAppAds`, re-applied
-   after resolution (works identically for API-sourced and declared age).
-7. Build the **house "remove ads" fallback ad** for the banner empty state; keep placeholder;
+5. Build the **fallback age-collection screen** in `:compose` (MVI ViewModel + composable + 3-bucket
+   /birth-year input + disclosure copy); write declared bracket back to `:age`.
+6. Wire the **age gate into the startup flow**: add `ageDecided` to `MainState.Ready`
+   (`MainViewModel.kt:38`), gate **after consent, before onboarding**, with the recovery rule
+   (decided = declared set OR API `Resolved`; skip if ads purchased).
+7. Wire `AdTreatment` into ad serving: set **both** TFCD and TFUA on `RequestConfiguration` in
+   `DrinkWaterAppAds`, re-applied after resolution (identical for API-sourced and declared age).
+8. Build the **house "remove ads" fallback ad** for the banner empty state; keep placeholder;
    keep purchased = no-ads precedence.
-8. Tests:
-    - `:age` repository (each `userStatus`, retry on retryable codes, non-retryable/`null` →
-      `Unavailable`, declared-age write, API supersedes declared) via `FakeAgeSignalsManager`.
-    - Fallback-screen ViewModel (shown only on `Unavailable` + no declared age; hidden after
-      submit or API success).
-    - Ads decision: minor → TFUA true; purchased → nothing; empty fill → house ad.
-9. Play Console: SKU age ratings, Age signals section, significant-change assessment doc,
-   revocation report monitoring.
-10. (Optional hardening) Pair with **Play Integrity API** to verify untampered caller.
+9. Add **Settings entry** to view/change the declared age (editable only when `source = DECLARED`);
+   re-apply ad config on change.
+10. Tests:
+    - `:age` repository (each `userStatus` → bracket, retry on retryable codes, non-retryable/`null`
+      → `Unavailable`, declared-age write, API supersedes declared) via `FakeAgeSignalsManager`.
+    - Age-gate logic (shown only when not decided; recovery rule; skipped when purchased; hidden
+      after submit or API success).
+    - Ads decision: under-13 → TFCD; 13–17 → TFUA; 18+ → neither; purchased → nothing; empty fill →
+      house ad.
+11. Play Console: SKU age ratings, Age signals section, significant-change assessment doc,
+    revocation report monitoring.
+12. (Optional hardening) Pair with **Play Integrity API** to verify untampered caller.
 
 ---
 
@@ -236,17 +273,15 @@ Precedence: `purchased → render nothing` › `ad available → render ad (TFUA
 
 ---
 
-## Open questions
+## Resolved decisions (continued)
 
-- **Fallback screen input granularity** — exact age, birth year, or a binary "under 18 / 18+"
-  toggle? Binary is simplest and sufficient for the ads-only use; confirm preference.
-
-for the law is this sufficient? if yes, lets do that.
-
-- **Where the fallback gate sits in navigation** — first-launch interstitial vs lazy gate before
-  the first ad surface. Recommend lazy (only when an ad would show and signal is unavailable).
-
-we should show this after legal compliant and data tracking screen and before onboarding.
-if legal is not shown and onboarding is complete, AND the age is still not set we display the age
-screen. Can you verify if this needs to be collected everytime we open the app or is 1 time enough
-to be compliant, we can also change this in the app settings by adding an option.
+5. **Fallback input granularity** → **3 buckets, not binary.** A binary under-18/18+ toggle is
+   **not** sufficient for the law: ad compliance has two thresholds — COPPA (under 13 → TFCD) and
+   under-age-of-consent (13–17 → TFUA). Collect **birth year** (derive bucket) or three explicit
+   choices *under 13 / 13–17 / 18+*, and set both AdMob tags accordingly. *(Resolved.)*
+6. **Collection frequency** → **once, persisted** — sufficient for compliance; no per-launch
+   re-prompt. Editable later via a Settings option. The API still re-resolves per cold start.
+   *(Resolved.)*
+7. **Gate placement** → **after consent (legal + tracking), before onboarding**, via an `ageDecided`
+   gate in `MainState`. **Recovery rule:** if consent already accepted and onboarding complete but
+   age still unset → show the age screen. Skipped entirely when ads are purchased. *(Resolved.)*
