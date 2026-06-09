@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?><!-- "DEV" badge drawn centered over the foreground. Dev build only. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Translucent pill behind the text for legibility over the logo. -->
+    <path
+        android:fillColor="#CC1A1A1A"
+        android:pathData="M28,46 L80,46 A8,8 0 0 1 80,62 L28,62 A8,8 0 0 1 28,46 Z" />
+
+    <!-- D -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M34,49 L34,59 M34,49 C41,49 41,59 34,59"
+        android:strokeWidth="3"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- E -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M58,49 L50,49 L50,59 L58,59 M50,54 L56,54"
+        android:strokeWidth="3"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- V -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M65,49 L70,59 L75,49"
+        android:strokeWidth="3"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?><!-- Dev foreground: regular launcher foreground + DEV badge on top. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@mipmap/ic_launcher_foreground" />
+    <item android:drawable="@drawable/ic_launcher_dev_overlay" />
+</layer-list>

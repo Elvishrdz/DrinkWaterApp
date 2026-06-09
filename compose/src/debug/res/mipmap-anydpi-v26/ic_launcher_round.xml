@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?><!-- Dev (debug) round launcher icon: orange background, DEV badge, no monochrome. -->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MonochromeLauncherIcon">
+    <background android:drawable="@color/ic_launcher_background_dev" />
+    <foreground android:drawable="@drawable/ic_launcher_foreground_dev" />
+</adaptive-icon>
