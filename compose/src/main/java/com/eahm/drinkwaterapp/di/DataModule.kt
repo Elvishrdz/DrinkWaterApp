@@ -1,6 +1,7 @@
 package com.eahm.drinkwaterapp.di
 
 import com.eahm.drinkwaterapp.analytics.tracking.trackingServiceModule
+import com.eahm.drinkwaterapp.core.ads.AdAgeConfigInitializer
 import com.eahm.drinkwaterapp.core.billing.billingModule
 import com.eahm.drinkwaterapp.core.config.appInfoModule
 import com.eahm.drinkwaterapp.core.data.confetti.confettiModule
@@ -31,4 +32,5 @@ internal val dataModule = module {
     includes(trackingServiceModule)
     includes(backupModule)
     singleOf(::TrackingFlushInitializer) bind AppInitializer::class
+    singleOf(::AdAgeConfigInitializer) bind AppInitializer::class
 }
