@@ -417,6 +417,9 @@ internal class DataStorePrefsStorage(
 
     override suspend fun clearBackupKeys() {
         dataStore.edit { prefs ->
+            // NOTE: deviceIdKey is intentionally NOT cleared — the device identifier is a
+            // stable, app-scoped UUID that must persist across disconnect/reconnect and
+            // account changes (see multiplatform-sync plan §2).
             prefs.remove(backupEnabledKey)
             prefs.remove(backupProviderKey)
             prefs.remove(backupLastSyncAtKey)
@@ -424,7 +427,6 @@ internal class DataStorePrefsStorage(
             prefs.remove(backupUserDisplayNameKey)
             prefs.remove(backupContentHashKey)
             prefs.remove(backupLastErrorKey)
-            prefs.remove(deviceIdKey)
             prefs.remove(syncPendingKey)
             prefs.remove(lastRemoteSyncAtKey)
             prefs.remove(syncOnSaveEnabledKey)
@@ -436,8 +438,28 @@ internal class DataStorePrefsStorage(
 
     // --- Sync / device identity prefs implementation ---
 
-    override suspend fun getDeviceId(): String =
-        dataStore.data.map { it[deviceIdKey] ?: "" }.first()
+    /**
+     * Returns the stable, app-scoped device identifier, generating and persisting a UUID
+     * on first access. Generated once, never changed — survives account changes and
+     * disconnect (see multiplatform-sync plan §2). NOT the Android ID.
+     */
+    override suspend fun getDeviceId(): String {
+        val existing = dataStore.data.map { it[deviceIdKey] }.first()
+        if (!existing.isNullOrBlank()) return existing
+
+        // Generate atomically: re-check inside the transaction so concurrent callers
+        // can't each create a different id.
+        var result = ""
+        dataStore.edit { prefs ->
+            val current = prefs[deviceIdKey]
+            result = if (!current.isNullOrBlank()) {
+                current
+            } else {
+                java.util.UUID.randomUUID().toString().also { prefs[deviceIdKey] = it }
+            }
+        }
+        return result
+    }
 
     override suspend fun setDeviceId(id: String) {
         dataStore.edit { it[deviceIdKey] = id }
