@@ -656,6 +656,14 @@
     <string name="backup_last_sync_never">Nunca</string>
     <string name="backup_last_sync_value">%1$s</string>
     <string name="backup_row_disconnect">Desconectar</string>
+    <string name="backup_row_restore">Restaurar desde copia</string>
+    <string name="backup_info_auto">Las nuevas entradas se respaldan automáticamente.</string>
+    <string name="backup_info_manual">La copia automática está desactivada: usa Sincronizar ahora.</string>
+
+    <!-- Backup — Restore confirmation -->
+    <string name="backup_restore_title">¿Restaurar desde la copia?</string>
+    <string name="backup_restore_body">Esto reemplaza todos los datos de este dispositivo con la copia de seguridad más reciente de la nube. Esta acción no se puede deshacer.</string>
+    <string name="backup_restore_confirm">Restaurar</string>
 
     <!-- Copia de seguridad — Hoja de selección de proveedor -->
     <string name="backup_picker_title">Elige un proveedor de copia</string>

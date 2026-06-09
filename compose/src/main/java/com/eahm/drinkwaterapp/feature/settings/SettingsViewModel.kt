@@ -457,6 +457,14 @@ internal class SettingsViewModel(
         }
     }
 
+    /** Pulls the cloud backup and replaces this device's local data with it. */
+    fun onRestoreBackup() {
+        viewModelScope.launch {
+            backupRepository.restore()
+            refreshBackupState()
+        }
+    }
+
     fun onSyncOnSaveToggled(enabled: Boolean) {
         viewModelScope.launch {
             backupPreferences.setSyncOnSaveEnabled(enabled)

@@ -57,6 +57,7 @@ internal fun BackupSettingsSection(
     onConnect: () -> Unit,
     onDisconnect: () -> Unit,
     onSyncNow: () -> Unit,
+    onRestore: () -> Unit = {},
     onSyncOnSaveToggled: (Boolean) -> Unit = {},
     onResolveConflict: (useRemote: Boolean) -> Unit = {},
     onResolveCorruption: (overwrite: Boolean) -> Unit = {},
@@ -132,20 +133,30 @@ internal fun BackupSettingsSection(
 
                 HorizontalDivider(color = DwInk100)
                 BackupRow(
-                    icon = DwIcons.Clock,
+                    icon = DwIcons.History,
                     iconBg = DwTintWater,
                     iconTint = DwWater,
-                    label = stringResource(R.string.backup_row_last_sync),
+                    label = stringResource(R.string.backup_row_restore),
+                    onClick = if (state.isSyncing) null else onRestore,
                 ) {
-                    val syncText = state.lastSyncAt
-                        ?.let {
-                            SimpleDateFormat(
-                                "MMM d, HH:mm",
-                                Locale.getDefault()
-                            ).format(Date(it))
-                        }
-                        ?: stringResource(R.string.backup_last_sync_never)
-                    BackupValueTrailing(value = syncText, showChevron = false)
+                    BackupChevronTrailing()
+                }
+
+                HorizontalDivider(color = DwInk100)
+                BackupRow(
+                    icon = DwIcons.Repeat,
+                    iconBg = DwTintMagenta,
+                    iconTint = DwMagenta,
+                    label = stringResource(R.string.sync_on_save_label),
+                ) {
+                    Switch(
+                        checked = state.syncOnSaveEnabled,
+                        onCheckedChange = onSyncOnSaveToggled,
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = DwMagenta,
+                            checkedTrackColor = DwTintMagenta,
+                        ),
+                    )
                 }
 
                 HorizontalDivider(color = DwInk100)
@@ -162,28 +173,14 @@ internal fun BackupSettingsSection(
         }
 
         if (state.isConnected) {
-            // TODO: rename this to: Force sync. force to sync in specified places while using the app.
-            BackupSection(title = "") {
-                BackupRow(
-                    icon = DwIcons.Repeat,
-                    iconBg = DwTintMagenta,
-                    iconTint = DwMagenta,
-                    label = stringResource(R.string.sync_on_save_label),
-                ) {
-                    Switch(
-                        checked = state.syncOnSaveEnabled,
-                        onCheckedChange = onSyncOnSaveToggled,
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = DwMagenta,
-                            checkedTrackColor = DwTintMagenta,
-                        ),
-                    )
-                }
-            }
-
             SyncPendingBanner(visible = state.syncPending)
 
             LinkedDevicesSection(devices = state.seenDevices)
+
+            BackupInfoFooter(
+                lastSyncAt = state.lastSyncAt,
+                syncOnSaveEnabled = state.syncOnSaveEnabled,
+            )
         }
     }
 }
@@ -216,6 +213,37 @@ private fun BackupErrorRow(errorMessage: String) {
             style = MaterialTheme.typography.bodySmall,
             color = DwInk500,
             modifier = Modifier.weight(1f),
+        )
+    }
+}
+
+/** Informative footer shown below the backup rows: last backup time + backup-mode hint. */
+@Composable
+private fun BackupInfoFooter(lastSyncAt: Long?, syncOnSaveEnabled: Boolean) {
+    val lastBackup = lastSyncAt
+        ?.let { SimpleDateFormat("MMM d, HH:mm", Locale.getDefault()).format(Date(it)) }
+        ?: stringResource(R.string.backup_last_sync_never)
+    // The hint mirrors the Sync-on-save toggle so it never contradicts the actual mode.
+    val hint = if (syncOnSaveEnabled) {
+        stringResource(R.string.backup_info_auto)
+    } else {
+        stringResource(R.string.backup_info_manual)
+    }
+    Column(
+        modifier = Modifier.padding(horizontal = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        Text(
+            text = "${stringResource(R.string.backup_row_last_sync)} · $lastBackup",
+            fontFamily = PlusJakartaSans,
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Text(
+            text = hint,
+            fontFamily = PlusJakartaSans,
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }

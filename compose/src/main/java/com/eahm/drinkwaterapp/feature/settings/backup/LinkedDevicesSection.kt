@@ -1,6 +1,7 @@
 package com.eahm.drinkwaterapp.feature.settings.backup
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,9 +15,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -47,38 +53,60 @@ internal fun LinkedDevicesSection(
     devices: List<SeenDevice>,
     modifier: Modifier = Modifier,
 ) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        Text(
-            text = stringResource(R.string.sync_linked_devices_title),
-            fontFamily = JetBrainsMono,
-            fontWeight = FontWeight.Medium,
-            fontSize = 11.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            letterSpacing = TextUnit(0.10f, TextUnitType.Em),
-            modifier = Modifier.padding(horizontal = 4.dp),
-        )
-
-        Column(
+        // Collapsed by default — tap the header to reveal the device list.
+        Row(
             modifier = Modifier
-                .outlineBorderStyle()
-                .background(MaterialTheme.colorScheme.surface),
+                .fillMaxWidth()
+                .clickable { expanded = !expanded }
+                .padding(horizontal = 4.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            if (devices.isEmpty()) {
-                Text(
-                    text = stringResource(R.string.sync_linked_devices_empty),
-                    fontFamily = PlusJakartaSans,
-                    fontSize = 13.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 14.dp, vertical = 12.dp),
-                )
-            } else {
-                devices.forEach { device ->
-                    DeviceRow(device = device)
+            Text(
+                text = stringResource(R.string.sync_linked_devices_title) + " (${devices.size})",
+                fontFamily = JetBrainsMono,
+                fontWeight = FontWeight.Medium,
+                fontSize = 11.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                letterSpacing = TextUnit(0.10f, TextUnitType.Em),
+                modifier = Modifier.weight(1f),
+            )
+            @Suppress("MagicNumber")
+            Icon(
+                imageVector = DwIcons.ChevronRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier
+                    .size(16.dp)
+                    .rotate(if (expanded) 90f else 0f),
+            )
+        }
+
+        if (expanded) {
+            Column(
+                modifier = Modifier
+                    .outlineBorderStyle()
+                    .background(MaterialTheme.colorScheme.surface),
+            ) {
+                if (devices.isEmpty()) {
+                    Text(
+                        text = stringResource(R.string.sync_linked_devices_empty),
+                        fontFamily = PlusJakartaSans,
+                        fontSize = 13.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 14.dp, vertical = 12.dp),
+                    )
+                } else {
+                    devices.forEach { device ->
+                        DeviceRow(device = device)
+                    }
                 }
             }
         }

@@ -297,6 +297,7 @@ internal fun SettingsScreen(
         },
         onSyncNow = viewModel::onSyncNow,
         onDisconnectBackupTap = viewModel::onDisconnectBackup,
+        onRestoreBackupTap = viewModel::onRestoreBackup,
         onSyncOnSaveToggled = viewModel::onSyncOnSaveToggled,
         onResolveConflict = viewModel::onResolveConflict,
         onResolveCorruption = viewModel::onResolveCorruption,
@@ -464,6 +465,7 @@ internal fun SettingsContent(
     onConnectBackup: (CloudProviderType) -> Unit = {},
     onSyncNow: () -> Unit = {},
     onDisconnectBackupTap: () -> Unit = {},
+    onRestoreBackupTap: () -> Unit = {},
     onSyncOnSaveToggled: (Boolean) -> Unit = {},
     onResolveConflict: (useRemote: Boolean) -> Unit = {},
     onResolveCorruption: (overwrite: Boolean) -> Unit = {},
@@ -567,11 +569,13 @@ internal fun SettingsContent(
                 item {
                     var showProviderPickerSheet by rememberSaveable { mutableStateOf(false) }
                     var showDisconnectBackupDialog by rememberSaveable { mutableStateOf(false) }
+                    var showRestoreBackupDialog by rememberSaveable { mutableStateOf(false) }
 
                     BackupSettingsSection(
                         state = state.backupUiState,
                         onConnect = { showProviderPickerSheet = true },
                         onSyncNow = onSyncNow,
+                        onRestore = { showRestoreBackupDialog = true },
                         onDisconnect = { showDisconnectBackupDialog = true },
                         onSyncOnSaveToggled = onSyncOnSaveToggled,
                         onResolveConflict = onResolveConflict,
@@ -596,6 +600,16 @@ internal fun SettingsContent(
                             onConfirm = {
                                 showDisconnectBackupDialog = false
                                 onDisconnectBackupTap()
+                            },
+                        )
+                    }
+
+                    if (showRestoreBackupDialog) {
+                        RestoreBackupDialog(
+                            onDismiss = { showRestoreBackupDialog = false },
+                            onConfirm = {
+                                showRestoreBackupDialog = false
+                                onRestoreBackupTap()
                             },
                         )
                     }
@@ -1801,6 +1815,50 @@ private fun DisconnectBackupDialog(
             Spacer(Modifier.height(24.dp))
             DwPrimaryButton(
                 text = stringResource(R.string.backup_disconnect_confirm),
+                onClick = onConfirm,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(Modifier.height(8.dp))
+            DwSecondaryButton(
+                text = stringResource(R.string.action_cancel),
+                onClick = onDismiss,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun RestoreBackupDialog(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+) {
+    BasicAlertDialog(onDismissRequest = onDismiss) {
+        Column(
+            modifier = Modifier
+                .clip(RoundedCornerShape(20.dp))
+                .background(color = MaterialTheme.colorScheme.background)
+                .padding(24.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.backup_restore_title),
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+            Spacer(Modifier.height(10.dp))
+            Text(
+                text = stringResource(R.string.backup_restore_body),
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp,
+                color = DwInk500,
+            )
+            Spacer(Modifier.height(24.dp))
+            DwPrimaryButton(
+                text = stringResource(R.string.backup_restore_confirm),
                 onClick = onConfirm,
                 modifier = Modifier.fillMaxWidth(),
             )

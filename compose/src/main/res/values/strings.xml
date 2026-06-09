@@ -656,6 +656,14 @@
     <string name="backup_last_sync_never">Never</string>
     <string name="backup_last_sync_value">%1$s</string>
     <string name="backup_row_disconnect">Disconnect</string>
+    <string name="backup_row_restore">Restore from backup</string>
+    <string name="backup_info_auto">New entries back up automatically.</string>
+    <string name="backup_info_manual">Automatic backup is off — use Sync now.</string>
+
+    <!-- Backup — Restore confirmation -->
+    <string name="backup_restore_title">Restore from backup?</string>
+    <string name="backup_restore_body">This replaces all data on this device with the latest cloud backup. This can\'t be undone.</string>
+    <string name="backup_restore_confirm">Restore</string>
 
     <!-- Backup — Provider picker sheet -->
     <string name="backup_picker_title">Choose a backup provider</string>

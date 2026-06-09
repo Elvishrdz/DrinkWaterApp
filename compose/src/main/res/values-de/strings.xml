@@ -654,6 +654,14 @@
     <string name="backup_last_sync_never">Nie</string>
     <string name="backup_last_sync_value">%1$s</string>
     <string name="backup_row_disconnect">Trennen</string>
+    <string name="backup_row_restore">Aus Backup wiederherstellen</string>
+    <string name="backup_info_auto">Neue Einträge werden automatisch gesichert.</string>
+    <string name="backup_info_manual">Automatische Sicherung ist aus — „Jetzt sichern“ verwenden.</string>
+
+    <!-- Backup — Restore confirmation -->
+    <string name="backup_restore_title">Aus Backup wiederherstellen?</string>
+    <string name="backup_restore_body">Dadurch werden alle Daten auf diesem Gerät durch das neueste Cloud-Backup ersetzt. Dies kann nicht rückgängig gemacht werden.</string>
+    <string name="backup_restore_confirm">Wiederherstellen</string>
 
     <!-- Backup — Anbieter-Auswahlblatt -->
     <string name="backup_picker_title">Backup-Anbieter wählen</string>
