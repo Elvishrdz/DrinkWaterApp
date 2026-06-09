@@ -28,26 +28,7 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:633043745524:android:d60faa79669626706afca1",
-        "android_client_info": {
-          "package_name": "com.eahm.drinkwaterapp.qa"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCkCqLgtf4lbI-s4eVxE-xLNJQxKBk6YS0"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:633043745524:android:fbb4546193c72078",
+        "mobilesdk_app_id": "1:633043745524:android:a6fb78f2998a83706afca1",
         "android_client_info": {
           "package_name": "com.eahm.drinkwaterapp.dev"
         }
@@ -66,9 +47,9 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:633043745524:android:fbb4546193c72078",
+        "mobilesdk_app_id": "1:633043745524:android:d60faa79669626706afca1",
         "android_client_info": {
-          "package_name": "com.eahm.drinkwaterapp.staging"
+          "package_name": "com.eahm.drinkwaterapp.qa"
         }
       },
       "oauth_client": [],
