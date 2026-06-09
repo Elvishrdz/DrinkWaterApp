@@ -12,6 +12,7 @@ import androidx.core.content.edit
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.WorkManager
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingService.Companion.OptOutSource
 import com.eahm.drinkwaterapp.backup.data.BackupRecoveryResolver
@@ -22,6 +23,7 @@ import com.eahm.drinkwaterapp.backup.data.currentBackupSchedule
 import com.eahm.drinkwaterapp.backup.data.observer.ConnectivityObserver
 import com.eahm.drinkwaterapp.backup.data.provider.DropboxBackupProvider
 import com.eahm.drinkwaterapp.backup.data.provider.GoogleDriveBackupProvider
+import com.eahm.drinkwaterapp.backup.data.worker.CloudBackupWorker
 import com.eahm.drinkwaterapp.backup.domain.BackupPreferences
 import com.eahm.drinkwaterapp.backup.domain.BackupRepository
 import com.eahm.drinkwaterapp.backup.domain.BackupScheduler
@@ -80,6 +82,7 @@ internal class SettingsViewModel(
     private val backupRepository: BackupRepository,
     private val backupPreferences: BackupPreferences,
     private val backupScheduler: BackupScheduler,
+    workManager: WorkManager,
     private val connectivityObserver: ConnectivityObserver,
     private val googleDriveProvider: GoogleDriveBackupProvider,
     private val dropboxProvider: DropboxBackupProvider,
@@ -98,6 +101,18 @@ internal class SettingsViewModel(
         started = SharingStarted.Lazily,
         initialValue = true,
     )
+
+    // WorkManager's own estimate of when the next periodic backup will run. Updates reactively as
+    // the work self-reschedules (e.g. right after a backup completes). Long.MAX_VALUE means "not
+    // scheduled to run again", which we treat as null.
+    private val nextSyncAt = workManager
+        .getWorkInfosForUniqueWorkFlow(CloudBackupWorker.WORK_NAME_PERIODIC)
+        .map { infos ->
+            infos.asSequence()
+                .map { it.nextScheduleTimeMillis }
+                .filter { it != Long.MAX_VALUE }
+                .minOrNull()
+        }
 
     init {
         viewModelScope.launch { refreshBackupState() }
@@ -285,6 +300,10 @@ internal class SettingsViewModel(
                     lastSyncAt = lastSyncAt ?: state.backupUiState.lastSyncAt,
                 ),
             )
+        }
+        // Approximate next scheduled backup time, from WorkManager's own estimate.
+        .combine(nextSyncAt) { state, nextAt ->
+            state.copy(backupUiState = state.backupUiState.copy(nextSyncAt = nextAt))
         }
         .combine(syncConflictResolver.pendingConflict) { state, conflict ->
             state.copy(backupUiState = state.backupUiState.copy(pendingConflict = conflict))

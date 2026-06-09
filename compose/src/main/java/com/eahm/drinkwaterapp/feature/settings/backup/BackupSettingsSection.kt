@@ -193,7 +193,20 @@ internal fun BackupSettingsSection(
                     label = stringResource(R.string.backup_row_frequency),
                     onClick = if (state.isSyncing) null else fun() { showFrequencyPicker = true },
                 ) {
-                    BackupValueTrailing(value = backupFrequencyLabel(state))
+                    Column(horizontalAlignment = Alignment.End) {
+                        BackupValueTrailing(value = backupFrequencyLabel(state))
+                        state.nextSyncAt?.let { next ->
+                            Text(
+                                text = stringResource(
+                                    R.string.backup_next_run,
+                                    formatClockTime(next),
+                                ),
+                                fontFamily = PlusJakartaSans,
+                                fontSize = 11.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
                 }
 
                 HorizontalDivider(color = DwInk100)
@@ -516,6 +529,10 @@ private fun BackupHourPickerDialog(
         },
     )
 }
+
+/** Device-locale short clock time (respects 12/24h setting), e.g. "20:31" or "8:31 PM". */
+private fun formatClockTime(millis: Long): String =
+    java.text.DateFormat.getTimeInstance(java.text.DateFormat.SHORT).format(Date(millis))
 
 private const val HOURS_IN_DAY = 24
 private val HOUR_PICKER_MAX_HEIGHT = 280.dp

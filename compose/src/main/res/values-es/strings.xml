@@ -666,6 +666,7 @@
     <string name="backup_frequency_interval">Cada %1$d horas</string>
     <string name="backup_frequency_daily">Diario a las %1$02d:00</string>
     <string name="backup_frequency_daily_option">Diario a una hora fija</string>
+    <string name="backup_next_run">Próxima ≈ %1$s</string>
     <string name="backup_status_waiting_connection">La copia está esperando conexión. Se reintentará automáticamente cuando vuelvas a estar en línea.</string>
     <string name="backup_status_will_retry">La copia automática falló. Se reintentará en breve.</string>
     <string name="backup_status_on_save_retry">No se pudo guardar tu último cambio en la copia. Lo intentaremos de nuevo automáticamente.</string>

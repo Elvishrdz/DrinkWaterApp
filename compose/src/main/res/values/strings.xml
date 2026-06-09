@@ -666,6 +666,7 @@
     <string name="backup_frequency_interval">Every %1$d hours</string>
     <string name="backup_frequency_daily">Daily at %1$02d:00</string>
     <string name="backup_frequency_daily_option">Daily at a set time</string>
+    <string name="backup_next_run">Next ≈ %1$s</string>
     <string name="backup_status_waiting_connection">Backup is waiting for a connection. It will retry automatically when you\'re back online.</string>
     <string name="backup_status_will_retry">Auto-backup failed. It will retry shortly.</string>
     <string name="backup_status_on_save_retry">Couldn\'t save your last change to backup. We\'ll try again automatically.</string>

@@ -18,6 +18,8 @@ data class BackupUiState(
     val scheduleMode: BackupScheduleMode = BackupScheduleMode.DAILY,
     // Interval in hours (used when scheduleMode == INTERVAL).
     val intervalHours: Int = 6,
+    // Approximate epoch-millis of the next scheduled auto-backup (null if none/unknown).
+    val nextSyncAt: Long? = null,
     // Contextual status/error message for the backup section.
     val statusMessage: BackupStatusMessage = BackupStatusMessage.NONE,
     val providerType: CloudProviderType? = null,
