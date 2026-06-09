@@ -28,6 +28,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -55,6 +57,12 @@ internal class BackupDevViewModel(
     val events: Flow<BackupDevEvent> = _events.receiveAsFlow()
 
     private val _log = MutableStateFlow<List<String>>(emptyList())
+    private val _backupPreview = MutableStateFlow<String?>(null)
+
+    private val prettyJson = Json {
+        prettyPrint = true
+        prettyPrintIndent = "  "
+    }
 
     val state = combine(
         _log,
@@ -67,6 +75,8 @@ internal class BackupDevViewModel(
         state.copy(tombstonesApplied = tombstones)
     }.combine(_autoResolvedConflicts) { state, autoResolved ->
         state.copy(autoResolvedConflicts = autoResolved)
+    }.combine(_backupPreview) { state, preview ->
+        state.copy(backupPreview = preview)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
@@ -81,12 +91,15 @@ internal class BackupDevViewModel(
             BackupDevAction.CheckStatusGoogle -> checkStatus(CloudProviderType.GOOGLE_DRIVE)
             BackupDevAction.DisconnectGoogle -> disconnectProvider(CloudProviderType.GOOGLE_DRIVE)
             BackupDevAction.DeleteFileGoogle -> deleteRemoteFile(CloudProviderType.GOOGLE_DRIVE)
+            BackupDevAction.VisualizeGoogle -> visualizeBackup(CloudProviderType.GOOGLE_DRIVE)
             BackupDevAction.ConnectDropbox -> connectProvider(CloudProviderType.DROPBOX)
             BackupDevAction.SyncDropbox -> syncProvider(CloudProviderType.DROPBOX)
             BackupDevAction.RestoreDropbox -> restoreProvider(CloudProviderType.DROPBOX)
             BackupDevAction.CheckStatusDropbox -> checkStatus(CloudProviderType.DROPBOX)
             BackupDevAction.DisconnectDropbox -> disconnectProvider(CloudProviderType.DROPBOX)
             BackupDevAction.DeleteFileDropbox -> deleteRemoteFile(CloudProviderType.DROPBOX)
+            BackupDevAction.VisualizeDropbox -> visualizeBackup(CloudProviderType.DROPBOX)
+            BackupDevAction.DismissBackupPreview -> _backupPreview.value = null
             BackupDevAction.MigrateGoogleToDropbox -> migrate(
                 CloudProviderType.GOOGLE_DRIVE,
                 CloudProviderType.DROPBOX,
@@ -151,6 +164,26 @@ internal class BackupDevViewModel(
 
             is BackupResult.Failure ->
                 log("${type.displayName} delete failed → ${result.error}")
+        }
+    }
+
+    /**
+     * Downloads the remote backup and shows its pretty-printed JSON in the viewer sheet.
+     * On failure, logs why so the reason is visible in the log panel.
+     */
+    private fun visualizeBackup(type: CloudProviderType) = viewModelScope.launch {
+        log("Fetch backup file ${type.displayName}…")
+        when (val result = registry.get(type).download()) {
+            is BackupResult.Success -> {
+                val pretty = runCatching {
+                    prettyJson.encodeToString(JsonObject.serializer(), result.value.rawData)
+                }.getOrElse { result.value.rawData.toString() }
+                _backupPreview.value = pretty
+                log("${type.displayName} backup loaded (${pretty.length} chars)")
+            }
+
+            is BackupResult.Failure ->
+                log("${type.displayName} could not load backup → ${result.error}")
         }
     }
 

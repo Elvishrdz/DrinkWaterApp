@@ -8,6 +8,7 @@ sealed interface BackupDevAction {
     data object CheckStatusGoogle : BackupDevAction
     data object DisconnectGoogle : BackupDevAction
     data object DeleteFileGoogle : BackupDevAction
+    data object VisualizeGoogle : BackupDevAction
 
     // Dropbox
     data object ConnectDropbox : BackupDevAction
@@ -16,6 +17,10 @@ sealed interface BackupDevAction {
     data object CheckStatusDropbox : BackupDevAction
     data object DisconnectDropbox : BackupDevAction
     data object DeleteFileDropbox : BackupDevAction
+    data object VisualizeDropbox : BackupDevAction
+
+    // Backup viewer
+    data object DismissBackupPreview : BackupDevAction
 
     // Migration
     data object MigrateGoogleToDropbox : BackupDevAction

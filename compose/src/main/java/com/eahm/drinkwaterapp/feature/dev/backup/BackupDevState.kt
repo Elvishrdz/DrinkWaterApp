@@ -11,4 +11,6 @@ data class BackupDevState(
     val tombstonesApplied: Int = 0,
     /** Total auto-resolved conflicts since app start. */
     val autoResolvedConflicts: Int = 0,
+    /** Pretty-printed remote backup JSON to inspect; non-null shows the viewer sheet. */
+    val backupPreview: String? = null,
 )
