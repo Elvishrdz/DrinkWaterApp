@@ -41,6 +41,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.backup.domain.BackupSyncState
+import com.eahm.drinkwaterapp.core.backup.BackupNotificationMode
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 
 @Composable
@@ -378,20 +379,56 @@ private fun BackgroundWorkControls(
             }
         }
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = "Status notification",
-                style = MaterialTheme.typography.bodyMedium,
-            )
-            Switch(
-                checked = state.backupNotificationEnabled,
-                onCheckedChange = { onAction(BackupDevAction.SetBackupNotification(it)) },
-            )
-        }
+        Text(
+            text = "Status notification",
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.Bold,
+        )
+        NotificationModeToggle(
+            label = "Background only",
+            mode = BackupNotificationMode.BACKGROUND_ONLY,
+            current = state.notificationMode,
+            onAction = onAction,
+        )
+        NotificationModeToggle(
+            label = "On-save only",
+            mode = BackupNotificationMode.ON_SAVE_ONLY,
+            current = state.notificationMode,
+            onAction = onAction,
+        )
+        NotificationModeToggle(
+            label = "All (background + foreground)",
+            mode = BackupNotificationMode.ALL,
+            current = state.notificationMode,
+            onAction = onAction,
+        )
+    }
+}
+
+/**
+ * A single mutually-exclusive notification-mode switch. Turning it on selects [mode]; turning the
+ * active one off falls back to [BackupNotificationMode.OFF].
+ */
+@Composable
+private fun NotificationModeToggle(
+    label: String,
+    mode: BackupNotificationMode,
+    current: BackupNotificationMode,
+    onAction: (BackupDevAction) -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(text = label, style = MaterialTheme.typography.bodyMedium)
+        Switch(
+            checked = current == mode,
+            onCheckedChange = { checked ->
+                val next = if (checked) mode else BackupNotificationMode.OFF
+                onAction(BackupDevAction.SetNotificationMode(next))
+            },
+        )
     }
 }
 

@@ -1,5 +1,7 @@
 package com.eahm.drinkwaterapp.feature.dev.backup
 
+import com.eahm.drinkwaterapp.core.backup.BackupNotificationMode
+
 sealed interface BackupDevAction {
     // Google Drive
     data object ConnectGoogle : BackupDevAction
@@ -37,7 +39,7 @@ sealed interface BackupDevAction {
     data object TriggerForegroundSync : BackupDevAction
     data object ScheduleDailySync : BackupDevAction
     data object CancelAllWork : BackupDevAction
-    data class SetBackupNotification(val enabled: Boolean) : BackupDevAction
+    data class SetNotificationMode(val mode: BackupNotificationMode) : BackupDevAction
 
     // Log
     data object ClearLog : BackupDevAction

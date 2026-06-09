@@ -74,8 +74,8 @@ internal class DataStorePrefsStorage(
     private val backupContentHashKey = stringPreferencesKey("BACKUP_CONTENT_HASH")
     private val backupLastErrorKey = stringPreferencesKey("BACKUP_LAST_ERROR")
     private val backupLastFailureKey = stringPreferencesKey("BACKUP_LAST_FAILURE")
-    private val devBackupNotificationEnabledKey =
-        booleanPreferencesKey("DEV_BACKUP_NOTIFICATION_ENABLED")
+    private val devBackupNotificationModeKey =
+        stringPreferencesKey("DEV_BACKUP_NOTIFICATION_MODE")
 
     // Sync / device identity keys
     private val deviceIdKey = stringPreferencesKey("SYNC_DEVICE_ID")
@@ -418,11 +418,11 @@ internal class DataStorePrefsStorage(
         }
     }
 
-    override suspend fun getDevBackupNotificationEnabled(): Boolean =
-        dataStore.data.map { it[devBackupNotificationEnabledKey] ?: false }.first()
+    override suspend fun getDevBackupNotificationModeName(): String? =
+        dataStore.data.map { it[devBackupNotificationModeKey] }.first()
 
-    override suspend fun setDevBackupNotificationEnabled(enabled: Boolean) {
-        dataStore.edit { it[devBackupNotificationEnabledKey] = enabled }
+    override suspend fun setDevBackupNotificationModeName(name: String) {
+        dataStore.edit { it[devBackupNotificationModeKey] = name }
     }
 
     override suspend fun getBackupLastFailure(): String? =

@@ -22,6 +22,7 @@ import com.eahm.drinkwaterapp.backup.domain.model.CloudProviderType
 import com.eahm.drinkwaterapp.backup.domain.model.GoalRecord
 import com.eahm.drinkwaterapp.backup.domain.model.PreferencesRecord
 import com.eahm.drinkwaterapp.backup.domain.model.SyncConflict
+import com.eahm.drinkwaterapp.core.backup.BackupNotificationMode
 import com.eahm.drinkwaterapp.core.backup.BackupSyncNotifier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -68,7 +69,7 @@ internal class BackupDevViewModel(
 
     private val _log = MutableStateFlow<List<String>>(emptyList())
     private val _backupPreview = MutableStateFlow<String?>(null)
-    private val _notificationEnabled = MutableStateFlow(false)
+    private val _notificationMode = MutableStateFlow(BackupNotificationMode.OFF)
 
     private val prettyJson = Json {
         prettyPrint = true
@@ -107,8 +108,8 @@ internal class BackupDevViewModel(
         state.copy(syncStatusLabel = describeStatus(status))
     }.combine(workSummary) { state, summary ->
         state.copy(workInfoSummary = summary)
-    }.combine(_notificationEnabled) { state, enabled ->
-        state.copy(backupNotificationEnabled = enabled)
+    }.combine(_notificationMode) { state, mode ->
+        state.copy(notificationMode = mode)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
@@ -117,7 +118,7 @@ internal class BackupDevViewModel(
 
     init {
         viewModelScope.launch {
-            _notificationEnabled.value = backupSyncNotifier.isEnabled()
+            _notificationMode.value = backupSyncNotifier.currentMode()
         }
     }
 
@@ -173,7 +174,7 @@ internal class BackupDevViewModel(
                 scheduler.cancelAll()
             }
 
-            is BackupDevAction.SetBackupNotification -> setBackupNotification(action.enabled)
+            is BackupDevAction.SetNotificationMode -> setNotificationMode(action.mode)
 
             BackupDevAction.ClearLog -> _log.value = emptyList()
         }
@@ -185,10 +186,10 @@ internal class BackupDevViewModel(
         log("Scheduled daily auto-sync at ${"%02d".format(hour)}:00")
     }
 
-    private fun setBackupNotification(enabled: Boolean) = viewModelScope.launch {
-        backupSyncNotifier.setEnabled(enabled)
-        _notificationEnabled.value = enabled
-        log("Backup status notification ${if (enabled) "enabled" else "disabled"}")
+    private fun setNotificationMode(mode: BackupNotificationMode) = viewModelScope.launch {
+        backupSyncNotifier.setMode(mode)
+        _notificationMode.value = mode
+        log("Backup status notification → ${mode.name}")
     }
 
     private fun connectProvider(type: CloudProviderType) = viewModelScope.launch(Dispatchers.IO) {

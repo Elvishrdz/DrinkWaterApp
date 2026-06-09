@@ -3,6 +3,7 @@ package com.eahm.drinkwaterapp.core.backup
 import android.content.Context
 import com.eahm.drinkwaterapp.backup.data.BackupSyncStatusHolder
 import com.eahm.drinkwaterapp.backup.domain.model.BackupSyncStatus
+import com.eahm.drinkwaterapp.backup.domain.model.SyncTrigger
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.systemnotifications.channel.BackupSyncNotificationChannel
 import com.eahm.drinkwaterapp.core.data.systemnotifications.notification.BackupSyncNotification
@@ -20,9 +21,9 @@ import java.util.Locale
 /**
  * Mirrors the unified backup sync status into a dedicated, updating notification.
  *
- * Dev-only for now: gated behind a persisted flag toggled from the Backup dev screen. When the
- * flag is on, the notification text updates as the background worker runs; when off (or when the
- * sync goes idle without a recent outcome), the notification is cleared.
+ * Dev-only for now: gated behind a persisted [BackupNotificationMode] toggled from the Backup dev
+ * screen. The notification updates as the sync runs and is cleared when the active mode says the
+ * current trigger shouldn't be shown (or when the sync goes idle without a recent outcome).
  */
 internal class BackupSyncNotifier(
     private val context: Context,
@@ -31,35 +32,40 @@ internal class BackupSyncNotifier(
 ) : AppInitializer {
 
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
-    private val enabled = MutableStateFlow(false)
+    private val mode = MutableStateFlow(BackupNotificationMode.OFF)
 
     override fun initialize() {
         BackupSyncNotificationChannel.createChannel(context)
 
         scope.launch {
-            enabled.value = prefs.getDevBackupNotificationEnabled()
+            mode.value = BackupNotificationMode.fromName(prefs.getDevBackupNotificationModeName())
 
-            combine(enabled, statusHolder.status) { on, status -> on to status }
-                .collect { (on, status) ->
-                    if (on) render(status) else BackupSyncNotification.cancel(context)
-                }
+            combine(mode, statusHolder.status) { mode, status -> mode to status }
+                .collect { (mode, status) -> render(mode, status) }
         }
     }
 
-    /** Toggle the dev notification. Persists the choice and applies it immediately. */
-    suspend fun setEnabled(value: Boolean) {
-        prefs.setDevBackupNotificationEnabled(value)
-        enabled.value = value
+    /** Set the dev notification mode. Persists the choice and applies it immediately. */
+    suspend fun setMode(value: BackupNotificationMode) {
+        prefs.setDevBackupNotificationModeName(value.name)
+        mode.value = value
     }
 
-    suspend fun isEnabled(): Boolean = prefs.getDevBackupNotificationEnabled()
+    suspend fun currentMode(): BackupNotificationMode =
+        BackupNotificationMode.fromName(prefs.getDevBackupNotificationModeName())
 
-    private fun render(status: BackupSyncStatus) {
+    private fun render(mode: BackupNotificationMode, status: BackupSyncStatus) {
+        val trigger = status.currentTrigger()
+        if (trigger == null || !mode.shouldNotify(trigger)) {
+            BackupSyncNotification.cancel(context)
+            return
+        }
+
         when {
             status.running -> BackupSyncNotification.show(
                 context = context,
                 title = "Backing up…",
-                text = "Sync in progress (${status.activeTrigger?.name ?: "AUTO"})",
+                text = "Sync in progress (${trigger.name})",
                 ongoing = true,
             )
 
@@ -67,19 +73,29 @@ internal class BackupSyncNotifier(
                 is BackupSyncStatus.Outcome.Success -> BackupSyncNotification.show(
                     context = context,
                     title = "Backup complete",
-                    text = "Last backup ${formatTime(outcome.syncedAt)} (${outcome.trigger.name})",
+                    text = "Last backup ${formatTime(outcome.syncedAt)} (${trigger.name})",
                     ongoing = false,
                 )
 
                 is BackupSyncStatus.Outcome.Failure -> BackupSyncNotification.show(
                     context = context,
                     title = "Backup failed",
-                    text = "${outcome.trigger.name} → ${outcome.disposition.name}",
+                    text = "${trigger.name} → ${outcome.disposition.name}",
                     ongoing = false,
                 )
 
                 null -> BackupSyncNotification.cancel(context)
             }
+        }
+    }
+
+    /** The trigger that the current notification should reflect — the running one, else the last. */
+    private fun BackupSyncStatus.currentTrigger(): SyncTrigger? = when {
+        running -> activeTrigger
+        else -> when (val outcome = lastOutcome) {
+            is BackupSyncStatus.Outcome.Success -> outcome.trigger
+            is BackupSyncStatus.Outcome.Failure -> outcome.trigger
+            null -> null
         }
     }
 

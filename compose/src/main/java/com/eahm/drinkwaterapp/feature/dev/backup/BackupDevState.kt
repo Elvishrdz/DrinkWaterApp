@@ -1,6 +1,7 @@
 package com.eahm.drinkwaterapp.feature.dev.backup
 
 import com.eahm.drinkwaterapp.backup.domain.BackupSyncState
+import com.eahm.drinkwaterapp.core.backup.BackupNotificationMode
 
 data class BackupDevState(
     val syncState: BackupSyncState = BackupSyncState.Idle,
@@ -9,8 +10,8 @@ data class BackupDevState(
     val syncStatusLabel: String = "Idle",
     /** WorkManager state summary per unique backup work name. */
     val workInfoSummary: String = "No work enqueued",
-    /** Dev toggle: show a dedicated status notification for background backups. */
-    val backupNotificationEnabled: Boolean = false,
+    /** Dev toggle: when the dedicated backup-status notification is shown. */
+    val notificationMode: BackupNotificationMode = BackupNotificationMode.OFF,
     /** Total number of records merged across all sync sessions this run. */
     val mergedRecordCount: Int = 0,
     /** Total tombstones applied since app start. */
