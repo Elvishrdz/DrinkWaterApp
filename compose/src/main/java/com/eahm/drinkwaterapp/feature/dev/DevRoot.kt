@@ -61,6 +61,7 @@ import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import com.eahm.drinkwaterapp.core.presentation.LayoutType
 import com.eahm.drinkwaterapp.core.presentation.getLayoutType
 import com.eahm.drinkwaterapp.feature.dev.adaptive.AdaptiveScreen
+import com.eahm.drinkwaterapp.feature.dev.age.AgeDevRoot
 import com.eahm.drinkwaterapp.feature.dev.alarmcalculator.AlarmCalculatorRoot
 import com.eahm.drinkwaterapp.feature.dev.alarmintervals.AlarmIntervalsRoot
 import com.eahm.drinkwaterapp.feature.dev.alarms.AlarmsRoot
@@ -108,6 +109,7 @@ enum class DevDestination(
     STREAK("Streak", DwIcons.Star),
     NOTIFICATION("Notification", DwIcons.Bell),
     CONSENT("Consent", DwIcons.Flag),
+    AGE("Age Signals", DwIcons.Flag),
     ONBOARDING("OnBoarding", DwIcons.Sun),
     CELEBRATIONS("Celebrations", DwIcons.Flag),
     BILLING("Billing", DwIcons.Star),
@@ -169,6 +171,10 @@ internal fun DevRoot(onBackClicked: () -> Unit) {
             )
 
             DevDestination.CONSENT -> ConsentDevRoot(
+                onBackClicked = onBackClicked,
+            )
+
+            DevDestination.AGE -> AgeDevRoot(
                 onBackClicked = onBackClicked,
             )
 
