@@ -56,6 +56,7 @@ class BackupRepositoryImplTest {
             restoreUseCase = restoreUseCase,
             resolver = InitialSyncResolver(),
             prefs = prefs,
+            dataSource = dataSource,
         )
         val connectUseCase = ConnectBackupUseCase(registry, prefs, initialConnectionSyncUseCase)
 

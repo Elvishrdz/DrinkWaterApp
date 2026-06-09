@@ -1,5 +1,6 @@
 package com.eahm.drinkwaterapp.core.backup
 
+import com.eahm.drinkwaterapp.backup.data.BackupContentFingerprint
 import com.eahm.drinkwaterapp.backup.data.BackupMigrationManager
 import com.eahm.drinkwaterapp.backup.domain.BackupDataSource
 import com.eahm.drinkwaterapp.backup.domain.BackupPreferences
@@ -38,8 +39,25 @@ class BackupSerializer(
     private val json: Json,
 ) : BackupDataSource {
 
-    @Suppress("LongMethod")
     override suspend fun serialize(): String {
+        val metadataJson = buildJsonObject {
+            put("schema_version", BackupMigrationManager.currentSchema)
+            put("app_version", appInfo.versionName)
+            put("created_at", System.currentTimeMillis())
+            put("device_id", backupPreferences.getDeviceId())
+        }
+
+        val root = buildJsonObject {
+            put("metadata", metadataJson)
+            put("data", buildDataJson())
+        }
+
+        return json.encodeToString(JsonObject.serializer(), root)
+    }
+
+    /** Builds the data envelope (history + goals + preferences), excluding metadata. */
+    @Suppress("LongMethod")
+    private suspend fun buildDataJson(): JsonObject {
         val historyRecords = database.getHistoryDao().getAll().first()
         val dailyGoals = database.getDailyGoalDao().getAllGoals().first()
 
@@ -94,26 +112,18 @@ class BackupSerializer(
             put("best_drink_streak", prefs.getBestDrinkStreak().first())
         }
 
-        val dataJson = buildJsonObject {
+        return buildJsonObject {
             put("history", historyJson)
             put("daily_goals", goalsJson)
             put("preferences", prefsJson)
         }
-
-        val metadataJson = buildJsonObject {
-            put("schema_version", BackupMigrationManager.currentSchema)
-            put("app_version", appInfo.versionName)
-            put("created_at", System.currentTimeMillis())
-            put("device_id", backupPreferences.getDeviceId())
-        }
-
-        val root = buildJsonObject {
-            put("metadata", metadataJson)
-            put("data", dataJson)
-        }
-
-        return json.encodeToString(JsonObject.serializer(), root)
     }
+
+    override suspend fun localContentFingerprint(): String =
+        BackupContentFingerprint.ofData(buildDataJson())
+
+    override fun remoteContentFingerprint(raw: JsonObject): String =
+        BackupContentFingerprint.ofRemoteEnvelope(raw)
 
     override suspend fun deserializeAndImport(data: JsonObject): BackupResult<Unit> {
         return try {

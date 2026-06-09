@@ -36,4 +36,18 @@ interface BackupDataSource {
      * Preferences are also applied. This is the merge-import path.
      */
     suspend fun writeBackupData(data: BackupData): BackupResult<Unit>
+
+    /**
+     * Order-independent fingerprint of the **local** data content (logs + goals +
+     * preferences), excluding volatile metadata. Two databases with exactly the same
+     * content produce the same fingerprint regardless of record ordering.
+     */
+    suspend fun localContentFingerprint(): String
+
+    /**
+     * Fingerprint of a **remote** backup's data content, computed identically to
+     * [localContentFingerprint] so the two can be compared for exact equality.
+     * [raw] is the full remote envelope (already schema-migrated).
+     */
+    fun remoteContentFingerprint(raw: JsonObject): String
 }

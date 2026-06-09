@@ -41,4 +41,12 @@ class FakeBackupDataSource(
 
     override suspend fun writeBackupData(data: BackupData): BackupResult<Unit> =
         BackupResult.Success(Unit)
+
+    // Distinct by default so the initial-connection flow treats local/remote as different.
+    var localFingerprint: String = "local-fingerprint"
+    var remoteFingerprint: String = "remote-fingerprint"
+
+    override suspend fun localContentFingerprint(): String = localFingerprint
+
+    override fun remoteContentFingerprint(raw: JsonObject): String = remoteFingerprint
 }
