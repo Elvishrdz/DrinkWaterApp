@@ -381,6 +381,9 @@ internal class DataStorePrefsStorage(
         dataStore.edit { it[backupLastSyncAtKey] = millis }
     }
 
+    override fun getBackupLastSyncAtFlow(): Flow<Long?> =
+        dataStore.data.map { it[backupLastSyncAtKey] }
+
     override suspend fun getBackupAutoHour(): Int =
         dataStore.data.map { it[backupAutoHourKey] ?: DEFAULT_BACKUP_HOUR }.first()
 

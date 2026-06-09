@@ -46,6 +46,10 @@ class BackupSyncStatusHolder(private val prefs: BackupPreferences) {
             )
         }
         _legacyState.value = BackupSyncState.Success(syncedAt)
+        // Persist the completion time for EVERY successful sync (upload or no-op "no changes"),
+        // from any source, so the Settings "Last backup" text stays current. SyncBackupUseCase
+        // only writes this on an actual upload, which is why background no-op syncs left it stale.
+        prefs.setBackupLastSyncAt(syncedAt)
         prefs.setBackupLastError(null)
         prefs.setBackupLastFailure(null)
     }

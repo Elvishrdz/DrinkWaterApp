@@ -40,6 +40,9 @@ class BackupSyncStatusHolderTest {
         val outcome = holder.status.value.lastOutcome
         assertTrue(outcome is BackupSyncStatus.Outcome.Success)
         assertEquals(123L, outcome.syncedAt)
+        // Every successful sync (incl. no-op) must persist the completion time so the
+        // "Last backup" text stays current across all sources.
+        assertEquals(123L, prefs.backupLastSyncAt)
         assertNull(prefs.backupLastError)
         assertNull(prefs.backupLastFailure)
     }

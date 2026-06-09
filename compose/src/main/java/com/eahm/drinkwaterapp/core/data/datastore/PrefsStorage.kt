@@ -73,6 +73,9 @@ interface PrefsStorage {
     suspend fun getBackupLastSyncAt(): Long?
     suspend fun setBackupLastSyncAt(millis: Long)
 
+    /** Reactive last-successful-backup timestamp; emits on every write, from any source. */
+    fun getBackupLastSyncAtFlow(): Flow<Long?>
+
     suspend fun getBackupAutoHour(): Int
     suspend fun setBackupAutoHour(hour: Int)
 

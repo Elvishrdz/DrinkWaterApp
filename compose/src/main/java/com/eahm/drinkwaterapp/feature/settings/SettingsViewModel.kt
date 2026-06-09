@@ -138,8 +138,9 @@ internal class SettingsViewModel(
         val failure = status.lastOutcome as? BackupSyncStatus.Outcome.Failure
             ?: return BackupStatusMessage.NONE
 
+        @Suppress("Indentation")
         val onSaveRetry = failure.trigger == SyncTrigger.ON_SAVE &&
-            failure.disposition != SyncDisposition.FAILED
+                failure.disposition != SyncDisposition.FAILED
 
         return when {
             onSaveRetry -> BackupStatusMessage.ON_SAVE_RETRY
@@ -268,6 +269,15 @@ internal class SettingsViewModel(
                         syncPending = state.backupUiState.syncPending,
                     ),
                 )
+            )
+        }
+        // "Last backup" must reflect uploads from ANY source (manual or background worker).
+        // Observe the persisted timestamp reactively so it updates without a manual refresh.
+        .combine(prefsStorage.getBackupLastSyncAtFlow()) { state, lastSyncAt ->
+            state.copy(
+                backupUiState = state.backupUiState.copy(
+                    lastSyncAt = lastSyncAt ?: state.backupUiState.lastSyncAt,
+                ),
             )
         }
         .combine(syncConflictResolver.pendingConflict) { state, conflict ->
