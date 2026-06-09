@@ -84,6 +84,22 @@
 - Obtener los skips para sugerir reducir notificaciones ai son demasiado. Si el usuario borra
   mucho la notificacion se puede tratar de reducir el intervalo para evitar molestias. Se sugiere en
   la pantalla de configuracion de notificaciones/reminders
+- [] fix stats graphic: monthly total is counting all month. When starting using the app we should
+  only count since the first day of usage, and calculate the correct total drink amount of the month
+  like that, for following months we can take all days. Its just a fix for initial days.
+- [] allow to disable drink water animation on settings
+- [] research: dependency injection for kmp using metro (no runtime errors)
+- [] research: integrate SQLDelight. find benefits. static checks.
+- [] fix graphic image in
+  listing: https://play.google.com/store/apps/developer?id=eahm&hl=es_NI&gl=US
+- [] stats screen: do not display when percentaje is lower than previous period, it always is lower
+  at beginnings of week/year show something more positive instead. show percentage only on last day
+  it can be negative or positive, for negative show a positive text.
+- [] check if interval bottom sheet still display text in english for all languages
+- [] delete all data button: update text to explain that the counter will enable the action to
+  delete to the user, not that it will delete when reaching zero. dont scare users.
+- [] research: integration with MCP. how this can be usefull to our app and our services.
+- [] fix: change goal does not update graphic goal value realtime.
 
 ## Projects
 
