@@ -3,6 +3,7 @@ package com.eahm.drinkwaterapp.backup.data.worker
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.eahm.drinkwaterapp.backup.data.BackupChangeTracker
 import com.eahm.drinkwaterapp.backup.data.BackupProviderRegistry
 import com.eahm.drinkwaterapp.backup.data.BackupSyncStatusHolder
 import com.eahm.drinkwaterapp.backup.data.usecase.SyncBackupUseCase
@@ -28,9 +29,13 @@ class CloudBackupWorker(
     private val prefs: BackupPreferences by inject()
     private val registry: BackupProviderRegistry by inject()
     private val scheduler: BackupScheduler by inject()
+    private val changeTracker: BackupChangeTracker by inject()
 
     override suspend fun doWork(): Result {
         val trigger = resolveTrigger()
+        // Capture before syncing so we can tell if a write lands mid-run.
+        val changeSnapshot = changeTracker.snapshot()
+
         val result = runSync(trigger)
 
         // The daily auto-backup is implemented as self-rescheduling one-time work: once it reaches
@@ -38,6 +43,12 @@ class CloudBackupWorker(
         // retry case itself, so we must not reschedule then or we'd stack jobs.
         if (trigger == SyncTrigger.PERIODIC && result != Result.retry()) {
             scheduler.scheduleDailyAutoSync(prefs.getBackupAutoHour())
+        }
+
+        // If a change landed during this run, enqueue exactly one follow-up on-change sync so the
+        // newest data is uploaded. Only on a completed run (not a retry — that re-runs anyway).
+        if (result != Result.retry() && changeTracker.hasChangedSince(changeSnapshot)) {
+            scheduler.enqueueFollowUpOnChangeSync()
         }
         return result
     }

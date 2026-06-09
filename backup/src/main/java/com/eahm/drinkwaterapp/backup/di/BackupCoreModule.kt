@@ -1,5 +1,6 @@
 package com.eahm.drinkwaterapp.backup.di
 
+import com.eahm.drinkwaterapp.backup.data.BackupChangeTracker
 import com.eahm.drinkwaterapp.backup.data.BackupRecoveryResolver
 import com.eahm.drinkwaterapp.backup.data.BackupRepositoryImpl
 import com.eahm.drinkwaterapp.backup.data.BackupSyncLock
@@ -47,6 +48,7 @@ val backupCoreModule = module {
     singleOf(::MergeEngine)
     single { TombstonePolicy() }
     single { PurgeTombstonesUseCase(get(), get(), get()) }
-    single { SyncCoordinator(get(), get()) }
+    single { BackupChangeTracker() }
+    single { SyncCoordinator(get(), get(), get()) }
     single { ConnectivityObserver(androidContext()) }
 }

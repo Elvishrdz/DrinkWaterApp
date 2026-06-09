@@ -53,17 +53,27 @@ class WorkManagerBackupScheduler(
     }
 
     override fun triggerOnChangeSync() {
+        // KEEP: while an on-change sync already exists (running or enqueued), drop this one — the
+        // worker's own follow-up (enqueueFollowUpOnChangeSync) is what guarantees mid-run changes
+        // get synced, so the queue can never grow beyond "one running + one queued".
+        enqueueOnChange(ExistingWorkPolicy.KEEP)
+    }
+
+    override fun enqueueFollowUpOnChangeSync() {
+        // Called from inside a still-RUNNING worker; APPEND_OR_REPLACE queues exactly one follow-up
+        // behind it rather than being dropped by KEEP.
+        enqueueOnChange(ExistingWorkPolicy.APPEND_OR_REPLACE)
+    }
+
+    private fun enqueueOnChange(policy: ExistingWorkPolicy) {
         val request = OneTimeWorkRequestBuilder<CloudBackupWorker>()
             .setConstraints(networkConstraints)
             .setInputData(triggerData(SyncTrigger.ON_SAVE))
             .build()
 
-        // APPEND_OR_REPLACE: if an on-change sync is already running, queue this one to run after
-        // it (with the latest DB state) instead of dropping it — so the newest write always wins
-        // without cancelling an in-flight upload.
         workManager.enqueueUniqueWork(
             CloudBackupWorker.WORK_NAME_ON_CHANGE,
-            ExistingWorkPolicy.APPEND_OR_REPLACE,
+            policy,
             request,
         )
     }

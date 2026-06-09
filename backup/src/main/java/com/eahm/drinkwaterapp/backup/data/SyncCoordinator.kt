@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 class SyncCoordinator(
     private val scheduler: BackupScheduler,
     private val prefs: BackupPreferences,
+    private val changeTracker: BackupChangeTracker,
     private val debounceMs: Long = 7_000L,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob()),
 ) {
@@ -33,6 +34,9 @@ class SyncCoordinator(
         scope.launch {
             if (!prefs.getBackupEnabled()) return@launch
             if (!prefs.getSyncOnSaveEnabled()) return@launch
+
+            // Record the change so an in-flight sync can detect it landed mid-run.
+            changeTracker.markChanged()
 
             // Mark pending immediately so the UI can react
             prefs.setSyncPending(true)

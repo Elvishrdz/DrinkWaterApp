@@ -84,6 +84,7 @@ internal class BackupDevViewModel(
         workManager.getWorkInfosForUniqueWorkFlow(CloudBackupWorker.WORK_NAME_FOREGROUND),
     ) { periodic, manual, onChange, foreground ->
         buildString {
+            appendLine("Enqueued works: ${enqueuedCount(periodic, manual, onChange, foreground)}")
             appendLine("daily:      ${describe(periodic)}")
             appendLine("manual:     ${describe(manual)}")
             appendLine("on-change:  ${describe(onChange)}")
@@ -322,10 +323,18 @@ internal class BackupDevViewModel(
     }
 
     private fun describe(infos: List<WorkInfo>): String {
-        val info = infos.firstOrNull() ?: return "—"
-        val attempt = if (info.runAttemptCount > 0) " (attempt ${info.runAttemptCount})" else ""
-        return "${info.state}$attempt"
+        if (infos.isEmpty()) return "—"
+        // Show every WorkInfo for this unique name so queued follow-ups (e.g. an appended
+        // on-change sync waiting behind a running one) are visible, not just the first.
+        return infos.joinToString(", ") { info ->
+            val attempt = if (info.runAttemptCount > 0) " (attempt ${info.runAttemptCount})" else ""
+            "${info.state}$attempt"
+        }
     }
+
+    /** Count of WorkInfos currently in the ENQUEUED (queued, waiting to run) state. */
+    private fun enqueuedCount(vararg lists: List<WorkInfo>): Int =
+        lists.sumOf { list -> list.count { it.state == WorkInfo.State.ENQUEUED } }
 
     private fun describeStatus(status: BackupSyncStatus): String = when {
         status.running -> "Running (${status.activeTrigger?.name ?: "?"})"
