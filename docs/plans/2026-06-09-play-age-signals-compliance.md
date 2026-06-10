@@ -1,7 +1,13 @@
 # Plan: Play Age Signals API Integration & US Age-Verification Compliance
 
 **Date:** 2026-06-09
-**Status:** Proposed
+**Status:** Implemented (code steps 1–10) · Play Console steps (11) pending · Play Integrity (12) optional
+
+> **Implementation note (2026-06-10):** All code stages are done and committed (one commit per
+> stage), debug app assembles, 26 `:age` unit tests pass. Remaining work is **non-code**:
+> step 11 (Play Console — IAP SKU age ratings, Age signals section, significant-change assessment,
+> revocation-report monitoring) must be done in the Play Console; step 12 (Play Integrity) is
+> optional hardening. The dev menu (`Dev → Age Signals`) drives the real pipeline for testing.
 **Driver:** Google Play age-verification changes for US states (Texas **SB 2420** in effect;
 Utah, Louisiana and others following) + Brazil. Ref:
 [Google Play developer help 16569691](https://support.google.com/googleplay/android-developer/answer/16569691),
