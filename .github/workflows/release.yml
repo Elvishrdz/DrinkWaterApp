@@ -39,6 +39,27 @@ jobs:
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > $RUNNER_TEMP/release.jks
 
+      # Validate that every unit test still passes at the point of release.
+      # Uses the debug-variant unit tests only (the single host unit-test task AGP
+      # generates); a failure here stops the workflow before the AAB is built or
+      # uploaded to Play. This does not touch the build/upload steps below.
+      # retention days: 1-90
+      - name: Run unit tests (debug)
+        run: ./gradlew :compose:testDebugUnitTest --stacktrace
+
+      # Always publish the results so they can be downloaded and reviewed, even
+      # when the test step above fails.
+      - name: Upload unit test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-unit-test-results
+          path: |
+            compose/build/reports/tests/testDebugUnitTest/
+            compose/build/test-results/testDebugUnitTest/
+          retention-days: 90
+          if-no-files-found: warn
+
       - name: Build release AAB
         env:
           KEYSTORE_PATH: ${{ runner.temp }}/release.jks
