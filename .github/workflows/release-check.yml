@@ -46,7 +46,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: release-test-results
           path: "**/build/reports/tests/"
@@ -60,7 +60,7 @@ jobs:
 
       - name: Upload Lint reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: release-lint-reports
           path: "**/build/reports/lint-results*.html"
