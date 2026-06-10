@@ -1,7 +1,6 @@
 # The fountain of wishes
 
 - migrate from koin to metro for dependency injection
-- convert to KMP project (to support iOS and Desktop app)
 - schedule future schedule for alarms. example: from a future day in a calendar select a day to
   configure the alarm for that specific day. This overrides any recurrent alarm configuration for
   that particular day. Once the day is over OR the last alarm of that day is completed this
