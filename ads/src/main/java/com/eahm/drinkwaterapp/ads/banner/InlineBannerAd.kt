@@ -38,6 +38,7 @@ private const val INLINE_TAG = "DrinkWaterInlineAd"
 class InlineBannerAdState internal constructor(
     internal val adView: AdView,
     internal val isAdLoaded: MutableState<Boolean> = mutableStateOf(false),
+    internal val isAdFailed: MutableState<Boolean> = mutableStateOf(false),
 )
 
 /**
@@ -75,10 +76,12 @@ internal fun rememberInlineBannerAdState(
             state.adView.adListener = object : AdListener() {
                 override fun onAdLoaded() {
                     state.isAdLoaded.value = true
+                    state.isAdFailed.value = false
                     Log.d(INLINE_TAG, "Inline banner ad loaded.")
                 }
 
                 override fun onAdFailedToLoad(error: LoadAdError) {
+                    state.isAdFailed.value = true
                     Log.e(INLINE_TAG, "Inline banner ad failed to load: ${error.message}")
                 }
 
@@ -113,12 +116,17 @@ internal fun rememberInlineBannerAdState(
 fun InlineBannerAd(
     state: InlineBannerAdState,
     modifier: Modifier = Modifier,
+    fallback: @Composable () -> Unit = {},
 ) {
-    // Show only after the ad has loaded (or immediately in the IDE for tooling feedback).
-    if (state.isAdLoaded.value || LocalInspectionMode.current) {
-        Box(modifier = modifier.fillMaxWidth()) {
-            BannerAd(state.adView)
+    when {
+        // Show the loaded ad (or immediately in the IDE for tooling feedback).
+        state.isAdLoaded.value || LocalInspectionMode.current -> {
+            Box(modifier = modifier.fillMaxWidth()) {
+                BannerAd(state.adView)
+            }
         }
+        // No fillable ad: surface the house "remove ads" promo in the same slot.
+        state.isAdFailed.value -> fallback()
     }
 }
 

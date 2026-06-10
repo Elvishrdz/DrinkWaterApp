@@ -55,6 +55,7 @@ import com.eahm.drinkwaterapp.core.presentation.layouttype.toNavigationSuite
 import com.eahm.drinkwaterapp.feature.dev.DevRoot
 import com.eahm.drinkwaterapp.feature.drink.DrinkRoot
 import com.eahm.drinkwaterapp.feature.history.HistoryRoot
+import com.eahm.drinkwaterapp.feature.home.ui.RemoveAdsHouseAd
 import com.eahm.drinkwaterapp.feature.reminders.RemindersScreen
 import com.eahm.drinkwaterapp.feature.settings.SettingsScreen
 import com.eahm.drinkwaterapp.feature.stats.StatsScreen
@@ -115,6 +116,7 @@ internal fun HomeScreen() {
                     state = bannerAdState,
                     navigationType = navigationType,
                     windowInsets = windowInsets,
+                    onRemoveAdsClick = { currentDestination = HomeDestination.SETTINGS },
                 )
             }
         },
@@ -141,6 +143,7 @@ private fun Banner(
     state: InlineBannerAdState,
     navigationType: NavigationType,
     windowInsets: WindowInsets = WindowInsets.safeDrawing,
+    onRemoveAdsClick: () -> Unit = {},
 ) {
     val modifier = when (navigationType) {
         NavigationType.NavigationBar -> {
@@ -159,6 +162,7 @@ private fun Banner(
     InlineBannerAd(
         state = state,
         modifier = modifier,
+        fallback = { RemoveAdsHouseAd(onClick = onRemoveAdsClick, modifier = modifier) },
     )
 }
 
