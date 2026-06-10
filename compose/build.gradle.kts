@@ -56,6 +56,12 @@ dependencies {
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
 
+    // Align concurrent-futures with androidx.test (junit 1.3.0 / espresso 3.7.0)
+    // which require 1.2.0; otherwise AGP's test/app classpath alignment conflicts
+    // with the 1.1.0 pulled transitively into the app.
+    implementation("androidx.concurrent:concurrent-futures:1.2.0")
+    implementation("androidx.concurrent:concurrent-futures-ktx:1.2.0")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.lifecycle.runtime.ktx)
 
