@@ -102,6 +102,14 @@ internal class SettingsViewModel(
         initialValue = true,
     )
 
+    // Reactive "backup pending" flag — clears the moment a sync uploads successfully (from any
+    // source), so the pending/waiting banner disappears immediately instead of lingering.
+    private val syncPending = prefsStorage.getSyncPendingFlow().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Lazily,
+        initialValue = false,
+    )
+
     // WorkManager's own estimate of when the next periodic backup will run. Updates reactively as
     // the work self-reschedules (e.g. right after a backup completes). Long.MAX_VALUE means "not
     // scheduled to run again", which we treat as null.
@@ -124,7 +132,6 @@ internal class SettingsViewModel(
         val lastSyncAt = backupPreferences.getBackupLastSyncAt()
         val syncOnSave = backupPreferences.getSyncOnSaveEnabled()
         val seenDevices = backupPreferences.getSeenDevices()
-        val syncPending = backupPreferences.getSyncPending()
         val autoHour = backupPreferences.getBackupAutoHour()
         val scheduleMode = BackupScheduleMode.fromName(backupPreferences.getBackupScheduleMode())
         val intervalHours = backupPreferences.getBackupIntervalHours()
@@ -135,7 +142,6 @@ internal class SettingsViewModel(
                 lastSyncAt = lastSyncAt,
                 syncOnSaveEnabled = syncOnSave,
                 seenDevices = seenDevices,
-                syncPending = syncPending,
                 autoBackupHour = autoHour,
                 scheduleMode = scheduleMode,
                 intervalHours = intervalHours,
@@ -144,9 +150,13 @@ internal class SettingsViewModel(
     }
 
     /**
-     * Maps the unified sync status (+ pending/connectivity) to the contextual message shown in
-     * Settings. A running sync always wins; otherwise we honour the last outcome's disposition,
-     * and surface "waiting for connection" even before the worker runs (offline + pending).
+     * Maps the unified sync status (+ live pending/connectivity) to the contextual message shown
+     * in Settings.
+     *
+     * The pending/retry banners are gated on [syncPending] — the live "changes not yet uploaded"
+     * flag — so the moment a backup uploads successfully (from any source) the flag clears and the
+     * banner disappears, rather than lingering on a stale failure outcome. "Waiting for connection"
+     * only shows while actually offline; once reconnected the retry is imminent, not blocked.
      */
     private fun computeStatusMessage(
         status: BackupSyncStatus,
@@ -154,8 +164,12 @@ internal class SettingsViewModel(
         syncPending: Boolean,
     ): BackupStatusMessage {
         if (status.running) return BackupStatusMessage.SYNCING
-        if (syncPending && !connected) return BackupStatusMessage.WAITING_FOR_CONNECTION
+        // Nothing pending → everything is backed up → no banner.
+        if (!syncPending) return BackupStatusMessage.NONE
+        // Pending while offline → waiting for the connection to come back.
+        if (!connected) return BackupStatusMessage.WAITING_FOR_CONNECTION
 
+        // Pending while online: a retry is coming. Tailor the wording to the last failure, if any.
         val failure = status.lastOutcome as? BackupSyncStatus.Outcome.Failure
             ?: return BackupStatusMessage.NONE
 
@@ -165,13 +179,8 @@ internal class SettingsViewModel(
 
         return when {
             onSaveRetry -> BackupStatusMessage.ON_SAVE_RETRY
-
-            failure.disposition == SyncDisposition.WAITING_FOR_CONNECTION ->
-                BackupStatusMessage.WAITING_FOR_CONNECTION
-
-            failure.disposition == SyncDisposition.WILL_RETRY -> BackupStatusMessage.WILL_RETRY
-
-            else -> BackupStatusMessage.FAILED_USE_MANUAL
+            failure.disposition == SyncDisposition.FAILED -> BackupStatusMessage.FAILED_USE_MANUAL
+            else -> BackupStatusMessage.WILL_RETRY
         }
     }
 
@@ -275,19 +284,23 @@ internal class SettingsViewModel(
             state.copy(backupUiState = backup)
         }
         .combine(
-            combine(backupRepository.syncStatus, connectivity) { status, connected ->
-                status to connected
-            }
-        ) { state, (status, connected) ->
+            combine(
+                backupRepository.syncStatus,
+                connectivity,
+                syncPending,
+            ) { status, connected, pending -> Triple(status, connected, pending) }
+        ) { state, (status, connected, pending) ->
             val failure = status.lastOutcome as? BackupSyncStatus.Outcome.Failure
             state.copy(
                 backupUiState = state.backupUiState.copy(
                     isSyncing = status.running,
                     error = failure?.error?.toUI(),
+                    // Drive the pending banner + status message off the live flag.
+                    syncPending = pending,
                     statusMessage = computeStatusMessage(
                         status = status,
                         connected = connected,
-                        syncPending = state.backupUiState.syncPending,
+                        syncPending = pending,
                     ),
                 )
             )

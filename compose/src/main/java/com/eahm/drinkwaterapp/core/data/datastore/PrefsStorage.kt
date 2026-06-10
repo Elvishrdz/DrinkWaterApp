@@ -76,6 +76,9 @@ interface PrefsStorage {
     /** Reactive last-successful-backup timestamp; emits on every write, from any source. */
     fun getBackupLastSyncAtFlow(): Flow<Long?>
 
+    /** Reactive "a backup is pending" flag; clears as soon as a sync uploads successfully. */
+    fun getSyncPendingFlow(): Flow<Boolean>
+
     suspend fun getBackupAutoHour(): Int
     suspend fun setBackupAutoHour(hour: Int)
 

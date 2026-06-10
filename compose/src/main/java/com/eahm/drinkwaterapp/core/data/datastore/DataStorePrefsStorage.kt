@@ -406,6 +406,9 @@ internal class DataStorePrefsStorage(
     override fun getBackupLastSyncAtFlow(): Flow<Long?> =
         dataStore.data.map { it[backupLastSyncAtKey] }
 
+    override fun getSyncPendingFlow(): Flow<Boolean> =
+        dataStore.data.map { it[syncPendingKey] ?: false }
+
     override suspend fun getBackupAutoHour(): Int =
         dataStore.data.map { it[backupAutoHourKey] ?: DEFAULT_BACKUP_HOUR }.first()
 
