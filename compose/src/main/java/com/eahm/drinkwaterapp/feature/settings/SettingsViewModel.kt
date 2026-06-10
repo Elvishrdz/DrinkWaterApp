@@ -314,6 +314,9 @@ internal class SettingsViewModel(
         .combine(initialSyncResolver.pending) { state, initialSync ->
             state.copy(backupUiState = state.backupUiState.copy(pendingInitialSync = initialSync))
         }
+        .combine(prefsStorage.getActiveDays()) { state, activeDays ->
+            state.copy(activeDays = activeDays)
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Lazily,
@@ -344,6 +347,29 @@ internal class SettingsViewModel(
 
     fun onUnitChanged(unit: WaterUnit, weightUnit: WeightUnit) {
         _state.update { it.copy(unit = unit, weightUnit = weightUnit) }
+    }
+
+    // ── Reminder active days (mirrors RemindersViewModel) ──────────────────────
+    @Suppress("MagicNumber")
+    fun onEnableAllDays() {
+        viewModelScope.launch {
+            prefsStorage.setActiveDays(setOf(1, 2, 3, 4, 5, 6, 7))
+            drinkAlarmManagerV2.restoreAlarm(source = "settings_enable_all_days")
+        }
+    }
+
+    fun onActiveDayToggled(dayOfWeek: Int) {
+        viewModelScope.launch {
+            val current = state.value.activeDays
+            val updated = if (dayOfWeek in current) {
+                // Keep at least one day active.
+                if (current.size > 1) current - dayOfWeek else current
+            } else {
+                current + dayOfWeek
+            }
+            prefsStorage.setActiveDays(updated)
+            drinkAlarmManagerV2.restoreAlarm(source = "settings_active_days_changed")
+        }
     }
 
     fun onIntervalChanged(minutes: Int) {

@@ -41,6 +41,9 @@ data class SettingsState(
     val unitPreference: UnitPreference = UnitPreference.ML,
     val currentLocaleTag: String = "",  // "" = system default; "en-US", "es-Es" otherwise
     val backupUiState: BackupUiState = BackupUiState(),
+    // ISO day-of-week values that are active for reminders: 1=Mon … 7=Sun.
+    @Suppress("MagicNumber")
+    val activeDays: Set<Int> = setOf(1, 2, 3, 4, 5, 6, 7),
 )
 
 enum class WaterUnit(val label: String) {

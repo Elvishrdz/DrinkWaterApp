@@ -94,10 +94,15 @@ internal fun HomeScreen() {
     // Show the DEV tab only in environments where dev tooling is intentional.
     // staging hides it (testers see the same UI as end users);
     // qa shows it (internal team validates dev tooling alongside features).
+    //
+    // The standalone REMINDERS tab is also dev/qa-only for now: its active-days controls live in
+    // Settings (reminders group) in production, and the dedicated screen is kept for future work.
     val menu = if (BuildEnvironment.isDev || BuildEnvironment.isQa) {
         HomeDestination.entries
     } else {
-        HomeDestination.entries.filterNot { it == HomeDestination.DEV }
+        HomeDestination.entries.filterNot {
+            it == HomeDestination.DEV || it == HomeDestination.REMINDERS
+        }
     }.let {
         MenuWrapper(menu = it)
     }

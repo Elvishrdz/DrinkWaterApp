@@ -10,6 +10,9 @@ import android.text.format.DateFormat
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -33,6 +36,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
@@ -101,6 +105,7 @@ import com.eahm.drinkwaterapp.core.domain.extension.sanitizeZeroDecimals
 import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.core.presentation.composable.BuildInfoFooter
+import com.eahm.drinkwaterapp.feature.reminders.components.DaysOfWeekToggle
 import com.eahm.drinkwaterapp.feature.settings.age.AgeSettingsSection
 import com.eahm.drinkwaterapp.feature.settings.backup.BackupSettingsSection
 import com.eahm.drinkwaterapp.feature.settings.backup.ProviderPickerSheet
@@ -306,6 +311,8 @@ internal fun SettingsScreen(
         onDismissInitialSync = viewModel::onDismissInitialSync,
         onAutoBackupHourChanged = viewModel::onAutoBackupHourChanged,
         onBackupIntervalChanged = viewModel::onBackupIntervalChanged,
+        onActiveDayToggled = viewModel::onActiveDayToggled,
+        onEnableAllDays = viewModel::onEnableAllDays,
         modifier = modifier,
     )
 
@@ -476,6 +483,8 @@ internal fun SettingsContent(
     onDismissInitialSync: () -> Unit = {},
     onAutoBackupHourChanged: (Int) -> Unit = {},
     onBackupIntervalChanged: (Int) -> Unit = {},
+    onActiveDayToggled: (Int) -> Unit = {},
+    onEnableAllDays: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -742,6 +751,12 @@ internal fun SettingsContent(
                             )
                         )
                     }
+                    HorizontalDivider(color = DwInk100)
+                    ActiveDaysSettingRow(
+                        activeDays = state.activeDays,
+                        onDayToggled = onActiveDayToggled,
+                        onEnableAllDays = onEnableAllDays,
+                    )
                 }
             }
 
@@ -1409,6 +1424,79 @@ private fun SettingRow(
             modifier = Modifier.weight(1f),
         )
         trailing()
+    }
+}
+
+/**
+ * Reminders-group row exposing the active weekday toggles. Keeps the standard settings-row framing
+ * (icon + label, with an "enable all" affordance) but hosts the [DaysOfWeekToggle] underneath so the
+ * 7 day buttons can wrap on narrow screens instead of being clipped.
+ */
+@Suppress("MagicNumber")
+@Composable
+private fun ActiveDaysSettingRow(
+    activeDays: Set<Int>,
+    onDayToggled: (Int) -> Unit,
+    onEnableAllDays: () -> Unit,
+) {
+    val allEnabled = activeDays.size == 7
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(horizontal = 14.dp, vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(RoundedCornerShape(9.dp))
+                    .background(DwTintWater),
+            ) {
+                Icon(
+                    imageVector = DwIcons.Alarm,
+                    contentDescription = null,
+                    tint = DwWater,
+                    modifier = Modifier.size(18.dp),
+                )
+            }
+            Text(
+                text = stringResource(R.string.reminders_section_active_days),
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.weight(1f),
+            )
+            AnimatedVisibility(
+                visible = !allEnabled,
+                enter = fadeIn(),
+                exit = fadeOut(),
+            ) {
+                IconButton(
+                    onClick = onEnableAllDays,
+                    modifier = Modifier.size(32.dp),
+                ) {
+                    Icon(
+                        imageVector = DwIcons.SevenDaysCheck,
+                        contentDescription = stringResource(R.string.reminders_enable_all_days),
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(22.dp),
+                    )
+                }
+            }
+        }
+        DaysOfWeekToggle(
+            activeDays = activeDays,
+            onDayToggled = onDayToggled,
+            centered = false,
+        )
     }
 }
 

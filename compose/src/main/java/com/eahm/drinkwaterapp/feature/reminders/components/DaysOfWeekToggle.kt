@@ -10,7 +10,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -50,22 +51,35 @@ import java.util.Locale
  * Active button: filled with a radial gradient built from the theme primary colour.
  * Inactive button: transparent background with a themed border.
  *
- * Width constraint: fills available space up to 480 dp and centres itself on wider screens
- * so tablets don't spread the items across the full display width.
+ * Layout adapts to the available width: a [FlowRow] keeps the 7 buttons on a single line when they
+ * fit and wraps the overflow onto a second line when space is tight (e.g. inside a Settings row on a
+ * narrow phone).
+ *
+ * When [centered] is true the toggle fills available space up to 480 dp and centres itself on wider
+ * screens (standalone Reminders screen / tablets). When false it hugs the start, which suits an
+ * inline placement inside a Settings row.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DaysOfWeekToggle(
     activeDays: Set<Int>,
     onDayToggled: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    centered: Boolean = true,
 ) {
-    Row(
-        modifier = modifier
+    val alignment = if (centered) Alignment.CenterHorizontally else Alignment.Start
+    val widthModifier = if (centered) {
+        Modifier
             .fillMaxWidth()
             .wrapContentWidth(align = Alignment.CenterHorizontally, unbounded = false)
-            .widthIn(max = 480.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-        verticalAlignment = Alignment.CenterVertically,
+            .widthIn(max = 480.dp)
+    } else {
+        Modifier.fillMaxWidth()
+    }
+    FlowRow(
+        modifier = modifier.then(widthModifier),
+        horizontalArrangement = Arrangement.spacedBy(8.dp, alignment),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         // ISO week: 1=Mon … 7=Sun
         for (isoDay in 1..7) {
