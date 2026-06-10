@@ -24,6 +24,10 @@ android {
         isCoreLibraryDesugaringEnabled = true
     }
 
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
+
     buildTypes {
         debug {
             buildConfigField("boolean", "FEATURE_CLOUD_BACKUP", "true")
@@ -59,6 +63,9 @@ dependencies {
     implementation(libs.androidx.cardview)
     implementation(libs.androidx.core.splashscreen)
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.test.core)
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

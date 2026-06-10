@@ -8,6 +8,7 @@ class FakeBackupScheduler : BackupScheduler {
     var lastSchedule: BackupSchedule? = null
     var triggerManualSyncCalled = false
     var triggerOnChangeSyncCalled = false
+    var triggerOnChangeSyncCount = 0
     var enqueueFollowUpOnChangeSyncCount = 0
     var triggerForegroundSyncCalled = false
     var cancelAllCalled = false
@@ -27,6 +28,7 @@ class FakeBackupScheduler : BackupScheduler {
 
     override fun triggerOnChangeSync() {
         triggerOnChangeSyncCalled = true
+        triggerOnChangeSyncCount++
     }
 
     override fun enqueueFollowUpOnChangeSync() {
