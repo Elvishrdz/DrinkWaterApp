@@ -101,6 +101,7 @@ import com.eahm.drinkwaterapp.core.domain.extension.sanitizeZeroDecimals
 import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.core.presentation.composable.BuildInfoFooter
+import com.eahm.drinkwaterapp.feature.settings.age.AgeSettingsSection
 import com.eahm.drinkwaterapp.feature.settings.backup.BackupSettingsSection
 import com.eahm.drinkwaterapp.feature.settings.backup.ProviderPickerSheet
 import com.eahm.drinkwaterapp.feature.settings.extension.openPlayStoreUrl
@@ -567,6 +568,10 @@ internal fun SettingsContent(
                         }
                     }
                 }
+            }
+
+            item {
+                AgeSettingsSection()
             }
 
             if (FeatureFlags.cloudBackupEnabled) {
