@@ -49,7 +49,7 @@ internal fun AgeCollectionRoot(
 @Composable
 internal fun AgeCollectionScreen(
     onSubmitBirthYear: (Int) -> Unit,
-    currentYear: Int = remember { Calendar.getInstance().get(Calendar.YEAR) },
+    currentYear: Int = Calendar.getInstance().get(Calendar.YEAR),
 ) {
     var input by remember { mutableStateOf("") }
     val birthYear = input.toIntOrNull()
