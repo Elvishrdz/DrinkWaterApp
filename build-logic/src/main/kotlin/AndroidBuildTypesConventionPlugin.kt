@@ -80,7 +80,8 @@ private fun ApplicationExtension.applyBuildTypes() {
                             "proguard-rules.pro",
                         )
                         ndk {
-                            debugSymbolLevel = "SYMBOL_TABLE"
+                            // Set to FULL to automatically pack the debug symbol directly into the .aab file
+                            debugSymbolLevel = "FULL"
                         }
                     }
                 }
