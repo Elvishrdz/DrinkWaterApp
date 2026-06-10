@@ -26,6 +26,7 @@ import com.eahm.drinkwaterapp.feature.drink.alarm.HomeAlarmViewModel
 import com.eahm.drinkwaterapp.feature.history.HistoryViewModel
 import com.eahm.drinkwaterapp.feature.history.v2.HistoryV2ViewModel
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingViewModel
+import com.eahm.drinkwaterapp.feature.onboarding.backup.OnboardingBackupViewModel
 import com.eahm.drinkwaterapp.feature.reminders.RemindersViewModel
 import com.eahm.drinkwaterapp.feature.settings.SettingsViewModel
 import com.eahm.drinkwaterapp.feature.settings.age.AgeSettingsViewModel
@@ -38,6 +39,7 @@ internal val featureModule = module {
     viewModelOf(::MainViewModel)
     viewModelOf(::ConsentViewModel)
     viewModelOf(::OnboardingViewModel)
+    viewModelOf(::OnboardingBackupViewModel)
 
     viewModelOf(::DrinkViewModel)
     viewModelOf(::HomeAlarmViewModel)

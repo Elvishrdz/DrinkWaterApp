@@ -7,6 +7,7 @@ import android.provider.Settings
 import android.text.format.DateFormat
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -16,6 +17,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
@@ -28,6 +30,7 @@ import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps.Intro
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps.RemindersSteps
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps.Summary
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps.Units
+import com.eahm.drinkwaterapp.feature.onboarding.backup.OnboardingBackupViewModel
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.LocalOnboardingProgress
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbShell
 import com.eahm.drinkwaterapp.feature.onboarding.ui.steps.OnboardingStep
@@ -43,6 +46,7 @@ import com.eahm.drinkwaterapp.feature.onboarding.ui.steps.stepSleep
 import com.eahm.drinkwaterapp.feature.onboarding.ui.steps.stepUnits
 import com.eahm.drinkwaterapp.feature.onboarding.ui.steps.stepWake
 import com.eahm.drinkwaterapp.feature.settings.ui.IntervalBottomSheet
+import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -52,6 +56,10 @@ internal fun OnboardingScreen(
     val viewModel = koinViewModel<OnboardingViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
+
+    val backupViewModel = koinViewModel<OnboardingBackupViewModel>()
+    val backupState by backupViewModel.state.collectAsStateWithLifecycle()
+    val connectGoogleDrive = rememberGoogleDriveConnect(backupViewModel)
 
     // Exact alarm permission launcher (Android 12+).
     // Auto-advances when the user grants the permission and returns to the app.
@@ -179,9 +187,15 @@ internal fun OnboardingScreen(
         )
 
         CloudBackup -> stepBackup(
+            state = backupState,
             onSkip = viewModel::skipBackup,
-            onConnectGoogle = viewModel::nextStep,
+            onContinue = viewModel::nextStep,
+            onConnectGoogle = connectGoogleDrive,
             onConnectDropbox = viewModel::nextStep,
+            onResolveConflict = backupViewModel::onResolveConflict,
+            onResolveCorruption = backupViewModel::onResolveCorruption,
+            onResolveInitialSync = backupViewModel::onResolveInitialSync,
+            onDismissInitialSync = backupViewModel::onDismissInitialSync,
             onBack = viewModel::prevStep,
         )
 
@@ -212,6 +226,31 @@ internal fun OnboardingScreen(
                 onIntervalChanged = viewModel::onIntervalSelect,
                 onDismiss = { showCustomIntervalBottomSheet = false },
             )
+        }
+    }
+}
+
+/**
+ * Wires the Google Sign-In activity-result launcher for backup and returns a click handler that
+ * starts the authorization flow. Mirrors the Settings connect flow. Extracted to keep
+ * [OnboardingScreen] simple.
+ */
+@Composable
+private fun rememberGoogleDriveConnect(
+    backupViewModel: OnboardingBackupViewModel,
+): () -> Unit {
+    val coroutineScope = rememberCoroutineScope()
+    val googleSignInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartIntentSenderForResult(),
+    ) { result ->
+        backupViewModel.onGoogleSignInResult(result.data)
+    }
+    return {
+        coroutineScope.launch {
+            val sender = backupViewModel.getGoogleAuthorizationIntentSender()
+            if (sender != null) {
+                googleSignInLauncher.launch(IntentSenderRequest.Builder(sender).build())
+            }
         }
     }
 }

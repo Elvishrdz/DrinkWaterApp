@@ -740,6 +740,10 @@
     <string name="backup_onb_google_drive">Conectar Google Drive</string>
     <string name="backup_onb_dropbox">Conectar Dropbox</string>
     <string name="backup_onb_skip">Omitir por ahora</string>
+    <string name="backup_onb_connecting">Configurando tu copia de seguridad…</string>
+    <string name="backup_onb_connected_title">Copia de seguridad lista</string>
+    <string name="backup_onb_connected_subtitle">Tu historial de hidratación se respalda en %1$s. Puedes administrar las copias cuando quieras en Ajustes.</string>
+    <string name="backup_onb_continue">Continuar</string>
 
     <!-- Sync UI — Fase 5 -->
     <string name="sync_on_save_label">Sincronizar al guardar</string>

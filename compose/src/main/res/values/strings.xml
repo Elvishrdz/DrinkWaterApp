@@ -740,6 +740,10 @@
     <string name="backup_onb_google_drive">Connect Google Drive</string>
     <string name="backup_onb_dropbox">Connect Dropbox</string>
     <string name="backup_onb_skip">Skip for now</string>
+    <string name="backup_onb_connecting">Setting up your backup…</string>
+    <string name="backup_onb_connected_title">Backup is all set</string>
+    <string name="backup_onb_connected_subtitle">Your hydration history is backed up to %1$s. You can manage backups anytime in Settings.</string>
+    <string name="backup_onb_continue">Continue</string>
 
     <!-- Sync UI — Phase 5 -->
     <string name="sync_on_save_label">Sync on save</string>
