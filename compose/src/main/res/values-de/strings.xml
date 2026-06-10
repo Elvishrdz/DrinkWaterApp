@@ -778,4 +778,19 @@
     <string name="validation_error_min_length">Die Länge muss größer als %s sein</string>
     <string name="validation_error_max_length">Die Länge muss kleiner als %s sein</string>
 
+    <!-- Age signals / compliance -->
+    <string name="age_collection_title">Wähle deine Altersgruppe</string>
+    <string name="age_collection_description">Wir fragen danach nur, um altersbezogene Gesetze einzuhalten und dir altersgerechte Werbung anzuzeigen. Es ändert sonst nichts in der App. Deine Auswahl wird nie für Analysen verwendet oder an unsere Server gesendet – sie bleibt auf diesem Gerät und du kannst sie jederzeit in den Einstellungen ändern.</string>
+    <string name="age_collection_continue">Weiter</string>
+    <string name="age_option_under_13">Unter 13</string>
+    <string name="age_option_13_17">13 bis 17</string>
+    <string name="age_option_18_plus">18 oder älter</string>
+    <string name="age_range_not_set">Nicht festgelegt</string>
+    <string name="age_settings_section_title">Alter</string>
+    <string name="age_settings_row_label">Altersgruppe (für passende Werbung)</string>
+    <string name="age_settings_source_play">Von Google Play festgelegt</string>
+    <string name="age_settings_source_declared">Von dir festgelegt · zum Ändern tippen</string>
+    <string name="age_settings_source_unset">Zum Festlegen tippen</string>
+    <string name="age_settings_dialog_description">Wird nur verwendet, um altersgerechte Werbung anzuzeigen und das Gesetz einzuhalten. Wird nie geteilt, an unsere Server gesendet oder für Analysen genutzt – sie bleibt auf diesem Gerät.</string>
+
 </resources>

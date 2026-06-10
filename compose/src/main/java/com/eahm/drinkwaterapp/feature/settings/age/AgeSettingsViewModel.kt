@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.age.api.AgeRepository
 import com.eahm.drinkwaterapp.age.api.AgeSignals
+import com.eahm.drinkwaterapp.feature.age.AgeBracketOption
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -24,8 +25,8 @@ internal class AgeSettingsViewModel(
             ageRepository.ageSignals.value,
         )
 
-    fun submitBirthYear(birthYear: Int) {
-        viewModelScope.launch { ageRepository.submitDeclaredBirthYear(birthYear) }
+    fun submitSelection(option: AgeBracketOption) {
+        viewModelScope.launch { ageRepository.submitDeclaredBracket(option.treatment) }
     }
 
     private companion object {

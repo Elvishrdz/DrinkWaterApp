@@ -8,11 +8,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -23,12 +22,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.eahm.drinkwaterapp.age.api.AdTreatment
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.age.api.AgeSignals
 import com.eahm.drinkwaterapp.age.api.AgeSource
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
@@ -37,11 +36,8 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.JetBrainsMono
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
+import com.eahm.drinkwaterapp.feature.age.AgeBracketOption
 import org.koin.compose.viewmodel.koinViewModel
-import java.util.Calendar
-
-private const val YEAR_INPUT_LENGTH = 4
-private const val MAX_PLAUSIBLE_AGE = 120
 
 @Composable
 internal fun AgeSettingsSection(
@@ -55,7 +51,7 @@ internal fun AgeSettingsSection(
 
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(
-            text = "AGE & ADS",
+            text = stringResource(R.string.age_settings_section_title).uppercase(),
             fontFamily = JetBrainsMono,
             fontWeight = FontWeight.Medium,
             fontSize = 11.sp,
@@ -84,7 +80,7 @@ internal fun AgeSettingsSection(
                 )
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Age range (for ad suitability)",
+                        text = stringResource(R.string.age_settings_row_label),
                         fontFamily = PlusJakartaSans,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 14.sp,
@@ -115,64 +111,73 @@ internal fun AgeSettingsSection(
     }
 
     if (showDialog) {
-        BirthYearDialog(
+        AgeOptionsDialog(
+            current = AgeBracketOption.fromTreatment(signals?.adTreatment),
             onDismiss = { showDialog = false },
-            onConfirm = { year ->
+            onConfirm = { option ->
                 showDialog = false
-                viewModel.submitBirthYear(year)
+                viewModel.submitSelection(option)
             },
         )
     }
 }
 
 @Composable
-private fun BirthYearDialog(
+private fun AgeOptionsDialog(
+    current: AgeBracketOption?,
     onDismiss: () -> Unit,
-    onConfirm: (Int) -> Unit,
+    onConfirm: (AgeBracketOption) -> Unit,
 ) {
-    val currentYear = Calendar.getInstance().get(Calendar.YEAR)
-    var input by remember { mutableStateOf("") }
-    val year = input.toIntOrNull()
-    val valid = year != null && (currentYear - year) in 0..MAX_PLAUSIBLE_AGE
+    var selected by remember { mutableStateOf(current) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Your year of birth") },
+        title = { Text(stringResource(R.string.age_collection_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = "Used only to keep ads appropriate for your age and to comply with " +
-                        "the law. Never shared, profiled, or used to target ads.",
+                    text = stringResource(R.string.age_settings_dialog_description),
                     color = DwInk400,
                     fontSize = 13.sp,
                 )
-                OutlinedTextField(
-                    value = input,
-                    onValueChange = { input = it.filter(Char::isDigit).take(YEAR_INPUT_LENGTH) },
-                    label = { Text("Year of birth") },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                )
+                AgeBracketOption.entries.forEach { option ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { selected = option },
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        RadioButton(
+                            selected = selected == option,
+                            onClick = { selected = option },
+                        )
+                        Text(stringResource(option.labelRes))
+                    }
+                }
             }
         },
         confirmButton = {
-            TextButton(enabled = valid, onClick = { year?.let(onConfirm) }) { Text("Save") }
+            TextButton(
+                enabled = selected != null,
+                onClick = { selected?.let(onConfirm) },
+            ) { Text(stringResource(R.string.action_save)) }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
         },
     )
 }
 
-private fun AgeSignals?.rangeLabel(): String = when (this?.adTreatment) {
-    AdTreatment.CHILD_DIRECTED -> "Under 13"
-    AdTreatment.UNDER_AGE_OF_CONSENT -> "13–17"
-    AdTreatment.STANDARD -> "18 or older"
-    null -> "Not set"
-}
+@Composable
+private fun AgeSignals?.rangeLabel(): String = stringResource(
+    AgeBracketOption.fromTreatment(this?.adTreatment)?.labelRes ?: R.string.age_range_not_set,
+)
 
-private fun AgeSignals?.sourceLabel(): String = when (this?.source) {
-    AgeSource.API -> "Set by Google Play"
-    AgeSource.DECLARED -> "You set this · tap to change"
-    null -> "Tap to set"
-}
+@Composable
+private fun AgeSignals?.sourceLabel(): String = stringResource(
+    when (this?.source) {
+        AgeSource.API -> R.string.age_settings_source_play
+        AgeSource.DECLARED -> R.string.age_settings_source_declared
+        null -> R.string.age_settings_source_unset
+    },
+)

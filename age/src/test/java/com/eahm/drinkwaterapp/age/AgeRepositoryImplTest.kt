@@ -115,4 +115,20 @@ class AgeRepositoryImplTest {
         assertEquals(AdTreatment.CHILD_DIRECTED, repo.ageSignals.value?.adTreatment)
         assertEquals(AgeSource.DECLARED, prefs.stored?.source)
     }
+
+    @Test
+    fun `submitDeclaredBracket stores the chosen bracket and clears prompt`() = runTest {
+        val prefs = FakePreferences()
+        val repo = repo(AgeResolution.CoveredAgeUnknown, prefs)
+        repo.refresh()
+        assertTrue(repo.needsAgeCollection.value)
+
+        repo.submitDeclaredBracket(AdTreatment.UNDER_AGE_OF_CONSENT)
+
+        assertFalse(repo.needsAgeCollection.value)
+        assertEquals(AdTreatment.UNDER_AGE_OF_CONSENT, repo.ageSignals.value?.adTreatment)
+        assertEquals(AgeSource.DECLARED, prefs.stored?.source)
+        assertEquals(13, prefs.stored?.ageLower)
+        assertEquals(17, prefs.stored?.ageUpper)
+    }
 }

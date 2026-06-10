@@ -1,5 +1,6 @@
 package com.eahm.drinkwaterapp.age.internal
 
+import com.eahm.drinkwaterapp.age.api.AdTreatment
 import com.eahm.drinkwaterapp.age.api.AgePreferences
 import com.eahm.drinkwaterapp.age.api.AgeRepository
 import com.eahm.drinkwaterapp.age.api.AgeResolution
@@ -48,6 +49,11 @@ internal class AgeRepositoryImpl(
     override suspend fun submitDeclaredBirthYear(birthYear: Int) {
         val age = (currentYear() - birthYear).coerceAtLeast(0)
         persist(AgeSignals.fromDeclaredAge(age))
+        _needsAgeCollection.value = false
+    }
+
+    override suspend fun submitDeclaredBracket(adTreatment: AdTreatment) {
+        persist(AgeSignals.fromDeclaredBracket(adTreatment))
         _needsAgeCollection.value = false
     }
 

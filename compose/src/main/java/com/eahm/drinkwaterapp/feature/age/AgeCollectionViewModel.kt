@@ -20,9 +20,9 @@ internal class AgeCollectionViewModel(
     private val _completed = MutableStateFlow(false)
     val completed: StateFlow<Boolean> = _completed.asStateFlow()
 
-    fun submitBirthYear(birthYear: Int) {
+    fun submitSelection(option: AgeBracketOption) {
         viewModelScope.launch {
-            ageRepository.submitDeclaredBirthYear(birthYear)
+            ageRepository.submitDeclaredBracket(option.treatment)
             _completed.value = true
         }
     }

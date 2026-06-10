@@ -30,4 +30,7 @@ interface AgeRepository {
 
     /** Persists a user-declared age derived from the bootstrap screen's birth-year input. */
     suspend fun submitDeclaredBirthYear(birthYear: Int)
+
+    /** Persists a user-declared age bracket chosen from the predefined options. */
+    suspend fun submitDeclaredBracket(adTreatment: AdTreatment)
 }

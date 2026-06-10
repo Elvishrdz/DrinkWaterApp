@@ -780,4 +780,19 @@
     <string name="validation_error_min_length">Length must be greater than %s</string>
     <string name="validation_error_max_length">Length must be less than %s</string>
 
+    <!-- Age signals / compliance -->
+    <string name="age_collection_title">Select your age range</string>
+    <string name="age_collection_description">We ask this only to comply with age-related laws and to keep the ads you see appropriate for your age. It does not change anything else in the app. Your selection is never used for analytics and is never sent to our servers — it stays on this device, and you can change it anytime in Settings.</string>
+    <string name="age_collection_continue">Continue</string>
+    <string name="age_option_under_13">Under 13</string>
+    <string name="age_option_13_17">13 to 17</string>
+    <string name="age_option_18_plus">18 or older</string>
+    <string name="age_range_not_set">Not set</string>
+    <string name="age_settings_section_title">age</string>
+    <string name="age_settings_row_label">Age range (for ad suitability)</string>
+    <string name="age_settings_source_play">Set by Google Play</string>
+    <string name="age_settings_source_declared">You set this · tap to change</string>
+    <string name="age_settings_source_unset">Tap to set</string>
+    <string name="age_settings_dialog_description">Used only to keep ads appropriate for your age and to comply with the law. Never shared, sent to our servers, or used for analytics — it stays on this device.</string>
+
 </resources>
