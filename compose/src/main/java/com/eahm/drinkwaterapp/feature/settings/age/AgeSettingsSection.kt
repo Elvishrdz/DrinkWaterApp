@@ -46,8 +46,15 @@ internal fun AgeSettingsSection(
     val signals by viewModel.ageSignals.collectAsStateWithLifecycle()
     var showDialog by remember { mutableStateOf(false) }
 
-    // API-sourced values are authoritative; only declared/unset values are editable.
-    val editable = signals?.source != AgeSource.API
+    val currentSignals = signals
+    // Nothing to show when there is no stored age (e.g. not in a covered region): the API is the
+    // source of truth and we are not relying on a local value.
+    if (currentSignals == null) return
+
+    // Editable ONLY when the value was collected locally (API unavailable). When the API supplied
+    // it, the value is authoritative and read-only — a later successful API response overrides any
+    // declared value automatically.
+    val editable = currentSignals.source == AgeSource.DECLARED
 
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(
