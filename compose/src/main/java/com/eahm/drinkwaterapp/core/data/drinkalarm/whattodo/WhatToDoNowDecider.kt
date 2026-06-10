@@ -2,7 +2,6 @@ package com.eahm.drinkwaterapp.core.data.drinkalarm.whattodo
 
 import com.eahm.drinkwaterapp.core.data.drinkalarm.calculator.calculateNextAlarmSlot
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.TimeResult
-import com.eahm.drinkwaterapp.core.data.drinkalarm.simulator.simulateNextIntervalCalculation
 import com.eahm.drinkwaterapp.core.domain.model.AlarmInterval
 import kotlinx.datetime.LocalDateTime
 
@@ -237,26 +236,17 @@ fun getNextAlarmSlot(
     endTime: LocalDateTime,
     goalMl: Float,
     interval: AlarmInterval,
-    testMode: Boolean = false,
 ): LocalDateTime {
-    return if (testMode) {
-        simulateNextIntervalCalculation(
-            now = now,
-            startTime = startTime,
-            endTime = endTime,
-        )
-    } else {
-        val intervalMinutes = (interval.hour * 60 + interval.minute).coerceAtLeast(1)
+    val intervalMinutes = (interval.hour * 60 + interval.minute).coerceAtLeast(1)
 
-        val startTimeResult = TimeResult(startTime.hour, startTime.minute, 0, 0L)
-        val endTimeResult = TimeResult(endTime.hour, endTime.minute, 0, 0L)
+    val startTimeResult = TimeResult(startTime.hour, startTime.minute, 0, 0L)
+    val endTimeResult = TimeResult(endTime.hour, endTime.minute, 0, 0L)
 
-        calculateNextAlarmSlot(
-            now = now,
-            startTime = startTimeResult,
-            endTime = endTimeResult,
-            goalMl = goalMl,
-            intervalMinutes = intervalMinutes,
-        )
-    }
+    return calculateNextAlarmSlot(
+        now = now,
+        startTime = startTimeResult,
+        endTime = endTimeResult,
+        goalMl = goalMl,
+        intervalMinutes = intervalMinutes,
+    )
 }
