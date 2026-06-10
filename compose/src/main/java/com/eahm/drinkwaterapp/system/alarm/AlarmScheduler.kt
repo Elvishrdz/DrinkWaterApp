@@ -1,12 +1,12 @@
 package com.eahm.drinkwaterapp.system.alarm
 
+import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.SystemClock
 import androidx.core.content.edit
-import com.eahm.drinkwaterapp.core.data.drinkalarm.DayTime
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.AlarmTime
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.TimeResult
 import com.eahm.drinkwaterapp.core.data.drinkalarm.data.createWithSeconds
@@ -45,6 +45,7 @@ object AlarmScheduler {
      * is calculated from the moment the alarm is scheduled. example. passing 5000 will trigger this alarm
      * in 5 seconds from the moment is called.
      * */
+    @SuppressLint("ScheduleExactAlarm")
     fun scheduleAlarm(context: Context, alarmId: Int, millisToTriggerFromNow: Long) {
         val alarmManager = context.getSystemService(AlarmManager::class.java)
 
@@ -65,7 +66,6 @@ object AlarmScheduler {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // TODO: handle fallback app behaviour
         if (ExactAlarmPermission.isGranted(context)) {
             alarmManager.setExactAndAllowWhileIdle(
                 AlarmManager.ELAPSED_REALTIME_WAKEUP,
@@ -163,18 +163,6 @@ object AlarmScheduler {
         }
     }
 
-    fun getAlarmStorageInfos(context: Context): List<AlarmStorageInfo> {
-        val prefs = context.getSharedPreferences(ALARM_PREFS_NAME, Context.MODE_PRIVATE)
-
-        val activeAlarms = prefs.getStringSet(KEY_ACTIVE_ALARMS, emptySet()).orEmpty()
-
-        return activeAlarms
-            .mapNotNull { runCatching { it.toInt() }.getOrNull() }
-            .mapNotNull { alarmId ->
-                getAlarmStorageInfo(context, alarmId)
-            }
-    }
-
     @OptIn(ExperimentalTime::class)
     fun getAlarmStorageInfo(context: Context, alarmId: Int): AlarmStorageInfo? {
         val prefs = context.getSharedPreferences(ALARM_PREFS_NAME, Context.MODE_PRIVATE)
@@ -225,25 +213,6 @@ object AlarmScheduler {
             alarmTriggerAt = alarmTriggerAt,
         )
     }
-
-    // triggerAtMillis is an elapsedRealtime value, not a Unix timestamp.
-    // Offset it to wall-clock time, then extract hour and minute.
-    val Long.asDayTime
-        get() = if (this <= 0) {
-            DayTime(0, 0)
-        } else {
-            val wallClockMs = System.currentTimeMillis() +
-                    (this - SystemClock.elapsedRealtime())
-
-            val calendar = Calendar.getInstance().apply {
-                timeInMillis = wallClockMs
-            }
-
-            DayTime(
-                hour = calendar.get(Calendar.HOUR_OF_DAY),
-                minute = calendar.get(Calendar.MINUTE),
-            )
-        }
 
     // triggerAtMillis is an elapsedRealtime value, not a Unix timestamp.
     // Offset it to wall-clock time, then extract hour and minute.

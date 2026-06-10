@@ -19,14 +19,14 @@ import org.junit.runner.RunWith
  * Instrumented tests for [DraggableQuickAddRow].
  *
  * These tests verify that drag-to-reorder gestures result in the correct list
- * being delivered to [onReorder]. The composable uses test-tagged chips
+ * being delivered to onReorder. The composable uses test-tagged chips
  * ("chip_<amountInt>", e.g. "chip_100") so nodes can be located by preset.
  *
  * Gesture simulation:
- *   1. [down] — press the chip
- *   2. [advanceEventTime] past the long-press timeout — triggers [onDragStart]
- *   3. [moveBy] a distance large enough to cross the swap threshold — triggers [onDrag]
- *   4. [up] — triggers [onDragEnd] which calls [onReorder]
+ *   1. down — press the chip
+ *   2. advanceEventTime past the long-press timeout — triggers onDragStart
+ *   3. moveBy a distance large enough to cross the swap threshold — triggers onDrag
+ *   4. up — triggers onDragEnd which calls onReorder
  */
 @RunWith(AndroidJUnit4::class)
 class DraggableQuickAddRowTest {
@@ -67,8 +67,8 @@ class DraggableQuickAddRowTest {
         assertNotNull("onReorder must be called after drag ends", capturedOrder)
         // A moved right; B should now be first.
         assertEquals(presetB, capturedOrder!!.first())
-        assertEquals(presetA, capturedOrder!![1])
-        assertEquals(presetC, capturedOrder!!.last())
+        assertEquals(presetA, capturedOrder[1])
+        assertEquals(presetC, capturedOrder.last())
     }
 
     @Test
@@ -101,8 +101,8 @@ class DraggableQuickAddRowTest {
         assertNotNull("onReorder must be called after drag ends", capturedOrder)
         // A should be back at index 0.
         assertEquals(presetA, capturedOrder!!.first())
-        assertEquals(presetB, capturedOrder!![1])
-        assertEquals(presetC, capturedOrder!!.last())
+        assertEquals(presetB, capturedOrder[1])
+        assertEquals(presetC, capturedOrder.last())
     }
 
     @Test
@@ -182,7 +182,7 @@ class DraggableQuickAddRowTest {
 
         assertNotNull("onReorder must be called after the gesture ends", capturedOrder)
         assertEquals(presetA, capturedOrder!![0])
-        assertEquals(presetB, capturedOrder!![1])
-        assertEquals(presetC, capturedOrder!![2])
+        assertEquals(presetB, capturedOrder[1])
+        assertEquals(presetC, capturedOrder[2])
     }
 }
