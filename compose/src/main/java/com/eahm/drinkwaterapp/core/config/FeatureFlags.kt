@@ -11,4 +11,7 @@ object FeatureFlags {
     val requestFeatureEnabled: Boolean = BuildConfig.FEATURE_REQUEST_FEATURE
     val streakFeatureEnabled: Boolean = BuildConfig.FEATURE_STREAKS
     val cloudBackupEnabled: Boolean = BuildConfig.FEATURE_CLOUD_BACKUP
+
+    // Dropbox backup is not fully tested yet — keep it dev-only until validated.
+    val dropboxBackupEnabled: Boolean = BuildConfig.IS_DEV
 }

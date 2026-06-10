@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.backup.domain.model.CloudProviderType
+import com.eahm.drinkwaterapp.core.config.FeatureFlags
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwSecondaryButton
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -84,13 +85,15 @@ private fun ProviderPickerContent(
             modifier = Modifier.fillMaxWidth(),
         )
 
-        Spacer(Modifier.height(8.dp))
+        if (FeatureFlags.dropboxBackupEnabled) {
+            Spacer(Modifier.height(8.dp))
 
-        DwPrimaryButton(
-            text = stringResource(R.string.backup_picker_dropbox),
-            onClick = { onProviderSelected(CloudProviderType.DROPBOX) },
-            modifier = Modifier.fillMaxWidth(),
-        )
+            DwPrimaryButton(
+                text = stringResource(R.string.backup_picker_dropbox),
+                onClick = { onProviderSelected(CloudProviderType.DROPBOX) },
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
 
         Spacer(Modifier.height(8.dp))
 

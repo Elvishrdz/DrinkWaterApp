@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.R
+import com.eahm.drinkwaterapp.core.config.FeatureFlags
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -57,12 +58,14 @@ internal fun stepBackup(
                 title = stringResource(R.string.backup_picker_google_drive),
                 onClick = onConnectGoogle,
             )
-            Spacer(Modifier.height(12.dp))
-            BackupProviderCard(
-                icon = { ProviderIcon(tint = Color(0xFF0061FF)) },
-                title = stringResource(R.string.backup_picker_dropbox),
-                onClick = onConnectDropbox,
-            )
+            if (FeatureFlags.dropboxBackupEnabled) {
+                Spacer(Modifier.height(12.dp))
+                BackupProviderCard(
+                    icon = { ProviderIcon(tint = Color(0xFF0061FF)) },
+                    title = stringResource(R.string.backup_picker_dropbox),
+                    onClick = onConnectDropbox,
+                )
+            }
         }
     },
 )
