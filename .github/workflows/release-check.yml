@@ -37,8 +37,12 @@ jobs:
           MIXPANEL_TOKEN: ${{ secrets.MIXPANEL_TOKEN || 'ci_placeholder' }}
         run: ./gradlew compileReleaseKotlin --stacktrace
 
+      # AGP 9.x only generates host unit-test tasks for the testBuildType (debug),
+      # so there is no testReleaseUnitTest task. Unit tests run against the same
+      # (non-minified) sources regardless of build type, so testDebugUnitTest is
+      # the correct and only available coverage.
       - name: Run unit tests
-        run: ./gradlew testReleaseUnitTest testDebugUnitTest --stacktrace --continue
+        run: ./gradlew testDebugUnitTest --stacktrace --continue
 
       - name: Upload test results
         if: always()

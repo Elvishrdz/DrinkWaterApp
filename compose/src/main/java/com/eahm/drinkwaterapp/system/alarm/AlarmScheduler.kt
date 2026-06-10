@@ -150,10 +150,16 @@ object AlarmScheduler {
         val ids = prefs.getStringSet(KEY_ACTIVE_ALARMS, mutableSetOf())!!
             .toMutableSet().also { it.add(alarmId.toString()) }
 
+        // Persist the wall-clock (Unix) fire time as well. elapsedRealtime (triggerAt)
+        // resets to 0 on reboot, so getAlarmStorageInfo prefers this value to
+        // reconstruct the correct fire time after a device restart.
+        val wallClockMs = System.currentTimeMillis() + triggerTimeMillis
+
         prefs.edit {
             putStringSet(KEY_ACTIVE_ALARMS, ids)
                 .putLong(keyTriggerTimeMillis(alarmId), triggerTimeMillis)
                 .putLong(keyTriggerAtMillis(alarmId), triggerAt)
+                .putLong(keyWallClockMs(alarmId), wallClockMs)
         }
     }
 

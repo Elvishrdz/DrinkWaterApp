@@ -54,10 +54,12 @@ class DraggableQuickAddRowTest {
         }
 
         // Long-press chip_100 (A) and drag it to the right past the swap threshold.
+        // Drag a full chip width so the swap threshold (itemWidth/2 + spacing/2) is
+        // reliably crossed regardless of the device's screen size/density.
         composeTestRule.onNodeWithTag("chip_100").performTouchInput {
             down(center)
             advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100L)
-            moveBy(Offset(300f, 0f))
+            moveBy(Offset(visibleSize.width.toFloat(), 0f))
             up()
         }
         composeTestRule.waitForIdle()
@@ -86,11 +88,12 @@ class DraggableQuickAddRowTest {
             }
         }
 
-        // Long-press chip_100 (A, currently at index 1) and drag it back left.
+        // Long-press chip_100 (A, currently at index 1) and drag it back left a full
+        // chip width so the swap threshold is reliably crossed on any device.
         composeTestRule.onNodeWithTag("chip_100").performTouchInput {
             down(center)
             advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100L)
-            moveBy(Offset(-300f, 0f))
+            moveBy(Offset(-visibleSize.width.toFloat(), 0f))
             up()
         }
         composeTestRule.waitForIdle()
@@ -121,7 +124,7 @@ class DraggableQuickAddRowTest {
         composeTestRule.onNodeWithTag("chip_100").performTouchInput {
             down(center)
             advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100L)
-            moveBy(Offset(300f, 0f))
+            moveBy(Offset(visibleSize.width.toFloat(), 0f))
             up()
         }
         composeTestRule.waitForIdle()
@@ -130,7 +133,7 @@ class DraggableQuickAddRowTest {
         composeTestRule.onNodeWithTag("chip_300").performTouchInput {
             down(center)
             advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100L)
-            moveBy(Offset(-300f, 0f))
+            moveBy(Offset(-visibleSize.width.toFloat(), 0f))
             up()
         }
         composeTestRule.waitForIdle()
