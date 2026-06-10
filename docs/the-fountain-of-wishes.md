@@ -89,8 +89,6 @@
 - [] allow to disable drink water animation on settings
 - [] research: dependency injection for kmp using metro (no runtime errors)
 - [] research: integrate SQLDelight. find benefits. static checks.
-- [] fix graphic image in
-  listing: https://play.google.com/store/apps/developer?id=eahm&hl=es_NI&gl=US
 - [] stats screen: do not display when percentaje is lower than previous period, it always is lower
   at beginnings of week/year show something more positive instead. show percentage only on last day
   it can be negative or positive, for negative show a positive text.
