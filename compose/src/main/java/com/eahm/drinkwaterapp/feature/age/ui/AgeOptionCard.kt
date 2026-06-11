@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk100
@@ -67,19 +68,33 @@ internal fun AgeOptionCard(
                 fontFamily = PlusJakartaSans,
                 fontWeight = if (selected) FontWeight.Bold else FontWeight.SemiBold,
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = if (selected) DwMagenta else MaterialTheme.colorScheme.onSurface,
             )
         }
     }
 }
 
 @Preview(showBackground = true)
+@PreviewLightDark
 @Composable
 private fun AgeOptionCardPreview() {
     DrinkWaterAppTheme {
         AgeOptionCard(
             text = "18 or older",
             selected = true,
+            onClick = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@PreviewLightDark
+@Composable
+private fun UnselectedPreview() {
+    DrinkWaterAppTheme {
+        AgeOptionCard(
+            text = "18 or older",
+            selected = false,
             onClick = {},
         )
     }
