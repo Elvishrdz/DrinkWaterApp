@@ -1493,7 +1493,8 @@ private fun ActiveDaysSettingRow(
         DaysOfWeekToggle(
             activeDays = activeDays,
             onDayToggled = onDayToggled,
-            centered = false,
+            centered = true,
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }
