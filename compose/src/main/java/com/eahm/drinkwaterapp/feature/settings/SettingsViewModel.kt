@@ -13,6 +13,7 @@ import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingReminders.Companion.ReminderDaysSource
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingService.Companion.OptOutSource
 import com.eahm.drinkwaterapp.backup.data.BackupRecoveryResolver
@@ -368,6 +369,7 @@ internal class SettingsViewModel(
         viewModelScope.launch {
             prefsStorage.setActiveDays(setOf(1, 2, 3, 4, 5, 6, 7))
             drinkAlarmManagerV2.restoreAlarm(source = "settings_enable_all_days")
+            trackingService.trackReminderAllDaysEnabled(ReminderDaysSource.Settings)
         }
     }
 
@@ -382,6 +384,14 @@ internal class SettingsViewModel(
             }
             prefsStorage.setActiveDays(updated)
             drinkAlarmManagerV2.restoreAlarm(source = "settings_active_days_changed")
+            if (updated != current) {
+                trackingService.trackReminderDayToggled(
+                    isoDay = dayOfWeek,
+                    enabled = dayOfWeek in updated,
+                    activeIsoDays = updated,
+                    source = ReminderDaysSource.Settings,
+                )
+            }
         }
     }
 
@@ -534,6 +544,7 @@ internal class SettingsViewModel(
                 backupRepository.connect(CloudProviderType.GOOGLE_DRIVE)
                 scheduleDailyAutoSync()
                 refreshBackupState()
+                trackBackupConnected(CloudProviderType.GOOGLE_DRIVE)
             }
         }
     }
@@ -559,6 +570,7 @@ internal class SettingsViewModel(
                 backupRepository.connect(CloudProviderType.DROPBOX)
                 scheduleDailyAutoSync()
                 refreshBackupState()
+                trackBackupConnected(CloudProviderType.DROPBOX)
             }
         }
     }
@@ -570,6 +582,7 @@ internal class SettingsViewModel(
             backupRepository.connect(providerType)
             scheduleDailyAutoSync()
             refreshBackupState()
+            trackBackupConnected(providerType)
         }
     }
 
@@ -577,6 +590,17 @@ internal class SettingsViewModel(
     private suspend fun scheduleDailyAutoSync() {
         backupScheduler.scheduleAutoSync(backupPreferences.currentBackupSchedule())
     }
+
+    private suspend fun trackBackupConnected(providerType: CloudProviderType) {
+        trackingService.trackBackupConnected(
+            provider = providerType.id,
+            deviceCount = backupPreferences.getSeenDevices().size,
+        )
+    }
+
+    /** The id of the currently connected provider, for analytics props. */
+    private suspend fun currentProviderId(): String =
+        backupPreferences.getBackupProvider() ?: "none"
 
     /** User picked the fixed daily-hour mode at [hour] — persist it and reschedule. */
     fun onAutoBackupHourChanged(hour: Int) {
@@ -587,6 +611,11 @@ internal class SettingsViewModel(
                 it.copy(autoBackupHour = hour, scheduleMode = BackupScheduleMode.DAILY)
             }
             rescheduleIfConnected()
+            trackingService.trackBackupScheduleChanged(
+                mode = BackupScheduleMode.DAILY.name.lowercase(),
+                dailyHour = hour,
+                intervalHours = null,
+            )
         }
     }
 
@@ -599,6 +628,11 @@ internal class SettingsViewModel(
                 it.copy(intervalHours = hours, scheduleMode = BackupScheduleMode.INTERVAL)
             }
             rescheduleIfConnected()
+            trackingService.trackBackupScheduleChanged(
+                mode = BackupScheduleMode.INTERVAL.name.lowercase(),
+                dailyHour = null,
+                intervalHours = hours,
+            )
         }
     }
 
@@ -610,14 +644,18 @@ internal class SettingsViewModel(
 
     fun onDisconnectBackup() {
         viewModelScope.launch {
+            // Read the provider before disconnecting — it is cleared by the disconnect.
+            val provider = currentProviderId()
             backupRepository.disconnect()
             backupScheduler.cancelAll()
             refreshBackupState()
+            trackingService.trackBackupDisconnected(provider)
         }
     }
 
     fun onSyncNow() {
         viewModelScope.launch {
+            trackingService.trackBackupManualSyncTapped(currentProviderId())
             backupRepository.sync(allowInitialDecision = true)
             refreshBackupState()
         }
@@ -626,6 +664,7 @@ internal class SettingsViewModel(
     /** Pulls the cloud backup and replaces this device's local data with it. */
     fun onRestoreBackup() {
         viewModelScope.launch {
+            trackingService.trackBackupRestoreTapped(currentProviderId())
             backupRepository.restore()
             refreshBackupState()
         }
@@ -635,6 +674,7 @@ internal class SettingsViewModel(
         viewModelScope.launch {
             backupPreferences.setSyncOnSaveEnabled(enabled)
             _backupUiState.update { it.copy(syncOnSaveEnabled = enabled) }
+            trackingService.trackBackupSyncOnSaveToggled(enabled)
         }
     }
 

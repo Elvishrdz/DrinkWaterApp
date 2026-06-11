@@ -7,7 +7,9 @@ interface TrackingService
     TrackingHistory,
     TrackingStats,
     TrackingSettings,
-    TrackingNotification {
+    TrackingNotification,
+    TrackingReminders,
+    TrackingBackup {
 
     fun startTracking()
 

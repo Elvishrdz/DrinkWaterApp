@@ -12,6 +12,7 @@ import com.eahm.drinkwaterapp.backup.domain.BackupScheduler
 import com.eahm.drinkwaterapp.core.backup.BackupSerializer
 import com.eahm.drinkwaterapp.core.backup.BackupSyncInitializer
 import com.eahm.drinkwaterapp.core.backup.BackupSyncNotifier
+import com.eahm.drinkwaterapp.core.backup.BackupSyncTracker
 import com.eahm.drinkwaterapp.core.backup.WorkManagerBackupScheduler
 import com.eahm.drinkwaterapp.core.data.datastore.DataStorePrefsStorage
 import com.eahm.drinkwaterapp.system.initializer.AppInitializer
@@ -71,6 +72,9 @@ internal val backupModule = module {
 
     // Dev-only: mirrors background sync status into a dedicated notification.
     singleOf(::BackupSyncNotifier) bind AppInitializer::class
+
+    // Reports every finished sync (any trigger) to analytics.
+    singleOf(::BackupSyncTracker) bind AppInitializer::class
 
     // BackupPreferences bridge — reuse the DataStorePrefsStorage single
     single<BackupPreferences> { get<DataStorePrefsStorage>() }

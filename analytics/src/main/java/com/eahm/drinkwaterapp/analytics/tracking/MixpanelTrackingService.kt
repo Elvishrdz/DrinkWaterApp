@@ -3,6 +3,13 @@ package com.eahm.drinkwaterapp.analytics.tracking
 import android.app.Application
 import android.content.Context
 import com.eahm.drinkwaterapp.analytics.BuildConfig
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingBackup.Companion.EVENT_BACKUP_CONNECTED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingBackup.Companion.EVENT_BACKUP_DISCONNECTED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingBackup.Companion.EVENT_BACKUP_MANUAL_SYNC_TAPPED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingBackup.Companion.EVENT_BACKUP_RESTORE_TAPPED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingBackup.Companion.EVENT_BACKUP_SCHEDULE_CHANGED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingBackup.Companion.EVENT_BACKUP_SYNC_FINISHED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingBackup.Companion.EVENT_BACKUP_SYNC_ON_SAVE_TOGGLED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingDrink.Companion.EVENT_DRINK_RECORDED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingDrink.Companion.EVENT_PRESET_BOTTOM_SHEET_OPENED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingDrink.Companion.EVENT_PRESET_CREATED
@@ -18,6 +25,9 @@ import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TR
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_COMPLETED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_STARTED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingOnboarding.Companion.TRACK_EVENT_ONBOARDING_TIME
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingReminders.Companion.EVENT_REMINDER_ALL_DAYS_ENABLED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingReminders.Companion.EVENT_REMINDER_DAY_TOGGLED
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingReminders.Companion.ReminderDaysSource
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingService.Companion.EVENT_TRACKING_OPTED_OUT
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingService.Companion.OptOutSource
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingService.Companion.SUPER_PROP_APP_VERSION
@@ -39,6 +49,7 @@ import com.eahm.drinkwaterapp.analytics.tracking.TrackingStats.Companion.EVENT_S
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingStats.Companion.EVENT_STATS_PERIOD_SELECTED
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingStats.Companion.EVENT_STATS_PERSONAL_BEST_TAPPED
 import com.mixpanel.android.mpmetrics.MixpanelAPI
+import org.json.JSONArray
 import org.json.JSONObject
 
 internal class MixpanelTrackingService(
@@ -272,5 +283,126 @@ internal class MixpanelTrackingService(
 
     override fun trackNotificationOpened() {
         sendEvent(EVENT_NOTIFICATION_OPENED)
+    }
+
+    override fun trackReminderDayToggled(
+        isoDay: Int,
+        enabled: Boolean,
+        activeIsoDays: Set<Int>,
+        source: ReminderDaysSource,
+    ) {
+        val activeNames = activeIsoDays.sorted().map(::dayName)
+        sendEvent(
+            EVENT_REMINDER_DAY_TOGGLED,
+            JSONObject().apply {
+                put("day", dayName(isoDay))
+                put("enabled", enabled)
+                put("active_days", JSONArray(activeNames))
+                // Canonical string of the resulting configuration — group by this property to
+                // find the most common active-days setup.
+                put("active_days_config", activeNames.joinToString(","))
+                put("active_days_count", activeIsoDays.size)
+                put("source", source.name)
+            },
+        )
+    }
+
+    override fun trackReminderAllDaysEnabled(source: ReminderDaysSource) {
+        sendEvent(
+            EVENT_REMINDER_ALL_DAYS_ENABLED,
+            JSONObject().apply {
+                put("source", source.name)
+            },
+        )
+    }
+
+    override fun trackBackupConnected(provider: String, deviceCount: Int) {
+        sendEvent(
+            EVENT_BACKUP_CONNECTED,
+            JSONObject().apply {
+                put("provider", provider)
+                put("device_count", deviceCount)
+            },
+        )
+    }
+
+    override fun trackBackupDisconnected(provider: String) {
+        sendEvent(
+            EVENT_BACKUP_DISCONNECTED,
+            JSONObject().apply {
+                put("provider", provider)
+            },
+        )
+    }
+
+    override fun trackBackupManualSyncTapped(provider: String) {
+        sendEvent(
+            EVENT_BACKUP_MANUAL_SYNC_TAPPED,
+            JSONObject().apply {
+                put("provider", provider)
+            },
+        )
+    }
+
+    override fun trackBackupRestoreTapped(provider: String) {
+        sendEvent(
+            EVENT_BACKUP_RESTORE_TAPPED,
+            JSONObject().apply {
+                put("provider", provider)
+            },
+        )
+    }
+
+    override fun trackBackupScheduleChanged(mode: String, dailyHour: Int?, intervalHours: Int?) {
+        sendEvent(
+            EVENT_BACKUP_SCHEDULE_CHANGED,
+            JSONObject().apply {
+                put("mode", mode)
+                dailyHour?.let { put("daily_hour", it) }
+                intervalHours?.let { put("interval_hours", it) }
+            },
+        )
+    }
+
+    override fun trackBackupSyncOnSaveToggled(enabled: Boolean) {
+        sendEvent(
+            EVENT_BACKUP_SYNC_ON_SAVE_TOGGLED,
+            JSONObject().apply {
+                put("enabled", enabled)
+            },
+        )
+    }
+
+    override fun trackBackupSyncFinished(
+        trigger: String,
+        success: Boolean,
+        provider: String,
+        deviceCount: Int,
+    ) {
+        sendEvent(
+            EVENT_BACKUP_SYNC_FINISHED,
+            JSONObject().apply {
+                put("trigger", trigger)
+                put("success", success)
+                put("provider", provider)
+                put("device_count", deviceCount)
+            },
+        )
+    }
+
+    private fun dayName(isoDay: Int): String =
+        ISO_DAY_NAMES.getOrElse(isoDay - 1) { "unknown" }
+
+    private companion object {
+        // Locale-independent so dashboards aggregate the same value regardless of the device language.
+        val ISO_DAY_NAMES = listOf(
+            "MONDAY",
+            "TUESDAY",
+            "WEDNESDAY",
+            "THURSDAY",
+            "FRIDAY",
+            "SATURDAY",
+            "SUNDAY",
+        )
     }
 }
