@@ -155,7 +155,8 @@ private fun DayButton(
 }
 
 private fun dayNarrowLabel(isoDay: Int): String =
-    DayOfWeek.of(isoDay).getDisplayName(TextStyle.NARROW, Locale.getDefault())
+    DayOfWeek.of(isoDay)
+        .getDisplayName(TextStyle.SHORT_STANDALONE, Locale.getDefault())
 
 @Preview(showBackground = true)
 @Composable
