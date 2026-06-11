@@ -583,56 +583,54 @@ internal fun SettingsContent(
                 AgeSettingsSection()
             }
 
-            if (FeatureFlags.cloudBackupEnabled) {
-                item {
-                    var showProviderPickerSheet by rememberSaveable { mutableStateOf(false) }
-                    var showDisconnectBackupDialog by rememberSaveable { mutableStateOf(false) }
-                    var showRestoreBackupDialog by rememberSaveable { mutableStateOf(false) }
+            item {
+                var showProviderPickerSheet by rememberSaveable { mutableStateOf(false) }
+                var showDisconnectBackupDialog by rememberSaveable { mutableStateOf(false) }
+                var showRestoreBackupDialog by rememberSaveable { mutableStateOf(false) }
 
-                    BackupSettingsSection(
-                        state = state.backupUiState,
-                        onConnect = { showProviderPickerSheet = true },
-                        onSyncNow = onSyncNow,
-                        onRestore = { showRestoreBackupDialog = true },
-                        onDisconnect = { showDisconnectBackupDialog = true },
-                        onSyncOnSaveToggled = onSyncOnSaveToggled,
-                        onResolveConflict = onResolveConflict,
-                        onResolveCorruption = onResolveCorruption,
-                        onResolveInitialSync = onResolveInitialSync,
-                        onDismissInitialSync = onDismissInitialSync,
-                        onAutoBackupHourChanged = onAutoBackupHourChanged,
-                        onBackupIntervalChanged = onBackupIntervalChanged,
+                BackupSettingsSection(
+                    state = state.backupUiState,
+                    onConnect = { showProviderPickerSheet = true },
+                    onSyncNow = onSyncNow,
+                    onRestore = { showRestoreBackupDialog = true },
+                    onDisconnect = { showDisconnectBackupDialog = true },
+                    onSyncOnSaveToggled = onSyncOnSaveToggled,
+                    onResolveConflict = onResolveConflict,
+                    onResolveCorruption = onResolveCorruption,
+                    onResolveInitialSync = onResolveInitialSync,
+                    onDismissInitialSync = onDismissInitialSync,
+                    onAutoBackupHourChanged = onAutoBackupHourChanged,
+                    onBackupIntervalChanged = onBackupIntervalChanged,
+                )
+
+                if (showProviderPickerSheet) {
+                    ProviderPickerSheet(
+                        onProviderSelected = { provider ->
+                            showProviderPickerSheet = false
+                            onConnectBackup(provider)
+                        },
+                        onDismiss = { showProviderPickerSheet = false },
                     )
+                }
 
-                    if (showProviderPickerSheet) {
-                        ProviderPickerSheet(
-                            onProviderSelected = { provider ->
-                                showProviderPickerSheet = false
-                                onConnectBackup(provider)
-                            },
-                            onDismiss = { showProviderPickerSheet = false },
-                        )
-                    }
+                if (showDisconnectBackupDialog) {
+                    DisconnectBackupDialog(
+                        onDismiss = { showDisconnectBackupDialog = false },
+                        onConfirm = {
+                            showDisconnectBackupDialog = false
+                            onDisconnectBackupTap()
+                        },
+                    )
+                }
 
-                    if (showDisconnectBackupDialog) {
-                        DisconnectBackupDialog(
-                            onDismiss = { showDisconnectBackupDialog = false },
-                            onConfirm = {
-                                showDisconnectBackupDialog = false
-                                onDisconnectBackupTap()
-                            },
-                        )
-                    }
-
-                    if (showRestoreBackupDialog) {
-                        RestoreBackupDialog(
-                            onDismiss = { showRestoreBackupDialog = false },
-                            onConfirm = {
-                                showRestoreBackupDialog = false
-                                onRestoreBackupTap()
-                            },
-                        )
-                    }
+                if (showRestoreBackupDialog) {
+                    RestoreBackupDialog(
+                        onDismiss = { showRestoreBackupDialog = false },
+                        onConfirm = {
+                            showRestoreBackupDialog = false
+                            onRestoreBackupTap()
+                        },
+                    )
                 }
             }
 
