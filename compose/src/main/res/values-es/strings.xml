@@ -794,9 +794,9 @@
     <string name="age_option_18_plus">18 o más</string>
     <string name="age_range_not_set">Sin definir</string>
     <string name="age_settings_section_title">Edad</string>
-    <string name="age_settings_row_label">Rango de edad (para anuncios adecuados)</string>
+    <string name="age_settings_row_label">Rango de edad</string>
     <string name="age_settings_source_play">Definido por Google Play</string>
-    <string name="age_settings_source_declared">Lo definiste tú · toca para cambiar</string>
+    <string name="age_settings_source_declared">Definido por el usuario</string>
     <string name="age_settings_source_unset">Toca para definir</string>
     <string name="age_settings_dialog_description">Se usa solo para mostrar anuncios adecuados para tu edad y cumplir con la ley. Nunca se comparte, se envía a nuestros servidores ni se usa para análisis: se queda en este dispositivo.</string>
 
