@@ -870,6 +870,78 @@ object DwIcons {
         }.build()
     }
 
+    val IdCard: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "DwIdCard",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 32f,
+            viewportHeight = 32f,
+        ).apply {
+            // Card body — 10 % fill so the tint colour shows as a subtle glow
+            path(
+                fill = SolidColor(Color.Black),
+                fillAlpha = 0.10f,
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2.2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round,
+            ) {
+                moveTo(7f, 7f)
+                horizontalLineTo(25f)
+                arcToRelative(4f, 4f, 0f, false, true, 4f, 4f)
+                verticalLineTo(21f)
+                arcToRelative(4f, 4f, 0f, false, true, -4f, 4f)
+                horizontalLineTo(7f)
+                arcToRelative(4f, 4f, 0f, false, true, -4f, -4f)
+                verticalLineTo(11f)
+                arcToRelative(4f, 4f, 0f, false, true, 4f, -4f)
+                close()
+            }
+            // Person head
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2.2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round,
+            ) {
+                moveTo(8.4f, 14f)
+                arcToRelative(2.4f, 2.4f, 0f, true, true, 4.8f, 0f)
+                arcToRelative(2.4f, 2.4f, 0f, true, true, -4.8f, 0f)
+                close()
+            }
+            // Person shoulders
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2.2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeLineJoin = StrokeJoin.Round,
+            ) {
+                moveTo(7f, 21.5f)
+                curveTo(7f, 18.8f, 8.7f, 17.6f, 10.8f, 17.6f)
+                curveTo(12.9f, 17.6f, 14.6f, 18.8f, 14.6f, 21.5f)
+            }
+            // Detail lines
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2.2f,
+                strokeLineCap = StrokeCap.Round,
+            ) {
+                moveTo(18.5f, 13f)
+                horizontalLineTo(25f)
+            }
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2.2f,
+                strokeLineCap = StrokeCap.Round,
+                strokeAlpha = 0.55f,
+            ) {
+                moveTo(18.5f, 18f)
+                horizontalLineTo(22.5f)
+            }
+        }.build()
+    }
+
     val PulseHeart: ImageVector by lazy {
         ImageVector.Builder(
             name = "DwPulseHeart",

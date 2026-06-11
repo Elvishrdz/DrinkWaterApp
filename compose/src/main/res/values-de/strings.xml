@@ -784,7 +784,8 @@
 
     <!-- Age signals / compliance -->
     <string name="age_collection_title">Wähle deine Altersgruppe</string>
-    <string name="age_collection_description">Wir fragen danach nur, um altersbezogene Gesetze einzuhalten und dir altersgerechte Werbung anzuzeigen. Es ändert sonst nichts in der App. Deine Auswahl wird nie für Analysen verwendet oder an unsere Server gesendet – sie bleibt auf diesem Gerät und du kannst sie jederzeit in den Einstellungen ändern.</string>
+    <string name="age_collection_description">Wir fragen danach nur, um altersbezogene Gesetze einzuhalten und dir altersgerechte Werbung anzuzeigen. Es ändert sonst nichts in der App.</string>
+    <string name="age_collection_privacy_note">Deine Auswahl wird nie für Analysen verwendet oder an unsere Server gesendet, sie bleibt auf diesem Gerät und du kannst sie jederzeit in den Einstellungen ändern.</string>
     <string name="age_collection_continue">Weiter</string>
     <string name="age_option_under_13">Unter 13</string>
     <string name="age_option_13_17">13 bis 17</string>
