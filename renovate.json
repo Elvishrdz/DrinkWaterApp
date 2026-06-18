@@ -14,54 +14,52 @@
   "packageRules": [
     {
       "description": "Kotlin, KSP, and Compose Compiler must stay compatible — update together",
-      "matchPackagePatterns": [
-        "^org\\.jetbrains\\.kotlin"
-      ],
       "matchPackageNames": [
+        "/^org\\.jetbrains\\.kotlin/",
         "com.google.devtools.ksp"
       ],
       "groupName": "Kotlin & KSP"
     },
     {
       "description": "Android Gradle Plugin",
-      "matchPackagePatterns": [
-        "^com\\.android\\.tools\\.build:gradle"
+      "matchPackageNames": [
+        "/^com\\.android\\.tools\\.build:gradle/"
       ],
       "groupName": "Android Gradle Plugin"
     },
     {
       "description": "Room — all three version refs must stay in sync",
-      "matchPackagePatterns": [
-        "^androidx\\.room"
+      "matchPackageNames": [
+        "/^androidx\\.room/"
       ],
       "groupName": "Room"
     },
     {
       "description": "AndroidX Lifecycle / ViewModel",
-      "matchPackagePatterns": [
-        "^androidx\\.lifecycle"
+      "matchPackageNames": [
+        "/^androidx\\.lifecycle/"
       ],
       "groupName": "AndroidX Lifecycle"
     },
     {
       "description": "AndroidX DataStore",
-      "matchPackagePatterns": [
-        "^androidx\\.datastore"
+      "matchPackageNames": [
+        "/^androidx\\.datastore/"
       ],
       "groupName": "AndroidX DataStore"
     },
     {
       "description": "Koin dependency injection",
-      "matchPackagePatterns": [
-        "^io\\.insert-koin"
+      "matchPackageNames": [
+        "/^io\\.insert-koin/"
       ],
       "groupName": "Koin"
     },
     {
       "description": "Firebase and Google Services",
-      "matchPackagePatterns": [
-        "^com\\.google\\.firebase",
-        "^com\\.google\\.gms"
+      "matchPackageNames": [
+        "/^com\\.google\\.firebase/",
+        "/^com\\.google\\.gms/"
       ],
       "groupName": "Firebase & Google Services"
     },
