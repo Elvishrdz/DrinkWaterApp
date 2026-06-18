@@ -2,7 +2,7 @@
 androidCompileSdk = "37"
 androidMinSdk = "24"
 androidTargetSdk = "37"
-androidVersionCode = "29"
+androidVersionCode = "30"
 androidVersionName = "2.1.0-alpha03"
 composeBom = "2025.12.00"
 activityCompose = "1.13.0"
