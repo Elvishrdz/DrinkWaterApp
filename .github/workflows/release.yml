@@ -51,7 +51,7 @@ jobs:
       # when the test step above fails.
       - name: Upload unit test results
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: release-unit-test-results
           path: |
