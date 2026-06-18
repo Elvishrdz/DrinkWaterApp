@@ -29,7 +29,6 @@ internal fun AgeCollectionRoot(
     AgeCollectionScreen(onContinue = viewModel::submitSelection)
 }
 
-@Suppress("Indentation")
 @Composable
 internal fun AgeCollectionScreen(
     onContinue: (AgeBracketOption) -> Unit,

@@ -160,7 +160,6 @@ private fun LabelValue(label: String, value: String) {
     Text(text = "$label: $value")
 }
 
-@Suppress("Indentation")
 private fun AgeSignals?.describe(): String = this?.let {
     "treatment=${it.adTreatment}, source=${it.source}, status=${it.status}, " +
             "age=${it.ageLower}..${it.ageUpper}"

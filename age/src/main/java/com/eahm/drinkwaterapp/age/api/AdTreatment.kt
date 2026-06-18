@@ -46,7 +46,6 @@ enum class AdTreatment {
         private const val CHILD_MAX_AGE = 13
         private const val ADULT_MIN_AGE = 18
 
-        @Suppress("Indentation")
         private val AgeStatus.isSupervisedMinor: Boolean
             get() = this == AgeStatus.SUPERVISED ||
                     this == AgeStatus.SUPERVISED_APPROVAL_PENDING ||

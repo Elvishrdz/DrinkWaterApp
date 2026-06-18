@@ -23,7 +23,6 @@ internal class AgeRepositoryImpl(
     private val _needsAgeCollection = MutableStateFlow(false)
     override val needsAgeCollection: StateFlow<Boolean> = _needsAgeCollection.asStateFlow()
 
-    @Suppress("Indentation")
     override suspend fun refresh() {
         // Apply any cached value immediately so ads get a treatment before the async call returns.
         val stored = preferences.getAgeSignals()

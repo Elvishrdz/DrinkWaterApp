@@ -174,7 +174,6 @@ internal class SettingsViewModel(
         val failure = status.lastOutcome as? BackupSyncStatus.Outcome.Failure
             ?: return BackupStatusMessage.NONE
 
-        @Suppress("Indentation")
         val onSaveRetry = failure.trigger == SyncTrigger.ON_SAVE &&
                 failure.disposition != SyncDisposition.FAILED
 

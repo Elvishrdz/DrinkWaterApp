@@ -31,7 +31,6 @@ internal object AgeSignalsMapper {
     }
 
     /** Maps a failed [com.google.android.gms.tasks.Task] exception into a typed [AgeError]. */
-    @Suppress("Indentation")
     fun toError(throwable: Throwable): AgeError {
         val code = (throwable as? AgeSignalsException)?.errorCode ?: return AgeError.UNKNOWN
         return when (code) {

@@ -59,7 +59,6 @@ class MainViewModel(
         updateState()
     }
 
-    @Suppress("Indentation")
     private fun updateState() {
         viewModelScope.launch {
             val trackingDecided = prefsStorage.getTrackingConsentDecided().firstOrNull() ?: false

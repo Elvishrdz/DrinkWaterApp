@@ -276,7 +276,6 @@ internal class DrinkViewModel(
             // aggregate) means background backup writes and lowering the goal never fire it.
             val statsBefore = drinkStatsObserver.drinkStats.first()
 
-            @Suppress("Indentation")
             val crossedGoal = statsBefore.goalAmount > 0f &&
                     statsBefore.drinkAmount < statsBefore.goalAmount &&
                     (statsBefore.drinkAmount + amount) >= statsBefore.goalAmount
