@@ -8,6 +8,7 @@ import com.dropbox.core.DbxRequestConfig
 import com.dropbox.core.android.Auth
 import com.dropbox.core.oauth.DbxCredential
 import com.dropbox.core.v2.DbxClientV2
+import com.dropbox.core.v2.files.UploadErrorException
 import com.dropbox.core.v2.files.WriteMode
 import com.eahm.drinkwaterapp.backup.BuildConfig
 import com.eahm.drinkwaterapp.backup.domain.CloudBackupProvider
@@ -132,10 +133,23 @@ class DropboxBackupProvider(
         }
         BackupResult.Success(Unit)
     }.getOrElse { e ->
-        val msg = e.message ?: ""
-        if (msg.contains("quota", ignoreCase = true) || msg.contains("storage", ignoreCase = true))
-            BackupResult.Failure(BackupError.QuotaExceeded())
-        else BackupResult.Failure(BackupError.UploadFailed(e))
+        if (isInsufficientSpace(e)) {
+            val fileSize = data.toByteArray(Charsets.UTF_8).size.toLong()
+            BackupResult.Failure(BackupError.QuotaExceeded(fileSize))
+        } else {
+            BackupResult.Failure(BackupError.UploadFailed(e))
+        }
+    }
+
+    /**
+     * True when an upload failed because the user's Dropbox is full. The SDK reports
+     * this as an [UploadErrorException] whose path write error is `insufficient_space`,
+     * which doesn't contain the words "quota"/"storage", so it can't be matched by text.
+     */
+    private fun isInsufficientSpace(e: Throwable): Boolean {
+        val error = (e as? UploadErrorException)?.errorValue ?: return false
+        return error.isPath &&
+                error.pathValue?.reason?.isInsufficientSpace == true
     }
 
     override suspend fun download(): BackupResult<BackupFile> = runCatching {

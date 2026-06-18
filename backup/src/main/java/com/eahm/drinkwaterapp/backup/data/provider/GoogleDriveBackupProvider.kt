@@ -47,6 +47,10 @@ private const val BACKUP_FILE_NAME = "drinkwater_backup.json"
 private const val DRIVE_BASE = "https://www.googleapis.com"
 private const val USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo"
 
+private val QUOTA_REASONS = setOf(
+    "storageQuotaExceeded",
+)
+
 /**
  * Google Drive backup using the Google Identity Services **Authorization** API
  * ([Identity.getAuthorizationClient])
@@ -263,8 +267,14 @@ class GoogleDriveBackupProvider(
         if (response.status.isSuccess()) {
             BackupResult.Success(Unit)
         } else {
-            Log.e(TAG, "upload failed: ${response.status} -> ${response.bodyAsText()}")
-            BackupResult.Failure(BackupError.UploadFailed())
+            val body = response.bodyAsText()
+            Log.e(TAG, "upload failed: ${response.status} -> $body")
+            if (isQuotaError(response.status, body)) {
+                val fileSize = data.toByteArray(Charsets.UTF_8).size.toLong()
+                BackupResult.Failure(BackupError.QuotaExceeded(fileSize))
+            } else {
+                BackupResult.Failure(BackupError.UploadFailed())
+            }
         }
 
     }.getOrElse { e ->
@@ -272,6 +282,23 @@ class GoogleDriveBackupProvider(
             BackupResult.Failure(BackupError.QuotaExceeded())
         else
             BackupResult.Failure(BackupError.UploadFailed(e))
+    }
+
+    /**
+     * Detects whether a failed Drive response is caused by the user's storage being
+     * full. Drive signals this with HTTP 403 and an `error.errors[].reason` of
+     * `storageQuotaExceeded` (or a quota-related variant) — not a thrown exception,
+     * so the response body must be inspected explicitly.
+     */
+    private fun isQuotaError(status: HttpStatusCode, body: String): Boolean {
+        if (status != HttpStatusCode.Forbidden) return false
+        val reasons = runCatching {
+            json.parseToJsonElement(body).jsonObject["error"]?.jsonObject
+                ?.get("errors")?.jsonArray
+                ?.mapNotNull { it.jsonObject["reason"]?.jsonPrimitive?.content }
+                .orEmpty()
+        }.getOrDefault(emptyList())
+        return reasons.any { it in QUOTA_REASONS }
     }
 
     override suspend fun download(): BackupResult<BackupFile> = runCatching {
