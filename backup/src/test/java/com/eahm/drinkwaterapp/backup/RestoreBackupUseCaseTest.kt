@@ -21,9 +21,8 @@ class RestoreBackupUseCaseTest {
 
     private fun metadataWithSchema(schema: Int) = BackupMetadata(
         schemaVersion = schema,
-        appVersion = "1.0",
         createdAt = 0L,
-        deviceId = "test",
+        lastUpdatedAt = 0L,
     )
 
     @Test

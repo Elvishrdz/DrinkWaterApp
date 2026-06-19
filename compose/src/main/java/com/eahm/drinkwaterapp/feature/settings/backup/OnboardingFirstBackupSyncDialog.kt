@@ -85,12 +85,22 @@ private fun DialogContent(
             color = MaterialTheme.colorScheme.onBackground,
         )
 
-        val createdAt = remote.metadata.createdAt.takeIf { it > 0L }?.let {
-            SimpleDateFormat("MMM d, yyyy HH:mm", Locale.getDefault()).format(Date(it))
-        }
+        // Freshness (last update) is the useful signal here; fall back to created_at for older
+        // files that predate the last_updated_at field.
+        val lastUpdatedValue = remote.metadata.lastUpdatedAt.takeIf { it > 0L }
+            ?: remote.metadata.createdAt
 
-        val body = if (createdAt != null) {
-            stringResource(R.string.backup_onb_initial_sync_body_dated, createdAt)
+        val lastUpdated = lastUpdatedValue
+            .takeIf { it > 0L }
+            ?.let {
+                SimpleDateFormat(
+                    "MMM d, yyyy HH:mm",
+                    Locale.getDefault()
+                ).format(Date(it))
+            }
+
+        val body = if (lastUpdated != null) {
+            stringResource(R.string.backup_onb_initial_sync_body_dated, lastUpdated)
         } else {
             stringResource(R.string.backup_onb_initial_sync_body)
         }
@@ -125,10 +135,9 @@ private fun DialogContentPreview() {
         DialogContent(
             remote = ExistingRemoteBackup(
                 BackupMetadata(
-                    schemaVersion = 2,
-                    appVersion = "1.0.0",
+                    schemaVersion = 3,
                     createdAt = 1_700_000_000_000L,
-                    deviceId = "pixel-8",
+                    lastUpdatedAt = 1_700_000_500_000L,
                 ),
             ),
             onUseRemote = {},

@@ -19,7 +19,7 @@ class MergeEngineTest {
     private val now = System.currentTimeMillis()
 
     private fun emptyPrefs(updatedAt: Long = 0L) = PreferencesRecord(
-        unitPreference = "ML", timeFormat = "SYSTEM", amountPerDrink = 250f, updatedAt = updatedAt
+        unitPreference = "ML", amountPerDrink = 250f, updatedAt = updatedAt
     )
 
     private fun historyRecord(
@@ -140,7 +140,12 @@ class MergeEngineTest {
         val local = BackupData(emptyList(), emptyList(), emptyPrefs())
         val remote = BackupData(
             history = listOf(
-                historyRecord("a", deviceId = remoteDeviceId, updatedAt = now - 100_000, deletedAt = now - 100_000)
+                historyRecord(
+                    "a",
+                    deviceId = remoteDeviceId,
+                    updatedAt = now - 100_000,
+                    deletedAt = now - 100_000
+                )
             ),
             dailyGoals = emptyList(), preferences = emptyPrefs()
         )
@@ -168,12 +173,25 @@ class MergeEngineTest {
     @Test
     fun `local tombstone within retention beats re-introduced remote live record (Rule 4)`() {
         val local = BackupData(
-            history = listOf(historyRecord("a", updatedAt = now - 10_000, deletedAt = now - 10_000)),
+            history = listOf(
+                historyRecord(
+                    "a",
+                    updatedAt = now - 10_000,
+                    deletedAt = now - 10_000
+                )
+            ),
             dailyGoals = emptyList(), preferences = emptyPrefs()
         )
         val remote = BackupData(
             // Remote live with NEWER updatedAt — a stale device re-introducing a deleted record.
-            history = listOf(historyRecord("a", deviceId = remoteDeviceId, updatedAt = now, deletedAt = null)),
+            history = listOf(
+                historyRecord(
+                    "a",
+                    deviceId = remoteDeviceId,
+                    updatedAt = now,
+                    deletedAt = null
+                )
+            ),
             dailyGoals = emptyList(), preferences = emptyPrefs()
         )
         val result = engine.merge(local, remote, localDeviceId, expiryThreshold = now - 60_000)
@@ -185,11 +203,24 @@ class MergeEngineTest {
     @Test
     fun `expired local tombstone does not force-win over newer remote live record`() {
         val local = BackupData(
-            history = listOf(historyRecord("a", updatedAt = now - 100_000, deletedAt = now - 100_000)),
+            history = listOf(
+                historyRecord(
+                    "a",
+                    updatedAt = now - 100_000,
+                    deletedAt = now - 100_000
+                )
+            ),
             dailyGoals = emptyList(), preferences = emptyPrefs()
         )
         val remote = BackupData(
-            history = listOf(historyRecord("a", deviceId = remoteDeviceId, updatedAt = now, deletedAt = null)),
+            history = listOf(
+                historyRecord(
+                    "a",
+                    deviceId = remoteDeviceId,
+                    updatedAt = now,
+                    deletedAt = null
+                )
+            ),
             dailyGoals = emptyList(), preferences = emptyPrefs()
         )
         // Tombstone deletedAt (now-100k) < expiry (now-50k) → not active → falls through to updatedAt.
@@ -268,8 +299,8 @@ class MergeEngineTest {
 
     @Test
     fun `preferences conflict within 5 minutes is flagged`() {
-        val localPrefs = PreferencesRecord("ML", "SYSTEM", 250f, updatedAt = now)
-        val remotePrefs = PreferencesRecord("FL_OZ", "12H", 8f, updatedAt = now - 120_000)
+        val localPrefs = PreferencesRecord("ML", 250f, updatedAt = now)
+        val remotePrefs = PreferencesRecord("FL_OZ", 8f, updatedAt = now - 120_000)
         val local =
             BackupData(history = emptyList(), dailyGoals = emptyList(), preferences = localPrefs)
         val remote =
@@ -283,8 +314,8 @@ class MergeEngineTest {
 
     @Test
     fun `preferences remote newer within 5 minutes triggers conflict`() {
-        val localPrefs = PreferencesRecord("ML", "SYSTEM", 250f, updatedAt = now - 120_000)
-        val remotePrefs = PreferencesRecord("FL_OZ", "12H", 8f, updatedAt = now)
+        val localPrefs = PreferencesRecord("ML", 250f, updatedAt = now - 120_000)
+        val remotePrefs = PreferencesRecord("FL_OZ", 8f, updatedAt = now)
         val local =
             BackupData(history = emptyList(), dailyGoals = emptyList(), preferences = localPrefs)
         val remote =
@@ -297,8 +328,8 @@ class MergeEngineTest {
 
     @Test
     fun `preferences remote newer outside 5 minutes is silent auto-resolve`() {
-        val localPrefs = PreferencesRecord("ML", "SYSTEM", 250f, updatedAt = now - 600_000)
-        val remotePrefs = PreferencesRecord("FL_OZ", "12H", 8f, updatedAt = now)
+        val localPrefs = PreferencesRecord("ML", 250f, updatedAt = now - 600_000)
+        val remotePrefs = PreferencesRecord("FL_OZ", 8f, updatedAt = now)
         val local =
             BackupData(history = emptyList(), dailyGoals = emptyList(), preferences = localPrefs)
         val remote =

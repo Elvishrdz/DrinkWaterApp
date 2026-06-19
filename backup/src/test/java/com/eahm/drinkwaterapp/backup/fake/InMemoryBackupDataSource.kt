@@ -37,9 +37,9 @@ class InMemoryBackupDataSource(
     var writeCallCount = 0
     var serializeCallCount = 0
 
-    override suspend fun serialize(): String {
+    override suspend fun serialize(createdAt: Long?): String {
         serializeCallCount++
-        return Json.encodeToString(JsonObject.serializer(), envelope(local))
+        return Json.encodeToString(JsonObject.serializer(), envelope(local, createdAt))
     }
 
     override suspend fun deserializeAndImport(data: JsonObject): BackupResult<Unit> {
@@ -85,11 +85,20 @@ class InMemoryBackupDataSource(
 
     // ── JSON envelope helpers (mirror the production field names) ──────────────────────────
 
-    private fun envelope(data: BackupData): JsonObject = buildJsonObject {
+    private fun envelope(data: BackupData, createdAt: Long?): JsonObject = buildJsonObject {
         put(
             "metadata",
             buildJsonObject {
                 put("schema_version", BackupMigrationManager.currentSchema)
+                // Mirror production: preserve a passed-in created_at, else stamp "now".
+                put("created_at", createdAt ?: System.currentTimeMillis())
+                put("last_updated_at", System.currentTimeMillis())
+            },
+        )
+        // Schema v3: the uploading device's id lives in last_upload_data, not metadata.
+        put(
+            "last_upload_data",
+            buildJsonObject {
                 put("device_id", data.preferences.deviceId)
             },
         )
@@ -136,7 +145,6 @@ class InMemoryBackupDataSource(
             "preferences",
             buildJsonObject {
                 put("unit_preference", data.preferences.unitPreference)
-                put("time_format_preference", data.preferences.timeFormat)
                 put("amount_per_drink", data.preferences.amountPerDrink)
                 put("device_id", data.preferences.deviceId)
                 put("updated_at", data.preferences.updatedAt)
@@ -172,7 +180,6 @@ class InMemoryBackupDataSource(
         val p = dataBlock["preferences"]?.jsonObject
         val prefs = PreferencesRecord(
             unitPreference = p?.get("unit_preference")?.jsonPrimitive?.content ?: "ML",
-            timeFormat = p?.get("time_format_preference")?.jsonPrimitive?.content ?: "SYSTEM",
             amountPerDrink = p?.get("amount_per_drink")?.jsonPrimitive?.double?.toFloat() ?: 250f,
             deviceId = p?.get("device_id")?.jsonPrimitive?.content ?: "",
             updatedAt = p?.get("updated_at")?.jsonPrimitive?.longOrNull ?: 0L,
@@ -186,7 +193,7 @@ class InMemoryBackupDataSource(
             .joinToString("|") { "${it.id},${it.amount},${it.status},${it.timestamp},${it.deletedAt}" }
         val g = data.dailyGoals.sortedBy { it.id }
             .joinToString("|") { "${it.id},${it.effectiveDate},${it.goalMl},${it.deletedAt}" }
-        val p = with(data.preferences) { "$unitPreference,$timeFormat,$amountPerDrink" }
+        val p = with(data.preferences) { "$unitPreference,$amountPerDrink" }
         return "$h#$g#$p"
     }
 
@@ -194,7 +201,7 @@ class InMemoryBackupDataSource(
         fun emptyBackup(): BackupData = BackupData(
             history = emptyList(),
             dailyGoals = emptyList(),
-            preferences = PreferencesRecord("ML", "SYSTEM", 250f),
+            preferences = PreferencesRecord("ML", 250f),
         )
     }
 }

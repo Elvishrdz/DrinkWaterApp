@@ -18,6 +18,9 @@ import com.eahm.drinkwaterapp.backup.fake.FakeBackupPreferences
 import com.eahm.drinkwaterapp.backup.fake.InMemoryBackupDataSource
 import com.eahm.drinkwaterapp.backup.fake.InMemoryCloudBackupProvider
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.long
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -59,7 +62,7 @@ class BackupSyncScenarioTest {
     ) = BackupData(
         history = history,
         dailyGoals = goals,
-        preferences = PreferencesRecord("ML", "SYSTEM", 250f, deviceId = deviceId),
+        preferences = PreferencesRecord("ML", 250f, deviceId = deviceId),
     )
 
     private fun buildSync(dataSource: InMemoryBackupDataSource, prefs: FakeBackupPreferences) =
@@ -80,7 +83,7 @@ class BackupSyncScenarioTest {
     }
 
     private suspend fun envelopeOf(data: BackupData): String =
-        InMemoryBackupDataSource(data).serialize()
+        InMemoryBackupDataSource(data).serialize(null)
 
     // 1 ── Clean app (no logs), no remote → first upload of empty data.
     @Test
@@ -180,4 +183,38 @@ class BackupSyncScenarioTest {
         assertEquals(listOf("remote-only"), dataSource.local.history.map { it.id })
         assertNull(dataSource.local.history.firstOrNull { it.id == "local-only" })
     }
+
+    // 7 ── created_at is stamped once on the first upload and then preserved on every
+    //      subsequent upload; only last_updated_at advances.
+    @Test
+    fun `scenario 7 - created_at preserved across uploads while last_updated_at advances`() =
+        runTest {
+            val prefs = prefs()
+            val dataSource = InMemoryBackupDataSource(
+                backup(history = listOf(history("a", "this-device"))),
+            )
+            val provider = InMemoryCloudBackupProvider()
+            val sync = buildSync(dataSource, prefs)
+
+            // First upload (no remote yet) stamps a fresh created_at.
+            assertEquals(SyncResult.Uploaded, (sync(provider) as BackupResult.Success).value)
+            val firstCreatedAt = createdAtOf(provider)
+            val firstUpdatedAt = lastUpdatedOf(provider)
+
+            // Local content changes → a second upload happens, but created_at must survive while
+            // last_updated_at moves forward.
+            dataSource.local = backup(
+                history = listOf(history("a", "this-device"), history("b", "this-device")),
+            )
+            assertEquals(SyncResult.Uploaded, (sync(provider) as BackupResult.Success).value)
+
+            assertEquals(firstCreatedAt, createdAtOf(provider))
+            assertTrue(lastUpdatedOf(provider) >= firstUpdatedAt)
+        }
+
+    private fun createdAtOf(provider: InMemoryCloudBackupProvider): Long =
+        provider.storedEnvelope()!!["metadata"]!!.jsonObject["created_at"]!!.jsonPrimitive.long
+
+    private fun lastUpdatedOf(provider: InMemoryCloudBackupProvider): Long =
+        provider.storedEnvelope()!!["metadata"]!!.jsonObject["last_updated_at"]!!.jsonPrimitive.long
 }

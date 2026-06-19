@@ -169,7 +169,7 @@ private fun PrefsConflictContent(conflict: SyncConflict.PreferencesConflict) {
 }
 
 private fun prefsDescription(prefs: PreferencesRecord): String =
-    "${prefs.unitPreference} · ${prefs.timeFormat} · ${prefs.amountPerDrink.toInt()} ml"
+    "${prefs.unitPreference} · ${prefs.amountPerDrink.toInt()} ml"
 
 @Composable
 private fun ConflictOptionCard(
@@ -226,12 +226,10 @@ private fun SyncConflictSheetPreview_Prefs() {
             conflict = SyncConflict.PreferencesConflict(
                 localPrefs = PreferencesRecord(
                     unitPreference = "ML",
-                    timeFormat = "24h",
                     amountPerDrink = 250f
                 ),
                 remotePrefs = PreferencesRecord(
                     unitPreference = "OZ",
-                    timeFormat = "12h",
                     amountPerDrink = 300f
                 ),
             ),

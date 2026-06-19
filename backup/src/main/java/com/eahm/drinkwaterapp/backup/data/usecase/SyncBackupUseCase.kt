@@ -15,7 +15,9 @@ import com.eahm.drinkwaterapp.backup.domain.model.SeenDevice
 import com.eahm.drinkwaterapp.backup.domain.model.SyncConflict
 import com.eahm.drinkwaterapp.backup.domain.model.SyncResult
 import com.eahm.drinkwaterapp.backup.domain.model.TombstonePolicy
-import java.security.MessageDigest
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
 class SyncBackupUseCase(
     private val lock: BackupSyncLock,
@@ -118,19 +120,25 @@ class SyncBackupUseCase(
             val writeResult = dataSource.writeBackupData(mergedData)
             if (writeResult is BackupResult.Failure) return writeResult
 
-            // Step 8: Update seen devices registry with the remote device
-            updateSeenDevices(remoteFile.metadata.deviceId, "")
+            // Step 8: Update seen devices registry with the remote device. As of schema v3 the
+            // uploading device's id lives in the `last_upload_data` node (the v2→v3 migration
+            // moves it there), so read it from the migrated envelope rather than the metadata.
+            val remoteDeviceId = migratedRaw["last_upload_data"]?.jsonObject
+                ?.get("device_id")?.jsonPrimitive?.contentOrNull ?: ""
+            updateSeenDevices(remoteDeviceId, "")
 
-            // Step 9: Serialize merged result and check if upload is needed
-            val serialized = dataSource.serialize()
-            val newHash = sha256(serialized)
-            val storedHash = prefs.getBackupContentHash()
-
-            if (newHash == storedHash && mergeResult.appliedRemoteRecords == 0) {
+            // Step 9: Decide whether an upload is needed by comparing *content* fingerprints
+            // (records + preferences, order-independent, metadata/timestamps excluded). If our
+            // merged content already matches the remote file, there is nothing new to push.
+            val localFingerprint = dataSource.localContentFingerprint()
+            val remoteFingerprint = dataSource.remoteContentFingerprint(migratedRaw)
+            if (localFingerprint == remoteFingerprint) {
+                prefs.setBackupContentHash(localFingerprint)
                 return BackupResult.Success(SyncResult.SkippedNoChanges)
             }
 
-            // Step 10: Upload
+            // Step 10: Serialize (preserving the existing file's created_at) and upload
+            val serialized = dataSource.serialize(createdAt = remoteFile.metadata.createdAt)
             val uploadResult = provider.upload(serialized)
             if (uploadResult is BackupResult.Failure) {
                 prefs.setBackupLastError(uploadResult.error.javaClass.simpleName)
@@ -138,7 +146,7 @@ class SyncBackupUseCase(
             }
 
             val now = System.currentTimeMillis()
-            prefs.setBackupContentHash(newHash)
+            prefs.setBackupContentHash(localFingerprint)
             prefs.setBackupLastSyncAt(now)
             prefs.setLastRemoteSyncAt(now)
             prefs.setBackupLastError(null)
@@ -195,19 +203,21 @@ class SyncBackupUseCase(
         deviceId: String,
         force: Boolean = false,
     ): BackupResult<SyncResult> {
-        val serialized = dataSource.serialize()
-        val newHash = sha256(serialized)
+        val localFingerprint = dataSource.localContentFingerprint()
         val storedHash = prefs.getBackupContentHash()
 
-        if (!force && newHash == storedHash) {
+        if (!force && localFingerprint == storedHash) {
             return BackupResult.Success(SyncResult.SkippedNoChanges)
         }
 
+        // No existing remote file (first upload) or we're deliberately replacing it → stamp a
+        // fresh created_at by passing null.
+        val serialized = dataSource.serialize(createdAt = null)
         val uploadResult = provider.upload(serialized)
 
         return if (uploadResult is BackupResult.Success) {
             val now = System.currentTimeMillis()
-            prefs.setBackupContentHash(newHash)
+            prefs.setBackupContentHash(localFingerprint)
             prefs.setBackupLastSyncAt(now)
             prefs.setLastRemoteSyncAt(now)
             prefs.setBackupLastError(null)
@@ -234,11 +244,5 @@ class SyncBackupUseCase(
         )
         if (idx >= 0) existing[idx] = updated else existing.add(updated)
         prefs.setSeenDevices(existing)
-    }
-
-    private fun sha256(input: String): String {
-        val digest = MessageDigest.getInstance("SHA-256")
-        val bytes = digest.digest(input.toByteArray(Charsets.UTF_8))
-        return bytes.joinToString("") { "%02x".format(it) }
     }
 }

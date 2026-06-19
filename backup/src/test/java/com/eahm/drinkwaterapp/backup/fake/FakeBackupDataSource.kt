@@ -13,7 +13,7 @@ class FakeBackupDataSource(
     var serializeCallCount = 0
     var lastImported: JsonObject? = null
 
-    override suspend fun serialize(): String {
+    override suspend fun serialize(createdAt: Long?): String {
         serializeCallCount++
         return serialized
     }
@@ -34,7 +34,7 @@ class FakeBackupDataSource(
         BackupData(
             history = emptyList(),
             dailyGoals = emptyList(),
-            preferences = PreferencesRecord("ML", "SYSTEM", 250f),
+            preferences = PreferencesRecord("ML", 250f),
         )
 
     override suspend fun parseRemoteData(raw: JsonObject): BackupData? = null

@@ -49,7 +49,7 @@ class MergeEngine {
                 // Rule 4: a still-valid local tombstone beats a re-introduced remote live
                 // record (a stale device that never saw the deletion), within retention.
                 val localIsActiveTombstone = localRecord.deletedAt != null &&
-                    localRecord.deletedAt >= expiryThreshold
+                        localRecord.deletedAt >= expiryThreshold
                 if (localIsActiveTombstone && remoteRecord.deletedAt == null) {
                     continue
                 }
@@ -101,7 +101,6 @@ class MergeEngine {
 
         val prefsDelta = abs(localPrefs.updatedAt - remotePrefs.updatedAt)
         val prefsAreDifferent = localPrefs.unitPreference != remotePrefs.unitPreference ||
-                localPrefs.timeFormat != remotePrefs.timeFormat ||
                 localPrefs.amountPerDrink != remotePrefs.amountPerDrink
 
         if (localPrefs.updatedAt >= remotePrefs.updatedAt) {

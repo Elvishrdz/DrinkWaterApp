@@ -702,7 +702,7 @@
     <!-- Backup — First-connection choice when a remote backup already exists -->
     <string name="backup_initial_sync_title">Copia de seguridad existente</string>
     <string name="backup_initial_sync_body">Esta cuenta ya tiene una copia de seguridad. Elige si restaurarla en este dispositivo o reemplazarla con los datos de este dispositivo. Esta acción no se puede deshacer.</string>
-    <string name="backup_initial_sync_body_dated">Esta cuenta ya tiene una copia de seguridad del %1$s. Elige si restaurarla en este dispositivo o reemplazarla con los datos de este dispositivo. Esta acción no se puede deshacer.</string>
+    <string name="backup_initial_sync_body_dated">Esta cuenta ya tiene una copia de seguridad, actualizada por última vez el %1$s. Elige si restaurarla en este dispositivo o reemplazarla con los datos de este dispositivo. Esta acción no se puede deshacer.</string>
     <string name="backup_initial_sync_merge">Combinar datos locales y de la nube</string>
     <string name="backup_initial_sync_use_remote">Usar copia remota (reemplazar este dispositivo)</string>
     <string name="backup_initial_sync_upload_local">Subir este dispositivo (reemplazar copia)</string>
@@ -750,7 +750,7 @@
     <string name="backup_onb_continue">Continuar</string>
     <string name="backup_onb_continue_onboarding">Continuar configuración</string>
     <string name="backup_onb_skip_configured">Omitir pasos configurados</string>
-    <string name="backup_onb_initial_sync_body_dated">Se encontró una copia de seguridad del %1$s en esta cuenta. Elige cómo continuar.</string>
+    <string name="backup_onb_initial_sync_body_dated">Se encontró una copia de seguridad en esta cuenta, actualizada por última vez el %1$s. Elige cómo continuar.</string>
     <string name="backup_onb_initial_sync_body">Se encontró una copia de seguridad en esta cuenta. Elige cómo continuar.</string>
 
     <!-- Sync UI — Fase 5 -->

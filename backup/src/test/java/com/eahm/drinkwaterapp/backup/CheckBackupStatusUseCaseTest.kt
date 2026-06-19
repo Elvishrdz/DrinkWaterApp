@@ -18,9 +18,8 @@ class CheckBackupStatusUseCaseTest {
 
     private fun metadata(schema: Int = BackupMigrationManager.currentSchema) = BackupMetadata(
         schemaVersion = schema,
-        appVersion = "1.0",
         createdAt = 0L,
-        deviceId = "device",
+        lastUpdatedAt = 0L,
     )
 
     @Test

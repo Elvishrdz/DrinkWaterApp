@@ -12,6 +12,7 @@ import com.eahm.drinkwaterapp.backup.domain.model.HistoryRecord
 import com.eahm.drinkwaterapp.backup.domain.model.PreferencesRecord
 import com.eahm.drinkwaterapp.core.config.AppInfoService
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
+import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.Instant
@@ -20,10 +21,12 @@ import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.double
+import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -39,20 +42,45 @@ class BackupSerializer(
     private val json: Json,
 ) : BackupDataSource {
 
-    override suspend fun serialize(): String {
+    override suspend fun serialize(createdAt: Long?): String {
+        val now = System.currentTimeMillis()
+        // created_at is preserved from the existing remote file (passed in) and only stamped
+        // fresh when creating/replacing a file; last_updated_at always reflects this write.
+        val effectiveCreatedAt = createdAt?.takeIf { it > 0L } ?: now
+
         val metadataJson = buildJsonObject {
             put("schema_version", BackupMigrationManager.currentSchema)
+            put("created_at", effectiveCreatedAt)
+            put("last_updated_at", now)
+        }
+
+        // Details of the device performing this upload. `provider` records where the backup
+        // currently lives (google_drive / dropbox).
+        val lastUploadJson = buildJsonObject {
             put("app_version", appInfo.versionName)
-            put("created_at", System.currentTimeMillis())
             put("device_id", backupPreferences.getDeviceId())
+            put("provider", backupPreferences.getBackupProvider().orEmpty())
         }
 
         val root = buildJsonObject {
             put("metadata", metadataJson)
+            put("last_upload_data", lastUploadJson)
             put("data", buildDataJson())
         }
 
         return json.encodeToString(JsonObject.serializer(), root)
+    }
+
+    /** Builds an `{ "hour": h, "minute": m }` object matching the ActiveTime wire shape. */
+    private fun activeTimeJson(time: ActiveTime): JsonObject = buildJsonObject {
+        put("hour", time.hour)
+        put("minute", time.minute)
+    }
+
+    private fun parseActiveTime(obj: JsonObject): ActiveTime? {
+        val hour = obj["hour"]?.jsonPrimitive?.intOrNull ?: return null
+        val minute = obj["minute"]?.jsonPrimitive?.intOrNull ?: return null
+        return ActiveTime(hour, minute)
     }
 
     /** Builds the data envelope (history + goals + preferences), excluding metadata. */
@@ -106,8 +134,15 @@ class BackupSerializer(
             put("username", prefs.getUsername().first())
             put("amount_per_drink", prefs.getAmountPerDrink().first())
             put("unit_preference", prefs.getUnitPreference().first().name)
-            put("time_format_preference", prefs.getTimeFormatPreference().first().name)
-            put("water_animation_enabled", prefs.getWaterAnimationEnabled().first())
+            // Active hours + notification cadence (time format & water animation are device-local
+            // and intentionally NOT backed up as of schema v3).
+            put("start_time", activeTimeJson(prefs.getStartTime().first()))
+            put("end_time", activeTimeJson(prefs.getEndTime().first()))
+            put("interval", activeTimeJson(prefs.getInterval().first()))
+            put(
+                "active_days",
+                buildJsonArray { prefs.getActiveDays().first().sorted().forEach { add(it) } },
+            )
             put("best_goal_streak", prefs.getBestGoalStreak().first())
             put("best_drink_streak", prefs.getBestDrinkStreak().first())
         }
@@ -186,17 +221,16 @@ class BackupSerializer(
                             com.eahm.drinkwaterapp.core.presentation.UnitPreference.valueOf(name)
                         }.getOrNull()?.let { prefs.setUnitPreference(it) }
                     }
-                prefsObj["time_format_preference"]?.jsonPrimitive?.contentOrNull
-                    ?.let { name ->
-                        runCatching {
-                            com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference.valueOf(
-                                name
-                            )
-                        }.getOrNull()?.let { prefs.setTimeFormatPreference(it) }
-                    }
-                prefsObj["water_animation_enabled"]?.jsonPrimitive?.contentOrNull
-                    ?.toBooleanStrictOrNull()
-                    ?.let { prefs.setWaterAnimationEnabled(it) }
+                prefsObj["start_time"]?.jsonObject?.let { parseActiveTime(it) }
+                    ?.let { prefs.setStartTime(it) }
+                prefsObj["end_time"]?.jsonObject?.let { parseActiveTime(it) }
+                    ?.let { prefs.setEndTime(it) }
+                prefsObj["interval"]?.jsonObject?.let { parseActiveTime(it) }
+                    ?.let { prefs.setInterval(it) }
+                prefsObj["active_days"]?.jsonArray
+                    ?.mapNotNull { it.jsonPrimitive.intOrNull }?.toSet()
+                    ?.takeIf { it.isNotEmpty() }
+                    ?.let { prefs.setActiveDays(it) }
                 prefsObj["best_goal_streak"]?.jsonPrimitive?.contentOrNull?.toIntOrNull()
                     ?.let { prefs.setBestGoalStreak(it) }
                 prefsObj["best_drink_streak"]?.jsonPrimitive?.contentOrNull?.toIntOrNull()
@@ -267,12 +301,10 @@ class BackupSerializer(
         }
 
         val unitPref = prefs.getUnitPreference().first().name
-        val timeFormat = prefs.getTimeFormatPreference().first().name
         val amountPerDrink = prefs.getAmountPerDrink().first()
 
         val prefsRecord = PreferencesRecord(
             unitPreference = unitPref,
-            timeFormat = timeFormat,
             amountPerDrink = amountPerDrink,
             deviceId = deviceId,
             updatedAt = 0L,
@@ -329,8 +361,6 @@ class BackupSerializer(
             val prefsRecord = PreferencesRecord(
                 unitPreference = prefsObj?.get("unit_preference")?.jsonPrimitive?.contentOrNull
                     ?: "ML",
-                timeFormat = prefsObj?.get("time_format_preference")?.jsonPrimitive?.contentOrNull
-                    ?: "SYSTEM",
                 amountPerDrink = prefsObj?.get("amount_per_drink")?.jsonPrimitive?.double?.toFloat()
                     ?: 250f,
                 deviceId = prefsObj?.get("device_id")?.jsonPrimitive?.contentOrNull ?: "",
@@ -384,10 +414,6 @@ class BackupSerializer(
             runCatching {
                 com.eahm.drinkwaterapp.core.presentation.UnitPreference.valueOf(prefsRecord.unitPreference)
             }.getOrNull()?.let { prefs.setUnitPreference(it) }
-
-            runCatching {
-                com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference.valueOf(prefsRecord.timeFormat)
-            }.getOrNull()?.let { prefs.setTimeFormatPreference(it) }
 
             prefs.setAmountPerDrink(prefsRecord.amountPerDrink)
 

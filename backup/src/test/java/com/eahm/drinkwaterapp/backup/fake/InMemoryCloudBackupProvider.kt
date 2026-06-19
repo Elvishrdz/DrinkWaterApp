@@ -13,6 +13,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.longOrNull
 
 /**
  * In-memory cloud: [upload] stores the serialized string and [download] returns it parsed back into
@@ -59,9 +60,8 @@ class InMemoryCloudBackupProvider(
         val meta = root["metadata"]?.jsonObject
         val metadata = BackupMetadata(
             schemaVersion = meta?.get("schema_version")?.jsonPrimitive?.int ?: 1,
-            appVersion = meta?.get("app_version")?.jsonPrimitive?.content ?: "test",
-            createdAt = 0L,
-            deviceId = meta?.get("device_id")?.jsonPrimitive?.content ?: "",
+            createdAt = meta?.get("created_at")?.jsonPrimitive?.longOrNull ?: 0L,
+            lastUpdatedAt = meta?.get("last_updated_at")?.jsonPrimitive?.longOrNull ?: 0L,
         )
         return BackupResult.Success(BackupFile(metadata = metadata, rawData = root))
     }

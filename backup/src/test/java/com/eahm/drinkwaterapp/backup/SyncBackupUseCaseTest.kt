@@ -55,12 +55,12 @@ class SyncBackupUseCaseTest {
     }
 
     @Test
-    fun `skips upload when hash is unchanged`() = runTest {
-        val serialized = """{"data":"same"}"""
-        // Pre-compute the expected sha256 to set as stored hash
-        val expectedHash = sha256(serialized)
-        val prefs = FakeBackupPreferences().apply { backupContentHash = expectedHash }
-        val dataSource = FakeBackupDataSource(serialized = serialized)
+    fun `skips upload when content fingerprint is unchanged`() = runTest {
+        val dataSource = FakeBackupDataSource()
+        // Stored hash matches the data source's current content fingerprint → nothing to push.
+        val prefs = FakeBackupPreferences().apply {
+            backupContentHash = dataSource.localContentFingerprint()
+        }
         val provider = FakeCloudBackupProvider()
         val useCase = buildUseCase(dataSource, prefs)
 
@@ -100,12 +100,5 @@ class SyncBackupUseCaseTest {
         val result = useCase(provider)
         assertTrue(result is BackupResult.Failure)
         assertNotNull(prefs.backupLastError)
-    }
-
-    // Replicate the SHA-256 logic from SyncBackupUseCase to compute expected hashes in tests
-    private fun sha256(input: String): String {
-        val digest = java.security.MessageDigest.getInstance("SHA-256")
-        val bytes = digest.digest(input.toByteArray(Charsets.UTF_8))
-        return bytes.joinToString("") { "%02x".format(it) }
     }
 }

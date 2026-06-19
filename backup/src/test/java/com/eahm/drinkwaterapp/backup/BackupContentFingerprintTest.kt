@@ -5,6 +5,7 @@ import com.eahm.drinkwaterapp.backup.data.BackupMigrationManager
 import com.eahm.drinkwaterapp.backup.domain.model.BackupResult
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -75,6 +76,34 @@ class BackupContentFingerprintTest {
         put("unit_preference", unit)
         put("time_format_preference", timeFormat)
         put("water_animation_enabled", waterAnimation)
+        put("best_goal_streak", bestGoalStreak)
+        put("best_drink_streak", bestDrinkStreak)
+    }
+
+    private fun activeTime(hour: Int, minute: Int) = buildJsonObject {
+        put("hour", hour)
+        put("minute", minute)
+    }
+
+    /** Preferences in the schema-v3 shape: no time format / water animation, plus active hours. */
+    private fun prefsV3(
+        username: String = "Elvis",
+        amountPerDrink: Float = 250f,
+        unit: String = "ML",
+        startHour: Int = 10,
+        endHour: Int = 16,
+        intervalMinute: Int = 45,
+        activeDays: List<Int> = listOf(1, 2, 3, 4, 5, 6, 7),
+        bestGoalStreak: Int = 7,
+        bestDrinkStreak: Int = 12,
+    ) = buildJsonObject {
+        put("username", username)
+        put("amount_per_drink", amountPerDrink)
+        put("unit_preference", unit)
+        put("start_time", activeTime(startHour, 0))
+        put("end_time", activeTime(endHour, 0))
+        put("interval", activeTime(0, intervalMinute))
+        put("active_days", buildJsonArray { activeDays.forEach { add(it) } })
         put("best_goal_streak", bestGoalStreak)
         put("best_drink_streak", bestDrinkStreak)
     }
@@ -357,13 +386,14 @@ class BackupContentFingerprintTest {
         )
     }
 
-    // ── Version awareness: a migrated v1 backup matches the equivalent v2 content ─
+    // ── Version awareness: a migrated v1 backup matches the equivalent v3 content ─
 
     @Test
-    fun `v1 backup migrated to current schema matches equivalent v2 content`() {
+    fun `v1 backup migrated to current schema matches equivalent v3 content`() {
         // A schema-v1 history record had no device_id / updated_at / deleted_at; migration
-        // backfills device_id="", updated_at=0, deleted_at=null. The comparison must treat a
-        // migrated v1 remote as equal to a v2 local holding the same logical content.
+        // backfills device_id="", updated_at=0, deleted_at=null (v1→v2) and then reshapes the
+        // preferences (v2→v3). The comparison must treat a migrated v1 remote as equal to a v3
+        // local holding the same logical content.
         val v1History = buildJsonObject {
             put("id", "h1"); put("amount", 250f); put("status", "IN_APP")
             put("timestamp", "2026-01-01T08:00:00")
@@ -383,7 +413,9 @@ class BackupContentFingerprintTest {
         val migrated = BackupMigrationManager.migrate(v1Envelope, fromSchema = 1)
         check(migrated is BackupResult.Success) { "migration failed: $migrated" }
 
-        val equivalentV2 = dataBlock(
+        // The v2→v3 migration drops time_format_preference / water_animation_enabled and backfills
+        // the active-hours fields with the canonical defaults — exactly what prefsV3() produces.
+        val equivalentV3 = dataBlock(
             history = listOf(
                 history(
                     id = "h1", amount = 250f, timestamp = "2026-01-01T08:00:00",
@@ -396,11 +428,29 @@ class BackupContentFingerprintTest {
                     deviceId = "", updatedAt = 0L, deletedAt = null
                 ),
             ),
-            preferences = prefs(),
+            preferences = prefsV3(),
         )
 
         assertEquals(
-            BackupContentFingerprint.ofData(equivalentV2),
+            BackupContentFingerprint.ofData(equivalentV3),
+            BackupContentFingerprint.ofRemoteEnvelope(migrated.value),
+        )
+    }
+
+    @Test
+    fun `v2 backup migrated to current schema matches equivalent v3 content`() {
+        val v2Envelope = envelope(
+            data = dataBlock(emptyList(), emptyList(), prefs()),
+            schemaVersion = 2,
+        )
+
+        val migrated = BackupMigrationManager.migrate(v2Envelope, fromSchema = 2)
+        check(migrated is BackupResult.Success) { "migration failed: $migrated" }
+
+        val equivalentV3 = dataBlock(emptyList(), emptyList(), prefsV3())
+
+        assertEquals(
+            BackupContentFingerprint.ofData(equivalentV3),
             BackupContentFingerprint.ofRemoteEnvelope(migrated.value),
         )
     }
@@ -442,9 +492,48 @@ class BackupContentFingerprintTest {
         assertEquals(GOLDEN_V2_FINGERPRINT, BackupContentFingerprint.ofData(data))
     }
 
+    @Test
+    fun `golden fingerprint for current schema v3 is stable`() {
+        // Locks the canonicalization + data shape for schema_version = 3 (active hours + interval
+        // + active days; no time format / water animation). Same contract as the v2 golden: if
+        // this value changes, the comparison contract changed — bump deliberately.
+        val data = dataBlock(
+            history = listOf(
+                history(
+                    id = "hist-1", amount = 250f, status = "IN_APP",
+                    timestamp = "2026-01-15T08:30:00", deviceId = "device-a",
+                    updatedAt = 1_700_000_000_001L, deletedAt = null,
+                ),
+                history(
+                    id = "hist-2", amount = 500f, status = "FROM_NOTIFICATION",
+                    timestamp = "2026-01-15T12:00:00", deviceId = "device-b",
+                    updatedAt = 1_700_000_000_002L, deletedAt = 1_700_000_500_000L,
+                ),
+            ),
+            goals = listOf(
+                goal(
+                    id = "goal-1", effectiveDate = "2026-01-15", goalMl = 2500f,
+                    deviceId = "device-a", updatedAt = 1_700_000_000_003L, deletedAt = null,
+                ),
+            ),
+            preferences = prefsV3(
+                username = "Elvis", amountPerDrink = 250f, unit = "ML",
+                startHour = 10, endHour = 16, intervalMinute = 45,
+                activeDays = listOf(1, 2, 3, 4, 5, 6, 7),
+                bestGoalStreak = 7, bestDrinkStreak = 12,
+            ),
+        )
+
+        assertEquals(GOLDEN_V3_FINGERPRINT, BackupContentFingerprint.ofData(data))
+    }
+
     private companion object {
         // SHA-256 of the canonical form of the schema-v2 dataset above. See the test note.
         const val GOLDEN_V2_FINGERPRINT =
             "cdc9ec5db770a1b71e55e3225bf785bf55bc0b24c01fa9c5dae5d607cc10e194"
+
+        // SHA-256 of the canonical form of the schema-v3 dataset above.
+        const val GOLDEN_V3_FINGERPRINT =
+            "e19d285131c5ef000b5e37004a3678c59957a1e7cdb08c8c5611182c7350fabc"
     }
 }

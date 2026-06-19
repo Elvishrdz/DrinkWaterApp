@@ -29,9 +29,14 @@ data class GoalRecord(
     val deletedAt: Long? = null,
 )
 
+/**
+ * Mergeable preferences. As of schema v3 the time format is no longer synced (it is decided
+ * per-device), so it is intentionally absent here. The other backed-up-but-not-merged settings
+ * (username, streaks, active hours, notification interval, active days) live only in the wire
+ * format produced by the serializer — they are not part of the merge model.
+ */
 data class PreferencesRecord(
     val unitPreference: String,
-    val timeFormat: String,
     val amountPerDrink: Float,
     val deviceId: String = "",
     val updatedAt: Long = 0L,

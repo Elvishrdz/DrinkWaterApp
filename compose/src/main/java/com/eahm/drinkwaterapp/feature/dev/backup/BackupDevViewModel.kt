@@ -303,12 +303,10 @@ internal class BackupDevViewModel(
         val conflict = SyncConflict.PreferencesConflict(
             localPrefs = PreferencesRecord(
                 unitPreference = "ML",
-                timeFormat = "24h",
                 amountPerDrink = 250f,
             ),
             remotePrefs = PreferencesRecord(
                 unitPreference = "OZ",
-                timeFormat = "12h",
                 amountPerDrink = 300f,
             ),
         )

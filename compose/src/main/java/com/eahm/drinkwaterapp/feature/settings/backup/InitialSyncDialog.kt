@@ -63,11 +63,22 @@ internal fun InitialSyncDialog(
                 color = MaterialTheme.colorScheme.onBackground,
             )
 
-            val createdAt = remote.metadata.createdAt.takeIf { it > 0L }?.let {
-                SimpleDateFormat("MMM d, yyyy HH:mm", Locale.getDefault()).format(Date(it))
-            }
-            val body = if (createdAt != null) {
-                stringResource(R.string.backup_initial_sync_body_dated, createdAt)
+            // Show how fresh the remote backup is (last update), which is what matters when
+            // deciding whether to restore it; fall back to created_at for older files.
+            val lastUpdatedValue = remote.metadata.lastUpdatedAt.takeIf { it > 0L }
+                ?: remote.metadata.createdAt
+
+            val lastUpdated = lastUpdatedValue
+                .takeIf { it > 0L }
+                ?.let {
+                    SimpleDateFormat("MMM d, yyyy HH:mm", Locale.getDefault()).format(
+                        Date(
+                            it
+                        )
+                    )
+                }
+            val body = if (lastUpdated != null) {
+                stringResource(R.string.backup_initial_sync_body_dated, lastUpdated)
             } else {
                 stringResource(R.string.backup_initial_sync_body)
             }
@@ -106,10 +117,9 @@ private fun InitialSyncDialogPreview() {
         InitialSyncDialog(
             remote = ExistingRemoteBackup(
                 BackupMetadata(
-                    schemaVersion = 2,
-                    appVersion = "1.0.0",
+                    schemaVersion = 3,
                     createdAt = 1_700_000_000_000L,
-                    deviceId = "pixel-8",
+                    lastUpdatedAt = 1_700_000_500_000L,
                 ),
             ),
             onMerge = {},

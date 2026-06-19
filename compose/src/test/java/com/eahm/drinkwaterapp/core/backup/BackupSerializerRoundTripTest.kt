@@ -7,11 +7,11 @@ import androidx.test.core.app.ApplicationProvider
 import com.eahm.drinkwaterapp.backup.domain.BackupPreferences
 import com.eahm.drinkwaterapp.core.config.AppInfoService
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
+import com.eahm.drinkwaterapp.core.data.datastore.data.ActiveTime
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.entity.DailyGoalEntity
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.database.entity.Status
-import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import io.mockk.coEvery
 import io.mockk.every
@@ -59,8 +59,10 @@ class BackupSerializerRoundTripTest {
         every { prefs.getUsername() } returns flowOf("Alice")
         every { prefs.getAmountPerDrink() } returns flowOf(250f)
         every { prefs.getUnitPreference() } returns flowOf(UnitPreference.ML)
-        every { prefs.getTimeFormatPreference() } returns flowOf(TimeFormatPreference.SYSTEM)
-        every { prefs.getWaterAnimationEnabled() } returns flowOf(true)
+        every { prefs.getStartTime() } returns flowOf(ActiveTime(10, 0))
+        every { prefs.getEndTime() } returns flowOf(ActiveTime(16, 0))
+        every { prefs.getInterval() } returns flowOf(ActiveTime(0, 45))
+        every { prefs.getActiveDays() } returns flowOf(setOf(1, 2, 3, 4, 5, 6, 7))
         every { prefs.getBestGoalStreak() } returns flowOf(0)
         every { prefs.getBestDrinkStreak() } returns flowOf(0)
 
@@ -112,7 +114,7 @@ class BackupSerializerRoundTripTest {
             ),
         )
 
-        val parsed = serializer.parseRemoteData(parseEnvelope(serializer.serialize()))
+        val parsed = serializer.parseRemoteData(parseEnvelope(serializer.serialize(null)))
         assertNotNull(parsed)
         serializer.writeBackupData(parsed)
 
@@ -144,7 +146,7 @@ class BackupSerializerRoundTripTest {
             ),
         )
 
-        val parsed = serializer.parseRemoteData(parseEnvelope(serializer.serialize()))!!
+        val parsed = serializer.parseRemoteData(parseEnvelope(serializer.serialize(null)))!!
         serializer.writeBackupData(parsed)
 
         val record = db.getHistoryDao().getAll().first().single()
@@ -165,7 +167,7 @@ class BackupSerializerRoundTripTest {
         )
 
         val localFp = serializer.localContentFingerprint()
-        val remoteFp = serializer.remoteContentFingerprint(parseEnvelope(serializer.serialize()))
+        val remoteFp = serializer.remoteContentFingerprint(parseEnvelope(serializer.serialize(null)))
         assertEquals(localFp, remoteFp)
     }
 }

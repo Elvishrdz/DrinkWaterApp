@@ -5,7 +5,14 @@ import com.eahm.drinkwaterapp.backup.domain.model.BackupResult
 import kotlinx.serialization.json.JsonObject
 
 interface BackupDataSource {
-    suspend fun serialize(): String
+    /**
+     * Serializes the current local state into a backup envelope.
+     *
+     * @param createdAt the `created_at` to stamp into the file's metadata. Pass the existing
+     * remote file's `created_at` to preserve it across updates; pass `null` when creating a
+     * brand-new file (or replacing one) so the current time is used instead.
+     */
+    suspend fun serialize(createdAt: Long? = null): String
     suspend fun deserializeAndImport(data: JsonObject): BackupResult<Unit>
 
     /**
