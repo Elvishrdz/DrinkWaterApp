@@ -21,8 +21,8 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
  * }
  * ```
  */
-@Preview(name = "Light", showBackground = true, uiMode = UI_MODE_NIGHT_NO or UI_MODE_TYPE_NORMAL)
-@Preview(name = "Dark",  showBackground = true, uiMode = UI_MODE_NIGHT_YES or UI_MODE_TYPE_NORMAL)
+@Preview(name = "Light", uiMode = UI_MODE_NIGHT_NO or UI_MODE_TYPE_NORMAL)
+@Preview(name = "Dark", uiMode = UI_MODE_NIGHT_YES or UI_MODE_TYPE_NORMAL)
 annotation class DwPreview
 
 /**

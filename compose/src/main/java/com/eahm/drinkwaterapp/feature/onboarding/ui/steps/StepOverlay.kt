@@ -19,7 +19,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +44,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwTintWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingStepBasePreview
 import com.eahm.drinkwaterapp.feature.onboarding.ui.components.DwPrimaryButtonAnimated
+import com.eahm.drinkwaterapp.feature.onboarding.ui.components.SkipButton
 import com.eahm.drinkwaterapp.feature.onboarding.ui.icons.OnbIcons
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbArtCircle
 
@@ -121,16 +121,10 @@ private fun stepRequestOverlay(
     subtitle = stringResource(R.string.onb_overlay_request_subtitle),
     onBack = onBack,
     footer = {
-        TextButton(
+        SkipButton(
             onClick = onContinue,
             modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(
-                text = stringResource(R.string.onb_overlay_request_cta_skip),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
+        )
         Spacer(Modifier.height(8.dp))
         DwPrimaryButton(
             text = stringResource(R.string.overlay_allow_over_other_apps),

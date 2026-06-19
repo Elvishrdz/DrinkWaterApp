@@ -8,11 +8,9 @@ import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.backup.data.BackupRecoveryResolver
 import com.eahm.drinkwaterapp.backup.data.InitialSyncResolver
 import com.eahm.drinkwaterapp.backup.data.SyncConflictResolver
-import com.eahm.drinkwaterapp.backup.data.currentBackupSchedule
 import com.eahm.drinkwaterapp.backup.data.provider.GoogleDriveBackupProvider
 import com.eahm.drinkwaterapp.backup.domain.BackupPreferences
 import com.eahm.drinkwaterapp.backup.domain.BackupRepository
-import com.eahm.drinkwaterapp.backup.domain.BackupScheduler
 import com.eahm.drinkwaterapp.backup.domain.model.BackupResult
 import com.eahm.drinkwaterapp.backup.domain.model.BackupSyncStatus
 import com.eahm.drinkwaterapp.backup.domain.model.CloudProviderType
@@ -35,7 +33,6 @@ import kotlinx.coroutines.launch
 internal class OnboardingBackupViewModel(
     private val backupRepository: BackupRepository,
     private val backupPreferences: BackupPreferences,
-    private val backupScheduler: BackupScheduler,
     private val googleDriveProvider: GoogleDriveBackupProvider,
     private val syncConflictResolver: SyncConflictResolver,
     private val backupRecoveryResolver: BackupRecoveryResolver,
@@ -93,10 +90,7 @@ internal class OnboardingBackupViewModel(
             )
             if (result is BackupResult.Success) {
                 backupRepository.connect(CloudProviderType.GOOGLE_DRIVE)
-                backupScheduler.scheduleAutoSync(backupPreferences.currentBackupSchedule())
                 refreshBackupState()
-                // Surface any existing remote backup so the user can decide (merge / use remote /
-                // upload local) — exactly like the Settings "Sync now" flow.
                 backupRepository.sync(allowInitialDecision = true)
                 refreshBackupState()
             }

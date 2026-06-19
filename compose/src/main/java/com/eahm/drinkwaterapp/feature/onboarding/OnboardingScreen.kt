@@ -22,6 +22,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.eahm.drinkwaterapp.core.domain.extension.canScheduleExactAlarms
 import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps.Celebrations
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingSteps.CloudBackup
@@ -82,13 +83,6 @@ internal fun OnboardingScreen(
         }
     }
 
-    fun canScheduleExactAlarms(): Boolean =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            context.getSystemService(AlarmManager::class.java)?.canScheduleExactAlarms() == true
-        } else {
-            true
-        }
-
     val is24Hour = when (state.timeFormatPreference) {
         TimeFormatPreference.SYSTEM -> DateFormat.is24HourFormat(context)
         TimeFormatPreference.HOUR_12 -> false
@@ -96,16 +90,16 @@ internal fun OnboardingScreen(
     }
 
     val animatedProgress by animateFloatAsState(
-        targetValue = state.step.toFloat() / OnboardingSteps.totalSteps.toFloat(),
+        targetValue = state.stepNumber.toFloat() / OnboardingSteps.totalSteps.toFloat(),
         animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing),
         label = "onboarding_progress",
     )
 
-    BackHandler(enabled = state.step > 1) {
+    BackHandler(enabled = state.stepNumber > 1) {
         viewModel.prevStep()
     }
 
-    val step = OnboardingSteps.byStep(state.step)
+    val step = OnboardingSteps.getStepByNumber(state.stepNumber)
 
     var showCustomIntervalBottomSheet by rememberSaveable { mutableStateOf(false) }
     var currentMinutes by rememberSaveable { mutableIntStateOf(0) }
@@ -114,6 +108,20 @@ internal fun OnboardingScreen(
     val stepConfig = when (step) {
         Intro -> stepIntro(
             onNext = viewModel::nextStep,
+        )
+
+        CloudBackup -> stepBackup(
+            state = backupState,
+            onSkip = viewModel::nextStep,
+            onContinueOnboarding = viewModel::nextStep,
+            onSkipConfiguredSteps = viewModel::onCloudBackupSkipConfiguredStep,
+            onConnectGoogle = connectGoogleDrive,
+            onConnectDropbox = viewModel::nextStep,
+            onResolveConflict = backupViewModel::onResolveConflict,
+            onResolveCorruption = backupViewModel::onResolveCorruption,
+            onResolveInitialSync = backupViewModel::onResolveInitialSync,
+            onDismissInitialSync = backupViewModel::onDismissInitialSync,
+            onBack = viewModel::prevStep,
         )
 
         Units -> stepUnits(
@@ -174,7 +182,7 @@ internal fun OnboardingScreen(
         )
 
         RemindersSteps.ExactAlarm -> stepExactAlarm(
-            exactAlarmGranted = canScheduleExactAlarms(),
+            exactAlarmGranted = context.canScheduleExactAlarms,
             onAllow = ::requestExactAlarmPermission,
             onContinue = viewModel::nextStep,
             onSkip = viewModel::nextStep,
@@ -183,19 +191,6 @@ internal fun OnboardingScreen(
 
         Celebrations -> stepOverlay(
             onContinue = viewModel::nextStep,
-            onBack = viewModel::prevStep,
-        )
-
-        CloudBackup -> stepBackup(
-            state = backupState,
-            onSkip = viewModel::skipBackup,
-            onContinue = viewModel::nextStep,
-            onConnectGoogle = connectGoogleDrive,
-            onConnectDropbox = viewModel::nextStep,
-            onResolveConflict = backupViewModel::onResolveConflict,
-            onResolveCorruption = backupViewModel::onResolveCorruption,
-            onResolveInitialSync = backupViewModel::onResolveInitialSync,
-            onDismissInitialSync = backupViewModel::onDismissInitialSync,
             onBack = viewModel::prevStep,
         )
 
@@ -209,7 +204,7 @@ internal fun OnboardingScreen(
 
     CompositionLocalProvider(LocalOnboardingProgress provides animatedProgress) {
         OnbShell(
-            step = state.step,
+            step = state.stepNumber,
             total = OnboardingSteps.totalSteps,
             title = stepConfig.title,
             subtitle = stepConfig.subtitle,

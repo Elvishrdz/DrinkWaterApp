@@ -31,8 +31,18 @@ internal data class OnbTimeSelection(
     }
 }
 
+internal val ActiveTime.toTimeSelection: OnbTimeSelection
+    get() = OnbTimeSelection(
+        hour = when {
+            hour % 12 == 0 -> 12
+            else -> hour % 12
+        },
+        minute = minute,
+        isPm = hour >= 12,
+    )
+
 internal data class OnboardingFormState(
-    val step: Int = 1,
+    val stepNumber: Int = 1,
     val name: String = "",
     val gender: Gender? = null,
     val weightValue: String = "",
@@ -50,6 +60,9 @@ internal data class OnboardingFormState(
 sealed interface OnboardingSteps {
 
     data object Intro : OnboardingSteps
+
+    data object CloudBackup : OnboardingSteps
+
     data object DailyGoal : OnboardingSteps
     data object Units : OnboardingSteps
 
@@ -63,29 +76,35 @@ sealed interface OnboardingSteps {
 
     data object Celebrations : OnboardingSteps
 
-    data object CloudBackup : OnboardingSteps
-
     data object Summary : OnboardingSteps
 
     companion object
 }
 
+private val introStep = OnboardingSteps.Intro
+
+private val activeSteps = listOf(
+    introStep,
+    OnboardingSteps.CloudBackup,
+    OnboardingSteps.Units,
+    OnboardingSteps.DailyGoal,
+    OnboardingSteps.RemindersSteps.StartTime,
+    OnboardingSteps.RemindersSteps.EndTime,
+    OnboardingSteps.RemindersSteps.Interval,
+    OnboardingSteps.RemindersSteps.Notification,
+    OnboardingSteps.RemindersSteps.ExactAlarm,
+    OnboardingSteps.Celebrations,
+    OnboardingSteps.Summary,
+)
+
 internal val OnboardingSteps.Companion.totalSteps: Int
-    get() = 11
+    get() = activeSteps.count()
 
-fun OnboardingSteps.Companion.byStep(step: Int) = when (step) {
-    1 -> OnboardingSteps.Intro
-    2 -> OnboardingSteps.Units
-    3 -> OnboardingSteps.DailyGoal
+fun OnboardingSteps.Companion.getStepByNumber(stepNumber: Int) =
+    activeSteps.getOrNull(stepNumber - 1) ?: introStep
 
-    4 -> OnboardingSteps.RemindersSteps.StartTime
-    5 -> OnboardingSteps.RemindersSteps.EndTime
-    6 -> OnboardingSteps.RemindersSteps.Interval
-    7 -> OnboardingSteps.RemindersSteps.Notification
-    8 -> OnboardingSteps.RemindersSteps.ExactAlarm
-    9 -> OnboardingSteps.Celebrations
-
-    10 -> OnboardingSteps.CloudBackup
-    11 -> OnboardingSteps.Summary
-    else -> OnboardingSteps.Intro
-}
+fun OnboardingSteps.Companion.getStepNumberByStep(step: OnboardingSteps) =
+    activeSteps.indexOf(step)
+        .takeIf { it > 0 }
+        ?.let { it + 1 }
+        ?: 0

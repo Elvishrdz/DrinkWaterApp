@@ -78,7 +78,7 @@ import com.eahm.drinkwaterapp.feature.settings.ui.DisplayUnit
 import com.eahm.drinkwaterapp.feature.settings.ui.effectiveDisplayUnit
 import kotlin.math.roundToInt
 
-@Suppress("AssignedValueIsNeverRead")
+@Suppress("CyclomaticComplexMethod", "CognitiveComplexMethod")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun stepNotifs(
@@ -92,7 +92,6 @@ internal fun stepNotifs(
 ): OnboardingStep {
     val context = LocalContext.current
     val hasNotificationPermission = context.canShowNotifications
-
 
     var showQuickDrinkStep by rememberSaveable(hasNotificationPermission) {
         mutableStateOf(hasNotificationPermission)
@@ -298,7 +297,7 @@ private fun PermissionCard() {
     }
 }
 
-@Suppress("AssignedValueIsNeverRead")
+@Suppress("CyclomaticComplexMethod", "CognitiveComplexMethod")
 @Composable
 private fun AmountStepper(
     unitPreference: UnitPreference,

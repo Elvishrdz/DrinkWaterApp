@@ -746,6 +746,10 @@
     <string name="backup_onb_connected_title">Backup ist eingerichtet</string>
     <string name="backup_onb_connected_subtitle">Dein Trinkverlauf wird in %1$s gesichert. Du kannst Backups jederzeit in den Einstellungen verwalten.</string>
     <string name="backup_onb_continue">Weiter</string>
+    <string name="backup_onb_continue_onboarding">Einrichtung fortsetzen</string>
+    <string name="backup_onb_skip_configured">Konfigurierte Schritte überspringen</string>
+    <string name="backup_onb_initial_sync_body_dated">In diesem Konto wurde ein Backup vom %1$s gefunden. Wähle, wie du fortfahren möchtest.</string>
+    <string name="backup_onb_initial_sync_body">In diesem Konto wurde ein Backup gefunden. Wähle, wie du fortfahren möchtest.</string>
 
     <!-- Sync-UI — Phase 5 -->
     <string name="sync_on_save_label">Nach dem Speichern synchronisieren</string>

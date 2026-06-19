@@ -18,23 +18,25 @@ import androidx.compose.ui.unit.dp
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.backup.domain.model.InitialSyncDecision
 import com.eahm.drinkwaterapp.core.config.FeatureFlags
+import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.preview.DwPreview
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.feature.onboarding.OnboardingStepBasePreview
-import com.eahm.drinkwaterapp.feature.onboarding.ui.components.DwPrimaryButtonAnimated
+import com.eahm.drinkwaterapp.feature.onboarding.ui.components.SkipButton
 import com.eahm.drinkwaterapp.feature.onboarding.ui.shell.OnbArtCircle
 import com.eahm.drinkwaterapp.feature.settings.backup.BackupUiState
 import com.eahm.drinkwaterapp.feature.settings.backup.CorruptedBackupDialog
-import com.eahm.drinkwaterapp.feature.settings.backup.InitialSyncDialog
+import com.eahm.drinkwaterapp.feature.settings.backup.OnboardingFirstBackupSyncDialog
 import com.eahm.drinkwaterapp.feature.settings.backup.SyncConflictSheet
 
 @Composable
 internal fun stepBackup(
     state: BackupUiState,
     onSkip: () -> Unit,
-    onContinue: () -> Unit,
+    onContinueOnboarding: () -> Unit,
+    onSkipConfiguredSteps: () -> Unit,
     onConnectGoogle: () -> Unit,
     onConnectDropbox: () -> Unit,
     onResolveConflict: (useRemote: Boolean) -> Unit,
@@ -59,14 +61,19 @@ internal fun stepBackup(
         onBack = onBack,
         footer = {
             if (state.isConnected) {
-                DwPrimaryButtonAnimated(
-                    text = stringResource(R.string.backup_onb_continue),
-                    onClick = onContinue,
+                SkipButton(
+                    text = stringResource(R.string.backup_onb_continue_onboarding),
+                    onClick = onContinueOnboarding,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(Modifier.height(8.dp))
+                DwPrimaryButton(
+                    text = stringResource(R.string.backup_onb_skip_configured),
+                    onClick = onSkipConfiguredSteps,
                     modifier = Modifier.fillMaxWidth(),
                 )
             } else {
-                DwPrimaryButtonAnimated(
-                    text = stringResource(R.string.backup_onb_skip),
+                SkipButton(
                     onClick = onSkip,
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -151,11 +158,9 @@ private fun BackupResolutionDialogs(
         )
     }
     state.pendingInitialSync?.let { remote ->
-        InitialSyncDialog(
+        OnboardingFirstBackupSyncDialog(
             remote = remote,
-            onMerge = { onResolveInitialSync(InitialSyncDecision.MERGE) },
             onUseRemote = { onResolveInitialSync(InitialSyncDecision.USE_REMOTE) },
-            onUploadLocal = { onResolveInitialSync(InitialSyncDecision.UPLOAD_LOCAL) },
             onDismiss = onDismissInitialSync,
         )
     }
@@ -166,7 +171,7 @@ private fun BackupProviderCard(
     title: String,
     onClick: () -> Unit,
 ) {
-    DwPrimaryButtonAnimated(
+    DwPrimaryButton(
         text = title,
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
@@ -174,12 +179,13 @@ private fun BackupProviderCard(
 }
 
 @Composable
-private fun StepBackupBasePreview() {
+private fun StepBackupBasePreview(state: BackupUiState = BackupUiState()) {
     OnboardingStepBasePreview(
         config = stepBackup(
-            state = BackupUiState(),
+            state = state,
             onSkip = {},
-            onContinue = {},
+            onContinueOnboarding = {},
+            onSkipConfiguredSteps = {},
             onConnectGoogle = {},
             onConnectDropbox = {},
             onResolveConflict = {},
@@ -196,5 +202,17 @@ private fun StepBackupBasePreview() {
 private fun StepBackupPreview() {
     DrinkWaterAppTheme {
         StepBackupBasePreview()
+    }
+}
+
+@DwPreview
+@Composable
+private fun BackupConnectedPreview() {
+    DrinkWaterAppTheme {
+        StepBackupBasePreview(
+            state = BackupUiState(
+                isConnected = true,
+            )
+        )
     }
 }

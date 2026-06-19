@@ -748,6 +748,10 @@
     <string name="backup_onb_connected_title">Copia de seguridad lista</string>
     <string name="backup_onb_connected_subtitle">Tu historial de hidratación se respalda en %1$s. Puedes administrar las copias cuando quieras en Ajustes.</string>
     <string name="backup_onb_continue">Continuar</string>
+    <string name="backup_onb_continue_onboarding">Continuar configuración</string>
+    <string name="backup_onb_skip_configured">Omitir pasos configurados</string>
+    <string name="backup_onb_initial_sync_body_dated">Se encontró una copia de seguridad del %1$s en esta cuenta. Elige cómo continuar.</string>
+    <string name="backup_onb_initial_sync_body">Se encontró una copia de seguridad en esta cuenta. Elige cómo continuar.</string>
 
     <!-- Sync UI — Fase 5 -->
     <string name="sync_on_save_label">Sincronizar al guardar</string>
