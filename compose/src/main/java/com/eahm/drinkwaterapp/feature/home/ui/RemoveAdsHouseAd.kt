@@ -13,9 +13,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.designsystem.icon.DwIcons
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
@@ -52,12 +54,12 @@ internal fun RemoveAdsHouseAd(
             )
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Enjoying the app? Go ad-free",
+                    text = stringResource(R.string.house_ad_remove_ads_title),
                     fontFamily = PlusJakartaSans,
                     fontWeight = FontWeight.SemiBold,
                 )
                 Text(
-                    text = "Remove ads with a one-time purchase",
+                    text = stringResource(R.string.house_ad_remove_ads_subtitle),
                     color = DwInk400,
                 )
             }

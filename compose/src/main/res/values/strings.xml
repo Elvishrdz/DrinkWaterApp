@@ -318,6 +318,10 @@
     <string name="settings_remove_ads_error">Something went wrong: %1$s</string>
     <string name="settings_remove_ads_nothing_to_restore">No previous purchase found for this account.</string>
 
+    <!-- House ad — shown in the banner slot when no network ad is filled -->
+    <string name="house_ad_remove_ads_title">Enjoying the app? Go ad-free</string>
+    <string name="house_ad_remove_ads_subtitle">Remove ads with a one-time purchase</string>
+
     <!-- Settings — Purchase success dialog -->
     <string name="settings_purchase_success_title">Ads Removed!</string>
     <string name="settings_purchase_success_body">Thank you for supporting DrinkWaterApp.\nEnjoy the app completely ad-free!</string>

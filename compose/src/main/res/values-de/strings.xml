@@ -317,6 +317,10 @@
     <string name="settings_remove_ads_error">Etwas ist schiefgelaufen: %1$s</string>
     <string name="settings_remove_ads_nothing_to_restore">Kein früherer Kauf für dieses Konto gefunden.</string>
 
+    <!-- Eigenwerbung — wird im Banner-Slot angezeigt, wenn keine Netzwerkanzeige geladen wird -->
+    <string name="house_ad_remove_ads_title">Gefällt dir die App? Werbung entfernen</string>
+    <string name="house_ad_remove_ads_subtitle">Entferne Werbung mit einem einmaligen Kauf</string>
+
     <!-- Einstellungen — Kauf-erfolgreich-Dialog -->
     <string name="settings_purchase_success_title">Werbung entfernt!</string>
     <string name="settings_purchase_success_body">Vielen Dank, dass du DrinkWaterApp unterstützt.\nGenieße die App vollständig werbefrei!</string>

@@ -335,6 +335,10 @@
     <string name="settings_remove_ads_error">Algo salió mal: %1$s</string>
     <string name="settings_remove_ads_nothing_to_restore">No se encontró ninguna compra previa para esta cuenta.</string>
 
+    <!-- Anuncio propio — se muestra en el espacio del banner cuando no hay anuncio de red -->
+    <string name="house_ad_remove_ads_title">¿Te gusta la app? Quita los anuncios</string>
+    <string name="house_ad_remove_ads_subtitle">Elimina los anuncios con una compra única</string>
+
     <!-- Ajustes — Diálogo de compra exitosa -->
     <string name="settings_purchase_success_title">¡Anuncios eliminados!</string>
     <string name="settings_purchase_success_body">Gracias por apoyar DrinkWater.\n¡Disfruta la app completamente sin anuncios!</string>
