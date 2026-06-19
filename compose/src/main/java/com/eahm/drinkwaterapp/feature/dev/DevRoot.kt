@@ -77,6 +77,7 @@ import com.eahm.drinkwaterapp.feature.dev.menu.DevMenuRoot
 import com.eahm.drinkwaterapp.feature.dev.notifications.NotificationsRoot
 import com.eahm.drinkwaterapp.feature.dev.onboarding.OnboardingDevRoot
 import com.eahm.drinkwaterapp.feature.dev.streak.StreakDevRoot
+import com.eahm.drinkwaterapp.feature.dev.stresstest.StressTestDevRoot
 import com.eahm.drinkwaterapp.feature.dev.tracking.TrackingDevRoot
 import com.eahm.drinkwaterapp.feature.dev.ui.Adaptive
 import com.eahm.drinkwaterapp.feature.dev.wateranimation.WaterAnimationDevRoot
@@ -121,6 +122,7 @@ enum class DevDestination(
     HISTORY_INJECT("History", DwIcons.History),
     HISTORY_V2("History V2", DwIcons.History),
     CLOUD_BACKUP("Backup", DwIcons.Star),
+    STRESS_TEST("Stress Test", DwIcons.History),
 }
 
 
@@ -217,6 +219,10 @@ internal fun DevRoot(onBackClicked: () -> Unit) {
             DevDestination.HISTORY_V2 -> HistoryV2Root()
 
             DevDestination.CLOUD_BACKUP -> BackupDevRoot(
+                onBackClicked = onBackClicked,
+            )
+
+            DevDestination.STRESS_TEST -> StressTestDevRoot(
                 onBackClicked = onBackClicked,
             )
         }
