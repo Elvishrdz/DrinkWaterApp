@@ -4,6 +4,7 @@ import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import kotlinx.datetime.LocalDate
 
 data class StatsState(
+    val isAdFree: Boolean = false,
     val selectedPeriod: StatsPeriod = StatsPeriod.WEEK,
     val chartPage: Int = 0,
     val pages: List<PeriodPage> = emptyList(),

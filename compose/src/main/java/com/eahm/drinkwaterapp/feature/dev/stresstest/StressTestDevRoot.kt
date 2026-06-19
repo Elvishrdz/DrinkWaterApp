@@ -34,7 +34,6 @@ internal fun StressTestDevRoot(
                 onRangeEndChanged = viewModel::onRangeEndChanged,
                 onInsertGenerated = viewModel::insertGenerated,
                 onInsertPredefined = viewModel::insertPredefined,
-                onInsertPreset = viewModel::insertPreset,
                 onClearAll = viewModel::clearAll,
                 onBackClicked = onBackClicked,
             )

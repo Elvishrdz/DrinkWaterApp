@@ -37,6 +37,7 @@ import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.ads.banner.InlineBannerAd
 import com.eahm.drinkwaterapp.ads.banner.rememberHistoryScreenLogsBannerAdState
 import com.eahm.drinkwaterapp.ads.banner.rememberInterstitialState
+import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
 import com.eahm.drinkwaterapp.core.bindings.toEntity
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
@@ -52,7 +53,6 @@ import com.eahm.drinkwaterapp.core.domain.mock.localDateTimeMock
 import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.feature.history.ui.RecordAmountBottomSheet
-import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
 import com.eahm.drinkwaterapp.ui.historylist.DateTimePickerButton
 import com.eahm.drinkwaterapp.ui.historylist.HistoryTimeline
 import com.eahm.drinkwaterapp.ui.historylist.HistoryUI
@@ -70,7 +70,6 @@ private const val INTERSTITIAL_PROBABILITY = 0.5f
 @Composable
 internal fun HistoryScreen(
     state: HistoryState.Data,
-    isAdFree: Boolean,
     onDelete: (HistoryEntity) -> Unit,
     onUpdate: (HistoryEntity) -> Unit,
     onDateChanged: (LocalDateTime) -> Unit,
@@ -97,7 +96,7 @@ internal fun HistoryScreen(
             consumedMl = state.consumedMl,
             isToday = state.isToday,
             is24Hour = is24Hour,
-            isAdFree = isAdFree,
+            isAdFree = state.isAdFree,
             unitPreference = state.unitPreference,
             onDelete = onDelete,
             onUpdate = onUpdate,

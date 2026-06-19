@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.eahm.drinkwaterapp.backup.data.SyncCoordinator
 import com.eahm.drinkwaterapp.backup.domain.BackupPreferences
+import com.eahm.drinkwaterapp.core.billing.PurchaseManager
 import com.eahm.drinkwaterapp.core.bindings.toUI
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.database.AppDatabase
@@ -12,6 +13,7 @@ import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
 import com.eahm.drinkwaterapp.core.domain.extension.toEndOfDayTime
 import com.eahm.drinkwaterapp.core.domain.extension.toStartOfDayTime
+import com.eahm.drinkwaterapp.core.screenshot.ScreenshotModeController
 import com.eahm.drinkwaterapp.feature.drink.DateTimeZoneChangedObserver
 import com.eahm.drinkwaterapp.ui.historylist.DayGroup
 import com.eahm.drinkwaterapp.ui.historylist.HourGroup
@@ -30,6 +32,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDateTime
 
+@Suppress("LongParameterList")
 internal class HistoryViewModel(
     val application: Application,
     val database: AppDatabase,
@@ -37,6 +40,8 @@ internal class HistoryViewModel(
     val dateTimeZoneChangedObserver: DateTimeZoneChangedObserver,
     private val syncCoordinator: SyncCoordinator,
     private val backupPreferences: BackupPreferences,
+    purchaseManager: PurchaseManager,
+    screenshotModeController: ScreenshotModeController,
 ) : ViewModel() {
 
     private val historyDao = database.getHistoryDao()
@@ -98,6 +103,13 @@ internal class HistoryViewModel(
         .map { it?.goalMl ?: DEFAULT_GOAL_ML }
         .flowOn(Dispatchers.IO)
 
+    private val isAdFree = combine(
+        purchaseManager.isAdFree,
+        screenshotModeController.state,
+    ) { isAdFree, screenshotState ->
+        isAdFree || screenshotState.enabled
+    }.stateIn(viewModelScope, SharingStarted.Lazily, false)
+
     val state = combine(
         historyDate,
         records,
@@ -144,6 +156,8 @@ internal class HistoryViewModel(
         historyState.copy(timeFormatPreference = timeFormat)
     }.combine(prefsStorage.getUnitPreference()) { historyState, unitPref ->
         historyState.copy(unitPreference = unitPref)
+    }.combine(isAdFree) { state, isAdFree ->
+        state.copy(isAdFree = isAdFree)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,

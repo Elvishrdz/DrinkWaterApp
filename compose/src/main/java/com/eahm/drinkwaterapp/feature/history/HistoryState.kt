@@ -13,6 +13,7 @@ internal sealed interface HistoryState {
 
     @Immutable
     data class Data(
+        val isAdFree: Boolean = false,
         val date: LocalDateTime,
         val historyRecords: ImmutableList<HourGroup>,
         val goalMl: Float,

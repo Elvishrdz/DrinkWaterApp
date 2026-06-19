@@ -52,6 +52,7 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk400
 import com.eahm.drinkwaterapp.core.presentation.layouttype.NavigationType
 import com.eahm.drinkwaterapp.core.presentation.layouttype.getNavigationType
 import com.eahm.drinkwaterapp.core.presentation.layouttype.toNavigationSuite
+import com.eahm.drinkwaterapp.core.screenshot.screenshotModeState
 import com.eahm.drinkwaterapp.feature.dev.DevRoot
 import com.eahm.drinkwaterapp.feature.drink.DrinkRoot
 import com.eahm.drinkwaterapp.feature.history.HistoryRoot
@@ -71,9 +72,12 @@ internal fun HomeScreen() {
     val trackingService = koinInject<TrackingService>()
     val state by confettiController.state.collectAsStateWithLifecycle()
     val isAdFree by purchaseManager.isAdFree.collectAsStateWithLifecycle()
+    // Screenshot mode (debug only) presents the app like release: ads off, dev tabs hidden.
+    val screenshotMode = screenshotModeState()
+    val adsHidden = isAdFree || screenshotMode.enabled
     var currentDestination by rememberSaveable { mutableStateOf(HomeDestination.TODAY) }
 
-    val bannerAdState = rememberBelowMainScreenBannerAdState(enabled = !isAdFree)
+    val bannerAdState = rememberBelowMainScreenBannerAdState(enabled = !adsHidden)
 
     LaunchedEffect(currentDestination) {
         val screen = when (currentDestination) {
@@ -97,7 +101,7 @@ internal fun HomeScreen() {
     //
     // The standalone REMINDERS tab is also dev/qa-only for now: its active-days controls live in
     // Settings (reminders group) in production, and the dedicated screen is kept for future work.
-    val menu = if (BuildEnvironment.isDev || BuildEnvironment.isQa) {
+    val menu = if ((BuildEnvironment.isDev || BuildEnvironment.isQa) && !screenshotMode.enabled) {
         HomeDestination.entries
     } else {
         HomeDestination.entries.filterNot {
@@ -116,7 +120,7 @@ internal fun HomeScreen() {
         isConfettiActive = state,
         currentDestination = currentDestination,
         advertisementContent = {
-            if (!isAdFree) {
+            if (!adsHidden) {
                 Banner(
                     state = bannerAdState,
                     navigationType = navigationType,

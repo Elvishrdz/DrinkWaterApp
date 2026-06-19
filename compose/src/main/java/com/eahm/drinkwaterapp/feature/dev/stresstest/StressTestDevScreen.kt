@@ -43,7 +43,6 @@ internal fun StressTestDevScreen(
     onRangeEndChanged: (Int) -> Unit,
     onInsertGenerated: () -> Unit,
     onInsertPredefined: () -> Unit,
-    onInsertPreset: () -> Unit,
     onClearAll: () -> Unit,
     onBackClicked: () -> Unit,
 ) {
@@ -174,13 +173,6 @@ internal fun StressTestDevScreen(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text("Insert predefined dataset")
-                }
-                Button(
-                    onClick = onInsertPreset,
-                    enabled = !state.isRunning,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text("Insert preset dataset (+ reminders)")
                 }
                 OutlinedButton(
                     onClick = onClearAll,

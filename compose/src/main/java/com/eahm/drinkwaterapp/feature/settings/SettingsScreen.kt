@@ -105,6 +105,7 @@ import com.eahm.drinkwaterapp.core.domain.extension.sanitizeZeroDecimals
 import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.eahm.drinkwaterapp.core.presentation.UnitPreference
 import com.eahm.drinkwaterapp.core.presentation.composable.BuildInfoFooter
+import com.eahm.drinkwaterapp.core.screenshot.screenshotModeState
 import com.eahm.drinkwaterapp.feature.reminders.components.DaysOfWeekToggle
 import com.eahm.drinkwaterapp.feature.settings.age.AgeSettingsSection
 import com.eahm.drinkwaterapp.feature.settings.backup.BackupSettingsSection
@@ -563,7 +564,7 @@ internal fun SettingsContent(
                 }
             }
 
-            if (!state.isAdFree) {
+            if (state.showRemoveAds) {
                 item {
                     SettingsSection(title = stringResource(R.string.settings_section_premium)) {
                         SettingRow(
@@ -903,9 +904,11 @@ internal fun SettingsContent(
             }
 
             item {
+                // In screenshot mode show a release-style version (no build-variant suffix).
+                val screenshotMode = screenshotModeState()
                 BuildInfoFooter(
-                    appVersion = state.appVersion,
-                    buildVariant = state.buildVariant,
+                    appVersion = if (screenshotMode.enabled) screenshotMode.displayVersion else state.appVersion,
+                    buildVariant = if (screenshotMode.enabled) "" else state.buildVariant,
                 )
             }
         }

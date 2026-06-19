@@ -28,6 +28,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,6 +44,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.core.config.FeatureFlags
 import com.eahm.drinkwaterapp.core.data.drinkstatsobserver.DrinkStats
@@ -54,16 +56,27 @@ import com.eahm.drinkwaterapp.core.designsystem.theme.DwMagentaDark
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwPaper
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwWater
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
+import com.eahm.drinkwaterapp.core.screenshot.ScreenshotModeController
 import com.eahm.drinkwaterapp.feature.drink.DrinkState
 import com.eahm.drinkwaterapp.ui.inputfield.toDigitString
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 import kotlin.random.Random
+
+private const val SCREENSHOT_EXIT_TAPS = 10
 
 @Composable
 internal fun RingSection(
     state: DrinkState.Data,
     modifier: Modifier = Modifier,
 ) {
+    // Debug-only: 10 taps on the ring exits screenshot mode (the dev menu is hidden while it's on).
+    val screenshotController = koinInject<ScreenshotModeController>()
+    val screenshotMode by screenshotController.state.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
+    var ringTapCount by remember { mutableIntStateOf(0) }
+
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -81,7 +94,15 @@ internal fun RingSection(
             current = state.drinkStats?.drinkAmount ?: 0f,
             goal = state.drinkStats?.goalAmount ?: 0f,
             displayZeroPercentage = false,
-            onClick = {},
+            onClick = {
+                if (screenshotMode.enabled) {
+                    ringTapCount++
+                    if (ringTapCount >= SCREENSHOT_EXIT_TAPS) {
+                        ringTapCount = 0
+                        scope.launch { screenshotController.disable() }
+                    }
+                }
+            },
             unitPreference = state.unitPreference,
         )
 

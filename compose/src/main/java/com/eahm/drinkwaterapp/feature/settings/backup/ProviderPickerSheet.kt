@@ -26,6 +26,7 @@ import com.eahm.drinkwaterapp.core.designsystem.component.button.DwPrimaryButton
 import com.eahm.drinkwaterapp.core.designsystem.component.button.DwSecondaryButton
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.PlusJakartaSans
+import com.eahm.drinkwaterapp.core.screenshot.screenshotModeState
 import com.eahm.drinkwaterapp.ui.bottomsheet.AppBottomSheet
 import kotlinx.coroutines.launch
 
@@ -85,7 +86,7 @@ private fun ProviderPickerContent(
             modifier = Modifier.fillMaxWidth(),
         )
 
-        if (FeatureFlags.dropboxBackupEnabled) {
+        if (FeatureFlags.dropboxBackupEnabled && !screenshotModeState().enabled) {
             Spacer(Modifier.height(8.dp))
 
             DwPrimaryButton(

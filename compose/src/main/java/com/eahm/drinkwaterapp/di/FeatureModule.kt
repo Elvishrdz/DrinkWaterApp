@@ -18,6 +18,7 @@ import com.eahm.drinkwaterapp.feature.dev.historyinject.HistoryInjectDevViewMode
 import com.eahm.drinkwaterapp.feature.dev.menu.DevMenuViewModel
 import com.eahm.drinkwaterapp.feature.dev.notifications.NotificationsViewModel
 import com.eahm.drinkwaterapp.feature.dev.onboarding.OnboardingDevViewModel
+import com.eahm.drinkwaterapp.feature.dev.screenshots.ScreenshotsDevViewModel
 import com.eahm.drinkwaterapp.feature.dev.streak.StreakDevViewModel
 import com.eahm.drinkwaterapp.feature.dev.stresstest.StressTestDevViewModel
 import com.eahm.drinkwaterapp.feature.dev.tracking.TrackingDevViewModel
@@ -73,4 +74,5 @@ internal val featureModule = module {
     viewModelOf(::HistoryInjectDevViewModel)
     viewModelOf(::BackupDevViewModel)
     viewModelOf(::StressTestDevViewModel)
+    viewModelOf(::ScreenshotsDevViewModel)
 }

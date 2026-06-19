@@ -27,13 +27,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.ads.banner.InlineBannerAd
 import com.eahm.drinkwaterapp.ads.banner.rememberStatsScreenComponentBannerAdState
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingService
 import com.eahm.drinkwaterapp.analytics.tracking.TrackingStats
-import com.eahm.drinkwaterapp.core.billing.PurchaseManager
 import com.eahm.drinkwaterapp.core.designsystem.theme.DrinkWaterAppTheme
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk50
 import com.eahm.drinkwaterapp.core.designsystem.theme.DwInk500
@@ -54,15 +52,12 @@ internal fun StatsScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val calendarState by calendarViewModel.state.collectAsState()
-    val purchaseManager = koinInject<PurchaseManager>()
     val trackingService = koinInject<TrackingService>()
-    val isAdFree by purchaseManager.isAdFree.collectAsStateWithLifecycle()
 
     Scaffold { innerPadding ->
         StatsContent(
             state = state,
             calendarState = calendarState,
-            isAdFree = isAdFree,
             onPeriodSelected = { period ->
                 val periodName = when (period) {
                     StatsPeriod.WEEK -> TrackingStats.PERIOD_WEEK
@@ -88,11 +83,11 @@ internal fun StatsScreen(
     }
 }
 
+@Suppress("CyclomaticComplexMethod")
 @Composable
 internal fun StatsContent(
     state: StatsState,
     calendarState: CalendarState,
-    isAdFree: Boolean = true,
     onPeriodSelected: (StatsPeriod) -> Unit,
     onChartPageChanged: (Int) -> Unit,
     onCalendarPrevious: () -> Unit,
@@ -102,7 +97,7 @@ internal fun StatsContent(
     onPersonalBestTapped: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
-    val bannerAdState = rememberStatsScreenComponentBannerAdState(enabled = !isAdFree)
+    val bannerAdState = rememberStatsScreenComponentBannerAdState(enabled = !state.isAdFree)
 
     val periodLabelWeek = stringResource(R.string.stats_period_label_week)
     val periodLabelMonth = stringResource(R.string.stats_period_label_month)
@@ -190,7 +185,7 @@ internal fun StatsContent(
             )
         }
 
-        if (!isAdFree) {
+        if (!state.isAdFree) {
             item {
                 InlineBannerAd(
                     state = bannerAdState,
@@ -338,7 +333,6 @@ private fun StatsScreenPreview() {
                 today = kotlinx.datetime.LocalDate(2026, 5, 7),
                 rangeLabel = "May 2026",
             ),
-            isAdFree = false,
             onPeriodSelected = {},
             onChartPageChanged = {},
             onCalendarPrevious = {},

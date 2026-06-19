@@ -46,6 +46,7 @@ import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
 import com.eahm.drinkwaterapp.core.database.entity.DailyGoalEntity
 import com.eahm.drinkwaterapp.core.presentation.TimeFormatPreference
 import com.eahm.drinkwaterapp.core.presentation.UnitPreference
+import com.eahm.drinkwaterapp.core.screenshot.ScreenshotModeController
 import com.eahm.drinkwaterapp.feature.drink.DateTimeZoneChangedObserver
 import com.eahm.drinkwaterapp.feature.settings.backup.BackupStatusMessage
 import com.eahm.drinkwaterapp.feature.settings.backup.BackupUiState
@@ -91,6 +92,7 @@ internal class SettingsViewModel(
     private val syncConflictResolver: SyncConflictResolver,
     private val backupRecoveryResolver: BackupRecoveryResolver,
     private val initialSyncResolver: InitialSyncResolver,
+    private val screenshotModeController: ScreenshotModeController,
 ) : ViewModel() {
 
     private val dao = database.getDailyGoalDao()
@@ -248,6 +250,13 @@ internal class SettingsViewModel(
         .map { (it?.goalMl ?: DEFAULT_GOAL_ML) }
         .flowOn(Dispatchers.IO)
 
+    private val isAdFree = combine(
+        purchaseManager.isAdFree,
+        screenshotModeController.state,
+    ) { isAdFree, screenshotState ->
+        isAdFree || screenshotState.enabled
+    }.stateIn(viewModelScope, SharingStarted.Lazily, false)
+
     val state = combine(
         prefsStorage.getUsername(),
         goal,
@@ -265,8 +274,8 @@ internal class SettingsViewModel(
             notificationAmountMl = reminderInfo?.third ?: 150f,
         )
     }
-        .combine(purchaseManager.isAdFree) { state, isAdFree ->
-            state.copy(isAdFree = isAdFree)
+        .combine(isAdFree) { state, isAdFree ->
+            state.copy(showRemoveAds = !isAdFree)
         }
         .combine(purchaseManager.purchaseState) { state, purchaseState ->
             state.copy(purchaseState = purchaseState)

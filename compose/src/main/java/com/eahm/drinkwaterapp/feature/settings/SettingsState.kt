@@ -34,7 +34,7 @@ data class SettingsState(
     val notificationAmountMl: Float = 150f,
     val appVersion: String,
     val buildVariant: String,
-    val isAdFree: Boolean = false,
+    val showRemoveAds: Boolean = false,
     val purchaseState: PurchaseState = PurchaseState.Idle,
     val offeringsState: OfferingsState? = null,
     val timeFormatPreference: TimeFormatPreference = TimeFormatPreference.SYSTEM,

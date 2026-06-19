@@ -2,6 +2,7 @@ package com.eahm.drinkwaterapp.feature.stats
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.eahm.drinkwaterapp.core.billing.PurchaseManager
 import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.data.streak.StreakData
 import com.eahm.drinkwaterapp.core.data.streak.StreakRepository
@@ -9,6 +10,7 @@ import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.dao.DEFAULT_GOAL_ML
 import com.eahm.drinkwaterapp.core.database.entity.DailyGoalEntity
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
+import com.eahm.drinkwaterapp.core.screenshot.ScreenshotModeController
 import com.eahm.drinkwaterapp.feature.drink.DateTimeZoneChangedObserver
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -36,6 +38,8 @@ internal class StatsViewModel(
     streakRepository: StreakRepository,
     prefsStorage: PrefsStorage,
     dateTimeZoneChangedObserver: DateTimeZoneChangedObserver,
+    purchaseManager: PurchaseManager,
+    screenshotModeController: ScreenshotModeController,
 ) : ViewModel() {
 
     private val historyDao = database.getHistoryDao()
@@ -64,6 +68,13 @@ internal class StatsViewModel(
 
     private val streakData: StateFlow<StreakData> = streakRepository.streakData
         .stateIn(viewModelScope, SharingStarted.Lazily, StreakData())
+
+    private val isAdFree = combine(
+        purchaseManager.isAdFree,
+        screenshotModeController.state,
+    ) { isAdFree, screenshotState ->
+        isAdFree || screenshotState.enabled
+    }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     val state: StateFlow<StatsState> = combine(
         combine(
@@ -95,6 +106,8 @@ internal class StatsViewModel(
         )
     }.combine(prefsStorage.getUnitPreference()) { state, unitPref ->
         state.copy(unitPreference = unitPref)
+    }.combine(isAdFree) { state, isAdFree ->
+        state.copy(isAdFree = isAdFree)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,

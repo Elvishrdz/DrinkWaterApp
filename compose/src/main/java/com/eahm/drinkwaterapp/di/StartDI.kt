@@ -3,6 +3,7 @@ package com.eahm.drinkwaterapp.di
 import com.eahm.drinkwaterapp.BaseApplication
 import com.eahm.drinkwaterapp.age.ageModule
 import com.eahm.drinkwaterapp.core.database.di.databaseModule
+import com.eahm.drinkwaterapp.core.screenshot.di.screenshotModule
 import com.eahm.drinkwaterapp.feature.drink.activeHoursObserverModule
 import com.eahm.drinkwaterapp.feature.drink.clockTickObserverModule
 import com.eahm.drinkwaterapp.feature.drink.dateTimeZoneChangedObserverModule
@@ -20,6 +21,7 @@ internal fun startDI(application: BaseApplication) {
             dataModule,
             featureModule,
             ageModule,
+            screenshotModule,
         )
     }
 }

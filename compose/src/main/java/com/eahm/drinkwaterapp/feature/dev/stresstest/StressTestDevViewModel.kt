@@ -4,7 +4,6 @@ package com.eahm.drinkwaterapp.feature.dev.stresstest
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.eahm.drinkwaterapp.core.data.datastore.PrefsStorage
 import com.eahm.drinkwaterapp.core.database.AppDatabase
 import com.eahm.drinkwaterapp.core.database.entity.DailyGoalEntity
 import com.eahm.drinkwaterapp.core.database.entity.HistoryEntity
@@ -30,7 +29,6 @@ import kotlin.time.ExperimentalTime
 @OptIn(ExperimentalTime::class)
 internal class StressTestDevViewModel(
     database: AppDatabase,
-    private val prefsStorage: PrefsStorage,
 ) : ViewModel() {
 
     private val historyDao = database.getHistoryDao()
@@ -103,34 +101,6 @@ internal class StressTestDevViewModel(
                 seed = seed,
             )
             runJob(history, goals, "Generated $days days")
-        }
-    }
-
-    /** Inserts the hand-authored [stressTestPreset] anchored behind the selected day. */
-    fun insertPreset() {
-        if (_state.value.isRunning) return
-        val anchorDate = _state.value.anchorDate
-        val preset = stressTestPreset
-
-        viewModelScope.launch {
-            val history = preset.history.map { h ->
-                HistoryEntity(
-                    amount = h.amountMl,
-                    status = h.status,
-                    timestamp = LocalDateTime(
-                        anchorDate.minus(h.daysAgo, DateTimeUnit.DAY),
-                        LocalTime(h.hour, h.minute),
-                    ),
-                )
-            }
-            val goals = preset.goals.map { g ->
-                DailyGoalEntity(
-                    effectiveDate = anchorDate.minus(g.daysAgo, DateTimeUnit.DAY),
-                    goalMl = g.goalMl,
-                )
-            }
-            applyReminders(preset)
-            runJob(history, goals, "Inserted preset + reminder config")
         }
     }
 
@@ -215,16 +185,6 @@ internal class StressTestDevViewModel(
             goals += DailyGoalEntity(effectiveDate = oldestDate.plusDays(i), goalMl = randomGoal())
         }
         return goals
-    }
-
-    private suspend fun applyReminders(preset: StressTestPreset) {
-        with(preset.reminders) {
-            prefsStorage.setStartTime(startTime)
-            prefsStorage.setEndTime(endTime)
-            prefsStorage.setInterval(interval)
-            prefsStorage.setAmountPerDrink(amountPerDrinkMl)
-            prefsStorage.setActiveDays(activeDays)
-        }
     }
 
     /** Clears existing data, then inserts history + goals in chunks while reporting progress. */
