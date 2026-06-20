@@ -49,13 +49,14 @@
         .app-icon {
           width: 36px;
           height: 36px;
-          background: linear-gradient(135deg, #4fc3f7 0%, #1a73e8 100%);
           border-radius: 8px;
+          overflow: hidden;
           display: flex;
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
         }
+        .app-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
         .app-icon svg { width: 20px; height: 20px; fill: white; }
 
@@ -282,9 +283,7 @@
 <header>
     <div class="header-inner">
         <div class="app-icon">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-4H7l5-8v4h4l-5 8z"/>
-            </svg>
+            <img src="app-icon.webp" alt="Drink Water App icon" width="192" height="192">
         </div>
         <span class="app-title">Drink Water App</span>
         <div class="lang-switcher">
@@ -322,7 +321,7 @@
             <span class="part-heading">Part 1</span>
             <h1>Privacy Policy</h1>
             <div class="meta">
-                <span>Effective date: May 26, 2026</span>
+                <span>Effective date: June 20, 2026</span>
                 <span>Contact: <a href="mailto:eahm3595@gmail.com">eahm3595@gmail.com</a></span>
             </div>
 
@@ -381,8 +380,10 @@
                     </tr>
                 </table>
             </div>
-            <p><strong>All of the above is stored exclusively on your device</strong> using the
-                device local storage. It is never transmitted to our servers or any third party.</p>
+            <p><strong>All of the above is stored on your device</strong> using the device local
+                storage. We do not operate servers that store it. It is never transmitted to us or
+                any third party, except the portion you choose to back up if you enable the optional
+                Cloud Backup feature (see 2.7).</p>
 
             <h3>2.2 App Usage Data - stored locally on your device</h3>
             <p>The App records the following data as you use it:</p>
@@ -393,7 +394,8 @@
                 <li><strong>Daily hydration goals:</strong> target amounts and effective dates.</li>
                 <li><strong>Drink suggestions:</strong> custom quick-add amounts you create.</li>
             </ul>
-            <p>This data is stored locally on your device.</p>
+            <p>This data is stored locally on your device, unless you enable the optional Cloud
+                Backup feature (see 2.7).</p>
 
             <h3>2.3 Anonymous Usage Analytics — optional, opt-out available</h3>
             <p>With your consent, the App sends anonymous usage events to <strong>Mixpanel</strong>
@@ -403,6 +405,13 @@
                 <li>Drink recorded and source of the "drink" action (e.g.: notification or app)</li>
                 <li>Custom preset created</li>
                 <li>Drink suggestions quick-add sheet opened</li>
+                <li>Reminders tab opened, and reminder active-day changes (which days of the week
+                    reminders are on/off, and how many)</li>
+                <li>Cloud backup actions: connecting or disconnecting the backup, tapping manual
+                    sync or restore, changing the auto-backup schedule, toggling sync-on-save, and
+                    when a sync finishes (with its result). These events include an anonymous count
+                    of how many of your own devices use the backup — never the file contents or any
+                    account identity.</li>
             </ul>
             <p><strong>No personal data, water log content, or identifiable information is included
                 in these events.</strong> Each device is assigned a random anonymous ID that is not
@@ -447,6 +456,45 @@
                 information. If you notice any unusual activity, we encourage you to report it so we
                 can take appropriate action. See RevenueCat's Privacy Policy for details.</p>
 
+            <h3>2.7 Cloud Backup &amp; Sync — optional, off by default (Google Drive)</h3>
+            <p>The App offers an <strong>optional</strong> cloud backup so you can protect your data
+                and synchronize it across your own devices. It is <strong>disabled by default</strong>
+                and only activates after you explicitly connect your Google Drive account and
+                authorize access.</p>
+            <p>When enabled, the App uploads a backup file containing your app data to your Google
+                Drive account:</p>
+            <ul>
+                <li><strong>Water intake logs</strong> (amount, timestamp, entry type)</li>
+                <li><strong>Daily hydration goals</strong> (target amounts and effective dates)</li>
+                <li><strong>Preferences</strong> (unit, time format, notification quick-add amount)</li>
+                <li>A random per-device identifier used only to merge data across your own devices</li>
+            </ul>
+            <p>The backup does <strong>not</strong> include your name, email, payment data, or any
+                advertising or analytics identifiers.</p>
+            <p><strong>Where your backup is stored:</strong> the file is written to your private,
+                hidden <em>application data folder</em> (<code>appDataFolder</code>) in Google
+                Drive — a Drive area reserved for the App that does not appear among your normal
+                Drive files and is not accessible to other apps. The App requests the
+                <code>drive.appdata</code> scope plus your basic Google profile (email and name)
+                solely to show which account is connected.</p>
+            <p>The backup is stored in <strong>your own</strong> Google Drive account. We do not
+                operate any server that stores this data, and the developer cannot read your backup.
+                You can disconnect at any time from <strong>Settings → Backup</strong>, and you can
+                delete the backup file directly from your Google Drive account.</p>
+            <div class="callout">
+                <strong>Google API Services — Limited Use disclosure.</strong>
+                Drink Water App's use of information received from Google APIs adheres to the
+                <a href="https://developers.google.com/terms/api-services-user-data-policy"
+                   target="_blank">Google API Services User Data Policy</a>, including the
+                <strong>Limited Use</strong> requirements. Data accessed through Google Drive is used
+                <strong>only</strong> to provide and improve the backup-and-sync feature you
+                requested. It is never sold, never used for advertising, and is never transferred to
+                others except as needed to provide the feature, to comply with applicable law, or as
+                part of a merger or acquisition. We do not allow humans to read your Google Drive
+                data unless we have your explicit consent, it is necessary for security purposes
+                (such as investigating abuse), or to comply with applicable law.
+            </div>
+
             <h2>3. Permissions Requested</h2>
             <div class="table-wrap">
                 <table>
@@ -472,7 +520,8 @@
                     </tr>
                     <tr>
                         <td><code>INTERNET</code></td>
-                        <td>Required for ads (free version), analytics, and purchase validation</td>
+                        <td>Required for ads (free version), analytics, purchase validation, and
+                            optional cloud backup</td>
                     </tr>
                 </table>
             </div>
@@ -515,6 +564,11 @@
                         <td>Process in-app purchases</td>
                         <td>RevenueCat purchase tokens</td>
                         <td>Contract</td>
+                    </tr>
+                    <tr>
+                        <td>Back up and sync your data (optional)</td>
+                        <td>Water logs, goals, preferences uploaded to your Google Drive</td>
+                        <td>Consent (you connect Google Drive, revocable)</td>
                     </tr>
                 </table>
             </div>
@@ -559,6 +613,14 @@
                         <td><a href="https://www.revenuecat.com/privacy" target="_blank">revenuecat.com</a>
                         </td>
                     </tr>
+                    <tr>
+                        <td>Google Drive</td>
+                        <td>Cloud backup (optional, you connect it)</td>
+                        <td>Backup file in your private app data folder; your email/name to show the
+                            connected account</td>
+                        <td><a href="https://policies.google.com/privacy" target="_blank">policies.google.com</a>
+                        </td>
+                    </tr>
                 </table>
             </div>
             <p>We may also disclose your information if required by law or court order, or to
@@ -586,6 +648,10 @@
                 <li><strong>RevenueCat</strong> purchase records are retained as required by app
                     store terms and applicable law.
                 </li>
+                <li><strong>Cloud backup</strong> data lives in your own Google Drive account and
+                    remains until you delete it there or disconnect the backup. We have no control
+                    over, and cannot access, files stored in your account.
+                </li>
             </ul>
 
             <h2>7. This App Is Not a Medical Application</h2>
@@ -609,9 +675,12 @@
 
             <h2>9. Data Security</h2>
             <p>All data you enter into the App is stored locally on your device's storage. We do
-                not operate servers that store your personal hydration data. However, no method of
-                electronic storage is completely secure, and we encourage you to protect your device
-                with the recommended security techniques.</p>
+                not operate servers that store your personal hydration data. If you enable Cloud
+                Backup, your data is transmitted over an encrypted connection and stored in your own
+                Google Drive account, protected by Google's security and your account credentials.
+                However, no method of electronic storage or transmission is completely secure, and we
+                encourage you to protect your device and your Google account with the recommended
+                security techniques.</p>
 
             <h2>10. Your Rights</h2>
             <p>Depending on your country of residence, you may have the right to:</p>
@@ -649,7 +718,7 @@
             <span class="part-heading">Parte 1</span>
             <h1>Política de Privacidad</h1>
             <div class="meta">
-                <span>Vigente desde: 26 de mayo de 2026</span>
+                <span>Vigente desde: 20 de junio de 2026</span>
                 <span>Contacto: <a href="mailto:eahm3595@gmail.com">eahm3595@gmail.com</a></span>
             </div>
 
@@ -711,9 +780,10 @@
                     </tr>
                 </table>
             </div>
-            <p><strong>Todo lo anterior se almacena exclusivamente en tu dispositivo</strong> usando
-                el almacenamiento local del dispositivo. Nunca se transmite a nuestros servidores ni
-                a terceros.</p>
+            <p><strong>Todo lo anterior se almacena en tu dispositivo</strong> usando el
+                almacenamiento local del dispositivo. No operamos servidores que lo almacenen. Nunca
+                se transmite a nosotros ni a terceros, salvo la parte que elijas respaldar si activas
+                la función opcional de Copia de seguridad en la nube (ver 2.7).</p>
 
             <h3>2.2 Datos de uso de la App - almacenados localmente en tu dispositivo</h3>
             <p>La App registra los siguientes datos durante su uso:</p>
@@ -728,7 +798,8 @@
                     rápida que creas.
                 </li>
             </ul>
-            <p>Estos datos se almacenan localmente en tu dispositivo.</p>
+            <p>Estos datos se almacenan localmente en tu dispositivo, salvo que actives la función
+                opcional de Copia de seguridad en la nube (ver 2.7).</p>
 
             <h3>2.3 Análisis de uso anónimo - opcional, con opción de desactivación</h3>
             <p>Con tu consentimiento, la App envía eventos de uso anónimos a
@@ -741,6 +812,14 @@
                 </li>
                 <li>Preset personalizado creado</li>
                 <li>Hoja de adición rápida de sugerencias de bebida abierta</li>
+                <li>Pestaña de Recordatorios abierta y cambios en los días activos de recordatorios
+                    (qué días de la semana están activados/desactivados y cuántos)</li>
+                <li>Acciones de copia de seguridad en la nube: conectar o desconectar la copia,
+                    tocar sincronización manual o restaurar, cambiar la programación automática,
+                    activar/desactivar la sincronización al guardar, y cuándo finaliza una
+                    sincronización (con su resultado). Estos eventos incluyen un conteo anónimo de
+                    cuántos de tus propios dispositivos usan la copia de seguridad, nunca el
+                    contenido del archivo ni identidad de cuenta alguna.</li>
             </ul>
             <p><strong>Ningún dato personal, contenido del registro de agua o información
                 identificable se incluye en estos eventos.</strong> A cada dispositivo se le asigna
@@ -789,6 +868,53 @@
                 invitamos a reportarla para que podamos tomar las medidas apropiadas. Consulta la
                 Política de Privacidad de RevenueCat para más detalles.</p>
 
+            <h3>2.7 Copia de seguridad y sincronización en la nube — opcional, desactivada por
+                defecto (Google Drive)</h3>
+            <p>La App ofrece una copia de seguridad en la nube <strong>opcional</strong> para que
+                protejas tus datos y los sincronices entre tus propios dispositivos. Está
+                <strong>desactivada por defecto</strong> y solo se activa después de que conectes
+                explícitamente tu cuenta de Google Drive y autorices el acceso.</p>
+            <p>Cuando está activada, la App sube un archivo de copia de seguridad con tus datos a tu
+                cuenta de Google Drive:</p>
+            <ul>
+                <li><strong>Registros de ingesta de agua</strong> (cantidad, marca de tiempo, tipo
+                    de entrada)</li>
+                <li><strong>Metas diarias de hidratación</strong> (cantidades objetivo y fechas de
+                    vigencia)</li>
+                <li><strong>Preferencias</strong> (unidad, formato de hora, cantidad de adición
+                    rápida en notificaciones)</li>
+                <li>Un identificador aleatorio por dispositivo, usado solo para combinar datos entre
+                    tus propios dispositivos</li>
+            </ul>
+            <p>La copia de seguridad <strong>no</strong> incluye tu nombre, correo, datos de pago ni
+                ningún identificador de publicidad o de análisis.</p>
+            <p><strong>Dónde se almacena tu copia de seguridad:</strong> el archivo se escribe en tu
+                <em>carpeta de datos de la aplicación</em> privada y oculta
+                (<code>appDataFolder</code>) en Google Drive, un área de Drive reservada para la App
+                que no aparece entre tus archivos normales de Drive y no es accesible para otras
+                apps. La App solicita el ámbito <code>drive.appdata</code> más tu perfil básico de
+                Google (correo y nombre) únicamente para mostrar qué cuenta está conectada.</p>
+            <p>La copia de seguridad se almacena en <strong>tu propia</strong> cuenta de Google
+                Drive. No operamos ningún servidor que almacene estos datos, y el desarrollador no
+                puede leer tu copia de seguridad. Puedes desconectarla en cualquier momento desde
+                <strong>Ajustes → Copia de seguridad</strong>, y puedes eliminar el archivo
+                directamente desde tu cuenta de Google Drive.</p>
+            <div class="callout">
+                <strong>Servicios de la API de Google — Divulgación de Uso Limitado.</strong>
+                El uso por parte de Drink Water App de la información recibida de las API de Google se
+                rige por la
+                <a href="https://developers.google.com/terms/api-services-user-data-policy"
+                   target="_blank">Política de Datos de Usuario de los Servicios de la API de
+                Google</a>, incluidos los requisitos de <strong>Uso Limitado</strong>. Los datos a
+                los que se accede mediante Google Drive se usan <strong>únicamente</strong> para
+                proporcionar y mejorar la función de copia de seguridad y sincronización que
+                solicitaste. Nunca se venden, nunca se usan para publicidad, y nunca se transfieren a
+                terceros salvo lo necesario para proporcionar la función, cumplir con la ley aplicable
+                o como parte de una fusión o adquisición. No permitimos que personas lean tus datos de
+                Google Drive salvo que contemos con tu consentimiento explícito, sea necesario por
+                motivos de seguridad (como investigar abusos), o para cumplir con la ley aplicable.
+            </div>
+
             <h2>3. Permisos solicitados</h2>
             <div class="table-wrap">
                 <table>
@@ -814,8 +940,8 @@
                     </tr>
                     <tr>
                         <td><code>INTERNET</code></td>
-                        <td>Necesario para anuncios (versión gratuita), análisis y validación de
-                            compras
+                        <td>Necesario para anuncios (versión gratuita), análisis, validación de
+                            compras y copia de seguridad en la nube opcional
                         </td>
                     </tr>
                 </table>
@@ -861,6 +987,11 @@
                         <td>Tokens de compra de RevenueCat</td>
                         <td>Contrato</td>
                     </tr>
+                    <tr>
+                        <td>Respaldar y sincronizar tus datos (opcional)</td>
+                        <td>Registros, metas y preferencias subidos a tu Google Drive</td>
+                        <td>Consentimiento (conectas Google Drive, revocable)</td>
+                    </tr>
                 </table>
             </div>
             <p>No usamos tus datos para perfilado, toma de decisiones automatizada ni ningún
@@ -904,6 +1035,14 @@
                         <td><a href="https://www.revenuecat.com/privacy" target="_blank">revenuecat.com</a>
                         </td>
                     </tr>
+                    <tr>
+                        <td>Google Drive</td>
+                        <td>Copia de seguridad en la nube (opcional, tú la conectas)</td>
+                        <td>Archivo de respaldo en tu carpeta de datos de app privada; tu correo/nombre
+                            para mostrar la cuenta conectada</td>
+                        <td><a href="https://policies.google.com/privacy" target="_blank">policies.google.com</a>
+                        </td>
+                    </tr>
                 </table>
             </div>
             <p>También podemos divulgar tu información si lo exige la ley o una orden judicial, o
@@ -933,6 +1072,11 @@
                 <li><strong>Registros de compras de RevenueCat</strong> retenidos según los términos
                     de la tienda y la ley aplicable.
                 </li>
+                <li><strong>Datos de copia de seguridad en la nube</strong> residen en tu propia
+                    cuenta de Google Drive y permanecen hasta que los elimines allí o desconectes la
+                    copia de seguridad. No tenemos control ni acceso a los archivos almacenados en tu
+                    cuenta.
+                </li>
             </ul>
 
             <h2>7. Esta App no es una aplicación médica</h2>
@@ -957,8 +1101,11 @@
             <h2>9. Seguridad de los datos</h2>
             <p>Todos los datos que introduces en la App se almacenan localmente en el almacenamiento
                 de tu dispositivo. No operamos servidores que almacenen tus datos personales de
-                hidratación. Sin embargo, ningún método de almacenamiento electrónico es
-                completamente seguro, y te recomendamos proteger tu dispositivo con las técnicas de
+                hidratación. Si activas la Copia de seguridad en la nube, tus datos se transmiten a
+                través de una conexión cifrada y se almacenan en tu propia cuenta de Google Drive,
+                protegida por la seguridad de Google y tus credenciales. Sin embargo, ningún método
+                de almacenamiento o transmisión electrónica es completamente seguro, y te
+                recomendamos proteger tu dispositivo y tu cuenta de Google con las técnicas de
                 seguridad recomendadas.</p>
 
             <h2>10. Tus derechos</h2>
@@ -998,7 +1145,7 @@
             <span class="part-heading">Teil 1</span>
             <h1>Datenschutzrichtlinie</h1>
             <div class="meta">
-                <span>Gültig ab: 26. Mai 2026</span>
+                <span>Gültig ab: 20. Juni 2026</span>
                 <span>Kontakt: <a href="mailto:eahm3595@gmail.com">eahm3595@gmail.com</a></span>
             </div>
 
@@ -1062,9 +1209,10 @@
                     </tr>
                 </table>
             </div>
-            <p><strong>Alle oben genannten Daten werden ausschließlich auf deinem Gerät
-                gespeichert</strong> und verwenden den lokalen Gerätespeicher. Sie werden niemals an
-                unsere Server oder Dritte übertragen.</p>
+            <p><strong>Alle oben genannten Daten werden auf deinem Gerät gespeichert</strong> und
+                verwenden den lokalen Gerätespeicher. Wir betreiben keine Server, die sie speichern.
+                Sie werden niemals an uns oder Dritte übermittelt, außer dem Teil, den du sichern
+                möchtest, wenn du die optionale Cloud-Backup-Funktion aktivierst (siehe 2.7).</p>
 
             <h3>2.2 App-Nutzungsdaten - lokal auf deinem Gerät gespeichert</h3>
             <p>Die App erfasst bei der Nutzung folgende Daten:</p>
@@ -1078,7 +1226,8 @@
                     die du erstellst.
                 </li>
             </ul>
-            <p>Diese Daten werden lokal auf deinem Gerät gespeichert.</p>
+            <p>Diese Daten werden lokal auf deinem Gerät gespeichert, es sei denn, du aktivierst die
+                optionale Cloud-Backup-Funktion (siehe 2.7).</p>
 
             <h3>2.3 Anonyme Nutzungsanalysen - optional, abwählbar</h3>
             <p>Mit deiner Zustimmung sendet die App anonyme Nutzungsereignisse an
@@ -1091,6 +1240,16 @@
                 </li>
                 <li>Benutzerdefiniertes Preset erstellt</li>
                 <li>Schnellzugriff-Panel für Trinkvorschläge geöffnet</li>
+                <li>Erinnerungen-Tab geöffnet und Änderungen an aktiven Erinnerungstagen (welche
+                    Wochentage Erinnerungen aktiv/inaktiv sind und wie viele)
+                </li>
+                <li>Cloud-Backup-Aktionen: Verbinden oder Trennen des Backups, Tippen auf manuelle
+                    Synchronisierung oder Wiederherstellung, Ändern des automatischen
+                    Backup-Zeitplans, Umschalten der Synchronisierung beim Speichern und wann eine
+                    Synchronisierung abgeschlossen ist (mit Ergebnis). Diese Ereignisse enthalten
+                    eine anonyme Anzahl, wie viele deiner eigenen Geräte das Backup nutzen — niemals
+                    den Dateiinhalt oder eine Kontoidentität.
+                </li>
             </ul>
             <p><strong>Keine persönlichen Daten, Wasserprotokoll-Inhalte oder identifizierbare
                 Informationen werden in diesen Ereignissen übermittelt.</strong> Jedem Gerät wird
@@ -1141,6 +1300,55 @@
                 empfehlen wir dir, diese zu melden, damit wir geeignete Maßnahmen ergreifen können.
                 Weitere Einzelheiten findest du in der Datenschutzrichtlinie von RevenueCat.</p>
 
+            <h3>2.7 Cloud-Backup &amp; Synchronisierung — optional, standardmäßig deaktiviert (Google
+                Drive)</h3>
+            <p>Die App bietet ein <strong>optionales</strong> Cloud-Backup, damit du deine Daten
+                schützen und zwischen deinen eigenen Geräten synchronisieren kannst. Es ist
+                <strong>standardmäßig deaktiviert</strong> und wird erst aktiviert, nachdem du
+                ausdrücklich dein Google Drive-Konto verbunden und den Zugriff autorisiert hast.</p>
+            <p>Wenn aktiviert, lädt die App eine Backup-Datei mit deinen App-Daten in dein Google
+                Drive-Konto hoch:</p>
+            <ul>
+                <li><strong>Wasseraufnahmeprotokolle</strong> (Menge, Zeitstempel, Eintragstyp)</li>
+                <li><strong>Tägliche Hydrationsziele</strong> (Zielmengen und Gültigkeitsdaten)</li>
+                <li><strong>Einstellungen</strong> (Einheit, Zeitformat, Schnellerfassungsmenge für
+                    Benachrichtigungen)
+                </li>
+                <li>Eine zufällige Geräte-ID, die nur zum Zusammenführen von Daten zwischen deinen
+                    eigenen Geräten verwendet wird
+                </li>
+            </ul>
+            <p>Das Backup enthält <strong>nicht</strong> deinen Namen, deine E-Mail, Zahlungsdaten
+                oder Werbe- bzw. Analyse-IDs.</p>
+            <p><strong>Wo dein Backup gespeichert wird:</strong> Die Datei wird in deinem privaten,
+                verborgenen <em>Anwendungsdatenordner</em> (<code>appDataFolder</code>) in Google
+                Drive gespeichert — einem für die App reservierten Drive-Bereich, der nicht zwischen
+                deinen normalen Drive-Dateien erscheint und für andere Apps nicht zugänglich ist. Die
+                App fordert den Bereich <code>drive.appdata</code> sowie dein grundlegendes
+                Google-Profil (E-Mail und Name) ausschließlich an, um anzuzeigen, welches Konto
+                verbunden ist.</p>
+            <p>Das Backup wird in <strong>deinem eigenen</strong> Google Drive-Konto gespeichert. Wir
+                betreiben keinen Server, der diese Daten speichert, und der Entwickler kann dein
+                Backup nicht lesen. Du kannst die Verbindung jederzeit unter <strong>Einstellungen →
+                Backup</strong> trennen und die Backup-Datei direkt aus deinem Google Drive-Konto
+                löschen.</p>
+            <div class="callout">
+                <strong>Google API-Dienste — Offenlegung zur eingeschränkten Nutzung.</strong>
+                Die Nutzung von Informationen, die von Google APIs empfangen werden, durch Drink
+                Water App entspricht der
+                <a href="https://developers.google.com/terms/api-services-user-data-policy"
+                   target="_blank">Google API Services User Data Policy</a>, einschließlich der
+                Anforderungen zur <strong>eingeschränkten Nutzung</strong> (Limited Use). Über Google
+                Drive abgerufene Daten werden <strong>ausschließlich</strong> verwendet, um die von
+                dir angeforderte Backup- und Synchronisierungsfunktion bereitzustellen und zu
+                verbessern. Sie werden niemals verkauft, niemals für Werbung verwendet und niemals an
+                Dritte weitergegeben, außer soweit dies zur Bereitstellung der Funktion, zur
+                Einhaltung geltender Gesetze oder im Rahmen einer Fusion oder Übernahme erforderlich
+                ist. Wir gestatten keiner Person, deine Google Drive-Daten zu lesen, es sei denn, wir
+                haben deine ausdrückliche Einwilligung, es ist aus Sicherheitsgründen erforderlich
+                (z. B. zur Untersuchung von Missbrauch) oder zur Einhaltung geltender Gesetze.
+            </div>
+
             <h2>3. Angeforderte Berechtigungen</h2>
             <div class="table-wrap">
                 <table>
@@ -1170,8 +1378,8 @@
                     </tr>
                     <tr>
                         <td><code>INTERNET</code></td>
-                        <td>Für Werbung (kostenlose Version), Analysen und Kaufvalidierung
-                            erforderlich
+                        <td>Für Werbung (kostenlose Version), Analysen, Kaufvalidierung und
+                            optionales Cloud-Backup erforderlich
                         </td>
                     </tr>
                 </table>
@@ -1216,6 +1424,11 @@
                         <td>In-App-Käufe verarbeiten</td>
                         <td>RevenueCat-Kauftokens</td>
                         <td>Vertrag</td>
+                    </tr>
+                    <tr>
+                        <td>Deine Daten sichern und synchronisieren (optional)</td>
+                        <td>Wasserprotokolle, Ziele, Einstellungen, in dein Google Drive hochgeladen</td>
+                        <td>Einwilligung (du verbindest Google Drive, widerrufbar)</td>
                     </tr>
                 </table>
             </div>
@@ -1264,6 +1477,15 @@
                                target="_blank">revenuecat.com</a>
                         </td>
                     </tr>
+                    <tr>
+                        <td>Google Drive</td>
+                        <td>Cloud-Backup (optional, von dir verbunden)</td>
+                        <td>Backup-Datei in deinem privaten App-Datenordner; deine E-Mail/dein Name
+                            zur Anzeige des verbundenen Kontos</td>
+                        <td><a href="https://policies.google.com/privacy"
+                               target="_blank">policies.google.com</a>
+                        </td>
+                    </tr>
                 </table>
             </div>
             <p>Wir können deine Informationen auch offenlegen, wenn dies gesetzlich oder durch
@@ -1294,6 +1516,11 @@
                 <li><strong>RevenueCat-Kaufaufzeichnungen</strong> werden gemäß den
                     App-Store-Bedingungen und dem anwendbaren Recht aufbewahrt.
                 </li>
+                <li><strong>Cloud-Backup-Daten</strong> befinden sich in deinem eigenen Google
+                    Drive-Konto und bleiben dort, bis du sie dort löschst oder das Backup trennst.
+                    Wir haben keine Kontrolle über und keinen Zugriff auf Dateien, die in deinem
+                    Konto gespeichert sind.
+                </li>
             </ul>
 
             <h2>7. Diese App ist keine medizinische Anwendung</h2>
@@ -1319,9 +1546,12 @@
             <h2>9. Datensicherheit</h2>
             <p>Alle Daten, die du in die App eingibst, werden lokal im Speicher deines Geräts
                 gespeichert. Wir betreiben keine Server, auf denen deine persönlichen
-                Hydrationsdaten gespeichert werden. Kein elektronisches Speicherverfahren ist
-                jedoch vollständig sicher, und wir empfehlen dir, dein Gerät mit den empfohlenen
-                Sicherheitstechniken zu schützen.</p>
+                Hydrationsdaten gespeichert werden. Wenn du Cloud-Backup aktivierst, werden deine
+                Daten über eine verschlüsselte Verbindung übertragen und in deinem eigenen Google
+                Drive-Konto gespeichert, geschützt durch die Sicherheit von Google und deine
+                Kontoanmeldedaten. Kein elektronisches Speicher- oder Übertragungsverfahren ist
+                jedoch vollständig sicher, und wir empfehlen dir, dein Gerät und dein Google-Konto
+                mit den empfohlenen Sicherheitstechniken zu schützen.</p>
 
             <h2>10. Deine Rechte</h2>
             <p>Je nach deinem Wohnsitzland hast du möglicherweise das Recht auf:</p>
@@ -1367,7 +1597,7 @@
             <span class="part-heading">Part 2</span>
             <h1>Terms of Use</h1>
             <div class="meta">
-                <span>Effective date: May 26, 2026</span>
+                <span>Effective date: June 20, 2026</span>
                 <span>Contact: <a href="mailto:eahm3595@gmail.com">eahm3595@gmail.com</a></span>
             </div>
 
@@ -1434,9 +1664,16 @@
 
             <h2>5. User-Generated Data</h2>
             <p>All data you enter into the App (water logs, goals, custom presets, personal profile)
-                is owned by you and stored exclusively on your device. We make no claim over this
-                data. You are responsible for backing it up. Uninstalling the App permanently
-                deletes this data.</p>
+                is owned by you and stored on your device. We make no claim over this data.
+                Uninstalling the App permanently deletes the local copy.</p>
+            <p><strong>Optional Cloud Backup.</strong> The App offers an optional backup that uploads
+                your data to your Google Drive account. This feature is off by default and only runs
+                after you connect Google Drive and authorize access. You are responsible for the
+                security of your Google account, and your use of Google Drive is governed by Google's
+                own terms. The backup is stored in your own account; we do not host it and cannot
+                access it. You may disconnect the backup or delete the backup file from your account
+                at any time. Synchronization depends on network availability and on Google Drive, and
+                we do not guarantee it will be uninterrupted or error-free.</p>
 
             <h2>6. Notifications and Reminders</h2>
             <p>By granting notification permission, you authorize the App to send drink reminders at
@@ -1478,9 +1715,10 @@
                 twelve months preceding the claim.</p>
 
             <h2>9. Third-Party Services</h2>
-            <p>The App integrates Google AdMob, Firebase Crashlytics, Mixpanel, and RevenueCat. Your
-                use of these services is subject to their respective terms and privacy policies. We
-                are not responsible for the practices of these third-party services.</p>
+            <p>The App integrates Google AdMob, Firebase Crashlytics, Mixpanel, RevenueCat, and —
+                only if you enable cloud backup — Google Drive. Your use of these services is subject
+                to their respective terms and privacy policies. We are not responsible for the
+                practices of these third-party services.</p>
 
             <h2>10. Intellectual Property</h2>
             <p>All content in the App, including the interface design, icons, graphics, text, and
@@ -1508,7 +1746,7 @@
             <span class="part-heading">Parte 2</span>
             <h1>Términos de Uso</h1>
             <div class="meta">
-                <span>Vigente desde: 26 de mayo de 2026</span>
+                <span>Vigente desde: 20 de junio de 2026</span>
                 <span>Contacto: <a href="mailto:eahm3595@gmail.com">eahm3595@gmail.com</a></span>
             </div>
 
@@ -1579,9 +1817,18 @@
 
             <h2>5. Datos generados por el usuario</h2>
             <p>Todos los datos que introduces en la App (registros de agua, metas, presets
-                personalizados, perfil personal) son de tu propiedad y se almacenan exclusivamente
-                en tu dispositivo. No reclamamos ningún derecho sobre estos datos. Eres responsable
-                de hacer respaldos. Desinstalar la App elimina permanentemente estos datos.</p>
+                personalizados, perfil personal) son de tu propiedad y se almacenan en tu
+                dispositivo. No reclamamos ningún derecho sobre estos datos. Desinstalar la App
+                elimina permanentemente la copia local.</p>
+            <p><strong>Copia de seguridad en la nube opcional.</strong> La App ofrece una copia de
+                seguridad opcional que sube tus datos a tu cuenta de Google Drive. Esta función está
+                desactivada por defecto y solo se ejecuta después de que conectes Google Drive y
+                autorices el acceso. Eres responsable de la seguridad de tu cuenta de Google, y tu
+                uso de Google Drive se rige por los términos propios de Google. La copia se almacena
+                en tu propia cuenta; nosotros no la alojamos ni podemos acceder a ella. Puedes
+                desconectar la copia o eliminar el archivo de respaldo de tu cuenta en cualquier
+                momento. La sincronización depende de la disponibilidad de la red y de Google Drive,
+                y no garantizamos que sea ininterrumpida o libre de errores.</p>
 
             <h2>6. Notificaciones y recordatorios</h2>
             <p>Al otorgar el permiso de notificaciones, autorizas a la App a enviar recordatorios
@@ -1625,9 +1872,10 @@
                 meses anteriores a la reclamación.</p>
 
             <h2>9. Servicios de terceros</h2>
-            <p>La App integra Google AdMob, Firebase Crashlytics, Mixpanel y RevenueCat. Tu uso de
-                estos servicios está sujeto a sus respectivos términos y políticas de privacidad. No
-                somos responsables de las prácticas de estos servicios.</p>
+            <p>La App integra Google AdMob, Firebase Crashlytics, Mixpanel, RevenueCat y —solo si
+                activas la copia de seguridad en la nube— Google Drive. Tu uso de estos servicios
+                está sujeto a sus respectivos términos y políticas de privacidad. No somos
+                responsables de las prácticas de estos servicios.</p>
 
             <h2>10. Propiedad intelectual</h2>
             <p>Todo el contenido de la App, incluyendo el diseño de interfaz, íconos, gráficos,
@@ -1655,7 +1903,7 @@
             <span class="part-heading">Teil 2</span>
             <h1>Nutzungsbedingungen</h1>
             <div class="meta">
-                <span>Gültig ab: 26. Mai 2026</span>
+                <span>Gültig ab: 20. Juni 2026</span>
                 <span>Kontakt: <a href="mailto:eahm3595@gmail.com">eahm3595@gmail.com</a></span>
             </div>
 
@@ -1730,10 +1978,19 @@
 
             <h2>5. Nutzergenerierte Daten</h2>
             <p>Alle Daten, die du in die App eingibst (Wasserprotokolle, Ziele, benutzerdefinierte
-                Presets, persönliches Profil), gehören dir und werden ausschließlich auf deinem
-                Gerät gespeichert. Wir erheben keinen Anspruch auf diese Daten. Du bist für deren
-                Sicherung verantwortlich. Das Deinstallieren der App löscht diese Daten
-                dauerhaft.</p>
+                Presets, persönliches Profil), gehören dir und werden auf deinem Gerät gespeichert.
+                Wir erheben keinen Anspruch auf diese Daten. Das Deinstallieren der App löscht die
+                lokale Kopie dauerhaft.</p>
+            <p><strong>Optionales Cloud-Backup.</strong> Die App bietet ein optionales Backup, das
+                deine Daten in dein Google Drive-Konto hochlädt. Diese Funktion ist standardmäßig
+                deaktiviert und läuft erst, nachdem du Google Drive verbunden und den Zugriff
+                autorisiert hast. Du bist für die Sicherheit deines Google-Kontos verantwortlich, und
+                deine Nutzung von Google Drive unterliegt den eigenen Bedingungen von Google. Das
+                Backup wird in deinem eigenen Konto gespeichert; wir hosten es nicht und können nicht
+                darauf zugreifen. Du kannst das Backup jederzeit trennen oder die Backup-Datei aus
+                deinem Konto löschen. Die Synchronisierung hängt von der Netzwerkverfügbarkeit und von
+                Google Drive ab, und wir garantieren nicht, dass sie ununterbrochen oder fehlerfrei
+                ist.</p>
 
             <h2>6. Benachrichtigungen und Erinnerungen</h2>
             <p>Durch die Erteilung der Benachrichtigungsberechtigung autorisierst du die App,
@@ -1780,10 +2037,10 @@
                 in den zwölf Monaten vor dem Anspruch gezahlt hast.</p>
 
             <h2>9. Dienste von Drittanbietern</h2>
-            <p>Die App integriert Google AdMob, Firebase Crashlytics, Mixpanel und RevenueCat. Deine
-                Nutzung dieser Dienste unterliegt deren jeweiligen Nutzungsbedingungen und
-                Datenschutzrichtlinien. Wir sind nicht verantwortlich für die Praktiken dieser
-                Drittanbieter.</p>
+            <p>Die App integriert Google AdMob, Firebase Crashlytics, Mixpanel, RevenueCat und —
+                nur wenn du Cloud-Backup aktivierst — Google Drive. Deine Nutzung dieser Dienste
+                unterliegt deren jeweiligen Nutzungsbedingungen und Datenschutzrichtlinien. Wir sind
+                nicht verantwortlich für die Praktiken dieser Drittanbieter.</p>
 
             <h2>10. Geistiges Eigentum</h2>
             <p>Alle Inhalte der App, einschließlich Schnittstellendesign, Icons, Grafiken, Texte
