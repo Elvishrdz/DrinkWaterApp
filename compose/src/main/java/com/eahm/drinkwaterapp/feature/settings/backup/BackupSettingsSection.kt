@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.eahm.drinkwaterapp.BuildConfig
 import com.eahm.drinkwaterapp.R
 import com.eahm.drinkwaterapp.backup.domain.model.BackupScheduleMode
 import com.eahm.drinkwaterapp.backup.domain.model.CloudProviderType
@@ -242,7 +243,9 @@ internal fun BackupSettingsSection(
         if (state.isConnected) {
             SyncPendingBanner(visible = state.syncPending)
 
-            LinkedDevicesSection(devices = state.seenDevices)
+            if (BuildConfig.DEBUG) {
+                LinkedDevicesSection(devices = state.seenDevices)
+            }
 
             BackupInfoFooter(
                 lastSyncAt = state.lastSyncAt,
@@ -290,12 +293,7 @@ private fun BackupInfoFooter(lastSyncAt: Long?, syncOnSaveEnabled: Boolean) {
     val lastBackup = lastSyncAt
         ?.let { SimpleDateFormat("MMM d, HH:mm", Locale.getDefault()).format(Date(it)) }
         ?: stringResource(R.string.backup_last_sync_never)
-    // The hint mirrors the Sync-on-save toggle so it never contradicts the actual mode.
-    val hint = if (syncOnSaveEnabled) {
-        stringResource(R.string.backup_info_auto)
-    } else {
-        stringResource(R.string.backup_info_manual)
-    }
+
     Column(
         modifier = Modifier.padding(horizontal = 4.dp),
         verticalArrangement = Arrangement.spacedBy(2.dp),
@@ -306,12 +304,21 @@ private fun BackupInfoFooter(lastSyncAt: Long?, syncOnSaveEnabled: Boolean) {
             fontSize = 12.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Text(
-            text = hint,
-            fontFamily = PlusJakartaSans,
-            fontSize = 12.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+        if (BuildConfig.DEBUG) {
+            // The hint mirrors the Sync-on-save toggle so it never contradicts the actual mode.
+            val hint = if (syncOnSaveEnabled) {
+                stringResource(R.string.backup_info_auto)
+            } else {
+                stringResource(R.string.backup_info_manual)
+            }
+
+            Text(
+                text = hint,
+                fontFamily = PlusJakartaSans,
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }
 

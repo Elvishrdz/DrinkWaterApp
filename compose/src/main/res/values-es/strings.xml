@@ -754,7 +754,7 @@
     <string name="backup_onb_initial_sync_body">Se encontró una copia de seguridad en esta cuenta. Elige cómo continuar.</string>
 
     <!-- Sync UI — Fase 5 -->
-    <string name="sync_on_save_label">Sincronizar al guardar</string>
+    <string name="sync_on_save_label">Sincronizar con cada nuevo cambio</string>
     <string name="sync_on_save_desc">Subir cambios automáticamente tras cada bebida o actualización de objetivo</string>
     <string name="sync_pending_banner">Sincronización pendiente: se subirá al conectarse</string>
     <string name="sync_linked_devices_title">Dispositivos vinculados</string>

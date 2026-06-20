@@ -752,7 +752,7 @@
     <string name="backup_onb_initial_sync_body">In diesem Konto wurde ein Backup gefunden. Wähle, wie du fortfahren möchtest.</string>
 
     <!-- Sync-UI — Phase 5 -->
-    <string name="sync_on_save_label">Nach dem Speichern synchronisieren</string>
+    <string name="sync_on_save_label">Mit jeder neuen Änderung synchronisieren</string>
     <string name="sync_on_save_desc">Änderungen nach jedem Trinken oder Zielanpassung automatisch hochladen</string>
     <string name="sync_pending_banner">Synchronisierung ausstehend – wird hochgeladen, sobald eine Verbindung besteht</string>
     <string name="sync_linked_devices_title">Verknüpfte Geräte</string>

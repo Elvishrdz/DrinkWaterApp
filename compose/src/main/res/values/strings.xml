@@ -754,7 +754,7 @@
     <string name="backup_onb_initial_sync_body">A backup was found in this account. Select how to proceed.</string>
 
     <!-- Sync UI — Phase 5 -->
-    <string name="sync_on_save_label">Sync on save</string>
+    <string name="sync_on_save_label">Sync with each new change</string>
     <string name="sync_on_save_desc">Upload changes automatically after each drink or goal update</string>
     <string name="sync_pending_banner">Sync pending — will upload when connected</string>
     <string name="sync_linked_devices_title">Linked devices</string>
