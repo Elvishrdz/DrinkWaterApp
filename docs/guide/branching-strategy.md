@@ -2,6 +2,8 @@
 
 DrinkWaterApp follows a **Gitflow**-inspired workflow simplified for a solo/small-team Android project.
 
+Versioning: https://semver.org/
+
 ---
 
 ## Branch Types
