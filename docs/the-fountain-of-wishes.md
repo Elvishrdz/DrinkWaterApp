@@ -6,11 +6,8 @@
   that particular day. Once the day is over OR the last alarm of that day is completed this
   configuration is disposed. Use case: Im on holiday next week and I dont want reminders those days,
   OR i just want a midday reminder during my holidays.
-- Fix: Change goal is not updating the stats graph immediately
 - Goal reached: Polish existing celebrations
 - Goal reached: add more celebrations
-- En el gráfico siempre sale menos va periodo anterior si seguimos bebiendo. Lo mejor sería mostrar
-  algo más positivo. O cuando hicimos el mismo día la semana pasada. Esto para V2
 - Eliminar datos botón: mostrar acción disponible en 5 (counter) para no asustar a la gente que
   se borran cuando llegue a zero
 - al aceptar una nueva politica de privacidad, y si ya esta aprovado el tracking, no mostrar esta
@@ -96,7 +93,6 @@
 - [] delete all data button: update text to explain that the counter will enable the action to
   delete to the user, not that it will delete when reaching zero. dont scare users.
 - [] research: integration with MCP. how this can be usefull to our app and our services.
-- [] fix: change goal does not update graphic goal value realtime.
 
 ## Projects
 
