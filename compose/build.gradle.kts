@@ -8,7 +8,7 @@ plugins {
     id("drinkwater.android.room")
     id("drinkwater.detekt")
 
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.3.20"
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.4.21"
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
 }
@@ -72,7 +72,7 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.test.core)
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
@@ -96,7 +96,7 @@ dependencies {
     implementation(libs.kotlinx.datetime)
 
     // Kotlin Collections
-    implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.5.0-beta01")
+    implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.5.2")
 
     implementation(libs.picktime.compose)
 
